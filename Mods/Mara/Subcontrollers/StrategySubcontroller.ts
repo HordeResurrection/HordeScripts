@@ -2,7 +2,7 @@
 
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 import { eNext, enumerate } from "Mara/Utils/Common";
-import { UnitComposition, MaraUtils, AlmostDefeatCondition } from "Mara/Utils/MaraUtils";
+import { UnitComposition, MaraUtils, AlmostDefeatCondition, AllowedCompositionItem } from "Mara/Utils/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSquad } from "./Squads/MaraSquad";
 
@@ -67,8 +67,9 @@ export class StrategySubcontroller extends MaraSubcontroller {
             }
         );
         this.parentController.Debug(`Offensive Cfg IDs: ${offensiveCfgIds}`);
+        let allowedOffensiveCfgItems = MaraUtils.MakeAllowedCfgItems(offensiveCfgIds, new Map<string, number>(), this.parentController.Settlement);
 
-        let unitList = this.makeCombatUnitComposition(offensiveCfgIds, requiredOffensiveStrength);
+        let unitList = this.makeCombatUnitComposition(allowedOffensiveCfgItems, requiredOffensiveStrength);
         this.parentController.Debug(`Offensive unit composition:`);
         MaraUtils.PrintMap(unitList);
 
@@ -83,8 +84,9 @@ export class StrategySubcontroller extends MaraSubcontroller {
             }
         );
         this.parentController.Debug(`Defensive Cfg IDs: ${defensiveCfgIds}`);
-        
-        let defensiveUnitList = this.makeCombatUnitComposition(defensiveCfgIds, requiredDefensiveStrength);
+
+        let allowedDefensiveCfgItems = MaraUtils.MakeAllowedCfgItems(defensiveCfgIds, unitList, this.parentController.Settlement);
+        let defensiveUnitList = this.makeCombatUnitComposition(allowedDefensiveCfgItems, requiredDefensiveStrength);
         this.parentController.Debug(`Defensive unit composition:`);
         MaraUtils.PrintMap(defensiveUnitList);
 
@@ -244,21 +246,32 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return settlementStrength;
     }
 
-    private makeCombatUnitComposition(allowedConfigs: Array<string>, requiredStrength: any): UnitComposition {
+    private makeCombatUnitComposition(allowedConfigs: Array<AllowedCompositionItem>, requiredStrength: any): UnitComposition {
         let unitComposition: UnitComposition = new Map<string, number>();
 
         if (allowedConfigs.length == 0) {
+            this.parentController.Debug(`Unable to compose required strength: no allowed configs provided`);
             return unitComposition;
         }
 
         let currentStrength = 0;
 
         while (currentStrength < requiredStrength) {
+            if (allowedConfigs.length == 0) {
+                this.parentController.Debug(`Unable to compose required strength: unit limits reached`);
+                break;
+            }
+            
             let index = MaraUtils.Random(this.parentController.MasterMind, allowedConfigs.length - 1);
-            let configId = allowedConfigs[index];
+            let configItem = allowedConfigs[index];
 
-            MaraUtils.IncrementMapItem(unitComposition, configId);
-            currentStrength += MaraUtils.GetConfigStrength(MaraUtils.GetUnitConfig(configId));
+            if (configItem.MaxCount > 0) {
+                MaraUtils.IncrementMapItem(unitComposition, configItem.UnitConfig.Uid);
+                currentStrength += MaraUtils.GetConfigStrength(configItem.UnitConfig);
+                configItem.MaxCount--;
+
+                allowedConfigs = allowedConfigs.filter((value) => {return value.MaxCount > 0});
+            }
         }
 
         return unitComposition;

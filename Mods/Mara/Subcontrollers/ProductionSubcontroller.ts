@@ -25,14 +25,14 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         let mmProductionDepartament = this.parentController.MasterMind.ProductionDepartment;
         let orderedUnits: Array<string> = [];
 
-        for (let unitConfig of this.productionList) {
-            let freeProducer = this.getProducer(unitConfig);
+        for (let unitConfigId of this.productionList) {
+            let freeProducer = this.getProducer(unitConfigId);
             
             //!! most probably doesn't work as expected since producer is always free on this tick
             if (freeProducer) {
-                if (MaraUtils.RequestMasterMindProduction(unitConfig, mmProductionDepartament)) {
-                    this.parentController.Debug(`Added ${unitConfig} to the production list`);
-                    orderedUnits.push(unitConfig);
+                if (MaraUtils.RequestMasterMindProduction(unitConfigId, mmProductionDepartament)) {
+                    this.parentController.Debug(`Added ${unitConfigId} to the production list`);
+                    orderedUnits.push(unitConfigId);
                 }
             }
         }
