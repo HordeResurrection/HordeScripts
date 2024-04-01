@@ -375,18 +375,21 @@ export class MaraUtils {
     }
 
     private static issueCommand(unit: any, player: any, location: any, command: any, isReplaceMode: boolean = true) {
-        let mode = isReplaceMode ? AssignOrderMode.Replace : AssignOrderMode.Queue;
+        let virtualInput = MaraUtils.playersInput[player];
         
-        if (!(player in MaraUtils.playersInput)) {
-            MaraUtils.playersInput[player] = new PlayerVirtualInput(player);
+        if (!virtualInput) {
+            virtualInput = new PlayerVirtualInput(player);
+            MaraUtils.playersInput[player] = virtualInput;
         }
 
-        let virtualInput = MaraUtils.playersInput[player];
+        let mode = isReplaceMode ? AssignOrderMode.Replace : AssignOrderMode.Queue;
+
         virtualInput.selectUnitsById([unit.Id], VirtualSelectUnitsMode.Select);
         virtualInput.pointBasedCommand(createPoint(location.X, location.Y), command, mode);
         virtualInput.commit();
     }
-    static playersInput = {};
+
+    private static playersInput = {};
 
     static Random(masterMind: any, max: number, min: number = 0) {
         let rnd = masterMind.Randomizer;
