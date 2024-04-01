@@ -27,6 +27,7 @@ export function allExamples() {
 
     // - Примеры работы c данными игрока
     addExample(new Example_PlayerWorks());
+    addExample(new Example_PlayerSelectedSquad());
 
     // - Примеры работы с игровой логикой
     addExample(new Example_IterateBullets());  // В этом примере выполняется перечисление новых снарядов на сцене
@@ -107,4 +108,5 @@ import { Example_SettlementDiplomacy } from "examples/settlement-diplomacy";
 import { Example_SettlementProductionFactor } from "examples/settlement-production-factor";
 import { Example_ReplaceUnit } from "examples/unit-replace";
 import { Example_UnitCheckPath } from "examples/unit-path-example";
+import { Example_PlayerSelectedSquad } from "examples/player-selected-squad";
 
