@@ -44,17 +44,17 @@ export class StrategySubcontroller extends MaraSubcontroller {
             this.SelectEnemy();
         }
         
-        let requiredOffensiveStrength = this.calcSettlementStrength(this.currentEnemy, true);
+        let requiredOffensiveStrength = this.calcSettlementStrength(this.currentEnemy);
         requiredOffensiveStrength = 1.5 * requiredOffensiveStrength;
         requiredOffensiveStrength = Math.ceil(Math.max(requiredOffensiveStrength / 100, 1)) * 100;
         this.parentController.Debug(`Calculated required offensive strength: ${requiredOffensiveStrength}`);
 
-        let currentStrength = this.calcSettlementStrength(this.parentController.Settlement, false);
-        this.parentController.Debug(`Current offensive strength: ${currentStrength}`);
+        let currentOffensiveStrength = this.calcSettlementStrength(this.parentController.Settlement) - this.GetCurrentDefensiveStrength();
+        this.parentController.Debug(`Current offensive strength: ${currentOffensiveStrength}`);
 
-        requiredOffensiveStrength -= currentStrength;
-        requiredOffensiveStrength = Math.max(requiredOffensiveStrength, 0);
-        this.parentController.Debug(`Offensive strength to produce: ${requiredOffensiveStrength}`);
+        let ofensiveStrengthToProduce = requiredOffensiveStrength - currentOffensiveStrength;
+        ofensiveStrengthToProduce = Math.max(ofensiveStrengthToProduce, 0);
+        this.parentController.Debug(`Offensive strength to produce: ${ofensiveStrengthToProduce}`);
 
         let produceableCfgIds = this.parentController.ProductionController.GetProduceableCfgIds();
         
@@ -69,12 +69,14 @@ export class StrategySubcontroller extends MaraSubcontroller {
         this.parentController.Debug(`Offensive Cfg IDs: ${offensiveCfgIds}`);
         let allowedOffensiveCfgItems = MaraUtils.MakeAllowedCfgItems(offensiveCfgIds, new Map<string, number>(), this.parentController.Settlement);
 
-        let unitList = this.makeCombatUnitComposition(allowedOffensiveCfgItems, requiredOffensiveStrength);
+        let unitList = this.makeCombatUnitComposition(allowedOffensiveCfgItems, ofensiveStrengthToProduce);
         this.parentController.Debug(`Offensive unit composition:`);
         MaraUtils.PrintMap(unitList);
 
         let requiredDefensiveStrength = 0.15 * requiredOffensiveStrength; //add a bit more for defense purposes
-        this.parentController.Debug(`Calculated required defensive strength: ${requiredDefensiveStrength}`);
+        let currentDefensiveStrength = this.GetCurrentDefensiveStrength();
+        let defensiveStrengthToProduce = Math.max(requiredDefensiveStrength - currentDefensiveStrength, 0);
+        this.parentController.Debug(`Calculated required defensive strength: ${defensiveStrengthToProduce}`);
         
         let defensiveCfgIds = produceableCfgIds.filter(
             (value, index, array) => {
@@ -86,7 +88,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         this.parentController.Debug(`Defensive Cfg IDs: ${defensiveCfgIds}`);
 
         let allowedDefensiveCfgItems = MaraUtils.MakeAllowedCfgItems(defensiveCfgIds, unitList, this.parentController.Settlement);
-        let defensiveUnitList = this.makeCombatUnitComposition(allowedDefensiveCfgItems, requiredDefensiveStrength);
+        let defensiveUnitList = this.makeCombatUnitComposition(allowedDefensiveCfgItems, defensiveStrengthToProduce);
         this.parentController.Debug(`Defensive unit composition:`);
         MaraUtils.PrintMap(defensiveUnitList);
 
@@ -226,21 +228,35 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return MaraUtils.GetSettlementUnitsInArea(cell, radius, this.EnemySettlements);
     }
 
+    GetCurrentDefensiveStrength(): number {
+        let units = enumerate(this.parentController.Settlement.Units);
+        let unit;
+        let defensiveStrength = 0;
+        
+        while ((unit = eNext(units)) !== undefined) {
+            if (MaraUtils.IsCombatConfig(unit.Cfg) && unit.IsAlive) {
+                if (MaraUtils.IsBuildingConfig(unit.Cfg.Uid)) {
+                    defensiveStrength += MaraUtils.GetUnitStrength(unit);
+                }
+            }
+        }
+
+        return defensiveStrength;
+    }
+
     private buildEnemyList(): void {
         let diplomacy = this.parentController.Settlement.Diplomacy;
         let settlements = MaraUtils.GetAllSettlements();
         this.EnemySettlements = settlements.filter((value) => {return diplomacy.IsWarStatus(value)})
     }
 
-    private calcSettlementStrength(settlement: any, includeBuildings: boolean): number {
+    private calcSettlementStrength(settlement: any): number {
         let units = enumerate(settlement.Units);
         let unit;
         let settlementStrength = 0;
         
         while ((unit = eNext(units)) !== undefined) {
-            if (unit.Cfg.BuildingConfig == null || includeBuildings) {
-                settlementStrength += MaraUtils.GetUnitStrength(unit);
-            }
+            settlementStrength += MaraUtils.GetUnitStrength(unit);
         }
 
         return settlementStrength;

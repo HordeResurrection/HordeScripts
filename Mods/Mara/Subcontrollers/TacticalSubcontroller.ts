@@ -147,7 +147,9 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         
         while ((unit = eNext(units)) !== undefined) {
             if (this.isCombatUnit(unit) && unit.IsAlive) {
-                combatUnits.push(unit);
+                if (!this.isBuilding(unit)) {
+                    combatUnits.push(unit);
+                }
             }
         }
 
@@ -155,10 +157,11 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             return;
         }
 
-        let requiredDefensiveStrength = 0.15 * this.calcTotalUnitsStrength(combatUnits);
+        let defensiveStrength = this.parentController.StrategyController.GetCurrentDefensiveStrength();
+
+        let requiredDefensiveStrength = 0.15 * (this.calcTotalUnitsStrength(combatUnits) + defensiveStrength);
         let unitIndex = 0;
         let defensiveUnits: any[] = [];
-        let defensiveStrength = 0;
         
         for (unitIndex = 0; unitIndex < combatUnits.length; unitIndex++) {
             if (defensiveStrength >= requiredDefensiveStrength) {
