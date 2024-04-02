@@ -1,4 +1,4 @@
-import { UnitComposition } from "Mara/Utils/MaraUtils";
+import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 import { ProductionState } from "./ProductionState";
 import { ExterminatingState } from "./ExterminatingState";
 
@@ -15,7 +15,10 @@ export class BuildingUpState extends ProductionState {
 
         if (enemy) {
             this.settlementController.Debug(`Proceeding to build-up against '${enemy.TownName}'.`);
-            return this.settlementController.StrategyController.GetArmyComposition();
+            let currentEconomy = this.settlementController.GetCurrentDevelopedEconomyComposition();
+            let armyToProduce = this.settlementController.StrategyController.GetArmyComposition();
+            
+            return MaraUtils.AddCompositionLists(currentEconomy, armyToProduce);
         }
         else {
             return new Map<string, number>();
