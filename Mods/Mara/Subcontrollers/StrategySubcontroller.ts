@@ -266,9 +266,15 @@ export class StrategySubcontroller extends MaraSubcontroller {
             let configItem = allowedConfigs[index];
 
             if (configItem.MaxCount > 0) {
-                MaraUtils.IncrementMapItem(unitComposition, configItem.UnitConfig.Uid);
-                currentStrength += MaraUtils.GetConfigStrength(configItem.UnitConfig);
-                configItem.MaxCount--;
+                let leftStrength = requiredStrength - currentStrength;
+                let unitStrength = MaraUtils.GetConfigStrength(configItem.UnitConfig);
+                let maxUnitCount = Math.min(Math.round(leftStrength / unitStrength), configItem.MaxCount);
+
+                let unitCount = Math.max(Math.round(maxUnitCount / 2), 1);
+                
+                MaraUtils.AddToMapItem(unitComposition, configItem.UnitConfig.Uid, unitCount);
+                configItem.MaxCount -= unitCount;
+                currentStrength += unitCount * unitStrength;
 
                 allowedConfigs = allowedConfigs.filter((value) => {return value.MaxCount > 0});
             }
