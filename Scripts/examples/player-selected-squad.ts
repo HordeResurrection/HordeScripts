@@ -29,11 +29,18 @@ export class Example_PlayerSelectedSquad extends HordeExampleBase {
         let squadUISelector = ScriptUtils.GetValue(this.workPlayer, "SquadUISelector");
         this.globalStorage.squadChangedHandler = squadUISelector.SquadChanged.connect((sender, args) => {
             try {
+                if (!args.WithSound) {
+                    // Пропускаем согласование UI и Virtual отрядов
+                    // В некоторых случаях это может иметь последствия, но для этого примера не критично. Максимум - будет выдана информация не потому отряду, что выделен
+                    return;
+                }
                 this.processNewSquad(args.NewSquad);
             } catch (exc) {
                 this.log.exception(exc);
             }
         });
+
+        this.log.info("Установлен обработчик на событие выделения отряда");
     }
 
     private processNewSquad(squad) {
@@ -57,7 +64,7 @@ export class Example_PlayerSelectedSquad extends HordeExampleBase {
         
         var needCancel = ScriptUtils.GetValue(u.OrdersMind, "NeedCancelActiveOrder");
         var activeOrder = u.OrdersMind.ActiveOrder;
-        this.log.info(prefix + '- Current:', activeOrder.ToString(), '| IsInstinct:', activeOrder.IsInstinct, '| NeedCancel:', needCancel);
+        this.log.info(prefix + '- Current:', activeOrder.ToString(), '| IsInstinct:', activeOrder.IsInstinct, '| Allow notifications:', activeOrder.CanBeCanceledByNotification, '| NeedCancel:', needCancel);
         this.log.info(prefix + '-   ', u.OrdersMind.ActiveAct);
         this.log.info(prefix + '-   ', u.OrdersMind.ActiveMotion);
         
