@@ -157,9 +157,10 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             return;
         }
 
+        let ratio = this.parentController.AttackToDefenseUnitRatio ?? 0.9;
         let defensiveStrength = this.parentController.StrategyController.GetCurrentDefensiveStrength();
 
-        let requiredDefensiveStrength = 0.15 * (this.calcTotalUnitsStrength(combatUnits) + defensiveStrength);
+        let requiredDefensiveStrength = (1 - ratio) * (this.calcTotalUnitsStrength(combatUnits) + defensiveStrength);
         let unitIndex = 0;
         let defensiveUnits: any[] = [];
         

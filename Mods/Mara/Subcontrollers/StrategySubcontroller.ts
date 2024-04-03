@@ -43,10 +43,14 @@ export class StrategySubcontroller extends MaraSubcontroller {
         if (!this.currentEnemy) {
             this.SelectEnemy();
         }
+
+        let ratio = this.selectAttackToDefenseRatio();
+        this.parentController.AttackToDefenseUnitRatio = ratio;
+        this.parentController.Debug(`Calculated attack to defense ratio: ${ratio}`);
         
-        let requiredOffensiveStrength = this.calcSettlementStrength(this.currentEnemy);
-        requiredOffensiveStrength = 1.5 * requiredOffensiveStrength;
-        requiredOffensiveStrength = Math.ceil(Math.max(requiredOffensiveStrength / 100, 1)) * 100;
+        let requiredStrength = 1.5 * Math.max(this.calcSettlementStrength(this.currentEnemy), 100);
+
+        let requiredOffensiveStrength = ratio * requiredStrength;
         this.parentController.Debug(`Calculated required offensive strength: ${requiredOffensiveStrength}`);
 
         let currentOffensiveStrength = this.calcSettlementStrength(this.parentController.Settlement) - this.GetCurrentDefensiveStrength();
@@ -73,7 +77,9 @@ export class StrategySubcontroller extends MaraSubcontroller {
         this.parentController.Debug(`Offensive unit composition:`);
         MaraUtils.PrintMap(unitList);
 
-        let requiredDefensiveStrength = 0.15 * requiredOffensiveStrength; //add a bit more for defense purposes
+        
+
+        let requiredDefensiveStrength = (1 - ratio) * requiredStrength;
         let currentDefensiveStrength = this.GetCurrentDefensiveStrength();
         let defensiveStrengthToProduce = Math.max(requiredDefensiveStrength - currentDefensiveStrength, 0);
         this.parentController.Debug(`Calculated required defensive strength: ${defensiveStrengthToProduce}`);
@@ -297,5 +303,22 @@ export class StrategySubcontroller extends MaraSubcontroller {
         }
 
         return unitComposition;
+    }
+
+    private selectAttackToDefenseRatio(): number {
+        let choise = MaraUtils.Random(this.parentController.MasterMind, 3);
+
+        switch (choise) {
+            case 0:
+                return 1;
+            case 1:
+                return 0.75;
+            case 2: 
+                return 0.5;
+            case 3:
+                return 0.25;
+            default:
+                return 0;
+        }
     }
 }
