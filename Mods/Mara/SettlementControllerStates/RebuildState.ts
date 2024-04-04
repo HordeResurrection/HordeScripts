@@ -13,7 +13,7 @@ export class RebuildState extends ProductionState {
 
                 if (
                     config.BuildingConfig != null ||
-                    MaraUtils.IsProducerConfig(key)
+                    MaraUtils.IsProducerConfig(config)
                 ) {
                     unitsComposition.set(key, value);
                 }

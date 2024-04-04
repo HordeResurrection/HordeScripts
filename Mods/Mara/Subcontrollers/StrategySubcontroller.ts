@@ -2,7 +2,7 @@
 
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 import { eNext, enumerate } from "Mara/Utils/Common";
-import { UnitComposition, MaraUtils, AlmostDefeatCondition } from "Mara/Utils/MaraUtils";
+import { UnitComposition, MaraUtils, AlmostDefeatCondition, AllowedCompositionItem } from "Mara/Utils/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSquad } from "./Squads/MaraSquad";
 
@@ -43,18 +43,22 @@ export class StrategySubcontroller extends MaraSubcontroller {
         if (!this.currentEnemy) {
             this.SelectEnemy();
         }
+
+        let ratio = this.selectAttackToDefenseRatio();
+        this.parentController.AttackToDefenseUnitRatio = ratio;
+        this.parentController.Debug(`Calculated attack to defense ratio: ${ratio}`);
         
-        let requiredOffensiveStrength = this.calcSettlementStrength(this.currentEnemy, true);
-        requiredOffensiveStrength = 1.5 * requiredOffensiveStrength;
-        requiredOffensiveStrength = Math.ceil(Math.max(requiredOffensiveStrength / 100, 1)) * 100;
+        let requiredStrength = 1.5 * Math.max(this.calcSettlementStrength(this.currentEnemy), 100);
+
+        let requiredOffensiveStrength = ratio * requiredStrength;
         this.parentController.Debug(`Calculated required offensive strength: ${requiredOffensiveStrength}`);
 
-        let currentStrength = this.calcSettlementStrength(this.parentController.Settlement, false);
-        this.parentController.Debug(`Current offensive strength: ${currentStrength}`);
+        let currentOffensiveStrength = this.calcSettlementStrength(this.parentController.Settlement) - this.GetCurrentDefensiveStrength();
+        this.parentController.Debug(`Current offensive strength: ${currentOffensiveStrength}`);
 
-        requiredOffensiveStrength -= currentStrength;
-        requiredOffensiveStrength = Math.max(requiredOffensiveStrength, 0);
-        this.parentController.Debug(`Offensive strength to produce: ${requiredOffensiveStrength}`);
+        let ofensiveStrengthToProduce = requiredOffensiveStrength - currentOffensiveStrength;
+        ofensiveStrengthToProduce = Math.max(ofensiveStrengthToProduce, 0);
+        this.parentController.Debug(`Offensive strength to produce: ${ofensiveStrengthToProduce}`);
 
         let produceableCfgIds = this.parentController.ProductionController.GetProduceableCfgIds();
         
@@ -67,13 +71,18 @@ export class StrategySubcontroller extends MaraSubcontroller {
             }
         );
         this.parentController.Debug(`Offensive Cfg IDs: ${offensiveCfgIds}`);
+        let allowedOffensiveCfgItems = MaraUtils.MakeAllowedCfgItems(offensiveCfgIds, new Map<string, number>(), this.parentController.Settlement);
 
-        let unitList = this.makeCombatUnitComposition(offensiveCfgIds, requiredOffensiveStrength);
+        let unitList = this.makeCombatUnitComposition(allowedOffensiveCfgItems, ofensiveStrengthToProduce);
         this.parentController.Debug(`Offensive unit composition:`);
         MaraUtils.PrintMap(unitList);
 
-        let requiredDefensiveStrength = 0.15 * requiredOffensiveStrength; //add a bit more for defense purposes
-        this.parentController.Debug(`Calculated required defensive strength: ${requiredDefensiveStrength}`);
+        
+
+        let requiredDefensiveStrength = (1 - ratio) * requiredStrength;
+        let currentDefensiveStrength = this.GetCurrentDefensiveStrength();
+        let defensiveStrengthToProduce = Math.max(requiredDefensiveStrength - currentDefensiveStrength, 0);
+        this.parentController.Debug(`Calculated required defensive strength: ${defensiveStrengthToProduce}`);
         
         let defensiveCfgIds = produceableCfgIds.filter(
             (value, index, array) => {
@@ -83,8 +92,9 @@ export class StrategySubcontroller extends MaraSubcontroller {
             }
         );
         this.parentController.Debug(`Defensive Cfg IDs: ${defensiveCfgIds}`);
-        
-        let defensiveUnitList = this.makeCombatUnitComposition(defensiveCfgIds, requiredDefensiveStrength);
+
+        let allowedDefensiveCfgItems = MaraUtils.MakeAllowedCfgItems(defensiveCfgIds, unitList, this.parentController.Settlement);
+        let defensiveUnitList = this.makeCombatUnitComposition(allowedDefensiveCfgItems, defensiveStrengthToProduce);
         this.parentController.Debug(`Defensive unit composition:`);
         MaraUtils.PrintMap(defensiveUnitList);
 
@@ -224,43 +234,91 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return MaraUtils.GetSettlementUnitsInArea(cell, radius, this.EnemySettlements);
     }
 
+    GetCurrentDefensiveStrength(): number {
+        let units = enumerate(this.parentController.Settlement.Units);
+        let unit;
+        let defensiveStrength = 0;
+        
+        while ((unit = eNext(units)) !== undefined) {
+            if (MaraUtils.IsCombatConfig(unit.Cfg) && unit.IsAlive) {
+                if (MaraUtils.IsBuildingConfig(unit.Cfg.Uid)) {
+                    defensiveStrength += MaraUtils.GetUnitStrength(unit);
+                }
+            }
+        }
+
+        return defensiveStrength;
+    }
+
     private buildEnemyList(): void {
         let diplomacy = this.parentController.Settlement.Diplomacy;
         let settlements = MaraUtils.GetAllSettlements();
         this.EnemySettlements = settlements.filter((value) => {return diplomacy.IsWarStatus(value)})
     }
 
-    private calcSettlementStrength(settlement: any, includeBuildings: boolean): number {
+    private calcSettlementStrength(settlement: any): number {
         let units = enumerate(settlement.Units);
         let unit;
         let settlementStrength = 0;
         
         while ((unit = eNext(units)) !== undefined) {
-            if (unit.Cfg.BuildingConfig == null || includeBuildings) {
-                settlementStrength += MaraUtils.GetUnitStrength(unit);
-            }
+            settlementStrength += MaraUtils.GetUnitStrength(unit);
         }
 
         return settlementStrength;
     }
 
-    private makeCombatUnitComposition(allowedConfigs: Array<string>, requiredStrength: any): UnitComposition {
+    private makeCombatUnitComposition(allowedConfigs: Array<AllowedCompositionItem>, requiredStrength: any): UnitComposition {
         let unitComposition: UnitComposition = new Map<string, number>();
 
         if (allowedConfigs.length == 0) {
+            this.parentController.Debug(`Unable to compose required strength: no allowed configs provided`);
             return unitComposition;
         }
 
         let currentStrength = 0;
 
         while (currentStrength < requiredStrength) {
+            if (allowedConfigs.length == 0) {
+                this.parentController.Debug(`Unable to compose required strength: unit limits reached`);
+                break;
+            }
+            
             let index = MaraUtils.Random(this.parentController.MasterMind, allowedConfigs.length - 1);
-            let configId = allowedConfigs[index];
+            let configItem = allowedConfigs[index];
 
-            MaraUtils.IncrementMapItem(unitComposition, configId);
-            currentStrength += MaraUtils.GetConfigStrength(MaraUtils.GetUnitConfig(configId));
+            if (configItem.MaxCount > 0) {
+                let leftStrength = requiredStrength - currentStrength;
+                let unitStrength = MaraUtils.GetConfigStrength(configItem.UnitConfig);
+                let maxUnitCount = Math.min(Math.round(leftStrength / unitStrength), configItem.MaxCount);
+
+                let unitCount = Math.max(Math.round(maxUnitCount / 2), 1);
+                
+                MaraUtils.AddToMapItem(unitComposition, configItem.UnitConfig.Uid, unitCount);
+                configItem.MaxCount -= unitCount;
+                currentStrength += unitCount * unitStrength;
+
+                allowedConfigs = allowedConfigs.filter((value) => {return value.MaxCount > 0});
+            }
         }
 
         return unitComposition;
+    }
+
+    private selectAttackToDefenseRatio(): number {
+        let choise = MaraUtils.Random(this.parentController.MasterMind, 3);
+
+        switch (choise) {
+            case 0:
+                return 1;
+            case 1:
+                return 0.75;
+            case 2: 
+                return 0.5;
+            case 3:
+                return 0.25;
+            default:
+                return 0;
+        }
     }
 }

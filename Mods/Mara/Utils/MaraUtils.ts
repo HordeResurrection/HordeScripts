@@ -89,6 +89,16 @@ export class MaraProfiler {
     }
 }
 
+export class AllowedCompositionItem {
+    UnitConfig: any;
+    MaxCount: number;
+
+    constructor(cfg: any, maxCount: number) {
+        this.UnitConfig = cfg;
+        this.MaxCount = maxCount;
+    }
+}
+
 const TileType = HCL.HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType;
 const AlmostDefeatCondition = HCL.HordeClassLibrary.World.Settlements.Existence.AlmostDefeatCondition;
 
@@ -96,6 +106,24 @@ export type UnitComposition = Map<string, number>;
 export { AlmostDefeatCondition }
 
 export class MaraUtils {
+    static MakeAllowedCfgItems(cfgIds: string[], currentComposition: UnitComposition, settlement: any): AllowedCompositionItem[] {
+        let allowedCfgItems = new Array<AllowedCompositionItem>();
+        
+        for (let cfgId of cfgIds) {
+            let cfg = MaraUtils.GetUnitConfig(cfgId);
+            
+            let currentUnitCount = currentComposition.get(cfgId) ?? 0;
+            let unitCountLimit = settlement.RulesOverseer.GetCurrentLimitForUnit(cfg) ?? Infinity;
+            let maxUnitCount = Math.max(unitCountLimit - currentUnitCount, 0);
+
+            if (maxUnitCount > 0) {
+                allowedCfgItems.push(new AllowedCompositionItem(cfg, maxUnitCount));
+            }
+        }
+
+        return allowedCfgItems;
+    }
+    
     static GetSettlementsSquadsFromUnits(
         units: Array<any>, 
         settlements: Array<any>,
@@ -268,6 +296,27 @@ export class MaraUtils {
         }
     }
 
+    static AddCompositionLists(
+        list1: UnitComposition, 
+        list2: UnitComposition
+    ): UnitComposition {
+        let newList = new Map<string, number>();
+        
+        list1.forEach(
+            (value, key, map) => {
+                MaraUtils.AddToMapItem(newList, key, value);
+            }
+        );
+
+        list2.forEach(
+            (value, key, map) => {
+                MaraUtils.AddToMapItem(newList, key, value);
+            }
+        );
+
+        return newList;
+    }
+
     static SubstractCompositionLists(
         minuend: UnitComposition, 
         subtrahend: UnitComposition
@@ -375,18 +424,21 @@ export class MaraUtils {
     }
 
     private static issueCommand(unit: any, player: any, location: any, command: any, isReplaceMode: boolean = true) {
-        let mode = isReplaceMode ? AssignOrderMode.Replace : AssignOrderMode.Queue;
+        let virtualInput = MaraUtils.playersInput[player];
         
-        if (!(player in MaraUtils.playersInput)) {
-            MaraUtils.playersInput[player] = new PlayerVirtualInput(player);
+        if (!virtualInput) {
+            virtualInput = new PlayerVirtualInput(player);
+            MaraUtils.playersInput[player] = virtualInput;
         }
 
-        let virtualInput = MaraUtils.playersInput[player];
+        let mode = isReplaceMode ? AssignOrderMode.Replace : AssignOrderMode.Queue;
+
         virtualInput.selectUnitsById([unit.Id], VirtualSelectUnitsMode.Select);
         virtualInput.pointBasedCommand(createPoint(location.X, location.Y), command, mode);
         virtualInput.commit();
     }
-    static playersInput = {};
+
+    private static playersInput = {};
 
     static Random(masterMind: any, max: number, min: number = 0) {
         let rnd = masterMind.Randomizer;
@@ -498,13 +550,11 @@ export class MaraUtils {
         return mainArmament != null && !isHarvester;
     }
 
-    static IsProducerConfig(cfgId: string): boolean {
-        let cfg = MaraUtils.GetUnitConfig(cfgId);
-        
+    static IsProducerConfig(cfg: any): boolean {
         return MaraUtils.ConfigHasProfession(cfg, UnitProfession.UnitProducer);
     }
 
-    static IsTechConfig(cfgId: string): boolean {
+    static IsTechConfig(cfg: any): boolean {
         let unitConfigs = enumerate(AllContent.UnitConfigs.Configs);
         let kv;
         
@@ -515,7 +565,7 @@ export class MaraUtils {
             let requirementConfig;
 
             while ((requirementConfig = eNext(productionRequirements)) !== undefined) {
-                if (requirementConfig.Uid == cfgId) {
+                if (requirementConfig.Uid == cfg.Uid) {
                     return true;
                 }
             }

@@ -19,11 +19,16 @@ export class DevelopingState extends ProductionState {
                 continue;
             }
 
-            if (MaraUtils.IsProducerConfig(cfgId)) {
-                absentProducers.push(cfgId);
-            }
-            else if (MaraUtils.IsTechConfig(cfgId)) {
-                absentTech.push(cfgId);
+            let config = MaraUtils.GetUnitConfig(cfgId);
+            let unitLimit = this.settlementController.Settlement.RulesOverseer.GetCurrentLimitForUnit(config) ?? Infinity;
+
+            if (unitLimit > 0) {
+                if (MaraUtils.IsProducerConfig(config)) {
+                    absentProducers.push(cfgId);
+                }
+                else if (MaraUtils.IsTechConfig(config)) {
+                    absentTech.push(cfgId);
+                }
             }
         }
 

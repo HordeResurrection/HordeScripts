@@ -41,6 +41,7 @@ export class MaraSettlementController {
     
     public HostileAttackingSquads: Array<MaraSquad> = [];
     public TargetUnitsComposition: UnitComposition | null = null;
+    public AttackToDefenseUnitRatio: number | null = null;
     
     private subcontrollers: Array<MaraSubcontroller> = [];
     private state: MaraSettlementControllerState;
