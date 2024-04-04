@@ -1,9 +1,10 @@
 import { MaraUtils } from "Mara/Utils/MaraUtils";
-import { MaraSquad } from "../MaraSquad";
+import { MaraSquad, MaraSquadLocation } from "../MaraSquad";
 import { MaraSquadAttackState } from "./MaraSquadAttackState";
 import { MaraSquadMoveState } from "./MaraSquadMoveState";
 import { ENEMY_SEARCH_RADIUS, MaraSquadState } from "./MaraSquadState";
 import { TileType } from "library/game-logic/horde-types";
+import { MaraSquadPullbackState } from "./MaraSquadPullbackState";
 
 abstract class MaraCellDataHolder {
     protected data: any;
@@ -84,9 +85,14 @@ export class MaraSquadBattleState extends MaraSquadState {
     private threatMap: MaraThreatMap;
     private cellHeuristics: MaraCellHeuristics;
     private reservedCells: MaraReservedCellData;
+
+    private initialLocation: MaraSquadLocation;
+    private lastNonKitedTick: number;
+    private readonly KITE_TIMEOUT = 4 * 50; // 4 sec
     
     OnEntry(): void {
         this.updateThreats();
+        this.initialLocation = this.squad.GetLocation();
     }
     
     OnExit(): void {}
@@ -97,9 +103,19 @@ export class MaraSquadBattleState extends MaraSquadState {
             return;
         }
 
+        if (tickNumber % 10 == 0) {
+            if (this.isAtLeastOneUnitAttacking()) {
+                this.lastNonKitedTick = tickNumber;
+            }
+            else if (tickNumber - this.lastNonKitedTick >= this.KITE_TIMEOUT) {
+                this.squad.SetState(new MaraSquadPullbackState(this.squad, this.initialLocation.Point));
+                return;
+            }
+        }
+
         if (tickNumber % 50 == 0) {
             this.updateThreats();
-
+            
             if (this.enemyUnits.length == 0) {
                 this.squad.Attack(this.squad.CurrentTargetCell);
                 this.squad.SetState(new MaraSquadAttackState(this.squad));
@@ -111,6 +127,16 @@ export class MaraSquadBattleState extends MaraSquadState {
             //this.distributeTargets_lite();
             this.distributeTargets_liter();
         }
+    }
+
+    private isAtLeastOneUnitAttacking(): boolean {
+        for (let unit of this.squad.Units) {
+            if (MaraUtils.GetUnitTarget(unit) != null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private updateThreats(): void {
