@@ -77,8 +77,6 @@ export class StrategySubcontroller extends MaraSubcontroller {
         this.parentController.Debug(`Offensive unit composition:`);
         MaraUtils.PrintMap(unitList);
 
-        
-
         let requiredDefensiveStrength = (1 - ratio) * requiredStrength;
         let currentDefensiveStrength = this.GetCurrentDefensiveStrength();
         let defensiveStrengthToProduce = Math.max(requiredDefensiveStrength - currentDefensiveStrength, 0);
