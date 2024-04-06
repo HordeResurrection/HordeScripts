@@ -3,6 +3,7 @@ import { eNext, enumerate } from "Mara/Utils/Common";
 import { MaraUtils } from "Mara/Utils/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraControllableSquad } from "./Squads/MaraControllableSquad";
+import { TileType } from "library/game-logic/horde-types";
 
 export class TacticalSubcontroller extends MaraSubcontroller {
     private readonly SQUAD_COMBATIVITY_THRESHOLD = 0.25;
@@ -334,6 +335,54 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     private createSquadsFromUnits(units: Array<any>): Array<MaraControllableSquad> {
+        let unitClusters = this.clusterizeUnits(units);
+        let result: Array<MaraControllableSquad> = [];
+
+        for (let cluster of unitClusters) {
+            let squads = this.createSquadsFromHomogeneousUnits(cluster);
+            result.push(...squads);
+        }
+        
+        return result;
+    }
+
+    private clusterizeUnits(units: Array<any>): Array<Array<any>> {
+        let clusters = new Map<string, Array<any>>();
+
+        for (let unit of units) {
+            let moveType = unit.Cfg.MoveType.ToString();
+
+            let unitSpeed = unit.Cfg.Speeds.Item(TileType.Grass);
+            let speedGroupCode = "";
+
+            if (unitSpeed <= 9) {
+                speedGroupCode = "1";
+            }
+            else if (unitSpeed <= 14) {
+                speedGroupCode = "2";
+            }
+            else {
+                speedGroupCode = "3";
+            }
+
+            let clusterKey = `${moveType}:${speedGroupCode}`;
+            let cluster: Array<any>;
+            
+            if (clusters.has(clusterKey)) {
+                cluster = clusters.get(clusterKey)!;
+            }
+            else {
+                cluster = new Array<any>();
+            }
+
+            cluster.push(unit);
+            clusters.set(clusterKey, cluster);
+        }
+        
+        return Array.from(clusters.values());
+    }
+
+    private createSquadsFromHomogeneousUnits(units: Array<any>): Array<MaraControllableSquad> {
         let squadUnits: any[] = [];
         let squads: Array<MaraControllableSquad> = [];
         let currentSquadStrength = 0;
