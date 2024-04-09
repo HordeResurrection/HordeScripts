@@ -580,6 +580,10 @@ export class MaraUtils {
         return cfg.BuildingConfig != null && cfg.HasNotFlags(UnitFlags.Passive);
     }
 
+    static IsMineConfig(unitConfig: any):boolean {
+        return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Mine);
+    }
+
     static GetUnitStrength(unit: any): number {
         if (this.IsCombatConfig(unit.Cfg) && unit.IsAlive) {
             return Math.max(unit.Health, 0);

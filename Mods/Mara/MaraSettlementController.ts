@@ -5,7 +5,6 @@
 
 import { Mara, MaraLogLevel } from "./Mara";
 import { DefendingState } from "./SettlementControllerStates/DefendingState";
-//import { RebuildState } from "./SettlementControllerStates/RebuildState";
 import { DevelopingState } from "./SettlementControllerStates/DevelopingState";
 import { MaraSettlementControllerState } from "./SettlementControllerStates/MaraSettlementControllerState";
 import { MiningSubcontroller } from "./Subcontrollers/MiningSubontroller";
@@ -145,7 +144,9 @@ export class MaraSettlementController {
             let unit;
             
             while ((unit = eNext(units)) !== undefined) {
-                MaraUtils.IncrementMapItem(this.currentUnitComposition, unit.Cfg.Uid);
+                if (!MaraUtils.IsMineConfig(unit.Cfg)) {
+                    MaraUtils.IncrementMapItem(this.currentUnitComposition, unit.Cfg.Uid);
+                }
             }
         }
 
@@ -160,7 +161,7 @@ export class MaraSettlementController {
             let unit;
             
             while ((unit = eNext(units)) !== undefined) {
-                if (unit.EffectsMind.BuildingInProgress || unit.IsNearDeath) {
+                if (unit.EffectsMind.BuildingInProgress || MaraUtils.IsMineConfig(unit.Cfg) || unit.IsNearDeath) {
                     continue;
                 }
                 
