@@ -18,9 +18,7 @@ export abstract class MaraSquadGatheringUpState extends MaraSquadState {
             }
 
             if (closestToTargetUnit) {
-                for (let unit of this.squad.Units) {
-                    MaraUtils.IssueMoveCommand(unit, this.squad.Controller.Player, closestToTargetUnit.Cell);
-                }
+                MaraUtils.IssueMoveCommand(this.squad.Units, this.squad.Controller.Player, closestToTargetUnit.Cell);
             }
         }
     }

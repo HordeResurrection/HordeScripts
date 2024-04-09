@@ -53,7 +53,7 @@ export class MaraSquadIdleState extends MaraSquadState {
                 unitsToDistribute.push(unit);
             }
             else {
-                MaraUtils.IssueMoveCommand(unit, this.squad.Controller.Player, unit.Cell);
+                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, unit.Cell);
             }
         }
 
@@ -67,10 +67,10 @@ export class MaraSquadIdleState extends MaraSquadState {
 
         for (let unit of unitsToDistribute) {
             if (cellIndex >= forestCells.length) {
-                MaraUtils.IssueMoveCommand(unit, this.squad.Controller.Player, this.squad.CurrentTargetCell);
+                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, this.squad.CurrentTargetCell);
             }
             else {
-                MaraUtils.IssueMoveCommand(unit, this.squad.Controller.Player, forestCells[cellIndex]);
+                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, forestCells[cellIndex]);
                 cellIndex++;
             }
         }

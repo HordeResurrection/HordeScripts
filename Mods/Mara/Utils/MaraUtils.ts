@@ -415,15 +415,15 @@ export class MaraUtils {
         return null;
     }
 
-    static IssueAttackCommand(unit: any, player: any, location: any, isReplaceMode: boolean = true) {
-        MaraUtils.issueCommand(unit, player, location, UnitCommand.Attack, isReplaceMode);
+    static IssueAttackCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true) {
+        MaraUtils.issueCommand(units, player, location, UnitCommand.Attack, isReplaceMode);
     }
 
-    static IssueMoveCommand(unit: any, player: any, location: any, isReplaceMode: boolean = true) {
-        MaraUtils.issueCommand(unit, player, location, UnitCommand.MoveToPoint, isReplaceMode);
+    static IssueMoveCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true) {
+        MaraUtils.issueCommand(units, player, location, UnitCommand.MoveToPoint, isReplaceMode);
     }
 
-    private static issueCommand(unit: any, player: any, location: any, command: any, isReplaceMode: boolean = true) {
+    private static issueCommand(units: Array<any>, player: any, location: any, command: any, isReplaceMode: boolean = true) {
         let virtualInput = MaraUtils.playersInput[player];
         
         if (!virtualInput) {
@@ -433,7 +433,7 @@ export class MaraUtils {
 
         let mode = isReplaceMode ? AssignOrderMode.Replace : AssignOrderMode.Queue;
 
-        virtualInput.selectUnitsById([unit.Id], VirtualSelectUnitsMode.Select);
+        virtualInput.selectUnitsById(units.map((unit) => unit.Id), VirtualSelectUnitsMode.Select);
         virtualInput.pointBasedCommand(createPoint(location.X, location.Y), command, mode);
         virtualInput.commit();
     }

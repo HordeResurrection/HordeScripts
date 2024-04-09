@@ -272,24 +272,24 @@ export class MaraSquadBattleState extends MaraSquadState {
                 
                 if (optimalTargetData.heuristic < Infinity) {
                     if (MaraUtils.ChebyshevDistance(unit.Cell, optimalTargetData.cell) > 0) {
-                        MaraUtils.IssueMoveCommand(unit, this.squad.Controller.Player, optimalTargetData.cell);
-                        MaraUtils.IssueAttackCommand(unit, this.squad.Controller.Player, attackCell, false);
+                        MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, optimalTargetData.cell);
+                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell, false);
                         this.reservedCells.Set(optimalTargetData.cell, true);
                     }
                     else {
-                        MaraUtils.IssueAttackCommand(unit, this.squad.Controller.Player, attackCell);
+                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell);
                     }
                 }
                 else {
                     let nearestFreeCell = MaraUtils.FindFreeCell(attackCell);
                     
                     if (nearestFreeCell) {
-                        MaraUtils.IssueAttackCommand(unit, this.squad.Controller.Player, nearestFreeCell);
+                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, nearestFreeCell);
                     }
                 }
             }
             else {
-                MaraUtils.IssueMoveCommand(unit, this.squad.Controller.Player, unit.Cell);
+                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, unit.Cell);
             }
         }
     }
@@ -391,34 +391,31 @@ export class MaraSquadBattleState extends MaraSquadState {
                 
                 if (optimalTargetData.heuristic < Infinity) {
                     if (MaraUtils.ChebyshevDistance(unit.Cell, optimalTargetData.cell) > 0) {
-                        MaraUtils.IssueMoveCommand(unit, this.squad.Controller.Player, optimalTargetData.cell);
-                        MaraUtils.IssueAttackCommand(unit, this.squad.Controller.Player, attackCell, false);
+                        MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, optimalTargetData.cell);
+                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell, false);
                         this.reservedCells.Set(optimalTargetData.cell, true);
                     }
                     else {
-                        MaraUtils.IssueAttackCommand(unit, this.squad.Controller.Player, attackCell);
+                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell);
                     }
                 }
                 else {
                     let nearestFreeCell = MaraUtils.FindFreeCell(attackCell);
                     
                     if (nearestFreeCell) {
-                        MaraUtils.IssueAttackCommand(unit, this.squad.Controller.Player, nearestFreeCell);
+                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, nearestFreeCell);
                     }
                 }
             }
             else {
-                MaraUtils.IssueMoveCommand(unit, this.squad.Controller.Player, unit.Cell);
+                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, unit.Cell);
             }
         }
     }
 
     private distributeTargets_liter(): void {
         let attackCell = MaraUtils.FindFreeCell(this.enemySquads[0].GetLocation().Point);
-
-        for (let unit of this.squad.Units) {
-            MaraUtils.IssueAttackCommand(unit, this.squad.Controller.Player, attackCell);
-        }
+        MaraUtils.IssueAttackCommand(this.squad.Units, this.squad.Controller.Player, attackCell);
     }
 
     private calcCellHeuristic(targetCell: any, unit: any): number {
