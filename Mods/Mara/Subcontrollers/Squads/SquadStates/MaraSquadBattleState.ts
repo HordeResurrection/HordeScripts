@@ -88,7 +88,7 @@ export class MaraSquadBattleState extends MaraSquadState {
 
     private initialLocation: MaraSquadLocation;
     private lastNonKitedTick: number;
-    private readonly KITE_TIMEOUT = 4 * 50; // 4 sec
+    private readonly KITE_TIMEOUT = 8 * 50; // 8 sec
     
     OnEntry(): void {
         this.updateThreats();
