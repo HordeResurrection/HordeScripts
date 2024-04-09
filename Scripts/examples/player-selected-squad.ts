@@ -45,35 +45,12 @@ export class Example_PlayerSelectedSquad extends HordeExampleBase {
 
     private processNewSquad(squad) {
         if (squad.Count == 0) {
-            this.log.info("[*] Selected squad is empty");
+            this.log.info("Selected squad is empty");
             return;
         }
-        this.log.info("[*] Selected squad:");
+        this.log.info("Selected squad:");
         ForEach(squad, u => {
-            this.log.info(u);
-
-            this.log.info('= Unit orders', '(BehaviorFlags:', u.OrdersMind.BehaviorFlags.ToString() + ')');
-            this._printOrders(u, '');
+            this.log.info('-', u);
         });
-    }
-
-    private _printOrders(u, prefix = "") {
-        if (!u) {
-            return;
-        }
-        
-        var needCancel = ScriptUtils.GetValue(u.OrdersMind, "NeedCancelActiveOrder");
-        var activeOrder = u.OrdersMind.ActiveOrder;
-        this.log.info(prefix + '- Current:', activeOrder.ToString(), '| IsInstinct:', activeOrder.IsInstinct, '| Allow notifications:', activeOrder.CanBeCanceledByNotification, '| NeedCancel:', needCancel);
-        this.log.info(prefix + '-   ', u.OrdersMind.ActiveAct);
-        this.log.info(prefix + '-   ', u.OrdersMind.ActiveMotion);
-        
-        var queue = ScriptUtils.GetValue(u.OrdersMind, "OrdersQueue");
-        var next = queue.GetNextExpectedOrder();
-        if (next) {
-            this.log.info(prefix + '- Next:', next.ToString());
-        } else {
-            this.log.info(prefix + '- Next:', 'None');
-        }
     }
 }

@@ -10,6 +10,7 @@ import { AttentionOnSurfacePlugin } from "plugins/attention-on-surface";
 function getDefaultPlugins() {
     return [
         new AttentionOnSurfacePlugin(),
+        //new PrintSelectedSquadOrdersPlugin(),
     ];
 }
 
