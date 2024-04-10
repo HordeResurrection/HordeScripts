@@ -433,7 +433,14 @@ export class MaraUtils {
 
         let mode = isReplaceMode ? AssignOrderMode.Replace : AssignOrderMode.Queue;
 
-        virtualInput.selectUnitsById(units.map((unit) => unit.Id), VirtualSelectUnitsMode.Select);
+        let unitIds = units.map((unit) => unit.Id);
+        let chunkSize = 10;
+
+        for (let i = 0; i < unitIds.length; i += chunkSize) {
+            let chunk = unitIds.slice(i, i + chunkSize);
+            virtualInput.selectUnitsById(chunk, VirtualSelectUnitsMode.Select);
+        }
+
         virtualInput.pointBasedCommand(createPoint(location.X, location.Y), command, mode);
         virtualInput.commit();
     }
