@@ -6,9 +6,6 @@ import { MaraControllableSquad } from "./Squads/MaraControllableSquad";
 import { TileType } from "library/game-logic/horde-types";
 
 export class TacticalSubcontroller extends MaraSubcontroller {
-    private readonly SQUAD_COMBATIVITY_THRESHOLD = 0.25;
-    private readonly SQUAD_STRENGTH_THRESHOLD = 100;
-
     private offensiveSquads: Array<MaraControllableSquad> = [];
     private defensiveSquads: Array<MaraControllableSquad> = [];
     private reinforcementSquads: Array<MaraControllableSquad> = [];
@@ -47,6 +44,10 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         return [...this.offensiveSquads, ...this.defensiveSquads, ...this.reinforcementSquads];
     }
 
+    public get SquadsSettings(): any {
+        return this.parentController.Settings.Squads;
+    }
+
     Tick(tickNumber: number): void {
         for (let squad of this.parentController.HostileAttackingSquads) {
             squad.Tick(tickNumber);
@@ -65,7 +66,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
                     for (let squad of this.offensiveSquads) {
                         if (pullbackLocation) {
-                            if (squad.CombativityIndex < this.SQUAD_COMBATIVITY_THRESHOLD) {
+                            if (squad.CombativityIndex < this.parentController.Settings.Squads.MinCombativityIndex) {
                                 this.sendSquadToLocation(squad, pullbackLocation);
                             }
                         }
@@ -392,7 +393,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             squadUnits.push(unit);
             this.parentController.Debug(`Added unit ${unit.ToString()} into squad`);
 
-            if (currentSquadStrength >= this.SQUAD_STRENGTH_THRESHOLD) {
+            if (currentSquadStrength >= this.parentController.Settings.Squads.MinStrength) {
                 let squad = this.createSquad(squadUnits);
                 
                 squads.push(squad);

@@ -4,7 +4,7 @@ import { MaraSquadAttackState } from "./MaraSquadAttackState";
 import { MaraSquadBattleState } from "./MaraSquadBattleState";
 import { MaraSquadIdleGatheringUpState } from "./MaraSquadIdleGatheringUpState";
 import { MaraSquadMoveState } from "./MaraSquadMoveState";
-import { MaraSquadState, MIN_SPREAD_THRESHOLD_MULTIPLIER, MAX_SPREAD_THRESHOLD_MULTIPLIER } from "./MaraSquadState";
+import { MaraSquadState } from "./MaraSquadState";
 
 export class MaraSquadIdleState extends MaraSquadState {
     OnEntry(): void {
@@ -32,7 +32,7 @@ export class MaraSquadIdleState extends MaraSquadState {
         
         if (
             this.squad.IsAllUnitsIdle() &&
-            this.squad.GetLocation().Spread > this.squad.MinSpread * MIN_SPREAD_THRESHOLD_MULTIPLIER
+            this.squad.GetLocation().Spread > this.squad.MinSpread * this.squad.Controller.SquadsSettings.MinSpreadMultiplier
         ) {
             this.squad.SetState(new MaraSquadIdleGatheringUpState(this.squad));
             return;
@@ -61,7 +61,11 @@ export class MaraSquadIdleState extends MaraSquadState {
             return;
         }
 
-        let searchRadius = this.squad.MinSpread * (MAX_SPREAD_THRESHOLD_MULTIPLIER + MIN_SPREAD_THRESHOLD_MULTIPLIER) / 2;
+        let searchRadius = 
+            this.squad.MinSpread * (
+                this.squad.Controller.SquadsSettings.MaxSpreadMultiplier + this.squad.Controller.SquadsSettings.MinSpreadMultiplier
+            ) / 2;
+            
         let forestCells = MaraUtils.FindCells(this.squad.CurrentTargetCell, searchRadius, MaraUtils.ForestCellFilter);
         let cellIndex = 0;
 

@@ -4,8 +4,6 @@ import { DefendingState } from "./DefendingState";
 import { DevelopingState } from "./DevelopingState";
 
 export class ExterminatingState extends MaraSettlementControllerState {
-    private readonly COMBATIVITY_THRESHOLD = 0.33;
-    private readonly EXTERMINATING_TIMEOUT = 5 * 60 * 50; //5 min
     private currentTarget: any; //but actually Unit
     private reinforcementsCfgIds: Array<string>;
     private timeoutTick: number | null;    
@@ -28,7 +26,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
 
     Tick(tickNumber: number): void {
         if (this.timeoutTick == null) {
-            this.timeoutTick = tickNumber + this.EXTERMINATING_TIMEOUT;
+            this.timeoutTick = tickNumber + this.settlementController.Settings.Timeouts.ExterminatingTimeout;
         }
         else if (tickNumber > this.timeoutTick) {
             this.settlementController.Debug(`Attack is too long-drawn, discontinuing`);
@@ -52,7 +50,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
 
         let combativityIndex = this.settlementController.TacticalController.OffenseCombativityIndex;
 
-        if (combativityIndex >= this.COMBATIVITY_THRESHOLD) {
+        if (combativityIndex >= this.settlementController.Settings.ControllerStates.ExterminatingLossRatioThreshold) {
             let enemy = this.settlementController.StrategyController.CurrentEnemy;
             
             if (!enemy) {

@@ -15,6 +15,7 @@ import { StrategySubcontroller } from "./Subcontrollers/StrategySubcontroller";
 import { TacticalSubcontroller } from "./Subcontrollers/TacticalSubcontroller";
 import { eNext, enumerate } from "./Utils/Common";
 import { MaraUtils, UnitComposition } from "./Utils/MaraUtils";
+import { MaraSettlementControllerSettings } from "./SettlementControllerSettings";
 
 export class SettlementLocation {
     Center: any;
@@ -32,6 +33,7 @@ export class MaraSettlementController {
     public Settlement: any;
     public MasterMind: any;
     public Player: any;
+    public Settings: MaraSettlementControllerSettings;
 
     public MiningController: MiningSubcontroller;
     public ProductionController: ProductionSubcontroller;
@@ -55,6 +57,7 @@ export class MaraSettlementController {
         this.Settlement = settlement;
         this.Player = player;
         this.MasterMind = settlementMM;
+        this.Settings = new MaraSettlementControllerSettings();
 
         if (!this.MasterMind.IsWorkMode) {
             this.Debug("Engaging MasterMind");
@@ -176,8 +179,6 @@ export class MaraSettlementController {
         if (this.settlementLocation) {
             return this.settlementLocation;
         }
-
-        const BUILDING_SEARCH_RADIUS = 5;
         
         let professionCenter = this.Settlement.Units.Professions;
         let centralProductionBuilding = professionCenter.ProducingBuildings.First();
@@ -187,7 +188,7 @@ export class MaraSettlementController {
                 [centralProductionBuilding], 
                 [this.Settlement], 
                 (unit) => {return unit.Cfg.BuildingConfig != null},
-                BUILDING_SEARCH_RADIUS
+                this.Settings.UnitSearch.BuildingSearchRadius
             );
             
             if (!squads || squads.length == 0) {

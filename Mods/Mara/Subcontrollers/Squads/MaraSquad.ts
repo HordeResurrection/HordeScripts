@@ -1,7 +1,5 @@
 import { MaraUtils } from "Mara/Utils/MaraUtils";
 
-export const MIN_INITIAL_SQUAD_STRENGTH = 100;
-
 export class MaraSquadLocation {
     Point: {
         X: number;

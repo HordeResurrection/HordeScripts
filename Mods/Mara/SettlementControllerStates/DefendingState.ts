@@ -70,8 +70,6 @@ export class DefendingState extends MaraSettlementControllerState {
     }
 
     private canRebuild(): boolean {
-        const REBUILD_THRESHOLD = 2 * 60 * 50 / 2; //3 min
-
         let requiredEconomy = this.settlementController.TargetUnitsComposition;
 
         if (!requiredEconomy) {
@@ -105,6 +103,6 @@ export class DefendingState extends MaraSettlementControllerState {
 
         this.settlementController.Debug(`Estimated rebuild time: ${productionTime}`);
 
-        return productionTime <= REBUILD_THRESHOLD;
+        return productionTime <= this.settlementController.Settings.Timeouts.RebuildEstimationThreshold / 2;
     }
 }

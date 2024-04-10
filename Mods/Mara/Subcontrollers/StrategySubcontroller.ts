@@ -48,7 +48,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         this.parentController.AttackToDefenseUnitRatio = ratio;
         this.parentController.Debug(`Calculated attack to defense ratio: ${ratio}`);
         
-        let requiredStrength = 1.5 * Math.max(this.calcSettlementStrength(this.currentEnemy), 100);
+        let requiredStrength = 1.5 * Math.max(this.calcSettlementStrength(this.currentEnemy), this.parentController.Settings.ControllerStates.MinAttackStrength);
 
         let requiredOffensiveStrength = ratio * requiredStrength;
         this.parentController.Debug(`Calculated required offensive strength: ${requiredOffensiveStrength}`);

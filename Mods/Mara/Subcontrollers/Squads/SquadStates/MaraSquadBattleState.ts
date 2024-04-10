@@ -2,7 +2,7 @@ import { MaraUtils } from "Mara/Utils/MaraUtils";
 import { MaraSquad, MaraSquadLocation } from "../MaraSquad";
 import { MaraSquadAttackState } from "./MaraSquadAttackState";
 import { MaraSquadMoveState } from "./MaraSquadMoveState";
-import { ENEMY_SEARCH_RADIUS, MaraSquadState } from "./MaraSquadState";
+import { MaraSquadState } from "./MaraSquadState";
 import { TileType } from "library/game-logic/horde-types";
 import { MaraSquadPullbackState } from "./MaraSquadPullbackState";
 
@@ -88,7 +88,6 @@ export class MaraSquadBattleState extends MaraSquadState {
 
     private initialLocation: MaraSquadLocation;
     private lastNonKitedTick: number;
-    private readonly KITE_TIMEOUT = 8 * 50; // 8 sec
     
     OnEntry(): void {
         this.updateThreats();
@@ -107,7 +106,7 @@ export class MaraSquadBattleState extends MaraSquadState {
             if (this.isAtLeastOneUnitAttacking()) {
                 this.lastNonKitedTick = tickNumber;
             }
-            else if (tickNumber - this.lastNonKitedTick >= this.KITE_TIMEOUT) {
+            else if (tickNumber - this.lastNonKitedTick >= this.squad.Controller.SquadsSettings.KiteTimeout) {
                 this.squad.SetState(new MaraSquadPullbackState(this.squad, this.initialLocation.Point));
                 return;
             }
@@ -144,14 +143,14 @@ export class MaraSquadBattleState extends MaraSquadState {
         
         let enemies = MaraUtils.GetSettlementUnitsInArea(
             location.Point, 
-            ENEMY_SEARCH_RADIUS, 
+            this.squad.Controller.SquadsSettings.EnemySearchRadius, 
             this.squad.Controller.EnemySettlements
         );
 
         this.enemySquads = MaraUtils.GetSettlementsSquadsFromUnits(
             enemies, 
             this.squad.Controller.EnemySettlements,
-            (unit) => {return MaraUtils.ChebyshevDistance(unit.Cell, location.Point) <= ENEMY_SEARCH_RADIUS}
+            (unit) => {return MaraUtils.ChebyshevDistance(unit.Cell, location.Point) <= this.squad.Controller.SquadsSettings.EnemySearchRadius}
         );
 
         this.enemyUnits = [];

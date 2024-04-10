@@ -3,7 +3,7 @@ import { ProductionState } from "./ProductionState";
 import { ExterminatingState } from "./ExterminatingState";
 
 export class BuildingUpState extends ProductionState {
-    protected readonly PRODUCTION_TIMEOUT: number | null = 3 * 60 * 50; //3 min
+    protected readonly PRODUCTION_TIMEOUT: number | null = this.settlementController.Settings.Timeouts.BuildUpProductionTimeout;
     
     protected getTargetUnitsComposition(): UnitComposition {
         let enemy = this.settlementController.StrategyController.CurrentEnemy

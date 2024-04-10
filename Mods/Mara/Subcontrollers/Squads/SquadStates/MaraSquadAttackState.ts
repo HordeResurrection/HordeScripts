@@ -1,7 +1,7 @@
 import { MaraUtils } from "Mara/Utils/MaraUtils";
 import { MaraSquadBattleState } from "./MaraSquadBattleState";
 import { MaraSquadMoveState } from "./MaraSquadMoveState";
-import { MAX_SPREAD_THRESHOLD_MULTIPLIER, MaraSquadState } from "./MaraSquadState";
+import { MaraSquadState } from "./MaraSquadState";
 import { MaraSquadIdleState } from "./MaraSquadIdleState";
 import { MaraSquadAttackGatheringUpState } from "./MaraSquadAttackGatheringUpState";
 
@@ -41,7 +41,7 @@ export class MaraSquadAttackState extends MaraSquadState {
         }
 
         if (tickNumber % (5 * 50) == 0) { //5 sec
-            if (location.Spread > this.squad.MinSpread * MAX_SPREAD_THRESHOLD_MULTIPLIER) {
+            if (location.Spread > this.squad.MinSpread * this.squad.Controller.SquadsSettings.MaxSpreadMultiplier) {
                 this.squad.SetState(new MaraSquadAttackGatheringUpState(this.squad));
                 return;
             }
