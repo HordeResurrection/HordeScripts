@@ -6,10 +6,17 @@ import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { world } from "./CastleFightPlugin";
 import { Entity, COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent, SpawnBuildingComponent, UpgradableBuildingComponent, BuffComponent, BUFF_TYPE, ReviveComponent, HeroAltarComponent, IncomeEvent, IncomeIncreaseEvent, SettlementComponent, IncomeLimitedPeriodicalComponent, UnitProducedEvent } from "./ESC_components";
-import { Polygon, Point, CfgAddUnitProducer, getCurrentTime } from "./Utils";
+import { Polygon, Point, CfgAddUnitProducer, getCurrentTime, BitmaskRemoveFlags } from "./Utils";
 import { printObjectItems } from "library/common/introspection";
 
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
+
+export enum GameState {
+    INIT = 0,
+    PLAY,
+    CLEAR,
+    END
+}
 
 export class World {
     /** количество поселений */
@@ -31,10 +38,8 @@ export class World {
     /** для каждого поселения хранится набор путей атаки */
     settlements_attack_paths: Array<Array<Array<Point>>>;
     
-    /** флаг, что игра проинициализирована */
-    gameInit: boolean;
-    /** флаг, что игра закончена */
-    gameEnd: boolean;
+    /** текущее состояние игры */
+    state: GameState;
 
     /** массив конфигов */
     configs: any;
@@ -59,8 +64,7 @@ export class World {
     
     public constructor ( )
     {
-        this.gameInit      = false;
-        this.gameEnd       = false;
+        this.state      = GameState.INIT;
 
         this.configs       = {};
         this.cfgUid_entity = new Map<string, Entity>();
@@ -119,7 +123,7 @@ export class World {
         // убираем ЗП
         ScriptUtils.SetValue(this.configs["castle"], "SalarySlots", 0);
         // здоровье
-        ScriptUtils.SetValue(this.configs["castle"], "MaxHealth", 300000*this.castle_health_coeff);
+        ScriptUtils.SetValue(this.configs["castle"], "MaxHealth", Math.round(300000*this.castle_health_coeff));
         // броня
         ScriptUtils.SetValue(this.configs["castle"], "Shield", 200);
 
@@ -288,7 +292,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_1_1_1_1"], "Shield", 0);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].MainArmament.BulletCombatParams, "Damage", 1000);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].MainArmament.BulletCombatParams, "Damage", 500);
         // убираем стоимость
         ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].CostResources, "Gold",   100);
         ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].CostResources, "Metal",  0);
@@ -480,7 +484,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_1_2_1"], "Shield", 300);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_1_2_1"].MainArmament.BulletCombatParams, "Damage", 700);
+        ScriptUtils.SetValue(this.configs["unit_1_2_1"].MainArmament.BulletCombatParams, "Damage", 500);
         // убираем стоимость
         ScriptUtils.SetValue(this.configs["unit_1_2_1"].CostResources, "Gold",   0);
         ScriptUtils.SetValue(this.configs["unit_1_2_1"].CostResources, "Metal",  0);
@@ -625,7 +629,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_2_1_1"], "Shield", 300);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_2_1_1"].MainArmament.BulletCombatParams, "Damage", 380);
+        ScriptUtils.SetValue(this.configs["unit_2_1_1"].MainArmament.BulletCombatParams, "Damage", 350);
         // убираем стоимость
         ScriptUtils.SetValue(this.configs["unit_2_1_1"].CostResources, "Gold",   0);
         ScriptUtils.SetValue(this.configs["unit_2_1_1"].CostResources, "Metal",  0);
@@ -903,28 +907,33 @@ export class World {
         // башня
         ////////////////////
 
-        // this.configs["tower_1"] = HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Tower"));
-        // // имя
-        // ScriptUtils.SetValue(this.configs["tower_1"], "Name", "Башня");
-        // // описание
-        // ScriptUtils.SetValue(this.configs["tower_1"], "Description", "Просто бьет врагов.");
-        // // здоровье
-        // ScriptUtils.SetValue(this.configs["tower_1"], "MaxHealth", 60000);
-        // // броня
-        // ScriptUtils.SetValue(this.configs["tower_1"], "Shield", 300);
-        // // делаем урон = 0
-        // ScriptUtils.SetValue(this.configs["tower_1"].MainArmament.BulletCombatParams, "Damage", 600);
-        // // стоимость
-        // ScriptUtils.SetValue(this.configs["tower_1"].CostResources, "Gold",   400);
-        // ScriptUtils.SetValue(this.configs["tower_1"].CostResources, "Metal",  0);
-        // ScriptUtils.SetValue(this.configs["tower_1"].CostResources, "Lumber", 400);
-        // ScriptUtils.SetValue(this.configs["tower_1"].CostResources, "People", 0);
-        // {
-        //     var entity : Entity = new Entity();
-        //     entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "tower_1"));
-        //     entity.components.set(COMPONENT_TYPE.BUFFABLE_COMPONENT, new BuffableComponent());
-        //     this.cfgUid_entity.set(this.configs["tower_1"].Uid, entity);
-        // }
+        this.configs["tower_1"] = HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Tower"));
+        // имя
+        ScriptUtils.SetValue(this.configs["tower_1"], "Name", "Башня");
+        // описание
+        ScriptUtils.SetValue(this.configs["tower_1"], "Description", "Защитное строение. Не допускайте катапульты. Можно усилить духами (кроме духа клонирования).");
+        // здоровье
+        ScriptUtils.SetValue(this.configs["tower_1"], "MaxHealth", 60000);
+        // броня
+        ScriptUtils.SetValue(this.configs["tower_1"], "Shield", 300);
+        // делаем урон = 0
+        ScriptUtils.SetValue(this.configs["tower_1"].MainArmament.BulletCombatParams, "Damage", 600);
+        // стоимость
+        ScriptUtils.SetValue(this.configs["tower_1"].CostResources, "Gold",   200);
+        ScriptUtils.SetValue(this.configs["tower_1"].CostResources, "Metal",  0);
+        ScriptUtils.SetValue(this.configs["tower_1"].CostResources, "Lumber", 200);
+        ScriptUtils.SetValue(this.configs["tower_1"].CostResources, "People", 0);
+        {
+            var entity : Entity = new Entity();
+            entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "tower_1"));
+            var buffMask = new Array<boolean>(BUFF_TYPE.SIZE);
+            for (var i = 0; i < BUFF_TYPE.SIZE; i++) {
+                buffMask[i] = true;
+            }
+            buffMask[BUFF_TYPE.CLONING] = false;
+            entity.components.set(COMPONENT_TYPE.BUFFABLE_COMPONENT, new BuffableComponent(buffMask));
+            this.cfgUid_entity.set(this.configs["tower_1"].Uid, entity);
+        }
 
         ////////////////////
         // мельница - сундук сокровищ
@@ -1065,7 +1074,7 @@ export class World {
         // имя
         ScriptUtils.SetValue(this.configs["church"], "Name", "Церковь");
         // описание
-        ScriptUtils.SetValue(this.configs["church"], "Description", "Святое место, позволяющее заполучить силу святого духа.");
+        ScriptUtils.SetValue(this.configs["church"], "Description", "Святое место, позволяющее заполучить силу святых духов. Для вызова духа требуется хотя бы 1 свободная клетка вокруг церкви.");
         // стоимость
         ScriptUtils.SetValue(this.configs["church"].CostResources, "Gold",   500);
         ScriptUtils.SetValue(this.configs["church"].CostResources, "Metal",  0);
@@ -1174,6 +1183,8 @@ export class World {
 
             produceList.Add(this.configs["church"]);
 
+            produceList.Add(this.configs["tower_1"]);
+
             //produceList.Add(this.configs["hero_altar"]);
         }
         {
@@ -1251,7 +1262,7 @@ export class World {
             ScriptUtils.SetValue(this.configs[cfgId], "ProducedPeople", 0);
             // убираем налоги
             ScriptUtils.SetValue(this.configs[cfgId], "SalarySlots", 0);
-            // если это здание, то даем имунн
+            // если это здание, то даем имунн и задаем ХП
             if (this.configs[cfgId].Flags.HasFlag(UnitFlags.Building)) {
                 // ScriptUtils.SetValue(this.configs[cfgId], "Flags", mergeFlags(UnitFlags, this.configs[cfgId].Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
                 if (cfgId != "castle" && cfgId != "tower_1") {
