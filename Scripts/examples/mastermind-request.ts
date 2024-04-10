@@ -1,3 +1,4 @@
+import { ProduceRequestArgs } from "library/mastermind/matermind-types";
 import HordeExampleBase from "./base-example";
 
 /**
@@ -25,10 +26,13 @@ export class Example_MasterMindRequest extends HordeExampleBase {
             masterMind.IsWorkMode = true;
         }
 
-        // Создадим запрос на производство катапульты
+        // Создадим запрос на производство одной катапульты
         let productionDepartament = masterMind.ProductionDepartment;
         let catapultCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Catapult");
-        if (!productionDepartament.AddRequestToProduce(catapultCfg, 1)) {
+        let produceRequestArgs = new ProduceRequestArgs(catapultCfg, 1);
+        produceRequestArgs.CheckExistsRequest = false;  // Следует ли проверять наличие имеющихся запросов?
+        produceRequestArgs.AllowAuxiliaryProduceRequests = true; // Разрешить ли создавать запросы на производство требуемых юнитов?
+        if (!productionDepartament.AddRequestToProduce(produceRequestArgs)) {
             this.log.info('Не удалось добавить запрос на создание катапульты.');
         } else {
             this.log.info('Добавлен запрос на создание 1 катапульты.');
