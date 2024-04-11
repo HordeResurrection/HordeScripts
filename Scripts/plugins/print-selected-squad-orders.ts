@@ -1,6 +1,9 @@
 import HordePluginBase from "./base-plugin";
 
 
+export const AOrderBaseT = ScriptUtils.GetTypeByName("HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase", "HordeClassLibrary");
+
+
 /**
  * Плагин для отображения списка приказов выделенных юнитов
  */
@@ -42,8 +45,8 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
         ForEach(squad, u => {
             this.log.info(u);
 
-            this.log.info('= Unit orders', '(BehaviorFlags:', u.OrdersMind.BehaviorFlags.ToString() + ')');
             this._printOrders(u, '');
+            this._printNotifications(u, '');
         });
     }
 
@@ -51,19 +54,44 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
         if (!u) {
             return;
         }
+
+        this.log.info('= Orders', '(BehaviorFlags:', u.OrdersMind.BehaviorFlags.ToString() + ')');
         
-        var needCancel = ScriptUtils.GetValue(u.OrdersMind, "NeedCancelActiveOrder");
-        var activeOrder = u.OrdersMind.ActiveOrder;
-        this.log.info(prefix + '- Current:', activeOrder.ToString(), '| IsInstinct:', activeOrder.IsInstinct, '| Allow notifications:', activeOrder.CanBeCanceledByNotification, '| NeedCancel:', needCancel);
-        this.log.info(prefix + '-   ', u.OrdersMind.ActiveAct);
-        this.log.info(prefix + '-   ', u.OrdersMind.ActiveMotion);
+        let ordersMind = u.OrdersMind;
+        let needCancel = ScriptUtils.GetValue(ordersMind, "NeedCancelActiveOrder");
+        let activeOrder = ordersMind.ActiveOrder;
         
-        var queue = ScriptUtils.GetValue(u.OrdersMind, "OrdersQueue");
-        var next = queue.GetNextExpectedOrder();
-        if (next) {
-            this.log.info(prefix + '- Next:', next.ToString());
-        } else {
-            this.log.info(prefix + '- Next:', 'None');
+        let disableNotificationsTimer = ScriptUtils.GetValueAs(AOrderBaseT, activeOrder, "_timerDisableNotifications");
+        let notificationsStr = `Allow notifications: ${activeOrder.CanBeCanceledByNotification}`;
+        if (disableNotificationsTimer && disableNotificationsTimer.LeftTicks > 0) {
+            notificationsStr += ` (LeftTicks: ${disableNotificationsTimer.LeftTicks})`;  // Feature: потом эту строку можно будет перенести в ядро
         }
+
+        this.log.info(prefix + '-   Current:', activeOrder.ToString(), '| IsInstinct:', activeOrder.IsInstinct, '|', notificationsStr, '| NeedCancel:', needCancel);
+        this.log.info(prefix + '-    ', ordersMind.ActiveAct);
+        this.log.info(prefix + '-    ', ordersMind.ActiveMotion);
+        this.log.info(prefix + '-     Motive:', u.OrdersMind.ActiveOrder.MotiveNotification);
+        
+        let queue = ScriptUtils.GetValue(ordersMind, "OrdersQueue");
+        let next = queue.GetNextExpectedOrder();
+        if (next) {
+            this.log.info(prefix + '-   Next:', next.ToString());
+        } else {
+            this.log.info(prefix + '-   Next:', 'None');
+        }
+    }
+    
+    private _printNotifications(u, prefix = "") {
+        if (!u) {
+            return;
+        }
+        
+        this.log.info('= Notifications');
+        
+        let instinctsMind = u.InstinctsMind;
+        this.log.info(prefix + '-   MainAlarm:', instinctsMind.MainAlarm);
+        this.log.info(prefix + '-   MainThreat:', instinctsMind.MainThreat);
+        this.log.info(prefix + '-   PanikCause:', instinctsMind.PanikCause);
+        this.log.info(prefix + '-   SideAction:', instinctsMind.SideAction);
     }
 }
