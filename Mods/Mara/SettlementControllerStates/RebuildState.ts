@@ -1,6 +1,6 @@
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
-import { BuildingUpState } from "./BuildingUpState";
 import { ProductionState } from "./ProductionState";
+import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 
 export class RebuildState extends ProductionState {
     protected getTargetUnitsComposition(): UnitComposition {
@@ -24,6 +24,6 @@ export class RebuildState extends ProductionState {
     }
 
     protected onTargetCompositionReached(): void {
-        this.settlementController.State = new BuildingUpState(this.settlementController);
+        this.settlementController.State = SettlementControllerStateFactory.MakeBuildingUpState(this.settlementController);
     }
 }

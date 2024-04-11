@@ -1,6 +1,6 @@
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 import { ProductionState } from "./ProductionState";
-import { ExterminatingState } from "./ExterminatingState";
+import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 
 export class BuildingUpState extends ProductionState {
     protected readonly PRODUCTION_TIMEOUT: number | null = this.settlementController.Settings.Timeouts.BuildUpProductionTimeout;
@@ -26,6 +26,6 @@ export class BuildingUpState extends ProductionState {
     }
 
     protected onTargetCompositionReached(): void {
-        this.settlementController.State = new ExterminatingState(this.settlementController);
+        this.settlementController.State = SettlementControllerStateFactory.MakeExterminatingState(this.settlementController);
     }
 }

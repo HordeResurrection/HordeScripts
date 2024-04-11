@@ -1,6 +1,6 @@
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
-import { DefendingState } from "./DefendingState";
+import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 
 export abstract class ProductionState extends MaraSettlementControllerState {
     private targetUnitsComposition: UnitComposition = new Map<string, number>();
@@ -41,7 +41,7 @@ export abstract class ProductionState extends MaraSettlementControllerState {
 
         if (tickNumber % 50 == 0) {
             if (this.settlementController.StrategyController.IsUnderAttack()) {
-                this.settlementController.State = new DefendingState(this.settlementController);
+                this.settlementController.State = SettlementControllerStateFactory.MakeDefendingState(this.settlementController);
                 return;
             }
         }

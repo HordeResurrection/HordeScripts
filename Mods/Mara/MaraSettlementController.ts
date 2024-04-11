@@ -4,8 +4,6 @@
 */
 
 import { Mara, MaraLogLevel } from "./Mara";
-import { DefendingState } from "./SettlementControllerStates/DefendingState";
-import { DevelopingState } from "./SettlementControllerStates/DevelopingState";
 import { MaraSettlementControllerState } from "./SettlementControllerStates/MaraSettlementControllerState";
 import { MiningSubcontroller } from "./Subcontrollers/MiningSubontroller";
 import { MaraSubcontroller } from "./Subcontrollers/MaraSubcontroller";
@@ -16,6 +14,7 @@ import { TacticalSubcontroller } from "./Subcontrollers/TacticalSubcontroller";
 import { eNext, enumerate } from "./Utils/Common";
 import { MaraUtils, UnitComposition } from "./Utils/MaraUtils";
 import { MaraSettlementControllerSettings } from "./SettlementControllerSettings";
+import { SettlementControllerStateFactory } from "./SettlementControllerStateFactory";
 
 export class SettlementLocation {
     Center: any;
@@ -78,12 +77,7 @@ export class MaraSettlementController {
         this.TacticalController = new TacticalSubcontroller(this);
         this.subcontrollers.push(this.TacticalController);
 
-        //!! temporary solution
-        //!! black magic that fixes mysterious import errors which are not even logged
-        //!! TODO: DEAL WITH THIS SHIT SOMEHOW!
-        new DefendingState(this);
-
-        this.State = new DevelopingState(this);
+        this.State = SettlementControllerStateFactory.MakeDevelopingState(this);
     }
 
     public get State(): MaraSettlementControllerState {

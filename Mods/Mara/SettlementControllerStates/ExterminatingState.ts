@@ -1,7 +1,5 @@
+import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
-import { IdleState } from "./IdleState";
-import { DefendingState } from "./DefendingState";
-import { DevelopingState } from "./DevelopingState";
 
 export class ExterminatingState extends MaraSettlementControllerState {
     private currentTarget: any; //but actually Unit
@@ -30,7 +28,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
         }
         else if (tickNumber > this.timeoutTick) {
             this.settlementController.Debug(`Attack is too long-drawn, discontinuing`);
-            this.settlementController.State = new DevelopingState(this.settlementController);
+            this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
             return;
         }
         
@@ -40,7 +38,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
 
         if (tickNumber % 50 == 0) {
             if (this.settlementController.StrategyController.IsUnderAttack()) {
-                this.settlementController.State = new DefendingState(this.settlementController);
+                this.settlementController.State = SettlementControllerStateFactory.MakeDefendingState(this.settlementController);
                 return;
             }
 
@@ -68,14 +66,14 @@ export class ExterminatingState extends MaraSettlementControllerState {
         else {
             this.settlementController.Debug(`Current combativity index '${combativityIndex}' is too low. Retreating...`);
             this.settlementController.TacticalController.Retreat();
-            this.settlementController.State = new DevelopingState(this.settlementController);
+            this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
             return;
         }
     }
 
     private celebrateVictory(): void {
         this.settlementController.Info(`No enemies left. We are victorious!`);
-        this.settlementController.State = new IdleState(this.settlementController);
+        this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
     }
 
     private selectAndAttackEnemy(): boolean {
