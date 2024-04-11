@@ -3,7 +3,13 @@ import { ProductionState } from "./ProductionState";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 
 export class BuildingUpState extends ProductionState {
-    protected readonly PRODUCTION_TIMEOUT: number | null = this.settlementController.Settings.Timeouts.BuildUpProductionTimeout;
+    protected getProductionTimeout(): number | null {
+        return MaraUtils.Random(
+            this.settlementController.MasterMind,
+            this.settlementController.Settings.Timeouts.MaxBuildUpProductionTimeout,
+            this.settlementController.Settings.Timeouts.MinBuildUpProductionTimeout
+        );
+    }
     
     protected getTargetUnitsComposition(): UnitComposition {
         let enemy = this.settlementController.StrategyController.CurrentEnemy

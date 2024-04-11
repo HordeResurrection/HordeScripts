@@ -12,7 +12,10 @@ class UnitSearchSettings {
 
 class TimeoutsSettings {
     public RebuildEstimationThreshold: number = 2 * 60 * 50;
-    public BuildUpProductionTimeout: number = 3 * 60 * 50;
+    
+    public MaxBuildUpProductionTimeout: number = 3 * 60 * 50;
+    public MinBuildUpProductionTimeout: number = 1 * 60 * 50;
+
     public UnitProductionEstimationThreshold: number = 2 * 60 * 50; //2 min
     public ExterminatingTimeout: number = 5 * 60 * 50; //5 min
 }
