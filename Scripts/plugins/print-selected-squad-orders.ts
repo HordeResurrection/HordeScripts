@@ -42,11 +42,12 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
             return;
         }
         this.log.info("[*] Selected squad:");
+        this.log.info('- Count:', squad.Count);
         ForEach(squad, u => {
-            this.log.info(u);
+            this.log.info('==', u);
 
-            this._printOrders(u, '');
-            this._printNotifications(u, '');
+            this._printOrders(u, '-   ');
+            this._printNotifications(u, '-   ');
         });
     }
 
@@ -55,9 +56,9 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
             return;
         }
 
-        this.log.info('= Orders', '(BehaviorFlags:', u.OrdersMind.BehaviorFlags.ToString() + ')');
-        
         let ordersMind = u.OrdersMind;
+        this.log.info('= Orders', '(Count:', ordersMind.OrdersCount + ', BehaviorFlags:', ordersMind.BehaviorFlags.ToString() + ')');
+        
         let needCancel = ScriptUtils.GetValue(ordersMind, "NeedCancelActiveOrder");
         let activeOrder = ordersMind.ActiveOrder;
         
@@ -67,18 +68,15 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
             notificationsStr += ` (LeftTicks: ${disableNotificationsTimer.LeftTicks})`;  // Feature: потом эту строку можно будет перенести в ядро
         }
 
-        this.log.info(prefix + '-   Current:', activeOrder.ToString(), '| IsInstinct:', activeOrder.IsInstinct, '|', notificationsStr, '| NeedCancel:', needCancel);
-        this.log.info(prefix + '-    ', ordersMind.ActiveAct);
-        this.log.info(prefix + '-    ', ordersMind.ActiveMotion);
-        this.log.info(prefix + '-     Motive:', u.OrdersMind.ActiveOrder.MotiveNotification);
+        this.log.info(prefix + 'Current:', activeOrder);
+        this.log.info(prefix + '  >', 'IsInstinct:', activeOrder.IsInstinct, '|', notificationsStr, '| NeedCancel:', needCancel);
+        this.log.info(prefix + '  Act:', ordersMind.ActiveAct);
+        this.log.info(prefix + '  Motion:', ordersMind.ActiveMotion);
+        this.log.info(prefix + '  Motive:', str(ordersMind.ActiveOrder.MotiveNotification));
         
         let queue = ScriptUtils.GetValue(ordersMind, "OrdersQueue");
         let next = queue.GetNextExpectedOrder();
-        if (next) {
-            this.log.info(prefix + '-   Next:', next.ToString());
-        } else {
-            this.log.info(prefix + '-   Next:', 'None');
-        }
+        this.log.info(prefix + 'Next:', str(next));
     }
     
     private _printNotifications(u, prefix = "") {
@@ -89,9 +87,15 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
         this.log.info('= Notifications');
         
         let instinctsMind = u.InstinctsMind;
-        this.log.info(prefix + '-   MainAlarm:', instinctsMind.MainAlarm);
-        this.log.info(prefix + '-   MainThreat:', instinctsMind.MainThreat);
-        this.log.info(prefix + '-   PanikCause:', instinctsMind.PanikCause);
-        this.log.info(prefix + '-   SideAction:', instinctsMind.SideAction);
+        this.log.info(prefix + 'MainAlarm:', str(instinctsMind.MainAlarm));
+        this.log.info(prefix + 'MainThreat:', str(instinctsMind.MainThreat));
+        this.log.info(prefix + 'PanikCause:', str(instinctsMind.PanikCause));
+        this.log.info(prefix + 'SideAction:', str(instinctsMind.SideAction));
     }
+}
+
+function str(obj) {
+    if (obj)
+        return obj.ToString();
+    return '<None>';
 }
