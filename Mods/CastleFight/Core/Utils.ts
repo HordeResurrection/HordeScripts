@@ -4,9 +4,19 @@ import { PointCommandArgs, UnitCommand } from "library/game-logic/horde-types";
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
 import { getUnitProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 
+/** метрика измерения расстояния */
+export enum MetricType {
+    L1 = 0,
+    L2
+}
+
 /** расстояние L1 между 2 точками */ 
-export function distanceBetweenPoints (x1:number, y1:number, x2:number, y2:number) {
+export function distance_L1 (x1:number, y1:number, x2:number, y2:number) {
     return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+}
+/** расстояние L2 между 2 точками */ 
+export function distance_L2 (x1:number, y1:number, x2:number, y2:number) {
+    return Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
 }
 /** получить текущее время в миллисекундах */
 export function getCurrentTime () {
@@ -32,7 +42,7 @@ export function CfgAddUnitProducer(Cfg: any) {
 }
 
 /** отдать юниту команду в ближайшую свободную точку */
-export function UnitGiveOrder (unit: any, point: Point, unitCommant: any, assignOrderMode: any) {
+export function UnitGiveOrder (unit: any, point: Cell, unitCommant: any, assignOrderMode: any) {
     UnitAllowCommands(unit);
     // позиция для атаки цели
     var goalPosition;
@@ -74,7 +84,7 @@ export function UnitAllowCommands(unit: any) {
     if (disallowedCommands.ContainsKey(UnitCommand.Cancel)) disallowedCommands.Remove(UnitCommand.Cancel);
 }
 
-export class Point {
+export class Cell {
     X:number;
     Y:number;
 
@@ -87,24 +97,24 @@ export class Point {
 /** полигон из точек по часовой стрелке! */
 export class Polygon {
     // набор точек задающие полигон
-    points: Array<Point>;
+    cells: Array<Cell>;
 
-    public constructor(points:Array<Point>) {
-        this.points = points;
+    public constructor(points:Array<Cell>) {
+        this.cells = points;
     }
 
     /** флаг, что точка лежит внутри полигона */
-    public IsPointInside(px:number, py:number) {
-        if (this.points.length < 3) {
+    public IsCellInside(px:number, py:number) {
+        if (this.cells.length < 3) {
             return false;
         }
 
         var inside = true;
-        for (var pointNum = 0, prevPointNum = this.points.length - 1;
-            pointNum < this.points.length;
-            prevPointNum = pointNum, pointNum++) {
-            var vectorProduct = (this.points[pointNum].X - this.points[prevPointNum].X) * (py - this.points[prevPointNum].Y)
-                - (this.points[pointNum].Y - this.points[prevPointNum].Y) * (px - this.points[prevPointNum].X);
+        for (var cellNum = 0, prevCellNum = this.cells.length - 1;
+            cellNum < this.cells.length;
+            prevCellNum = cellNum, cellNum++) {
+            var vectorProduct = (this.cells[cellNum].X - this.cells[prevCellNum].X) * (py - this.cells[prevCellNum].Y)
+                - (this.cells[cellNum].Y - this.cells[prevCellNum].Y) * (px - this.cells[prevCellNum].X);
 
             if (vectorProduct < 0) {
                 inside = false;
