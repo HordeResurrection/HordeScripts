@@ -1,50 +1,52 @@
 @startuml controller states
 
-state EXPLOIT {
-    state Develop: Build-up economy
-    state Rebuild: Rebuild economy after losses
-    state Defend: Defend against attacks
-    state BuildUp: Build an army that\ncounters enemy strategy
+state Develop #LightGreen: Build-up production
+state Rebuild #LightGreen: Rebuild economy after losses
+state Defend #LightGreen: Defend against attacks
+state BuildUp #LightGreen: Build an army that\ncounters enemy strategy
 
-    state Exploit_Entry <<inputPin>>
+state ExpandPrepare #LightBlue: Selecting expand location\nand preparing forces to\nsecure it
+state ExpandSecure #LightBlue: Move to selected location\nand secure it
+state ExpandBuild #LightBlue: Build expand\non secured location
+state ExpandDefend #LightBlue: Defend against attacks
 
-    Exploit_Entry --> Develop
+state Exterminate #LightCoral: Attack the enemy
 
-    Defend --> Rebuild: Attack countered\nDamage is not severe
-    Defend --> Develop: Attack countered\nDamage is too severe
-    
-    Develop --> BuildUp: Economy\nfunctioning
-    Develop --> Defend: Attacked
+[*] --> Develop: Initial state
 
-    BuildUp -down-> Exploit_ArmyGathered <<outputPin>>: Army gathered\nOR\nTimeout Exceeded
-    BuildUp --> Defend: Attacked
-    BuildUp --> Develop: Impossible to produce\nany combat unit
+Defend --> Rebuild: Attack countered\nDamage is not severe
+Defend --> Develop: Attack countered\nDamage is too severe
 
-    Rebuild --> BuildUp: Economy\nRestored
-    Rebuild --> Defend: Attacked
-}
+Develop --> BuildUp: Economy\nfunctioning
+Develop --> Defend: Attacked
+Develop -left-> ExpandPrepare: Not enough resources to\nproduce estimated army
 
-note left of EXPLOIT
-Building up economy,
-gathering resources 
-and training an army
-end note
+BuildUp -down-> Exterminate: Army gathered\nOR\nTimeout Exceeded
+BuildUp --> Defend: Attacked
+BuildUp --> Develop: Impossible to produce\nany combat unit
 
-state EXPAND #pink: Choosing and securing expansion sites
-state Exterminate: Attack the enemy
+Rebuild --> BuildUp: Economy\nRestored
+Rebuild --> Defend: Attacked
 
-[*] -down-> Exploit_Entry: Initial state
+ExpandPrepare --> ExpandSecure: Forces gathered
+ExpandPrepare -left-> ExpandDefend: Attacked
 
-Exploit_ArmyGathered -right-> Exterminate: Army gathered
+ExpandSecure --> ExpandBuild: Expand secured
+ExpandSecure -left-> ExpandDefend: Attacked
+
+ExpandBuild --> Develop: Expand build and functioning
+ExpandBuild -left-> ExpandDefend: Attacked
+
+ExpandDefend --> ExpandPrepare: Attack Countered\nDamage is not severe
+ExpandDefend --> Develop: Attack Countered\nDamage is too severe
 
 Exterminate --> [*]: Enemy defeated
-Exterminate --> Exploit_Entry: Army slain\nOR\nTimeout exceeded
+Exterminate --> Develop: Army slain\nOR\nTimeout exceeded
 Exterminate --> Defend: Main or expand attacked
 
 
 legend
-Pink and red colors mean that this 
-state/transition is not implemented yet
+muffins!
 endlegend
 
 @enduml
