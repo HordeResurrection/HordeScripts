@@ -72,6 +72,7 @@ export function allExamples() {
     addExample(new Example_CustomBullet());
     addExample(new Example_CustomUnit());
     addExample(new Example_CustomUnitCommand());
+    addExample(new Example_CustomUnitCanBePlaced());
 }
 
 
@@ -109,4 +110,5 @@ import { Example_SettlementProductionFactor } from "examples/settlement-producti
 import { Example_ReplaceUnit } from "examples/unit-replace";
 import { Example_UnitCheckPath } from "examples/unit-path-example";
 import { Example_PlayerSelectedSquad } from "examples/player-selected-squad";
+import { Example_CustomUnitCanBePlaced } from "examples/custom-unit-can-be-placed";
 

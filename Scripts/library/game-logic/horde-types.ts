@@ -128,6 +128,12 @@ export const MotionHit = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Motio
 export const ScriptUnitWorkerState = HCL.HordeClassLibrary.UnitComponents.Workers.Script.ScriptUnitWorkerState;
 export const ScriptUnitWorkerEveryTick = HCL.HordeClassLibrary.UnitComponents.Workers.Script.ScriptUnitWorkerEveryTick;
 export const ScriptUnitWorkerGetOrder = HCL.HordeClassLibrary.UnitComponents.Workers.Script.ScriptUnitWorkerGetOrder;
+export const ScriptUnitWorkerGetSpeedAtCell = HCL.HordeClassLibrary.UnitComponents.Workers.Script.ScriptUnitWorkerGetSpeedAtCell;
+export const GetSpeedAtCellByKnownMapJsResult = HCL.HordeClassLibrary.UnitComponents.Workers.Script.GetSpeedAtCellByKnownMapJsResult;
+export const GetSpeedAtCellByRealMapJsResult = HCL.HordeClassLibrary.UnitComponents.Workers.Script.GetSpeedAtCellByRealMapJsResult;
+export const ScriptUnitWorkerCanBePlaced = HCL.HordeClassLibrary.UnitComponents.Workers.Script.ScriptUnitWorkerCanBePlaced;
+export const CanBePlacedByKnownMapJsResult = HCL.HordeClassLibrary.UnitComponents.Workers.Script.CanBePlacedByKnownMapJsResult;
+export const CanBePlacedByRealMapJsResult = HCL.HordeClassLibrary.UnitComponents.Workers.Script.CanBePlacedByRealMapJsResult;
 
 // ===================================================
 // --- Конфиги
