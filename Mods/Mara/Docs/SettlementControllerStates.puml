@@ -46,7 +46,10 @@ Exterminate --> Defend: Main or expand attacked
 
 
 legend
-muffins!
+| **Color** | **Meaning** |
+|<#LightGreen>| Exploit |
+|<#LightBlue>| Expand |
+|<#LightCoral>| Exterminate |
 endlegend
 
 @enduml
