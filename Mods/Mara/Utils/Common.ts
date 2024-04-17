@@ -23,3 +23,13 @@ export abstract class FsmState {
     abstract OnExit(): void;
     abstract Tick(tickNumber: number): void;
 }
+
+export class MaraPoint {
+    public readonly X: number;
+    public readonly Y: number;
+
+    constructor(x: number, y: number) {
+        this.X = x;
+        this.Y = y;
+    }
+}

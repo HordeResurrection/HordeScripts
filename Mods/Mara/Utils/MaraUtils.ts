@@ -36,7 +36,7 @@ class DotnetHolder {
     
     public static get UnitsMap() {
         if (!DotnetHolder.unitsMap) {
-            DotnetHolder.unitsMap = ActiveScena.GetRealScena().UnitsMap;
+            DotnetHolder.unitsMap = DotnetHolder.RealScena.UnitsMap;
         }
         
         return DotnetHolder.unitsMap;
@@ -46,10 +46,20 @@ class DotnetHolder {
     
     public static get LandscapeMap() {
         if (!DotnetHolder.landscapeMap) {
-            DotnetHolder.landscapeMap = ActiveScena.GetRealScena().LandscapeMap;
+            DotnetHolder.landscapeMap = DotnetHolder.RealScena.LandscapeMap;
         }
         
         return DotnetHolder.landscapeMap;
+    }
+
+    private static resourceMap;
+
+    public static get ResourceMap() {
+        if (!DotnetHolder.resourceMap) {
+            DotnetHolder.resourceMap = DotnetHolder.RealScena.ResourcesMap;
+        }
+        
+        return DotnetHolder.resourceMap;
     }
 }
 
@@ -101,11 +111,36 @@ export class AllowedCompositionItem {
 
 const TileType = HCL.HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType;
 const AlmostDefeatCondition = HCL.HordeClassLibrary.World.Settlements.Existence.AlmostDefeatCondition;
+const ResourceType = HCL.HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
 
 export type UnitComposition = Map<string, number>;
 export { AlmostDefeatCondition }
+export { ResourceType }
 
 export class MaraUtils {
+    static GetScenaWidth(): number {
+        return DotnetHolder.RealScena.Size.Width;
+    }
+
+    static GetScenaHeigth(): number {
+        return DotnetHolder.RealScena.Size.Height;
+    }
+    
+    static GetCellMineralType(x: number, y: number): any {
+        let res = DotnetHolder.ResourceMap.Item.get(x, y);
+        return res.ResourceType;
+    }
+
+    static GetCellMineralsAmount(x: number, y: number): number {
+        let res = DotnetHolder.ResourceMap.Item.get(x, y);
+        return res.ResourceAmount;
+    }
+
+    static GetCellTreesCount(x: number, y: number): number {
+        let res = DotnetHolder.ResourceMap.Item.get(x, y);
+        return res.TreesCount;
+    }
+    
     static MakeAllowedCfgItems(cfgIds: string[], currentComposition: UnitComposition, settlement: any): AllowedCompositionItem[] {
         let allowedCfgItems = new Array<AllowedCompositionItem>();
         
