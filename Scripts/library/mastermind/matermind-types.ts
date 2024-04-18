@@ -1,2 +1,2 @@
 
-export const ProduceRequestArgs = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Intellect.Requests.CreationArgs.ProduceRequestArgs", "HordeResurrection.Intellect"));
+export const ProduceRequestParameters = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Intellect.Requests.CreationArgs.ProduceRequestParameters", "HordeResurrection.Intellect"));

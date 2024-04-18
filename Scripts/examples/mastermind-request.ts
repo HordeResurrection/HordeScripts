@@ -1,4 +1,5 @@
-import { ProduceRequestArgs } from "library/mastermind/matermind-types";
+import { createPoint } from "library/common/primitives";
+import { ProduceRequestParameters } from "library/mastermind/matermind-types";
 import HordeExampleBase from "./base-example";
 
 /**
@@ -20,7 +21,7 @@ export class Example_MasterMindRequest extends HordeExampleBase {
             return;
         }
 
-        // Активация бота, если отключен
+        // Активация MasterMind, если отключен
         if (!masterMind.IsWorkMode) {
             this.log.info('Включение режима работы MasterMind для', realPlayer.Nickname);
             masterMind.IsWorkMode = true;
@@ -29,13 +30,36 @@ export class Example_MasterMindRequest extends HordeExampleBase {
         // Создадим запрос на производство одной катапульты
         let productionDepartament = masterMind.ProductionDepartment;
         let catapultCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Catapult");
-        let produceRequestArgs = new ProduceRequestArgs(catapultCfg, 1);
-        produceRequestArgs.CheckExistsRequest = false;  // Следует ли проверять наличие имеющихся запросов?
-        produceRequestArgs.AllowAuxiliaryProduceRequests = true; // Разрешить ли создавать запросы на производство требуемых юнитов?
-        if (!productionDepartament.AddRequestToProduce(produceRequestArgs)) {
+
+        // Параметры запроса
+        let produceRequestParameters = new ProduceRequestParameters(catapultCfg, 1);
+        produceRequestParameters.CheckExistsRequest = false;            // Следует ли проверять наличие имеющихся запросов?
+        produceRequestParameters.AllowAuxiliaryProduceRequests = true;  // Разрешить ли создавать запросы на производство требуемых юнитов?
+        produceRequestParameters.TargetPosition = null;                 // Местоположение строительства (актуально только для зданий)
+
+        // Добавление запроса
+        if (!productionDepartament.AddRequestToProduce(produceRequestParameters)) {
             this.log.info('Не удалось добавить запрос на создание катапульты.');
         } else {
             this.log.info('Добавлен запрос на создание 1 катапульты.');
+        }
+
+        // Создадим запрос на производство одной избы
+        let productionDepartament = masterMind.ProductionDepartment;
+        let farmCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Farm");
+
+        // Параметры запроса
+        produceRequestParameters = new ProduceRequestParameters(farmCfg, 1);
+        produceRequestParameters.CheckExistsRequest = false;            // Следует ли проверять наличие имеющихся запросов?
+        produceRequestParameters.AllowAuxiliaryProduceRequests = false; // Разрешить ли создавать запросы на производство требуемых юнитов?
+        produceRequestParameters.TargetPosition = createPoint(95, 3);   // Местоположение строительства (верхний левый угол)
+        produceRequestParameters.MaxRetargetAttempts = 0;               // Количество попыток (за такт) для выбора другого места строительства поблизости
+
+        // Добавление запроса
+        if (!productionDepartament.AddRequestToProduce(produceRequestParameters)) {
+            this.log.info('Не удалось добавить запрос на постройку избы.');
+        } else {
+            this.log.info('Добавлен запрос на постройку избы.');
         }
 
         // Проверяем запросы
