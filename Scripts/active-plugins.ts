@@ -10,7 +10,8 @@ import { AttentionOnSurfacePlugin } from "plugins/attention-on-surface";
 function getDefaultPlugins() {
     return [
         new AttentionOnSurfacePlugin(),
-        //new PrintSelectedSquadOrdersPlugin(),
+
+        // new PrintSelectedSquadOrdersPlugin(),
     ];
 }
 
@@ -68,3 +69,6 @@ export class HordePluginsCollection {
  * Объект с активными плагинами.
  */
 export const activePlugins: HordePluginsCollection = new HordePluginsCollection();
+
+// Импорты для отключенных плагинов
+import { PrintSelectedSquadOrdersPlugin } from "plugins/print-selected-squad-orders";
