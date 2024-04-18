@@ -4,18 +4,20 @@ import { MaraUtils, ResourceType } from "./Utils/MaraUtils";
 const CLUSTER_SIZE = 8;
 
 export class MaraResourceMap {
-    public static ResourceClusters = {};
+    public static ResourceClusters: Map<string, MaraResourceCluster>;
     
     public static Init() {
         let maxRowIndex = Math.floor(MaraUtils.GetScenaHeigth() / CLUSTER_SIZE);
         let maxColIndex = Math.floor(MaraUtils.GetScenaWidth() / CLUSTER_SIZE);
+
+        MaraResourceMap.ResourceClusters = new Map<string, MaraResourceCluster>();
         
         for (let rowIndex = 0; rowIndex < maxRowIndex; rowIndex ++) {
             for (let colIndex = 0; colIndex < maxColIndex; colIndex ++) {
                 let cluster = new MaraResourceCluster(colIndex, rowIndex);
 
                 if (cluster.WoodAmount > 112 || cluster.MetalAmount > 0 || cluster.GoldAmount > 0) {
-                    MaraResourceMap.ResourceClusters[cluster.ToString()] = cluster;
+                    MaraResourceMap.ResourceClusters.set(cluster.ToString(), cluster);
                 }
             }
         }
@@ -92,11 +94,11 @@ export class MaraResourceCluster {
         return amount;
     }
 
-    public ToString(): string {
-        return this.pointToString(this.Index);
+    public get Center(): MaraPoint {
+        return new MaraPoint(this.Coordinates.X + CLUSTER_SIZE / 2, this.Coordinates.Y + CLUSTER_SIZE / 2);
     }
 
-    private pointToString(point: MaraPoint): string {
-        return `${point.X};${point.Y}`;
+    public ToString(): string {
+        return this.Index.ToString();
     }
 }

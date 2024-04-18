@@ -32,4 +32,22 @@ export class MaraPoint {
         this.X = x;
         this.Y = y;
     }
+
+    public ToString(): string {
+        return `${this.X};${this.Y}`
+    }
+}
+
+export class MaraResources {
+    public Wood: number;
+    public Metal: number;
+    public Gold: number;
+    public People: number;
+
+    constructor(wood: number, metal: number, gold: number, people: number) {
+        this.Wood = wood;
+        this.Metal = metal;
+        this.Gold = gold;
+        this.People = people;
+    }
 }

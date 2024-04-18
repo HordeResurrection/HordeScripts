@@ -5,6 +5,7 @@ import { eNext, enumerate } from "Mara/Utils/Common";
 import { UnitComposition, MaraUtils, AlmostDefeatCondition, AllowedCompositionItem } from "Mara/Utils/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSquad } from "./Squads/MaraSquad";
+import { MaraResourceCluster } from "../MaraResourceMap";
 
 export class StrategySubcontroller extends MaraSubcontroller {
     private currentEnemy: any; //but actually Settlement
@@ -246,6 +247,19 @@ export class StrategySubcontroller extends MaraSubcontroller {
         }
 
         return defensiveStrength;
+    }
+
+    SelectOptimalResourceCluster(candidates: Array<MaraResourceCluster>): MaraResourceCluster {
+        let result: MaraResourceCluster = null;
+        let minDistance = Infinity;
+
+        for (let cluster of candidates) {
+            if (MaraUtils.ChebyshevDistance(cluster.Center, this.parentController.GetSettlementLocation()?.Center) < minDistance) {
+                result = cluster;
+            }
+        }
+
+        return result;
     }
 
     private buildEnemyList(): void {

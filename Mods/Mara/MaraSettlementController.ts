@@ -15,6 +15,7 @@ import { eNext, enumerate } from "./Utils/Common";
 import { MaraUtils, UnitComposition } from "./Utils/MaraUtils";
 import { MaraSettlementControllerSettings } from "./SettlementControllerSettings";
 import { SettlementControllerStateFactory } from "./SettlementControllerStateFactory";
+import { MaraResourceCluster } from "./MaraResourceMap";
 
 export class SettlementLocation {
     Center: any;
@@ -42,6 +43,7 @@ export class MaraSettlementController {
     public HostileAttackingSquads: Array<MaraSquad> = [];
     public TargetUnitsComposition: UnitComposition | null = null;
     public AttackToDefenseUnitRatio: number | null = null;
+    public TargetExpandCluster: MaraResourceCluster | null = null;
     
     private subcontrollers: Array<MaraSubcontroller> = [];
     private state: MaraSettlementControllerState;
