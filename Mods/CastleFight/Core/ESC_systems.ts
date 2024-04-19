@@ -405,6 +405,12 @@ export function AttackingAlongPathSystem2(world: World, gameTickNum: number) {
 
     var unitsMap = world.realScena.UnitsMap;
     var settlements_enemyAttackedCastle_positions = new Array<Array<Cell>>(world.settlementsCount);
+    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+        if (!world.IsSettlementInGame(settlementId)) {
+            continue;
+        }
+        settlements_enemyAttackedCastle_positions[settlementId] = new Array<Cell>();
+    }
 
     // ищем врагов, которые атакуют наш замок
 
@@ -412,7 +418,6 @@ export function AttackingAlongPathSystem2(world: World, gameTickNum: number) {
         if (!world.IsSettlementInGame(settlementId)) {
             continue;
         }
-        settlements_enemyAttackedCastle_positions[settlementId] = new Array<Cell>();
 
         for (var i = 0; i < world.settlements_entities[settlementId].length; i++) {
             var entity = world.settlements_entities[settlementId][i] as Entity;
@@ -438,7 +443,7 @@ export function AttackingAlongPathSystem2(world: World, gameTickNum: number) {
                 unitComponent.unit.Cell.X,
                 unitComponent.unit.Cell.Y,
                 targetCastleUnit.Cell.X,
-                targetCastleUnit.Cell.Y) > world.configs[unitComponent.cfgId].OrderDistance) {
+                targetCastleUnit.Cell.Y) > 2*world.configs[unitComponent.cfgId].OrderDistance) {
                 continue;
             }
 
@@ -447,14 +452,15 @@ export function AttackingAlongPathSystem2(world: World, gameTickNum: number) {
         }
     }
 
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
-        if (!world.IsSettlementInGame(settlementId)) {
-            continue;
-        }
-        log.info(settlementId, " = ", settlements_enemyAttackedCastle_positions[settlementId].length);
-    }
+    // for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    //     if (!world.IsSettlementInGame(settlementId)) {
+    //         continue;
+    //     }
+    //     log.info(settlementId, " = ", settlements_enemyAttackedCastle_positions[settlementId].length);
+    // }
 
     // отдаем приказы
+
     for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
         if (!world.IsSettlementInGame(settlementId)) {
             continue;
@@ -480,7 +486,7 @@ export function AttackingAlongPathSystem2(world: World, gameTickNum: number) {
 
             // если юнит вообще не знает куда идти, то выбираем путь атаки
             if (isAttackPathNull) {
-                var selectedAttackPathNum                       = world.settlements_attackPathChoiser[settlementId].choiseAttackPath(unitComponent.unit, world.settlements_attack_paths);
+                var selectedAttackPathNum                       = world.settlements_attackPathChoiser[settlementId].choiseAttackPath(unitComponent.unit, world);
                 attackingAlongPathComponent.attackPath          = world.settlements_attack_paths[settlementId][selectedAttackPathNum];
                 attackingAlongPathComponent.currentPathPointNum = 0;
             }
@@ -524,21 +530,33 @@ export function AttackingAlongPathSystem2(world: World, gameTickNum: number) {
                     unitComponent.unit.Cell.Y,
                     world.settlements_castleUnit[settlementId].Cell.X,
                     world.settlements_castleUnit[settlementId].Cell.Y) < 2*deffenceReactionRadius) {
+                // который в направлении атаки
+                var attackVector     = new Cell(
+                    attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].X - unitComponent.unit.Cell.X,
+                    attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].Y - unitComponent.unit.Cell.Y);
                 // ищем ближайшего врага
                 var nearPos_num      = -1;
                 var nearPos_distance = 10000;
                 for (var posNum = 0; posNum < settlements_enemyAttackedCastle_positions[castleUnit_settlementId].length; posNum++) {
+                    var enemyX = settlements_enemyAttackedCastle_positions[castleUnit_settlementId][posNum].X;
+                    var enemyY = settlements_enemyAttackedCastle_positions[castleUnit_settlementId][posNum].Y;
+                    // проверяем, что враг на пути атаки
+                    if (attackVector.X*(enemyX - unitComponent.unit.Cell.X)
+                        + attackVector.Y*(enemyY - unitComponent.unit.Cell.Y) < 0) {
+                        continue;
+                    }
+                    // ищем расстояние до цели
                     var posDistance = distance_L1(
                         unitComponent.unit.Cell.X,
                         unitComponent.unit.Cell.Y,
-                        settlements_enemyAttackedCastle_positions[castleUnit_settlementId][posNum].X,
-                        settlements_enemyAttackedCastle_positions[castleUnit_settlementId][posNum].Y);
+                        enemyX,
+                        enemyY);
                     if (posDistance < nearPos_distance) {
                         nearPos_num      = posNum;
                         nearPos_distance = posDistance;
                     }
                 }
-                if (nearPos_distance < deffenceReactionRadius) {
+                if (deffenceReactionRadius < nearPos_distance) {
                     nearPos_num = -1;
                 }
 
@@ -653,7 +671,7 @@ export function AttackingAlongPathSystem(world: World, gameTickNum: number) {
 
             // если юнит вообще не знает куда идти, то выбираем путь атаки
             if (isAttackPathNull) {
-                var selectedAttackPathNum                       = world.settlements_attackPathChoiser[settlementId].choiseAttackPath(unitComponent.unit, world.settlements_attack_paths);
+                var selectedAttackPathNum                       = world.settlements_attackPathChoiser[settlementId].choiseAttackPath(unitComponent.unit, world);
                 attackingAlongPathComponent.attackPath          = world.settlements_attack_paths[settlementId][selectedAttackPathNum];
                 attackingAlongPathComponent.currentPathPointNum = 0;
             }

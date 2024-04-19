@@ -2,7 +2,7 @@ import HordePluginBase from "plugins/base-plugin";
 import { BalanceFindingSystem } from "./BalanceFindingSystem";
 import { WordClearSystem, IncomeSystem, SpawnBuildingSystem, AttackingAlongPathSystem, ReviveSystem, UpgradableBuildingSystem_Stage1, BuffSystem, UpgradableBuildingSystem_Stage2, UnitProducedSystem, DiplomacySystem, UpgradableBuildingSystem, BuffSystem_v2, AttackingAlongPathSystem2 } from "./ESC_systems";
 import { Polygon, Cell, MetricType } from "./Utils";
-import { AttackPathChoiser_NearDistance, AttackPathChoiser_Periodically, GameState, IAttackPathChoiser, World } from "./World";
+import { AttackPathChoiser_NearDistance, AttackPathChoiser_Periodically, AttackPathChoiser_Periodically_WithCondCell, GameState, IAttackPathChoiser, World } from "./World";
 
 export var world = new World();
 
@@ -365,6 +365,172 @@ export class CastleFightPlugin extends HordePluginBase {
                         for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
                             world.settlements_attackPathChoiser[settlementId] = new AttackPathChoiser_NearDistance();
                         }
+                    } else if (scenaName == "Битва замков - перекресток (1x1x1x1)") {
+                        world.settlementsCount = 4;
+                        world.settlements_field                   = [
+                            new Polygon([new Cell(0, 0), new Cell(47, 0), new Cell(47, 47), new Cell(0, 47)]),
+                            new Polygon([new Cell(191, 0), new Cell(191, 47), new Cell(144, 47), new Cell(144, 0)]),
+                            new Polygon([new Cell(191, 191), new Cell(144, 191), new Cell(144, 144), new Cell(191, 144)]),
+                            new Polygon([new Cell(0, 191), new Cell(0, 144), new Cell(47, 144), new Cell(47, 191)])
+                        ];
+                        world.settlements_workers_reviveCells = [
+                            [new Cell(16, 16)],
+                            [new Cell(175, 16)],
+                            [new Cell(175, 175)],
+                            [new Cell(16, 175)]
+                        ];
+                        world.settlements_castle_cell         = [
+                            new Cell(35, 36),
+                            new Cell(152, 36),
+                            new Cell(152, 152),
+                            new Cell(35, 152)
+                        ];
+                        world.settlements_attack_paths            = [
+                            [
+                                [new Cell(156, 36)],
+                                [new Cell(156, 155)],
+                                [new Cell(35, 155)]
+                            ],
+                            [
+                                [new Cell(156, 155)],
+                                [new Cell(35, 155)],
+                                [new Cell(35, 36)]
+                            ],
+                            [
+                                [new Cell(35, 155)],
+                                [new Cell(35, 36)],
+                                [new Cell(156, 36)]
+                            ],
+                            [
+                                [new Cell(35, 36)],
+                                [new Cell(156, 36)],
+                                [new Cell(156, 155)]
+                            ]
+                        ];
+                        world.settlements_attackPathChoiser = new Array<IAttackPathChoiser>(world.settlementsCount);
+                        for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+                            world.settlements_attackPathChoiser[settlementId] = new AttackPathChoiser_Periodically_WithCondCell([
+                                [
+                                    [new Cell(156, 36)],
+                                    [new Cell(156, 155)],
+                                    [new Cell(35, 155)]
+                                ],
+                                [
+                                    [new Cell(156, 155)],
+                                    [new Cell(35, 155)],
+                                    [new Cell(35, 36)]
+                                ],
+                                [
+                                    [new Cell(35, 155)],
+                                    [new Cell(35, 36)],
+                                    [new Cell(156, 36)]
+                                ],
+                                [
+                                    [new Cell(35, 36)],
+                                    [new Cell(156, 36)],
+                                    [new Cell(156, 155)]
+                                ]
+                            ]);
+                        }
+                    } else if (scenaName == "Битва замков - перекресток (2x2x2)") {
+                        world.settlementsCount = 6;
+                        world.settlements_field                   = [
+                            new Polygon([new Cell(96, 96), new Cell(159, 96), new Cell(159, 159), new Cell(96, 159)]),
+                            new Polygon([new Cell(96, 96), new Cell(159, 96), new Cell(159, 159), new Cell(96, 159)]),
+
+                            new Polygon([new Cell(32, 32), new Cell(63, 32), new Cell(63, 63), new Cell(32, 63)]),
+                            new Polygon([new Cell(192, 32), new Cell(223, 32), new Cell(223, 63), new Cell(192, 63)]),
+
+                            new Polygon([new Cell(32, 192), new Cell(63, 192), new Cell(63, 223), new Cell(32, 223)]),
+                            new Polygon([new Cell(192, 192), new Cell(223, 192), new Cell(223, 223), new Cell(192, 223)])
+                        ];
+                        world.settlements_workers_reviveCells = [
+                            [new Cell(128, 71)],
+                            [new Cell(127, 184)],
+
+                            [new Cell(31, 31)],
+                            [new Cell(224, 41)],
+
+                            [new Cell(31, 224)],
+                            [new Cell(224, 224)]
+                        ];
+                        world.settlements_castle_cell         = [
+                            new Cell(126, 126),
+                            new Cell(126, 126),
+
+                            new Cell(43, 44),
+                            new Cell(208, 44),
+
+                            new Cell(43, 208),
+                            new Cell(208, 208)
+                        ];
+                        world.settlements_attack_paths            = [
+                            [
+                                [new Cell(47, 47)],
+                                [new Cell(208, 47)],
+                                [new Cell(208, 208)],
+                                [new Cell(43, 208)]
+                            ],
+                            [
+                                [new Cell(47, 47)],
+                                [new Cell(208, 47)],
+                                [new Cell(208, 208)],
+                                [new Cell(43, 208)]
+                            ],
+
+                            [
+                                [new Cell(126, 126), new Cell(208, 208)],
+                                [new Cell(43, 208)]
+                            ],
+                            [
+                                [new Cell(126, 126), new Cell(43, 208)],
+                                [new Cell(208, 208)],
+                            ],
+
+                            [
+                                [new Cell(126, 126), new Cell(208, 44)],
+                                [new Cell(43, 44)]
+                            ],
+                            [
+                                [new Cell(126, 126), new Cell(43, 44)],
+                                [new Cell(208, 44)]
+                            ]
+                        ];
+                        world.settlements_attackPathChoiser = new Array<IAttackPathChoiser>(world.settlementsCount);
+                        for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+                            world.settlements_attackPathChoiser[settlementId] = new AttackPathChoiser_Periodically_WithCondCell([
+                                [
+                                    [new Cell(47, 47)],
+                                    [new Cell(208, 47)],
+                                    [new Cell(208, 208)],
+                                    [new Cell(43, 208)]
+                                ],
+                                [
+                                    [new Cell(47, 47)],
+                                    [new Cell(208, 47)],
+                                    [new Cell(208, 208)],
+                                    [new Cell(43, 208)]
+                                ],
+    
+                                [
+                                    [new Cell(126, 126), new Cell(208, 208)],
+                                    [new Cell(43, 208)]
+                                ],
+                                [
+                                    [new Cell(126, 126), new Cell(43, 208)],
+                                    [new Cell(208, 208)],
+                                ],
+    
+                                [
+                                    [new Cell(126, 126), new Cell(208, 44)],
+                                    [new Cell(43, 44)]
+                                ],
+                                [
+                                    [new Cell(126, 126), new Cell(43, 44)],
+                                    [new Cell(208, 44)]
+                                ]
+                            ]);
+                        }
                     } else {
                         return;
                     }
@@ -376,8 +542,8 @@ export class CastleFightPlugin extends HordePluginBase {
                     world.RegisterSystem(WordClearSystem, "WordClearSystem");
                     world.RegisterSystem(IncomeSystem, "IncomeSystem");
                     world.RegisterSystem(SpawnBuildingSystem, "SpawnBuildingSystem");
-                    world.RegisterSystem(AttackingAlongPathSystem, "AttackingAlongPathSystem");
-                    //world.RegisterSystem(AttackingAlongPathSystem2, "AttackingAlongPathSystem");
+                    //world.RegisterSystem(AttackingAlongPathSystem, "AttackingAlongPathSystem");
+                    world.RegisterSystem(AttackingAlongPathSystem2, "AttackingAlongPathSystem");
                     world.RegisterSystem(ReviveSystem, "ReviveSystem");
                     world.RegisterSystem(UpgradableBuildingSystem, "UpgradableBuildingSystem");
                     world.RegisterSystem(BuffSystem, "BuffSystem");
