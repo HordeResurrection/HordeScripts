@@ -1,6 +1,7 @@
 import { printObjectItems } from "library/common/introspection";
 import { log } from "library/common/logging";
-import { Point } from "./Utils";
+import { Cell } from "./Utils";
+import { Int32 } from "library/dotnet/dotnet-types";
 
 export class Entity {
     /** компоненты */
@@ -120,11 +121,11 @@ export class SpawnBuildingComponent extends IComponent {
 
 export class AttackingAlongPathComponent extends IComponent {
     /** путь атаки */
-    attackPath: Array<Point>;
+    attackPath: Array<Cell>;
     /** номер точки в которую нужно сейчас идти */
     currentPathPointNum: number;
 
-    public constructor(attackPath?: Array<Point>, currentPathPointNum?: number) {
+    public constructor(attackPath?: Array<Cell>, currentPathPointNum?: number) {
         super(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT);
 
         if (attackPath) {
@@ -283,7 +284,7 @@ export class SettlementComponent extends IComponent {
 
 export class ReviveComponent extends IComponent {
     /** точка - места респа рабочего */
-    point: Point;
+    cell: Cell;
     /** время возрождения */
     reviveTicks: number;
     /** время когда рабочего нужно реснуть */
@@ -291,17 +292,17 @@ export class ReviveComponent extends IComponent {
     /** флаг, что юнит ждет респа */
     waitingToRevive: boolean;
     
-    public constructor(point: Point, reviveTicks: number, tick: number) {
+    public constructor(point: Cell, reviveTicks: number, tick: number) {
         super(COMPONENT_TYPE.REVIVE_COMPONENT);
 
-        this.point           = point;
+        this.cell           = point;
         this.reviveTicks     = reviveTicks;
         this.tick            = tick;
         this.waitingToRevive = false;
     }
 
     public Clone() : ReviveComponent {
-        return new ReviveComponent(this.point, this.reviveTicks, this.tick);
+        return new ReviveComponent(this.cell, this.reviveTicks, this.tick);
     }
 };
 
@@ -325,11 +326,14 @@ export class UpgradableBuildingComponent extends IComponent {
 
 /** тип баффа */
 export enum BUFF_TYPE {
-    ATTACK = 0,
+    EMPTY = 0,
+    ATTACK,
+    ACCURACY,
     HEALTH,
     DEFFENSE,
     CLONING,
-    EMPTY
+
+    SIZE
 };
 
 /** Компонент с информацией о текущем бафе, его наличие означает, что юнита можно баффать */
@@ -338,8 +342,10 @@ export class BuffableComponent extends IComponent {
     buffType: BUFF_TYPE;
     /** баффнутый Cfg */
     buffCfg: any;
+    /** маска доступных баффов */
+    buffMask: Array<boolean>;
 
-    public constructor(buffType?: BUFF_TYPE, buffCfg?: any) {
+    public constructor(buffMask?: Array<boolean>, buffType?: BUFF_TYPE, buffCfg?: any) {
         super(COMPONENT_TYPE.BUFFABLE_COMPONENT);
 
         if (buffType) {
@@ -352,10 +358,18 @@ export class BuffableComponent extends IComponent {
         } else {
             this.buffCfg = null;
         }
+        if (buffMask) {
+            this.buffMask = buffMask;
+        } else {
+            this.buffMask = new Array<boolean>(BUFF_TYPE.SIZE);
+            for (var i = 0; i < BUFF_TYPE.SIZE; i++) {
+                this.buffMask[i] = true;
+            }
+        }
     }
 
     public Clone() : BuffableComponent {
-        return new BuffableComponent(this.buffType, this.buffCfg);
+        return new BuffableComponent(this.buffMask, this.buffType, this.buffCfg);
     }
 };
 
