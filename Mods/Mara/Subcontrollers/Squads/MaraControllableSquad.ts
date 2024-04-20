@@ -1,8 +1,8 @@
 import { MaraUtils } from "Mara/Utils/MaraUtils";
 import { TacticalSubcontroller } from "../TacticalSubcontroller";
-import { MaraSquad, MIN_INITIAL_SQUAD_STRENGTH } from "./MaraSquad";
+import { MaraSquad } from "./MaraSquad";
 import { MaraSquadIdleState } from "./SquadStates/MaraSquadIdleState";
-import { MaraSquadState, ENEMY_SEARCH_RADIUS } from "./SquadStates/MaraSquadState";
+import { MaraSquadState } from "./SquadStates/MaraSquadState";
 
 export class MaraControllableSquad extends MaraSquad {
     private controller: TacticalSubcontroller;
@@ -26,12 +26,11 @@ export class MaraControllableSquad extends MaraSquad {
     MovementTargetCell: any; //but actually cell
     CurrentTargetCell: any; //but actually cell
     MovementPrecision: number;
-    public readonly DEFAULT_MOVEMENT_PRECISION = 3;
 
     constructor(units:Array<any>, controller: TacticalSubcontroller){
         super(units);
         this.controller = controller;
-        this.initialStrength = Math.max(this.Strength, MIN_INITIAL_SQUAD_STRENGTH);
+        this.initialStrength = Math.max(this.Strength, this.controller.SquadsSettings.MinStrength);
         this.recalcMinSpread();
 
         this.SetState(new MaraSquadIdleState(this));
@@ -50,13 +49,13 @@ export class MaraControllableSquad extends MaraSquad {
     Attack(targetLocation: any, precision?: number): void {
         this.AttackTargetCell = targetLocation;
         this.MovementTargetCell = null;
-        this.MovementPrecision = precision ? precision : this.DEFAULT_MOVEMENT_PRECISION;
+        this.MovementPrecision = precision ? precision : this.controller.SquadsSettings.DefaultMovementPrecision;
     }
 
     Move(location: any, precision?: number): void {
         this.MovementTargetCell = location;
         this.AttackTargetCell = null;
-        this.MovementPrecision = precision ? precision : this.DEFAULT_MOVEMENT_PRECISION;
+        this.MovementPrecision = precision ? precision : this.controller.SquadsSettings.DefaultMovementPrecision;
     }
 
     SetState(newState: MaraSquadState): void {
@@ -75,7 +74,7 @@ export class MaraControllableSquad extends MaraSquad {
     IsEnemyNearby(): boolean {
         let enemies = MaraUtils.GetSettlementUnitsInArea(
             this.GetLocation().Point, 
-            ENEMY_SEARCH_RADIUS, 
+            this.Controller.SquadsSettings.EnemySearchRadius,
             this.Controller.EnemySettlements
         );
 

@@ -1,9 +1,15 @@
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 import { ProductionState } from "./ProductionState";
-import { ExterminatingState } from "./ExterminatingState";
+import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 
 export class BuildingUpState extends ProductionState {
-    protected readonly PRODUCTION_TIMEOUT: number | null = 3 * 60 * 50; //3 min
+    protected getProductionTimeout(): number | null {
+        return MaraUtils.Random(
+            this.settlementController.MasterMind,
+            this.settlementController.Settings.Timeouts.MaxBuildUpProductionTimeout,
+            this.settlementController.Settings.Timeouts.MinBuildUpProductionTimeout
+        );
+    }
     
     protected getTargetUnitsComposition(): UnitComposition {
         let enemy = this.settlementController.StrategyController.CurrentEnemy
@@ -26,6 +32,6 @@ export class BuildingUpState extends ProductionState {
     }
 
     protected onTargetCompositionReached(): void {
-        this.settlementController.State = new ExterminatingState(this.settlementController);
+        this.settlementController.State = SettlementControllerStateFactory.MakeExterminatingState(this.settlementController);
     }
 }

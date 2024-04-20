@@ -1,6 +1,6 @@
 import { MaraUtils } from "Mara/Utils/MaraUtils";
 import { MaraSquadBattleState } from "./MaraSquadBattleState";
-import { MaraSquadState, MIN_SPREAD_THRESHOLD_MULTIPLIER } from "./MaraSquadState";
+import { MaraSquadState } from "./MaraSquadState";
 
 export abstract class MaraSquadGatheringUpState extends MaraSquadState {
     OnEntry(): void {
@@ -18,9 +18,7 @@ export abstract class MaraSquadGatheringUpState extends MaraSquadState {
             }
 
             if (closestToTargetUnit) {
-                for (let unit of this.squad.Units) {
-                    MaraUtils.IssueMoveCommand(unit, this.squad.Controller.Player, closestToTargetUnit.Cell);
-                }
+                MaraUtils.IssueMoveCommand(this.squad.Units, this.squad.Controller.Player, closestToTargetUnit.Cell);
             }
         }
     }
@@ -35,7 +33,7 @@ export abstract class MaraSquadGatheringUpState extends MaraSquadState {
         
         let location = this.squad.GetLocation();
 
-        if (location.Spread <= this.squad.MinSpread * MIN_SPREAD_THRESHOLD_MULTIPLIER) {
+        if (location.Spread <= this.squad.MinSpread * this.squad.Controller.SquadsSettings.MinSpreadMultiplier) {
             this.onGatheredUp();
             return;
         }

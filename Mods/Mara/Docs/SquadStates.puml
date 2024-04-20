@@ -4,25 +4,29 @@ state Idle : Standing doing nothing\nstart battle if enemy is nearby
 state Move : Moving to a destination and\nignoring enemies on the way
 state Attack : Moving to a destination and\nengaging enemies on the way
 state GatherUp : Trying to get the squad together
-state Fight : Fighting the enemies\ntill victory or the bitter end
+state Battle : Fighting the enemies\ntill victory or the bitter end
 state IdleGatherUp: Trying to get the squad together
+state Pullback: Moving back to location\nwhere fight started
 
 Idle --> Move: Move command received
 Idle --> Attack: Attack command received
-Idle --> Fight: Enemy is\nnearby
+Idle --> Battle: Enemy is\nnearby
 Idle -> IdleGatherUp: Spread is too big
 
 Attack --> GatherUp: Squad spread is too big
-Attack --> Fight: Enemy is nearby
+Attack --> Battle: Enemy is nearby
 Attack --> Idle: Destination reached
 Attack --> Move: Move command\nreceived
 
 GatherUp --> Attack: Squad spread is\nacceptable
-GatherUp --> Fight: Enemy is nearby
+GatherUp --> Battle: Enemy is nearby
 
 Move --> Idle: Destination reached with\ngiven accuracy or\ntimeout expires
 
-Fight --> Attack: Enemy\ndefeated
+Battle --> Attack: Enemy\ndefeated
+Battle --> Pullback: Moved too far from battle\ninitial location
+
+Pullback --> Battle: Reached initial battle location
 
 IdleGatherUp -> Idle: Spread is acceptable
 

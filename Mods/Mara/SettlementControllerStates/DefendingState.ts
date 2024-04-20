@@ -1,6 +1,5 @@
-import { DevelopingState } from "./DevelopingState";
+import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
-import { RebuildState } from "./RebuildState";
 import { MaraUtils } from "Mara/Utils/MaraUtils";
 
 export class DefendingState extends MaraSettlementControllerState {
@@ -25,11 +24,11 @@ export class DefendingState extends MaraSettlementControllerState {
                 
                 if (this.canRebuild()) {
                     this.settlementController.Debug(`Damage is acceptable, rebuilding`);
-                    this.settlementController.State = new RebuildState(this.settlementController);
+                    this.settlementController.State = SettlementControllerStateFactory.MakeRebuildState(this.settlementController);
                 }
                 else {
                     this.settlementController.Debug(`Damage is too severe, starting to build up from lower tier`);
-                    this.settlementController.State = new DevelopingState(this.settlementController);
+                    this.settlementController.State = SettlementControllerStateFactory.MakeBuildingUpState(this.settlementController);
                 }
 
                 return;
@@ -70,8 +69,6 @@ export class DefendingState extends MaraSettlementControllerState {
     }
 
     private canRebuild(): boolean {
-        const REBUILD_THRESHOLD = 2 * 60 * 50 / 2; //3 min
-
         let requiredEconomy = this.settlementController.TargetUnitsComposition;
 
         if (!requiredEconomy) {
@@ -105,6 +102,6 @@ export class DefendingState extends MaraSettlementControllerState {
 
         this.settlementController.Debug(`Estimated rebuild time: ${productionTime}`);
 
-        return productionTime <= REBUILD_THRESHOLD;
+        return productionTime <= this.settlementController.Settings.Timeouts.RebuildEstimationThreshold / 2;
     }
 }

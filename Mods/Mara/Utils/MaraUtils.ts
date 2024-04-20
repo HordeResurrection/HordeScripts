@@ -415,15 +415,15 @@ export class MaraUtils {
         return null;
     }
 
-    static IssueAttackCommand(unit: any, player: any, location: any, isReplaceMode: boolean = true) {
-        MaraUtils.issueCommand(unit, player, location, UnitCommand.Attack, isReplaceMode);
+    static IssueAttackCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true) {
+        MaraUtils.issueCommand(units, player, location, UnitCommand.Attack, isReplaceMode);
     }
 
-    static IssueMoveCommand(unit: any, player: any, location: any, isReplaceMode: boolean = true) {
-        MaraUtils.issueCommand(unit, player, location, UnitCommand.MoveToPoint, isReplaceMode);
+    static IssueMoveCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true) {
+        MaraUtils.issueCommand(units, player, location, UnitCommand.MoveToPoint, isReplaceMode);
     }
 
-    private static issueCommand(unit: any, player: any, location: any, command: any, isReplaceMode: boolean = true) {
+    private static issueCommand(units: Array<any>, player: any, location: any, command: any, isReplaceMode: boolean = true) {
         let virtualInput = MaraUtils.playersInput[player];
         
         if (!virtualInput) {
@@ -433,7 +433,14 @@ export class MaraUtils {
 
         let mode = isReplaceMode ? AssignOrderMode.Replace : AssignOrderMode.Queue;
 
-        virtualInput.selectUnitsById([unit.Id], VirtualSelectUnitsMode.Select);
+        let unitIds = units.map((unit) => unit.Id);
+        let chunkSize = 10;
+
+        for (let i = 0; i < unitIds.length; i += chunkSize) {
+            let chunk = unitIds.slice(i, i + chunkSize);
+            virtualInput.selectUnitsById(chunk, VirtualSelectUnitsMode.Select);
+        }
+
         virtualInput.pointBasedCommand(createPoint(location.X, location.Y), command, mode);
         virtualInput.commit();
     }
@@ -578,6 +585,10 @@ export class MaraUtils {
         let cfg = MaraUtils.GetUnitConfig(cfgId);
 
         return cfg.BuildingConfig != null && cfg.HasNotFlags(UnitFlags.Passive);
+    }
+
+    static IsMineConfig(unitConfig: any):boolean {
+        return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Mine);
     }
 
     static GetUnitStrength(unit: any): number {

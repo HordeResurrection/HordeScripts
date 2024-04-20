@@ -1,13 +1,12 @@
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
-import { DefendingState } from "./DefendingState";
+import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 
 export abstract class ProductionState extends MaraSettlementControllerState {
     private targetUnitsComposition: UnitComposition = new Map<string, number>();
 
     protected abstract getTargetUnitsComposition(): UnitComposition;
     protected abstract onTargetCompositionReached(): void;
-    protected readonly PRODUCTION_TIMEOUT: number | null = null;
 
     private timeoutTick: number | null;
     
@@ -24,9 +23,12 @@ export abstract class ProductionState extends MaraSettlementControllerState {
     }
 
     Tick(tickNumber: number): void {
-        if (this.PRODUCTION_TIMEOUT != null) {
+        let timeout = this.getProductionTimeout();
+        
+        if (timeout != null) {
             if (this.timeoutTick == null) {
-                this.timeoutTick = tickNumber + this.PRODUCTION_TIMEOUT;
+                this.settlementController.Debug(`Set production timeout to ${timeout} ticks`);
+                this.timeoutTick = tickNumber + timeout;
             }
             else if (tickNumber > this.timeoutTick) {
                 this.settlementController.Debug(`Production is too long-drawn, discontinuing`);
@@ -41,7 +43,7 @@ export abstract class ProductionState extends MaraSettlementControllerState {
 
         if (tickNumber % 50 == 0) {
             if (this.settlementController.StrategyController.IsUnderAttack()) {
-                this.settlementController.State = new DefendingState(this.settlementController);
+                this.settlementController.State = SettlementControllerStateFactory.MakeDefendingState(this.settlementController);
                 return;
             }
         }
@@ -54,6 +56,10 @@ export abstract class ProductionState extends MaraSettlementControllerState {
             this.onTargetCompositionReached();
             return;
         }
+    }
+
+    protected getProductionTimeout(): number | null {
+        return null;
     }
 
     private getRemainingProductionList(): UnitComposition {

@@ -1,11 +1,8 @@
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 import { ProductionState } from "./ProductionState";
-import { BuildingUpState } from "./BuildingUpState";
+import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 
 export class DevelopingState extends ProductionState {
-    private readonly MAX_PRODUCTION_TIME = (2 * 60 * 50) / 2; //2 min
-    private readonly PRODUCER_PRODUCTION_PROBABILITY = 66;
-    
     protected getTargetUnitsComposition(): UnitComposition {
         var targetCompostion = new Map<string, number>();
 
@@ -38,7 +35,7 @@ export class DevelopingState extends ProductionState {
             if (absentProducers.length > 0 && absentTech.length > 0) {
                 let pick = MaraUtils.Random(this.settlementController.MasterMind, 100, 1);
                 
-                if (pick > this.PRODUCER_PRODUCTION_PROBABILITY) {
+                if (pick > this.settlementController.Settings.ControllerStates.ProducerProductionProbability) {
                     selectedCfgIds = absentTech;
                 }
                 else {
@@ -60,7 +57,7 @@ export class DevelopingState extends ProductionState {
         let estimation = this.settlementController.ProductionController.EstimateProductionTime(combatComposition);
 
         estimation.forEach((value, key) => {
-            if (value > this.MAX_PRODUCTION_TIME) {
+            if (value > this.settlementController.Settings.Timeouts.UnitProductionEstimationThreshold / 2) {
                 let producingCfgIds = this.settlementController.ProductionController.GetProducingCfgIds(key);
 
                 if (producingCfgIds.length > 0) {
@@ -86,6 +83,6 @@ export class DevelopingState extends ProductionState {
     }
 
     protected onTargetCompositionReached(): void {
-        this.settlementController.State = new BuildingUpState(this.settlementController);
+        this.settlementController.State = SettlementControllerStateFactory.MakeBuildingUpState(this.settlementController);
     }
 }

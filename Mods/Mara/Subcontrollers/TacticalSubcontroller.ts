@@ -3,11 +3,9 @@ import { eNext, enumerate } from "Mara/Utils/Common";
 import { MaraUtils } from "Mara/Utils/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraControllableSquad } from "./Squads/MaraControllableSquad";
+import { TileType } from "library/game-logic/horde-types";
 
 export class TacticalSubcontroller extends MaraSubcontroller {
-    private readonly SQUAD_COMBATIVITY_THRESHOLD = 0.25;
-    private readonly SQUAD_STRENGTH_THRESHOLD = 100;
-
     private offensiveSquads: Array<MaraControllableSquad> = [];
     private defensiveSquads: Array<MaraControllableSquad> = [];
     private reinforcementSquads: Array<MaraControllableSquad> = [];
@@ -46,6 +44,10 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         return [...this.offensiveSquads, ...this.defensiveSquads, ...this.reinforcementSquads];
     }
 
+    public get SquadsSettings(): any {
+        return this.parentController.Settings.Squads;
+    }
+
     Tick(tickNumber: number): void {
         for (let squad of this.parentController.HostileAttackingSquads) {
             squad.Tick(tickNumber);
@@ -64,7 +66,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
                     for (let squad of this.offensiveSquads) {
                         if (pullbackLocation) {
-                            if (squad.CombativityIndex < this.SQUAD_COMBATIVITY_THRESHOLD) {
+                            if (squad.CombativityIndex < this.parentController.Settings.Squads.MinCombativityIndex) {
                                 this.sendSquadToLocation(squad, pullbackLocation);
                             }
                         }
@@ -334,6 +336,54 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     private createSquadsFromUnits(units: Array<any>): Array<MaraControllableSquad> {
+        let unitClusters = this.clusterizeUnits(units);
+        let result: Array<MaraControllableSquad> = [];
+
+        for (let cluster of unitClusters) {
+            let squads = this.createSquadsFromHomogeneousUnits(cluster);
+            result.push(...squads);
+        }
+        
+        return result;
+    }
+
+    private clusterizeUnits(units: Array<any>): Array<Array<any>> {
+        let clusters = new Map<string, Array<any>>();
+
+        for (let unit of units) {
+            let moveType = unit.Cfg.MoveType.ToString();
+
+            let unitSpeed = unit.Cfg.Speeds.Item(TileType.Grass);
+            let speedGroupCode = "";
+
+            if (unitSpeed <= 9) {
+                speedGroupCode = "1";
+            }
+            else if (unitSpeed <= 14) {
+                speedGroupCode = "2";
+            }
+            else {
+                speedGroupCode = "3";
+            }
+
+            let clusterKey = `${moveType}:${speedGroupCode}`;
+            let cluster: Array<any>;
+            
+            if (clusters.has(clusterKey)) {
+                cluster = clusters.get(clusterKey)!;
+            }
+            else {
+                cluster = new Array<any>();
+            }
+
+            cluster.push(unit);
+            clusters.set(clusterKey, cluster);
+        }
+        
+        return Array.from(clusters.values());
+    }
+
+    private createSquadsFromHomogeneousUnits(units: Array<any>): Array<MaraControllableSquad> {
         let squadUnits: any[] = [];
         let squads: Array<MaraControllableSquad> = [];
         let currentSquadStrength = 0;
@@ -343,7 +393,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             squadUnits.push(unit);
             this.parentController.Debug(`Added unit ${unit.ToString()} into squad`);
 
-            if (currentSquadStrength >= this.SQUAD_STRENGTH_THRESHOLD) {
+            if (currentSquadStrength >= this.parentController.Settings.Squads.MinStrength) {
                 let squad = this.createSquad(squadUnits);
                 
                 squads.push(squad);
