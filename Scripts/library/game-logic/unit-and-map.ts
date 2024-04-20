@@ -10,7 +10,7 @@ import { KnownUnit, Unit } from "./horde-types";
  * (Тут используется актуальные данные карты)
  */
 export function unitCanBePlacedByRealMap(uCfg, x, y) {
-    return uCfg.CanBePlaced(ActiveScena.GetRealScena(), x, y);
+    return uCfg.CanBePlacedByRealMap(ActiveScena.GetRealScena(), x, y);
 }
 
 /**
