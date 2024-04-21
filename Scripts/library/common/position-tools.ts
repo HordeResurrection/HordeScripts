@@ -119,3 +119,21 @@ export function* generateRandomCellInRect(rectX, rectY, rectW, rectH) {
 
     return;
 }
+
+export function* generateCellInRect(rectX: number, rectY: number, rectW: number, rectH: number) {
+    let scenaWidth = ActiveScena.GetRealScena().Size.Width;
+    let scenaHeight = ActiveScena.GetRealScena().Size.Height;
+
+    rectX = Math.max(0, rectX);
+    rectY = Math.max(0, rectY);
+    rectW = Math.min(scenaWidth - rectX, rectW);
+    rectH = Math.min(scenaHeight - rectY, rectH);
+
+    for (var x = rectX; x < rectX + rectW; x++) {
+        for (var y = rectY; y < rectY + rectH; y++) {
+            yield { X: x, Y: y };
+        }
+    }
+
+    return;
+}

@@ -1,41 +1,98 @@
+import { createPoint } from "library/common/primitives";
+import { ProduceRequestParameters } from "library/mastermind/matermind-types";
 import HordeExampleBase from "./base-example";
 
 /**
  * Пример работы с MasterMind
  */
 export class Example_MasterMindRequest extends HordeExampleBase {
+    workPlayerNum: string;
+    printRequestsPeriod: number;
+    masterMind: any;
 
     public constructor() {
         super("Request for MasterMind");
+        
+        this.workPlayerNum = "1";
+        this.printRequestsPeriod = 1000;
     }
 
     public onFirstRun() {
         this.logMessageOnRun();
         
-        let realPlayer = Players["1"].GetRealPlayer();
-        let masterMind = realPlayer.MasterMind;
-        if (!masterMind) {
+        let workPlayer = Players[this.workPlayerNum].GetRealPlayer();
+        this.masterMind = workPlayer.MasterMind;
+        if (!this.masterMind) {
             this.log.info('Выбранный игрок не управляется MasterMind.');
             return;
         }
-
-        // Активация бота, если отключен
-        if (!masterMind.IsWorkMode) {
-            this.log.info('Включение режима работы MasterMind для', realPlayer.Nickname);
-            masterMind.IsWorkMode = true;
+        
+        // Активация MasterMind, если отключен
+        if (!this.masterMind.IsWorkMode) {
+            this.log.info('Включение режима работы MasterMind для', workPlayer.Nickname);
+            this.masterMind.IsWorkMode = true;
         }
 
-        // Создадим запрос на производство катапульты
-        let productionDepartament = masterMind.ProductionDepartment;
+        // Объект для задания запросов
+        let productionDepartament = this.masterMind.ProductionDepartment;
+
+        // Создадим запрос на производство одной катапульты
         let catapultCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Catapult");
-        if (!productionDepartament.AddRequestToProduce(catapultCfg, 1)) {
+
+        // Параметры запроса
+        let produceRequestParameters = new ProduceRequestParameters(catapultCfg, 1);
+        produceRequestParameters.CheckExistsRequest = false;            // Следует ли проверять наличие имеющихся запросов?
+        produceRequestParameters.AllowAuxiliaryProduceRequests = true;  // Разрешить ли создавать запросы на производство требуемых юнитов?
+        produceRequestParameters.TargetCell = null;                     // Местоположение строительства (актуально только для зданий)
+
+        // Добавление запроса
+        if (!productionDepartament.AddRequestToProduce(produceRequestParameters)) {
             this.log.info('Не удалось добавить запрос на создание катапульты.');
         } else {
             this.log.info('Добавлен запрос на создание 1 катапульты.');
         }
 
+        // Создадим запрос на производство одной избы
+        let farmCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Farm");
+
+        // Параметры запроса
+        produceRequestParameters = new ProduceRequestParameters(farmCfg, 1);
+        produceRequestParameters.CheckExistsRequest = false;            // Следует ли проверять наличие имеющихся запросов?
+        produceRequestParameters.AllowAuxiliaryProduceRequests = false; // Разрешить ли создавать запросы на производство требуемых юнитов?
+        produceRequestParameters.TargetCell = createPoint(95, 3);       // Местоположение строительства (верхний левый угол)
+        produceRequestParameters.MaxRetargetAttempts = 0;               // Количество попыток (за такт) для выбора другого места строительства поблизости
+        produceRequestParameters.DisableBuildPlaceChecking = true;      // Принудительное строительство в этой клетке без проверки места
+        let producer = workPlayer.GetRealSettlement().Units.GetById(439);
+        produceRequestParameters.Producer = producer;                   // Так можно задать юнита-исполнителя (если null, то будет выбран свободный подходящий производитель)
+
+        // Добавление запроса
+        if (!productionDepartament.AddRequestToProduce(produceRequestParameters)) {
+            this.log.info('Не удалось добавить запрос на постройку избы.');
+        } else {
+            this.log.info('Добавлен запрос на постройку избы.');
+        }
+
         // Проверяем запросы
-        let requests = masterMind.Requests;
+        let requests = this.masterMind.Requests;
+        this.log.info('Запросов в обработке:', requests.Count);
+        ForEach(requests, item => {
+            this.log.info('-', item);
+        });
+    }
+
+    public onEveryTick(gameTickNum: number) {
+        if (this.masterMind == 0) {
+            return;
+        }
+        if (this.printRequestsPeriod == 0) {
+            return;
+        }
+        if (gameTickNum % this.printRequestsPeriod != 0) {
+            return;
+        }
+
+        // Отобразить текущие запросы
+        let requests = this.masterMind.Requests;
         this.log.info('Запросов в обработке:', requests.Count);
         ForEach(requests, item => {
             this.log.info('-', item);
