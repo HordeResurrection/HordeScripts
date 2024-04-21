@@ -99,13 +99,13 @@ export class MaraSettlementController {
         
         if (this.nextState) {
             if (this.state) {
-                this.Debug("Leaving state " + this.state.constructor.name);
+                this.Debug(`Leaving state ${this.state.constructor.name}`);
                 this.state.OnExit();
             }
             
             this.state = this.nextState;
             this.nextState = null;
-            this.Debug("Entering state " + this.state.constructor.name);
+            this.Debug(`Entering state ${this.state.constructor.name}, tick ${tickNumber}`);
             this.state.OnEntry();
         }
 
