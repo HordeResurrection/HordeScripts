@@ -12,7 +12,17 @@ export abstract class ProductionState extends MaraSettlementControllerState {
     
     OnEntry(): void {
         this.settlementController.ProductionController.CancelAllProduction();
-        this.targetUnitsComposition = this.getTargetUnitsComposition();
+        let unitsComposition = this.getTargetUnitsComposition();
+        this.targetUnitsComposition = new Map<string, number>();
+        
+        unitsComposition.forEach((value, key) => {
+            let unitConfig = MaraUtils.GetUnitConfig(key);
+            let canProduce = this.settlementController.Settlement.TechTree.HypotheticalProducts.CanProduce(unitConfig);
+
+            if (canProduce) {
+                this.targetUnitsComposition.set(key, value);
+            }
+        })
 
         this.refreshTargetProductionLists();
         this.timeoutTick = null;
