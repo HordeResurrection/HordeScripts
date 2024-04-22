@@ -231,12 +231,12 @@ export class MaraUtils {
     static GetSettlementUnitsInArea(
         cell: any, 
         radius: number, 
-        enemySettelements: Array<any>,
+        settelements: Array<any>,
         unitFilter?: (unit: any) => boolean
     ): Array<any> {
         let units = MaraUtils.GetUnitsInArea(cell, radius, unitFilter);
         let enemies = units.filter((unit) => {
-            return enemySettelements.indexOf(unit.Owner) > -1 && unit.IsAlive && unit.Cfg.HasNotFlags(UnitFlags.Passive)
+            return settelements.indexOf(unit.Owner) > -1 && unit.IsAlive && unit.Cfg.HasNotFlags(UnitFlags.Passive)
         });
 
         return enemies;

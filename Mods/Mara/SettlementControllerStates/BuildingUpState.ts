@@ -22,7 +22,7 @@ export class BuildingUpState extends ProductionState {
         if (enemy) {
             this.settlementController.Debug(`Proceeding to build-up against '${enemy.TownName}'.`);
             let currentEconomy = this.settlementController.GetCurrentDevelopedEconomyComposition();
-            let armyToProduce = this.settlementController.StrategyController.GetArmyComposition();
+            let armyToProduce = this.settlementController.StrategyController.GetSettlementAttackArmyComposition();
             
             return MaraUtils.AddCompositionLists(currentEconomy, armyToProduce);
         }

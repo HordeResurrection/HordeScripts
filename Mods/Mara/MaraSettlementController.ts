@@ -15,7 +15,7 @@ import { eNext, enumerate } from "./Utils/Common";
 import { MaraUtils, UnitComposition } from "./Utils/MaraUtils";
 import { MaraSettlementControllerSettings } from "./SettlementControllerSettings";
 import { SettlementControllerStateFactory } from "./SettlementControllerStateFactory";
-import { MaraResourceCluster } from "./MaraResourceMap";
+import { MaraResourceCluster, MaraResourceType } from "./MaraResourceMap";
 
 export class SettlementLocation {
     Center: any;
@@ -24,6 +24,16 @@ export class SettlementLocation {
     constructor(center: any, radius: number) {
         this.Center = center;
         this.Radius = radius;
+    }
+}
+
+export class TargetExpandData {
+    Cluster: MaraResourceCluster | null;
+    ResourceType: MaraResourceType[];
+
+    constructor(cluster: MaraResourceCluster | null, resourceType: MaraResourceType[]) {
+        this.Cluster = cluster;
+        this.ResourceType = resourceType;
     }
 }
 
@@ -43,7 +53,7 @@ export class MaraSettlementController {
     public HostileAttackingSquads: Array<MaraSquad> = [];
     public TargetUnitsComposition: UnitComposition | null = null;
     public AttackToDefenseUnitRatio: number | null = null;
-    public TargetExpandCluster: MaraResourceCluster | null = null;
+    public TargetExpand: TargetExpandData | null = null;
     
     private subcontrollers: Array<MaraSubcontroller> = [];
     private state: MaraSettlementControllerState;

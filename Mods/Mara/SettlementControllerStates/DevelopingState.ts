@@ -53,7 +53,7 @@ export class DevelopingState extends ProductionState {
             MaraUtils.IncrementMapItem(targetCompostion, selectedCfgIds[index]);
         }
 
-        let combatComposition = this.settlementController.StrategyController.GetArmyComposition();
+        let combatComposition = this.settlementController.StrategyController.GetSettlementAttackArmyComposition();
         let estimation = this.settlementController.ProductionController.EstimateProductionTime(combatComposition);
 
         estimation.forEach((value, key) => {

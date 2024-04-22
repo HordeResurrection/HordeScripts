@@ -8,6 +8,7 @@ export class MaraSettlementControllerSettings {
 
 class UnitSearchSettings {
     public BuildingSearchRadius: number = 5;
+    public ExpandEnemySearchRadius: number = 10;
 }
 
 class TimeoutsSettings {
@@ -34,4 +35,5 @@ class ControllerStatesSettings {
     public ProducerProductionProbability: number = 66;
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;
+    public AttackStrengthToEnemyStrengthRatio: number = 1.5;
 }

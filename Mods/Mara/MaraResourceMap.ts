@@ -3,6 +3,13 @@ import { MaraUtils, ResourceType } from "./Utils/MaraUtils";
 
 const CLUSTER_SIZE = 8;
 
+export enum MaraResourceType {
+    Wood,
+    Metal,
+    Gold,
+    People
+}
+
 export class MaraResourceMap {
     public static ResourceClusters: Map<string, MaraResourceCluster>;
     
