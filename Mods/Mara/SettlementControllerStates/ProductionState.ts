@@ -12,6 +12,14 @@ export abstract class ProductionState extends MaraSettlementControllerState {
     
     OnEntry(): void {
         this.settlementController.ProductionController.CancelAllProduction();
+
+        let nextState = this.prepareProductionContext();
+
+        if (nextState) {
+            this.settlementController.State = nextState;
+            return;
+        }
+
         this.targetUnitsComposition = this.getTargetUnitsComposition();
 
         this.refreshTargetProductionLists();
@@ -59,6 +67,10 @@ export abstract class ProductionState extends MaraSettlementControllerState {
     }
 
     protected getProductionTimeout(): number | null {
+        return null;
+    }
+
+    protected prepareProductionContext(): MaraSettlementControllerState | null {
         return null;
     }
 

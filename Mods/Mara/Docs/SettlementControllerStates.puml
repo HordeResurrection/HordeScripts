@@ -30,11 +30,13 @@ Rebuild --> Defend: Attacked
 
 ExpandPrepare --> ExpandSecure: Forces gathered
 ExpandPrepare -left-> ExpandDefend: Attacked
+ExpandPrepare --> Develop: No suitable\nexpand location
 
 ExpandSecure --> ExpandBuild: Expand secured
 ExpandSecure -left-> ExpandDefend: Attacked
+ExpandSecure --> Develop: Failed to\nsecure expand
 
-ExpandBuild --> Develop: Expand build and functioning
+ExpandBuild --> Develop: Expand up and running
 ExpandBuild -left-> ExpandDefend: Attacked
 
 ExpandDefend --> ExpandPrepare: Attack Countered\nDamage is not severe

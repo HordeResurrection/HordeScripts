@@ -97,7 +97,12 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
     GetExpandAttackArmyComposition(expandLocation: MaraPoint): UnitComposition {
         let requiredStrength = 0;
-        let enemyUnits = MaraUtils.GetSettlementUnitsInArea(expandLocation, this.parentController.Settings.UnitSearch.ExpandEnemySearchRadius, this.EnemySettlements);
+        
+        let enemyUnits = MaraUtils.GetSettlementUnitsInArea(
+            expandLocation, 
+            this.parentController.Settings.UnitSearch.ExpandEnemySearchRadius, 
+            this.EnemySettlements
+        );
 
         if (enemyUnits.length > 0) {
             for (let unit of enemyUnits) {
@@ -209,6 +214,21 @@ export class StrategySubcontroller extends MaraSubcontroller {
         }
 
         return null;
+    }
+
+    GetExpandOffenseTarget(expandLocation: MaraPoint): any {
+        let enemyUnits = MaraUtils.GetSettlementUnitsInArea(
+            expandLocation, 
+            this.parentController.Settings.UnitSearch.ExpandEnemySearchRadius, 
+            this.EnemySettlements
+        );
+
+        if (enemyUnits.length > 0) {
+            return enemyUnits[0];
+        }
+        else {
+            return null;
+        }
     }
 
     OrderAttackersByDangerLevel(): Array<MaraSquad> {

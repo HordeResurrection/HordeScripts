@@ -1,62 +1,29 @@
 import { MaraResourceCluster, MaraResourceMap, MaraResourceType } from "../MaraResourceMap";
 import { TargetExpandData } from "../MaraSettlementController";
+import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 import { MaraResources } from "../Utils/Common";
 import { MaraUtils, UnitComposition } from "../Utils/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
+import { ProductionState } from "./ProductionState";
 
-export class ExpandPrepareState extends MaraSettlementControllerState {
-    OnEntry(): void {
-        this.fillTargetExpandData();
+export class ExpandPrepareState extends ProductionState {
+    protected onTargetCompositionReached(): void {
+        this.settlementController.State = SettlementControllerStateFactory.MakeExpandSecureState(this.settlementController);
     }
-
-    OnExit(): void {}
-
-    Tick(tickNumber: number): void {
-
-    }
-
+    
     protected getTargetUnitsComposition(): UnitComposition {
         if (this.settlementController.TargetExpand?.Cluster) {
-            return this.settlementController.StrategyController.GetExpandAttackArmyComposition(this.settlementController.TargetExpand!.Cluster!.Center!);
+            let currentEconomy = this.settlementController.GetCurrentDevelopedEconomyComposition();
+            let armyToProduce = this.settlementController.StrategyController.GetExpandAttackArmyComposition(this.settlementController.TargetExpand!.Cluster!.Center!);
+            
+            return MaraUtils.AddCompositionLists(currentEconomy, armyToProduce);
         }
         else {
-            return new Map<string, number>();
+            return this.settlementController.GetCurrentDevelopedEconomyComposition();
         }
     }
 
-    private calculateCompositionCost(composition: UnitComposition): MaraResources {
-        //TODO: add cost calculation
-        return new MaraResources(0, 0, 0, 0);
-    }
-
-    private selectOptimalResourceCluster(requiredResources: Map<string, number>): MaraResourceCluster | null {
-        let candidates: Array<MaraResourceCluster> = [];
-        
-        let requiredGold = requiredResources.get("Gold")!;
-        let requiredMetal = requiredResources.get("Metal")!;
-        let requiredWood = requiredResources.get("Wood")!;
-
-        MaraResourceMap.ResourceClusters.forEach((value) => {
-            if (requiredGold > 0 && value.GoldAmount >= requiredGold) {
-                candidates.push(value);
-            }
-            else if (requiredMetal > 0 && value.MetalAmount >= requiredMetal) {
-                candidates.push(value);
-            }
-            else if (requiredWood > 0 && value.WoodAmount >= requiredWood) {
-                candidates.push(value);
-            }
-        });
-
-        if (candidates.length > 0) {
-            return this.settlementController.StrategyController.SelectOptimalResourceCluster(candidates);
-        }
-        else {
-            return null;
-        }
-    }
-
-    private fillTargetExpandData(): void {
+    protected prepareProductionContext(): MaraSettlementControllerState | null {
         let targetComposition = this.settlementController.TargetUnitsComposition;
         let currentEconomy = this.settlementController.GetCurrentDevelopedEconomyComposition();
 
@@ -98,17 +65,54 @@ export class ExpandPrepareState extends MaraSettlementControllerState {
                     optimalCluster,
                     requiredResourceTypes
                 );
+
+                return null;
             }
             else {
-                //TODO: add going back to Developing State
+                //TODO: possibly go to other state since it can go right back from Developing State
+                this.settlementController.Debug(`Unable to find suitable resource cluster for mining, going back to Developing State`);
+                return SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
             }
         }
         else {
-            //TODO: add Izbas ordering
             this.settlementController.TargetExpand = new TargetExpandData(
                 null,
                 [MaraResourceType.People]
             );
+
+            return null;
+        }
+    }
+
+    private calculateCompositionCost(composition: UnitComposition): MaraResources {
+        //TODO: add cost calculation
+        return new MaraResources(0, 0, 0, 0);
+    }
+
+    private selectOptimalResourceCluster(requiredResources: Map<string, number>): MaraResourceCluster | null {
+        let candidates: Array<MaraResourceCluster> = [];
+        
+        let requiredGold = requiredResources.get("Gold")!;
+        let requiredMetal = requiredResources.get("Metal")!;
+        let requiredWood = requiredResources.get("Wood")!;
+
+        MaraResourceMap.ResourceClusters.forEach((value) => {
+            if (requiredGold > 0 && value.GoldAmount >= requiredGold) {
+                candidates.push(value);
+            }
+            else if (requiredMetal > 0 && value.MetalAmount >= requiredMetal) {
+                candidates.push(value);
+            }
+            else if (requiredWood > 0 && value.WoodAmount >= requiredWood) {
+                candidates.push(value);
+            }
+        });
+
+        if (candidates.length > 0) {
+            return this.settlementController.StrategyController.SelectOptimalResourceCluster(candidates);
+        }
+        else {
+            return null;
         }
     }
 }
