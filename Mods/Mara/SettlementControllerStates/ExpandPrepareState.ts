@@ -85,8 +85,19 @@ export class ExpandPrepareState extends ProductionState {
     }
 
     private calculateCompositionCost(composition: UnitComposition): MaraResources {
-        //TODO: add cost calculation
-        return new MaraResources(0, 0, 0, 0);
+        let result = new MaraResources(0, 0, 0, 0);
+
+        composition.forEach((value, key) => {
+            let config = MaraUtils.GetUnitConfig(key);
+            let cost = config.CostResources;
+
+            result.Gold += cost.Gold * value;
+            result.Metal += cost.Metal * value;
+            result.Wood += cost.Lumber * value;
+            result.People += cost.People * value;
+        });
+
+        return result;
     }
 
     private selectOptimalResourceCluster(requiredResources: Map<string, number>): MaraResourceCluster | null {
