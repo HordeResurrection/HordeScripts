@@ -387,24 +387,24 @@ export class CastleFightPlugin extends HordePluginBase {
                         ];
                         world.settlements_attack_paths            = [
                             [
-                                [new Cell(156, 36)],
-                                [new Cell(156, 155)],
-                                [new Cell(35, 155)]
+                                [new Cell(95, 31), new Cell(156, 36)],
+                                [new Cell(95, 95), new Cell(156, 155)],
+                                [new Cell(31, 95), new Cell(35, 155)]
                             ],
                             [
-                                [new Cell(156, 155)],
-                                [new Cell(35, 155)],
-                                [new Cell(35, 36)]
+                                [new Cell(159, 95), new Cell(156, 155)],
+                                [new Cell(95, 95), new Cell(35, 155)],
+                                [new Cell(95, 31), new Cell(35, 36)]
                             ],
                             [
-                                [new Cell(35, 155)],
-                                [new Cell(35, 36)],
-                                [new Cell(156, 36)]
+                                [new Cell(95, 159), new Cell(35, 155)],
+                                [new Cell(95, 95), new Cell(35, 36)],
+                                [new Cell(159, 95), new Cell(156, 36)]
                             ],
                             [
-                                [new Cell(35, 36)],
-                                [new Cell(156, 36)],
-                                [new Cell(156, 155)]
+                                [new Cell(31, 95), new Cell(35, 36)],
+                                [new Cell(95, 95), new Cell(156, 36)],
+                                [new Cell(95, 159), new Cell(156, 155)]
                             ]
                         ];
                         world.settlements_attackPathChoiser = new Array<IAttackPathChoiser>(world.settlementsCount);

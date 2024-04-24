@@ -6,7 +6,7 @@ import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { world } from "./CastleFightPlugin";
 import { Entity, COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent, SpawnBuildingComponent, UpgradableBuildingComponent, BuffComponent, BUFF_TYPE, ReviveComponent, HeroAltarComponent, IncomeEvent, IncomeIncreaseEvent, SettlementComponent, IncomeLimitedPeriodicalComponent, UnitProducedEvent } from "./ESC_components";
-import { Polygon, Cell as Cell, CfgAddUnitProducer, getCurrentTime, MetricType, distance_L1, distance_L2 } from "./Utils";
+import { Polygon, Cell as Cell, CfgAddUnitProducer, getCurrentTime, MetricType, distance_L1, distance_L2, CfgSetSpeed } from "./Utils";
 
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 
@@ -1046,10 +1046,11 @@ export class World {
         ScriptUtils.SetValue(this.configs["holy_spirit_accuracy"], "Name", "Святой дух меткости");
         // описание
         ScriptUtils.SetValue(this.configs["holy_spirit_accuracy"], "Description", "Тот кого ударит данный дух, получит его силу\n" +
-            "Увеличение дальности видимости в 3 раза\n" +
+            "Увеличение дальности видимости на 4 (макс 14)\n" +
             "Для дальнего боя:\n" +
-            "Увеличение перезарядки в 3 раза\n" +
-            "Увеличение дальности атаки в 3 раза\n"
+            "Увеличение перезарядки в 2 раза\n" +
+            "Увеличение дальности атаки в 2 раза\n" +
+            "Увеличение скорости снаряда примерно в 3 раза\n"
         );
         // здоровье
         ScriptUtils.SetValue(this.configs["holy_spirit_accuracy"], "MaxHealth", 1);
@@ -1098,6 +1099,7 @@ export class World {
         // описание
         ScriptUtils.SetValue(this.configs["holy_spirit_defense"], "Description", "Тот кого ударит данный дух, получит его силу.\n" +
             "Увеличение защиты до max(390, текущая защита)\n" +
+            "Увеличение здоровья в 2 раза\n" +
             "Имунн к огню, магии"
         );
         // здоровье
@@ -1230,6 +1232,8 @@ export class World {
         ScriptUtils.SetValue(this.configs["worker"], "Name", "Работяга");
         // удаляем команду атаки
         this.configs["worker"].AllowedCommands.Remove(UnitCommand.Attack);
+        // здоровье
+        ScriptUtils.SetValue(this.configs["worker"], "MaxHealth", 10000);
         // число людей
         ScriptUtils.SetValue(this.configs["worker"].CostResources, "People", 0);
         // убираем профессию добычу
@@ -1247,8 +1251,7 @@ export class World {
 
             produceList.Add(this.configs["church"]);
 
-            produceList.Add(this.configs["tower_1"]);
-
+            //produceList.Add(this.configs["tower_1"]);
             //produceList.Add(this.configs["hero_altar"]);
         }
         {
@@ -1293,19 +1296,13 @@ export class World {
         machineSpeed.set(TileType.Mounts, 0);
         machineSpeed.set(TileType.Road, 13);
         machineSpeed.set(TileType.Ice, 10);
-        const setSpeedForCfg = (cfg: any, speeds: Map<TileType, number>) => {
-            var tileTypes = speeds.keys();
-            for (var tileType = tileTypes.next(); !tileType.done; tileType = tileTypes.next()) {
-                cfg.Speeds.Item.set(tileType.value, speeds.get(tileType.value));
-            }
-        };
         for (var cfgId in this.configs) {
             if (!this.configs[cfgId].Flags.HasFlag(UnitFlags.Building) &&
                 !this.configs[cfgId].Specification.HasFlag(UnitSpecification.Rider)) {
                 if (this.configs[cfgId].Specification.HasFlag(UnitSpecification.Machine)) {
-                    setSpeedForCfg(this.configs[cfgId], machineSpeed);
+                    CfgSetSpeed(this.configs[cfgId], machineSpeed);
                 } else {
-                    setSpeedForCfg(this.configs[cfgId], infantrySpeed);
+                    CfgSetSpeed(this.configs[cfgId], infantrySpeed);
                 }
             }
         }
@@ -1336,11 +1333,11 @@ export class World {
                 }
                 // настраиваем починку
                 if (this.configs[cfgId].ProfessionParams.ContainsKey(UnitProfession.Reparable)) {
-                    //ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Reparable.RecoverCost, "Gold",   0);
-                    //ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Reparable.RecoverCost, "Metal",  0);
-                    //ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Reparable.RecoverCost, "Lumber", 0);
-                    //ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Reparable.RecoverCost, "People", 0);
-                    ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Reparable, "RecoverTime", 4000);
+                    ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Item.get(UnitProfession.Reparable).RecoverCost, "Gold",   0);
+                    ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Item.get(UnitProfession.Reparable).RecoverCost, "Metal",  0);
+                    ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Item.get(UnitProfession.Reparable).RecoverCost, "Lumber", 0);
+                    ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Item.get(UnitProfession.Reparable).RecoverCost, "People", 0);
+                    ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Item.get(UnitProfession.Reparable), "RecoverTime", 4000);
                 }
             }
             // юниты
@@ -1525,7 +1522,7 @@ export class World {
 
                     var entity = new Entity();
                     entity.components.set(COMPONENT_TYPE.SETTLEMENT_COMPONENT, new SettlementComponent(0, 100, 0, goldTime / goldPerPlayer * 100, 0));
-                    entity.components.set(COMPONENT_TYPE.INCOME_EVENT, new IncomeEvent(0, 0, 200, 1));
+                    entity.components.set(COMPONENT_TYPE.INCOME_EVENT, new IncomeEvent(0, 0, 5000 - totalLumberPerPlayer, 1));
                     entity.components.set(COMPONENT_TYPE.INCOME_LIMITED_PERIODICAL_COMPONENT,
                         new IncomeLimitedPeriodicalComponent(0, 0, totalLumberPerPlayer, 0, 0, 100, totalLumberTime / totalLumberPerPlayer * 100, 0))
                     this.settlements_entities[settlementId].push(entity);

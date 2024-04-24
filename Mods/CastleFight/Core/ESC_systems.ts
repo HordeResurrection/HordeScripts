@@ -5,13 +5,14 @@ import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
 import { UnitDeathType, UnitCommand, UnitDirection, UnitFlags, DiplomacyStatus } from "library/game-logic/horde-types";
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
-import { spawnUnits } from "library/game-logic/unit-spawn";
+//import { spawnUnits } from "library/game-logic/unit-spawn";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { COMPONENT_TYPE, UnitComponent, BuffableComponent, BUFF_TYPE, SettlementComponent, IncomeIncreaseEvent, IncomeIncreaseComponent, IncomeEvent, IncomeLimitedPeriodicalComponent, Entity, AttackingAlongPathComponent, SpawnBuildingComponent, ReviveComponent, UpgradableBuildingComponent, UpgradableBuildingEvent, BuffEvent, BuffComponent, UnitProducedEvent } from "./ESC_components";
-import { Cell, distance_L1, UnitGiveOrder, UnitDisallowCommands, MakeBitmaskFromArray, BitmaskTestFlags } from "./Utils";
+import { Cell, distance_L1, UnitGiveOrder, UnitDisallowCommands, MakeBitmaskFromArray, BitmaskTestFlags, spawnUnits } from "./Utils";
 import { GameState, World } from "./World";
 import { log } from "library/common/logging";
 import { printObjectItems } from "library/common/introspection";
+import { createPF, createPoint } from "library/common/primitives";
 
 const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 
@@ -448,7 +449,9 @@ export function AttackingAlongPathSystem2(world: World, gameTickNum: number) {
             }
 
             // заносим в список
-            settlements_enemyAttackedCastle_positions[targetCastleUnit.Owner.Uid].push(new Cell(unitComponent.unit.Cell.X, unitComponent.unit.Cell.Y));
+            if (settlements_enemyAttackedCastle_positions[targetCastleUnit.Owner.Uid]) {
+                settlements_enemyAttackedCastle_positions[targetCastleUnit.Owner.Uid].push(new Cell(unitComponent.unit.Cell.X, unitComponent.unit.Cell.Y));
+            }
         }
     }
 
@@ -534,9 +537,9 @@ export function AttackingAlongPathSystem2(world: World, gameTickNum: number) {
                 var attackVector     = new Cell(
                     attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].X - unitComponent.unit.Cell.X,
                     attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].Y - unitComponent.unit.Cell.Y);
-                // ищем ближайшего врага
-                var nearPos_num      = -1;
-                var nearPos_distance = 10000;
+                // ищем врага
+                var goalPos_num      = -1;
+                var goalPos_distance = 10000;
                 for (var posNum = 0; posNum < settlements_enemyAttackedCastle_positions[castleUnit_settlementId].length; posNum++) {
                     var enemyX = settlements_enemyAttackedCastle_positions[castleUnit_settlementId][posNum].X;
                     var enemyY = settlements_enemyAttackedCastle_positions[castleUnit_settlementId][posNum].Y;
@@ -547,23 +550,36 @@ export function AttackingAlongPathSystem2(world: World, gameTickNum: number) {
                     }
                     // ищем расстояние до цели
                     var posDistance = distance_L1(
-                        unitComponent.unit.Cell.X,
-                        unitComponent.unit.Cell.Y,
+                        //unitComponent.unit.Cell.X,
+                        //unitComponent.unit.Cell.Y,
+                        world.settlements_castleUnit[settlementId].Cell.X,
+                        world.settlements_castleUnit[settlementId].Cell.Y,
                         enemyX,
                         enemyY);
-                    if (posDistance < nearPos_distance) {
-                        nearPos_num      = posNum;
-                        nearPos_distance = posDistance;
-                    }
+                    // дальники идут на ближайшего
+                    //if (world.configs[unitComponent.cfgId].MainArmament.Range > 1) {
+                        if (goalPos_num == -1 || posDistance < goalPos_distance) {
+                            goalPos_num      = posNum;
+                            goalPos_distance = posDistance;
+                        }
+                    //}
+                    // ближники идут на дальних
+                    // else {
+                    //     if (goalPos_num == -1 ||
+                    //         (goalPos_distance < posDistance && posDistance <= deffenceReactionRadius)) {
+                    //         goalPos_num      = posNum;
+                    //         goalPos_distance = posDistance;
+                    //     }
+                    // }
                 }
-                if (deffenceReactionRadius < nearPos_distance) {
-                    nearPos_num = -1;
+                if (deffenceReactionRadius < goalPos_distance) {
+                    goalPos_num = -1;
                 }
 
                 // нашелся юнит по пути атаки идем его атаковать
-                if (nearPos_num != -1) {
+                if (goalPos_num != -1) {
                     UnitGiveOrder(unitComponent.unit,
-                        settlements_enemyAttackedCastle_positions[castleUnit_settlementId][nearPos_num],
+                        settlements_enemyAttackedCastle_positions[castleUnit_settlementId][goalPos_num],
                         UnitCommand.Attack,
                         AssignOrderMode.Replace);
                 }
@@ -989,15 +1005,14 @@ export function BuffSystem(world: World, gameTickNum: number) {
                 case BUFF_TYPE.ATTACK:
                     ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {атака}");
                     ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 150, 0, 0));
-                    ScriptUtils.SetValue(cloneCFG.MainArmament.BulletCombatParams, "Damage", Math.max(1000, 5*cloneCFG.MainArmament.BulletCombatParams.Damage));
-                    ScriptUtils.SetValue(cloneCFG, "Sight", Math.max(14, cloneCFG.Sight + 4));
+                    ScriptUtils.SetValue(cloneCFG.MainArmament.BulletCombatParams, "Damage", Math.min(1000, 5*cloneCFG.MainArmament.BulletCombatParams.Damage));
+                    ScriptUtils.SetValue(cloneCFG, "Sight", Math.min(13, cloneCFG.Sight + 2));
                     if (cloneCFG.MainArmament.Range > 1) {
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "EmitBulletsCountMin", Math.max(5, cloneCFG.MainArmament.EmitBulletsCountMin + 2));
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "EmitBulletsCountMax", Math.max(5, cloneCFG.MainArmament.EmitBulletsCountMax + 2));
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "Range", Math.max(13, cloneCFG.MainArmament.Range + 2));
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ForestRange", Math.max(13, cloneCFG.MainArmament.ForestRange + 2));
-                        ScriptUtils.SetValue(cloneCFG, "OrderDistance", Math.max(13, cloneCFG.OrderDistance + 2));
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "OrderDistance", Math.max(13, cloneCFG.MainArmament.OrderDistance + 2));
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "EmitBulletsCountMin", Math.min(5, cloneCFG.MainArmament.EmitBulletsCountMin + 2));
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "EmitBulletsCountMax", Math.min(5, cloneCFG.MainArmament.EmitBulletsCountMax + 2));
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "Range", Math.min(13, cloneCFG.MainArmament.Range + 2));
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ForestRange", Math.min(13, cloneCFG.MainArmament.ForestRange + 2));
+                        ScriptUtils.SetValue(cloneCFG, "OrderDistance", Math.min(13, cloneCFG.OrderDistance + 2));
                         ScriptUtils.SetValue(cloneCFG.MainArmament, "BaseAccuracy", 0);
                         ScriptUtils.SetValue(cloneCFG.MainArmament, "MaxDistanceDispersion", 300);
                     }
@@ -1005,21 +1020,22 @@ export function BuffSystem(world: World, gameTickNum: number) {
                 case BUFF_TYPE.ACCURACY:
                     ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {меткость}");
                     ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 148, 0, 211));
-                    ScriptUtils.SetValue(cloneCFG, "Sight", 3*cloneCFG.Sight);
+                    //ScriptUtils.SetValue(cloneCFG, "Sight", 3*cloneCFG.Sight);
+                    ScriptUtils.SetValue(cloneCFG, "Sight", Math.min(14, cloneCFG.Sight + 4));
                     if (cloneCFG.MainArmament.Range > 1) {
-                        ScriptUtils.SetValue(cloneCFG, "ReloadTime", 3*cloneCFG.ReloadTime);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ReloadTime", 3*cloneCFG.MainArmament.ReloadTime);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "Range", 3*cloneCFG.MainArmament.Range);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ForestRange", 3*cloneCFG.MainArmament.ForestRange);
-                        ScriptUtils.SetValue(cloneCFG, "OrderDistance", 3*cloneCFG.OrderDistance);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "OrderDistance", 3*cloneCFG.MainArmament.OrderDistance);
+                        ScriptUtils.SetValue(cloneCFG, "ReloadTime", 2*cloneCFG.ReloadTime);
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ReloadTime", 2*cloneCFG.MainArmament.ReloadTime);
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "Range", 2*cloneCFG.MainArmament.Range);
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ForestRange", 2*cloneCFG.MainArmament.ForestRange);
+                        ScriptUtils.SetValue(cloneCFG, "OrderDistance", 2*cloneCFG.OrderDistance);
                         ScriptUtils.SetValue(cloneCFG.MainArmament, "DisableDispersion", true);
+                        ScriptUtils.SetValue(cloneCFG.MainArmament.BulletCombatParams, "AdditiveBulletSpeed", createPF(30, 0));
                     }
                     break;
                 case BUFF_TYPE.HEALTH:
                     ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {здоровье}");
                     ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 0, 150, 0));
-                    ScriptUtils.SetValue(cloneCFG, "MaxHealth", Math.max(200000, 10*cloneCFG.MaxHealth));
+                    ScriptUtils.SetValue(cloneCFG, "MaxHealth", Math.min(200000, 10*cloneCFG.MaxHealth));
                     break;
                 case BUFF_TYPE.DEFFENSE:
                     ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {защита}");
@@ -1059,7 +1075,7 @@ export function BuffSystem(world: World, gameTickNum: number) {
                 replaceParams.NewUnitConfig = cloneCFG;
                 replaceParams.Cell = null;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
                 replaceParams.PreserveHealthLevel = false;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
-                replaceParams.PreserveOrders = true;        // Нужно ли передать приказы?
+                replaceParams.PreserveOrders = false;        // Нужно ли передать приказы?
                 replaceParams.Silent = true;                 // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
                 target_unitComponent.unit = target_unitComponent.unit.Owner.Units.ReplaceUnit(replaceParams);
                 // записываем инфу о баффе (конфиг записывает только для 1-ого, чтобы корректно удалился он)

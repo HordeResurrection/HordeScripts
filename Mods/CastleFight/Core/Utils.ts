@@ -1,8 +1,9 @@
 import { generateCellInSpiral } from "library/common/position-tools";
 import { createBox, createPoint } from "library/common/primitives";
 import { PointCommandArgs, UnitCommand } from "library/game-logic/horde-types";
-import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
 import { getUnitProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
+
+const SpawnUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
 
 /** метрика измерения расстояния */
 export enum MetricType {
@@ -41,6 +42,14 @@ export function CfgAddUnitProducer(Cfg: any) {
     }
 }
 
+/** установить скорость */
+export function CfgSetSpeed(cfg: any, speeds: Map<TileType, number>) {
+    var tileTypes = speeds.keys();
+    for (var tileType = tileTypes.next(); !tileType.done; tileType = tileTypes.next()) {
+        cfg.Speeds.Item.set(tileType.value, speeds.get(tileType.value));
+    }
+};
+
 /** отдать юниту команду в ближайшую свободную точку */
 export function UnitGiveOrder (unit: any, point: Cell, unitCommant: any, assignOrderMode: any) {
     UnitAllowCommands(unit);
@@ -49,7 +58,7 @@ export function UnitGiveOrder (unit: any, point: Cell, unitCommant: any, assignO
     {
         var generator = generateCellInSpiral(point.X, point.Y);
         for (goalPosition = generator.next(); !goalPosition.done; goalPosition = generator.next()) {
-            if (unitCanBePlacedByRealMap(unit.Cfg, goalPosition.value.X, goalPosition.value.Y)) {
+            if (unit.Cfg.CanBePlacedByRealMap(ActiveScena.GetRealScena(), goalPosition.value.X, goalPosition.value.Y)) {
                 break;
             }
         }
@@ -165,4 +174,20 @@ export function GetUnitsInArea(rect: Rectangle): Array<any> {
     }
 
     return result;
+}
+
+export function spawnUnits(settlement, uCfg, uCount, direction, generator) {
+    let spawnParams = new SpawnUnitParameters();
+    spawnParams.ProductUnitConfig = uCfg;
+    spawnParams.Direction = direction;
+
+    let outSpawnedUnits: any[] = [];
+    for (let position = generator.next(); !position.done && outSpawnedUnits.length < uCount; position = generator.next()) {
+        if (uCfg.CanBePlacedByRealMap(ActiveScena.GetRealScena(), position.value.X, position.value.Y)) {
+            spawnParams.Cell = createPoint(position.value.X, position.value.Y);
+            outSpawnedUnits.push(settlement.Units.SpawnUnit(spawnParams));
+        }
+    }
+
+    return outSpawnedUnits;
 }
