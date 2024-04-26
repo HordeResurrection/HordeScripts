@@ -11,7 +11,7 @@ import { ProductionSubcontroller } from "./Subcontrollers/ProductionSubcontrolle
 import { MaraSquad } from "./Subcontrollers/Squads/MaraSquad";
 import { StrategySubcontroller } from "./Subcontrollers/StrategySubcontroller";
 import { TacticalSubcontroller } from "./Subcontrollers/TacticalSubcontroller";
-import { eNext, enumerate } from "./Utils/Common";
+import { MaraPoint, eNext, enumerate } from "./Utils/Common";
 import { MaraUtils, UnitComposition } from "./Utils/MaraUtils";
 import { MaraSettlementControllerSettings } from "./SettlementControllerSettings";
 import { SettlementControllerStateFactory } from "./SettlementControllerStateFactory";
@@ -29,12 +29,24 @@ export class SettlementLocation {
 
 export class TargetExpandData {
     Cluster: MaraResourceCluster | null;
-    ResourceType: MaraResourceType[];
+    ResourceType: MaraResourceType[] = [];
 
     constructor(cluster: MaraResourceCluster | null, resourceType: MaraResourceType[]) {
         this.Cluster = cluster;
         this.ResourceType = resourceType;
     }
+}
+
+class ReservedHarvestersData {
+    public Tiers: Array<Array<any>> = [[], [], []];
+
+    public static readonly Builders = 0;
+    public static readonly Miners = 1;
+    public static readonly Woodworkers = 2;
+}
+
+export class MaraSettlementCluster {
+    public Center: MaraPoint;
 }
 
 export class MaraSettlementController {
@@ -54,6 +66,8 @@ export class MaraSettlementController {
     public TargetUnitsComposition: UnitComposition | null = null;
     public AttackToDefenseUnitRatio: number | null = null;
     public TargetExpand: TargetExpandData | null = null;
+    public ReservedHarvesters: ReservedHarvestersData;
+    public SettlementClusters: Array<MaraSettlementCluster> = [];
     
     private subcontrollers: Array<MaraSubcontroller> = [];
     private state: MaraSettlementControllerState;

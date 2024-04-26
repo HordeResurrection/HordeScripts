@@ -17,8 +17,8 @@ class TimeoutsSettings {
     public MaxBuildUpProductionTimeout: number = 3 * 60 * 50;
     public MinBuildUpProductionTimeout: number = 1 * 60 * 50;
 
-    public UnitProductionEstimationThreshold: number = 2 * 60 * 50; //2 min
-    public ExterminatingTimeout: number = 5 * 60 * 50; //5 min
+    public UnitProductionEstimationThreshold: number = 2 * 60 * 50;
+    public ExterminatingTimeout: number = 5 * 60 * 50;
 }
 
 class SquadsSettings {
@@ -36,4 +36,6 @@ class ControllerStatesSettings {
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;
     public AttackStrengthToEnemyStrengthRatio: number = 1.5;
+
+    public SettlementClustersRadius: number = 10;
 }
