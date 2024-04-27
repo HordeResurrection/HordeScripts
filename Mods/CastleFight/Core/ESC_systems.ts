@@ -826,7 +826,7 @@ export function SpawnBuildingSystem(world: World, gameTickNum: number) {
 
                     // спавним юнитов
                     var generator     = generateCellInSpiral(unitComponent.unit.Cell.X + emergePoint.X, unitComponent.unit.Cell.Y + emergePoint.Y);
-                    var spawnedUnits  = spawnUnits(world.settlements[settlementId], world.configs[spawnBuildingComponent.spawnUnitConfigId], 1, UnitDirection.Down, generator);
+                    var spawnedUnits  = spawnUnits(world.settlements[settlementId], world.configs[spawnBuildingComponent.spawnUnitConfigId], world.spawn_count_coeff, UnitDirection.Down, generator);
                     for (var spawnedUnit of spawnedUnits) {
                         world.RegisterUnitEntity(spawnedUnit);
                     }

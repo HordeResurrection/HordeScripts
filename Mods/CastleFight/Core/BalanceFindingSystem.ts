@@ -8,7 +8,7 @@ import { spawnUnit } from "library/game-logic/unit-spawn";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { world } from "./CastleFightPlugin";
 import { Entity, COMPONENT_TYPE, SpawnBuildingComponent, UpgradableBuildingComponent, UnitComponent } from "./ESC_components";
-import { World } from "./World";
+import { GameState, World } from "./World";
 import { GetUnitsInArea, Rectangle, getCurrentTime } from "./Utils";
 
 enum Stage {
@@ -598,7 +598,7 @@ export function BalanceFindingSystem(world: World, gameTickNum: number) {
             }
             break;
         case Stage.End:
-            world.gameEnd = true;
+            world.state = GameState.CLEAR;
             break;
     }
 }

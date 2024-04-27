@@ -7,6 +7,8 @@ import { spawnUnit } from "library/game-logic/unit-spawn";
 import { world } from "./CastleFightPlugin";
 import { Entity, COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent, SpawnBuildingComponent, UpgradableBuildingComponent, BuffComponent, BUFF_TYPE, ReviveComponent, HeroAltarComponent, IncomeEvent, IncomeIncreaseEvent, SettlementComponent, IncomeLimitedPeriodicalComponent, UnitProducedEvent } from "./ESC_components";
 import { Polygon, Cell as Cell, CfgAddUnitProducer, getCurrentTime, MetricType, distance_L1, distance_L2, CfgSetSpeed } from "./Utils";
+import { AI_Init } from "./AISystems";
+import { mergeFlags } from "library/dotnet/dotnet-utils";
 
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 
@@ -195,6 +197,7 @@ export class World {
 
     /** параметры */
     castle_health_coeff: number;
+    spawn_count_coeff: number;
     
     public constructor ( )
     {
@@ -208,6 +211,7 @@ export class World {
         this.systems_executionTime = new Array<number>();
 
         this.castle_health_coeff = 1;
+        this.spawn_count_coeff = 1;
     }
 
     public Init() {
@@ -230,6 +234,7 @@ export class World {
         this._InitConfigs();
         this._InitSettlements();
         this._PlaceCastle();
+        AI_Init(this);
     }
 
     private _InitConfigs() {
@@ -1233,9 +1238,11 @@ export class World {
         // удаляем команду атаки
         this.configs["worker"].AllowedCommands.Remove(UnitCommand.Attack);
         // здоровье
-        ScriptUtils.SetValue(this.configs["worker"], "MaxHealth", 10000);
+        ScriptUtils.SetValue(this.configs["worker"], "MaxHealth", 5000);
         // число людей
         ScriptUtils.SetValue(this.configs["worker"].CostResources, "People", 0);
+        // добавляем иммун к огню
+        ScriptUtils.SetValue(this.configs["worker"], "Flags", mergeFlags(UnitFlags, this.configs["worker"].Flags, UnitFlags.FireResistant));
         // убираем профессию добычу
         if (this.configs["worker"].ProfessionParams.ContainsKey(UnitProfession.Harvester)) {
             this.configs["worker"].ProfessionParams.Remove(UnitProfession.Harvester);
