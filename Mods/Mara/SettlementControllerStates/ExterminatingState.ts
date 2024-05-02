@@ -105,7 +105,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
 
     private requestReinforcementsProduction() {
         for (let cfgId of this.reinforcementsCfgIds) {
-            this.settlementController.ProductionController.RequestSingleProduction(cfgId);
+            this.settlementController.ProductionController.RequestSingleCfgIdProduction(cfgId);
         }
     }
 }

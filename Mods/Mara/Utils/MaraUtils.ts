@@ -4,8 +4,9 @@ import { createBox, createPoint } from "library/common/primitives";
 import { UnitFlags, UnitCommand, AllContent } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
-import { enumerate, eNext } from "./Common";
+import { enumerate, eNext, MaraProductionRequest } from "./Common";
 import { generateCellInSpiral } from "library/common/position-tools";
+import { ProduceRequestParameters } from "library/mastermind/matermind-types";
 
 export class MaraSettlementData {
     public Settlement: any;
@@ -491,10 +492,17 @@ export class MaraUtils {
         return HordeContentApi.GetUnitConfig(configId);
     }
 
-    static RequestMasterMindProduction(configId: string, productionDepartment: any, checkDuplicate: boolean = false) {
-        let cfg = MaraUtils.GetUnitConfig(configId);
+    static RequestMasterMindProduction(productionRequest: MaraProductionRequest, productionDepartment: any, checkDuplicate: boolean = false) {
+        let cfg = MaraUtils.GetUnitConfig(productionRequest.ConfigId);
+
+        let produceRequestParameters = new ProduceRequestParameters(cfg, 1);
+        produceRequestParameters.CheckExistsRequest = checkDuplicate;
+        produceRequestParameters.AllowAuxiliaryProduceRequests = true;
+        produceRequestParameters.TargetCell = productionRequest.Point;
+        produceRequestParameters.MaxRetargetAttempts = productionRequest.Precision;
+        produceRequestParameters.DisableBuildPlaceChecking = productionRequest.Precision == 0;
         
-        return productionDepartment.AddRequestToProduce(cfg, 1, null, checkDuplicate);
+        return productionDepartment.AddRequestToProduce(produceRequestParameters);
     }
 
     static ConfigHasProfession(unitConfig: any, profession: any): boolean {
@@ -622,8 +630,38 @@ export class MaraUtils {
         return cfg.BuildingConfig != null && cfg.HasNotFlags(UnitFlags.Passive);
     }
 
-    static IsMineConfig(unitConfig: any):boolean {
+    static IsMineConfig(unitConfig: any): boolean {
         return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Mine);
+    }
+
+    static IsSawmillConfig(unitConfig: any): boolean {
+        return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Sawmill);
+    }
+
+    static GetAllSawmillConfigs(settlement: any): Array<string> {
+        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsSawmillConfig);
+    }
+
+    static GetAllMineConfigs(settlement: any): Array<string> {
+        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsMineConfig);
+    }
+
+    static getAllConfigs(settlement: any, configFilter: (config: any) => boolean) {
+        let result: Array<string> = [];
+
+        ForEach(AllContent.UnitConfigs.Configs, kv => {
+            let cfgId = kv.Key;
+            let uCfg = kv.Value;
+            
+            if (
+                configFilter(uCfg) &&
+                settlement.TechTree.HypotheticalProducts.CanProduce(uCfg)
+            ) {
+                result.push(cfgId);
+            }
+        });
+
+        return result;
     }
 
     static GetUnitStrength(unit: any): number {

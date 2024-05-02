@@ -90,7 +90,7 @@ export abstract class ProductionState extends MaraSettlementControllerState {
         trainingList.forEach(
             (val, key, map) => {
                 for (let i = 0; i < val; i++) {
-                    this.settlementController.ProductionController.RequestProduction(key);
+                    this.settlementController.ProductionController.RequestCfgIdProduction(key);
                 }
             }
         );

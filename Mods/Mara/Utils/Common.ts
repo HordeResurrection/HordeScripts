@@ -51,3 +51,15 @@ export class MaraResources {
         this.People = people;
     }
 }
+
+export class MaraProductionRequest {
+    public ConfigId: string;
+    public Point: MaraPoint | null;
+    public Precision: number | null;
+
+    constructor(configId: string, point: MaraPoint | null, precision: number | null) {
+        this.ConfigId = configId;
+        this.Point = point;
+        this.Precision = precision;
+    }
+}

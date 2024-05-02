@@ -1,7 +1,7 @@
 import { MaraResourceType } from "../MaraResourceMap";
 import { MaraSettlementCluster } from "../MaraSettlementController";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
-import { MaraPoint } from "../Utils/Common";
+import { MaraPoint, MaraProductionRequest } from "../Utils/Common";
 import { MaraUtils } from "../Utils/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 
@@ -46,7 +46,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     }
 
     Tick(tickNumber: number): void {
-        
+        //TODO: add checking if some orders need to be re-put
     }
 
     private fillExpandCluster(): boolean {
@@ -89,9 +89,23 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     private orderMiningProduction(): void {
 
     }
-
+    
     private orderWoodcuttingProduction(): void {
+        //TODO: check if settlement cluster already has sawmill
+        let sawmillConfigs = MaraUtils.GetAllSawmillConfigs(this.settlementController.Settlement);
 
+        let index = 0; 
+        
+        if (sawmillConfigs.length == 0) {
+            return;
+        } 
+        else if (sawmillConfigs.length > 1) {
+            index = MaraUtils.Random(this.settlementController.MasterMind, sawmillConfigs.length - 1);
+        }
+
+        let cfgId = sawmillConfigs[index];
+        let productionRequest = new MaraProductionRequest(cfgId, this.expandCluster.Center, null);
+        this.settlementController.ProductionController.RequestProduction(productionRequest);
     }
 
     private orderHousingProduction() {

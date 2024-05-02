@@ -2,13 +2,13 @@
 //TODO: probably reorganize build list to a queue
 
 import { MaraSettlementController } from "Mara/MaraSettlementController";
-import { eNext, enumerate } from "Mara/Utils/Common";
+import { MaraProductionRequest, eNext, enumerate } from "Mara/Utils/Common";
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
-    private productionList: Array<string> = [];
+    private productionList: Array<MaraProductionRequest> = [];
     private productionIndex: Map<string, Array<any>> | null = null;
 
     constructor (parent: MaraSettlementController) {
@@ -23,25 +23,25 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         this.productionIndex = null;
         
         let mmProductionDepartament = this.parentController.MasterMind.ProductionDepartment;
-        let orderedUnits: Array<string> = [];
+        let processedRequests: Array<MaraProductionRequest> = [];
 
-        for (let unitConfigId of this.productionList) {
-            let freeProducer = this.getProducer(unitConfigId);
+        for (let request of this.productionList) {
+            let freeProducer = this.getProducer(request.ConfigId);
             
             //!! most probably doesn't work as expected since producer is always free on this tick
             if (freeProducer) {
-                if (MaraUtils.RequestMasterMindProduction(unitConfigId, mmProductionDepartament)) {
-                    this.parentController.Debug(`Added ${unitConfigId} to the production list`);
-                    orderedUnits.push(unitConfigId);
+                if (MaraUtils.RequestMasterMindProduction(request, mmProductionDepartament)) {
+                    this.parentController.Debug(`Added ${request} to the production list`);
+                    processedRequests.push(request);
                 }
             }
         }
 
-        if (orderedUnits.length > 0) {
-            this.parentController.Debug(`Removed ${orderedUnits.length} units from target production list`);
+        if (processedRequests.length > 0) {
+            this.parentController.Debug(`Removed ${processedRequests.length} units from target production list`);
 
-            for (let cfg of orderedUnits) {
-                let index = this.productionList.indexOf(cfg);
+            for (let request of processedRequests) {
+                let index = this.productionList.indexOf(request);
 
                 if (index > -1) {
                     this.productionList.splice(index, 1);
@@ -51,7 +51,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     public get ProductionList(): Array<string> {
-        let list = [...this.productionList];
+        let list = [...this.productionList].map((value) => value.ConfigId);
 
         let masterMind = this.parentController.MasterMind;
         let requests = enumerate(masterMind.Requests);
@@ -66,14 +66,20 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         return list;
     }
 
-    RequestProduction(configId: string): void {
-        this.productionList.push(configId);
+    RequestCfgIdProduction(configId: string): void {
+        let request = new MaraProductionRequest(configId, null, null);
+        this.productionList.push(request);
         this.parentController.Debug(`Added ${configId} to target production list`);
     }
 
-    RequestSingleProduction(configId: string): void {
+    RequestProduction(request: MaraProductionRequest): void {
+        this.productionList.push(request);
+        this.parentController.Debug(`Added ${request.ConfigId} at ${request.Point?.ToString()}:${request.Precision} to target production list`);
+    }
+
+    RequestSingleCfgIdProduction(configId: string): void {
         if (this.ProductionList.indexOf(configId) < 0) {
-            this.RequestProduction(configId);
+            this.RequestCfgIdProduction(configId);
         }
     }
 
@@ -91,7 +97,8 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
         
         let mmProductionDepartament = this.parentController.MasterMind.ProductionDepartment;
-        MaraUtils.RequestMasterMindProduction(configId, mmProductionDepartament);
+        let productionRequest = new MaraProductionRequest(configId, null, null);
+        MaraUtils.RequestMasterMindProduction(productionRequest, mmProductionDepartament);
     }
 
     CancelAllProduction(): void {
