@@ -1,4 +1,4 @@
-import { ScriptUnitWorkerGetOrder, ScriptUnitWorkerState } from "./horde-types";
+import { ScriptUnitWorkerGetOrder, ScriptUnitWorkerCanBePlaced, ScriptUnitWorkerState } from "./horde-types";
 
 
 // ===================================================
@@ -84,4 +84,28 @@ export function setUnitGetOrderWorker(plugin, unitCfg, workerFunc) {
 
     // Установка обработчика в конфиг
     unitCfg.GetOrderWorker = workerObject;
+}
+
+/**
+ * Установить CanBePlaced-обработчик для юнита на основе метода из плагина.
+ */
+export function setUnitCanBePlacedWorker(plugin, unitCfg, func_canBePlacedByKnownMap, func_canBePlacedByRealMap) {
+    const name_canBePlacedByKnownMap = `${plugin.name}_CanBePlacedByKnownMap`;
+    const name_canBePlacedByRealMap = `${plugin.name}_CanBePlacedByRealMap`;
+
+    // Обертка для метода из плагина, чтобы работал "this"
+    const wrapper_canBePlacedByKnownMap = (settlement, uCfg, x, y, size1x1, considerUnit) => func_canBePlacedByKnownMap.call(plugin, settlement, uCfg, x, y, size1x1, considerUnit);
+    const wrapper_canBePlacedByRealMap = (scena, uCfg, x, y, size1x1, considerUnit) => func_canBePlacedByRealMap.call(plugin, scena, uCfg, x, y, size1x1, considerUnit);
+
+    // Прокидываем доступ к функции-обработчику в .Net через глобальную переменную
+    UnitWorkersRegistry.Register(name_canBePlacedByKnownMap, wrapper_canBePlacedByKnownMap);
+    UnitWorkersRegistry.Register(name_canBePlacedByRealMap, wrapper_canBePlacedByRealMap);
+
+    // Объект-обработчик
+    const workerObject = host.newObj(ScriptUnitWorkerCanBePlaced);
+    ScriptUtils.SetValue(workerObject, "ByKnownMapFuncName", name_canBePlacedByKnownMap);
+    ScriptUtils.SetValue(workerObject, "ByRealMapFuncName", name_canBePlacedByRealMap);
+
+    // Установка обработчика в конфиг
+    ScriptUtils.SetValue(unitCfg, "CanBePlacedWorker", workerObject);
 }

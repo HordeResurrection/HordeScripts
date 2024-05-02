@@ -1,6 +1,6 @@
 import { activePlugins } from "active-plugins";
-import { BeammanPlugin } from "./beamman";
-import { CastleFightPlugin } from "./plugins/CastleFight";
+import { BeammanPlugin } from "./Dependencies/beamman";
+import { CastleFightPlugin } from "./Core/CastleFightPlugin";
 
 /**
  * Вызывается до вызова "onFirstRun()" при первом запуске скрипт-машины, а так же при hot-reload
