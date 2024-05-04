@@ -47,6 +47,7 @@ class ReservedHarvestersData {
 
 export class MaraSettlementCluster {
     public Center: MaraPoint;
+    public ResourceClusters: Array<MaraResourceCluster> = [];
 }
 
 export class MaraSettlementController {

@@ -2,6 +2,8 @@ import { MaraSettlementController } from "./MaraSettlementController";
 import { BuildingUpState } from "./SettlementControllerStates/BuildingUpState";
 import { DefendingState } from "./SettlementControllerStates/DefendingState";
 import { DevelopingState } from "./SettlementControllerStates/DevelopingState";
+import { ExpandBuildState } from "./SettlementControllerStates/ExpandBuildState";
+import { ExpandPrepareState } from "./SettlementControllerStates/ExpandPrepareState";
 import { ExpandSecureState } from "./SettlementControllerStates/ExpandSecureState";
 import { ExterminatingState } from "./SettlementControllerStates/ExterminatingState";
 import { IdleState } from "./SettlementControllerStates/IdleState";
@@ -32,7 +34,15 @@ export class SettlementControllerStateFactory {
         return new RebuildState(settlementController);
     }
 
+    static MakeExpandPrepareState(settlementController: MaraSettlementController): ExpandPrepareState {
+        return new ExpandPrepareState(settlementController);
+    }
+
     static MakeExpandSecureState(settlementController: MaraSettlementController): ExpandSecureState {
         return new ExpandSecureState(settlementController);
+    }
+
+    static MakeExpandBuildState(settlementController: MaraSettlementController): ExpandBuildState {
+        return new ExpandBuildState(settlementController);
     }
 }

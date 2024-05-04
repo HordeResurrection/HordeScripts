@@ -498,7 +498,11 @@ export class MaraUtils {
         let produceRequestParameters = new ProduceRequestParameters(cfg, 1);
         produceRequestParameters.CheckExistsRequest = checkDuplicate;
         produceRequestParameters.AllowAuxiliaryProduceRequests = true;
-        produceRequestParameters.TargetCell = productionRequest.Point;
+        
+        if (productionRequest.Point) {
+            produceRequestParameters.TargetCell = createPoint(productionRequest.Point.X, productionRequest.Point.Y);
+        }
+
         produceRequestParameters.MaxRetargetAttempts = productionRequest.Precision;
         produceRequestParameters.DisableBuildPlaceChecking = productionRequest.Precision == 0;
         
@@ -638,6 +642,18 @@ export class MaraUtils {
         return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Sawmill);
     }
 
+    static IsHarvesterConfig(unitConfig: any): boolean {
+        return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Harvester);
+    }
+
+    static IsHousingConfig(unitConfig: any): boolean {
+        return unitConfig.ProducedPepole > 0 && !MaraUtils.IsProducerConfig(unitConfig);
+    }
+
+    static IsMetalStockConfig(unitConfig: any): boolean {
+        return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.MetalStock);
+    }
+
     static GetAllSawmillConfigs(settlement: any): Array<string> {
         return MaraUtils.getAllConfigs(settlement, MaraUtils.IsSawmillConfig);
     }
@@ -646,7 +662,19 @@ export class MaraUtils {
         return MaraUtils.getAllConfigs(settlement, MaraUtils.IsMineConfig);
     }
 
-    static getAllConfigs(settlement: any, configFilter: (config: any) => boolean) {
+    static GetAllHarvesterConfigs(settlement: any): Array<string> {
+        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsHarvesterConfig);
+    }
+
+    static GetAllHousingConfigs(settlement: any): Array<string> {
+        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsHousingConfig);
+    }
+
+    static GetAllMetalStockConfigs(settlement: any): Array<string> {
+        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsMetalStockConfig);
+    }
+
+    private static getAllConfigs(settlement: any, configFilter: (config: any) => boolean) {
         let result: Array<string> = [];
 
         ForEach(AllContent.UnitConfigs.Configs, kv => {

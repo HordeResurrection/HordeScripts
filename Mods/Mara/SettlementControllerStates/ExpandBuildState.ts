@@ -1,3 +1,4 @@
+import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
 import { MaraResourceType } from "../MaraResourceMap";
 import { MaraSettlementCluster } from "../MaraSettlementController";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
@@ -46,7 +47,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     }
 
     Tick(tickNumber: number): void {
-        //TODO: add checking if some orders need to be re-put
+        //TODO: add checking if some requests need to be re-requested
     }
 
     private fillExpandCluster(): boolean {
@@ -82,33 +83,130 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             this.expandCluster.Center = expandCenter;
             this.settlementController.SettlementClusters.push(this.expandCluster);
         }
+        
+        if (targetResourceCluster) {
+            this.expandCluster.ResourceClusters.push(targetResourceCluster);
+        }
 
         return true;
     }
 
-    private orderMiningProduction(): void {
+    private selectConfigId(configIds: Array<string>): string | null {
+        let index = 0; 
+        
+        if (configIds.length == 0) {
+            return null;
+        } 
+        else if (configIds.length > 1) {
+            index = MaraUtils.Random(this.settlementController.MasterMind, configIds.length - 1);
+        }
 
+        return configIds[index];
+    }
+
+    private orderMineProduction(cells: Array<MaraPoint>): void {
+        let mineConfigs = MaraUtils.GetAllMineConfigs(this.settlementController.Settlement);
+        let cfgId = this.selectConfigId(mineConfigs);
+
+        if (cfgId == null) {
+            this.settlementController.Debug(`Unable to order mine production: no mine config available`);
+            return;
+        }
+
+        let minePosition: MaraPoint | null = null;
+
+        for (let cell of cells) {
+            if (unitCanBePlacedByRealMap(MaraUtils.GetUnitConfig(cfgId), cell.X, cell.Y)) {
+                minePosition = cell;
+                break;
+            }
+        }
+
+        if (!minePosition) {
+            this.settlementController.Debug(`Unable to order mine production: no suitable place for mine found`);
+            return;
+        }
+
+        let productionRequest = new MaraProductionRequest(cfgId, minePosition, null);
+        this.settlementController.ProductionController.RequestProduction(productionRequest);
+
+        let harvesterConfigs = MaraUtils.GetAllHarvesterConfigs(this.settlementController.Settlement);
+        cfgId = this.selectConfigId(harvesterConfigs);
+
+        if (cfgId == null) {
+            this.settlementController.Debug(`Unable to order mine production: no harvester config available`);
+            return;
+        }
+
+        for (let i = 0; i < 3; i++) { //TODO: add this 3 into settings
+            let productionRequest = new MaraProductionRequest(cfgId, null, null);
+            this.settlementController.ProductionController.RequestProduction(productionRequest);
+        }
+    }
+
+    private orderMiningProduction(): void {
+        let targetExpand = this.settlementController.TargetExpand!;
+
+        if (targetExpand.ResourceType.findIndex((value) => {return value == MaraResourceType.Gold}) >= 0) {
+            this.orderMineProduction(targetExpand.Cluster!.GoldCells);
+        }
+
+        if (targetExpand.ResourceType.findIndex((value) => {return value == MaraResourceType.Metal}) >= 0) {
+            this.orderMineProduction(targetExpand.Cluster!.MetalCells);
+        }
+
+        //TODO: check if settlement cluster already has a metal stock
+        let metalStockConfigs = MaraUtils.GetAllMetalStockConfigs(this.settlementController.Settlement);
+        let cfgId = this.selectConfigId(metalStockConfigs);
+
+        if (cfgId == null) {
+            this.settlementController.Debug(`Unable to order mining production: no metal stock config available`);
+            return;
+        }
+
+        let productionRequest = new MaraProductionRequest(cfgId, null, null);
+        this.settlementController.ProductionController.RequestProduction(productionRequest);
     }
     
     private orderWoodcuttingProduction(): void {
-        //TODO: check if settlement cluster already has sawmill
+        //TODO: check if settlement cluster already has a sawmill
         let sawmillConfigs = MaraUtils.GetAllSawmillConfigs(this.settlementController.Settlement);
+        let cfgId = this.selectConfigId(sawmillConfigs);
 
-        let index = 0; 
-        
-        if (sawmillConfigs.length == 0) {
+        if (cfgId == null) {
+            this.settlementController.Debug(`Unable to order mine production: no sawmill config available`);
             return;
-        } 
-        else if (sawmillConfigs.length > 1) {
-            index = MaraUtils.Random(this.settlementController.MasterMind, sawmillConfigs.length - 1);
         }
 
-        let cfgId = sawmillConfigs[index];
         let productionRequest = new MaraProductionRequest(cfgId, this.expandCluster.Center, null);
         this.settlementController.ProductionController.RequestProduction(productionRequest);
+
+        let harvesterConfigs = MaraUtils.GetAllHarvesterConfigs(this.settlementController.Settlement);
+        cfgId = this.selectConfigId(harvesterConfigs);
+
+        if (cfgId == null) {
+            this.settlementController.Debug(`Unable to order mine production: no harvester config available`);
+            return;
+        }
+
+        for (let i = 0; i < 5; i++) { //TODO: add this 5 into settings
+            let productionRequest = new MaraProductionRequest(cfgId, null, null);
+            this.settlementController.ProductionController.RequestProduction(productionRequest);
+        }
     }
 
     private orderHousingProduction() {
+        let housingConfigs = MaraUtils.GetAllHousingConfigs(this.settlementController.Settlement);
+        let cfgId = this.selectConfigId(housingConfigs);
+        
+        if (cfgId == null) {
+            this.settlementController.Debug(`Unable to order mine production: no housing config available`);
+            return;
+        }
 
+        for (let i = 0; i < 5; i++) { //TODO: add this 5 into settings
+            let productionRequest = new MaraProductionRequest(cfgId, null, null);
+            this.settlementController.ProductionController.RequestProduction(productionRequest);
+        }
     }
 }

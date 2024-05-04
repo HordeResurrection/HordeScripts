@@ -83,7 +83,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
     }
 
-    ForceRequestSingleProduction(configId: string): void {
+    ForceRequestSingleCfgIdProduction(configId: string): void {
         let masterMind = this.parentController.MasterMind;
         let requests = enumerate(masterMind.Requests);
         let request;

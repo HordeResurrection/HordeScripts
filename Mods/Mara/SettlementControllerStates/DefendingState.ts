@@ -43,7 +43,7 @@ export class DefendingState extends MaraSettlementControllerState {
 
     private requestReinforcementsProduction() {
         for (let cfgId of this.reinforcementsCfgIds) {
-            this.settlementController.ProductionController.ForceRequestSingleProduction(cfgId);
+            this.settlementController.ProductionController.ForceRequestSingleCfgIdProduction(cfgId);
         }
     }
 

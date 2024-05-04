@@ -75,9 +75,13 @@ export class DevelopingState extends ProductionState {
             MaraUtils.AddToMapItem(targetCompostion, key, value);
         });
 
+        //!!TODO: remove this!!
+        this.settlementController.TargetUnitsComposition = targetCompostion;
+        this.settlementController.State = SettlementControllerStateFactory.MakeExpandPrepareState(this.settlementController);
+
         //temp code until resource gathering is implemented
-        targetCompostion.set("#UnitConfig_Slavyane_Farm", 5);
-        targetCompostion.set("#UnitConfig_Slavyane_Worker1", 5);
+        // targetCompostion.set("#UnitConfig_Slavyane_Farm", 5);
+        // targetCompostion.set("#UnitConfig_Slavyane_Worker1", 5);
 
         return targetCompostion;
     }
