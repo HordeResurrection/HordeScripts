@@ -52,7 +52,12 @@ export function CfgSetSpeed(cfg: any, speeds: Map<TileType, number>) {
 
 /** отдать юниту команду в ближайшую свободную точку */
 export function UnitGiveOrder (unit: any, point: Cell, unitCommant: any, assignOrderMode: any) {
-    UnitAllowCommands(unit);
+    var commandsMind       = unit.CommandsMind;
+    var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
+
+    if (disallowedCommands.ContainsKey(unitCommant)) disallowedCommands.Remove(unitCommant);
+
+    //UnitAllowCommands(unit);
     // позиция для атаки цели
     var goalPosition;
     {
@@ -66,7 +71,9 @@ export function UnitGiveOrder (unit: any, point: Cell, unitCommant: any, assignO
     var pointCommandArgs = new PointCommandArgs(createPoint(goalPosition.value.X, goalPosition.value.Y), unitCommant, assignOrderMode);
     // отдаем приказ
     unit.Cfg.GetOrderDelegate(unit, pointCommandArgs);
-    UnitDisallowCommands(unit);
+    //UnitDisallowCommands(unit);
+
+    disallowedCommands.Add(unitCommant, 1);
 }
 
 /** запретить управление юнитом */

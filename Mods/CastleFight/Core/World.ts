@@ -5,9 +5,9 @@ import { UnitCommand, TileType, UnitFlags, UnitSpecification, UnitDeathType, Uni
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { world } from "./CastleFightPlugin";
-import { Entity, COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent, SpawnBuildingComponent, UpgradableBuildingComponent, BuffComponent, BUFF_TYPE, ReviveComponent, HeroAltarComponent, IncomeEvent, IncomeIncreaseEvent, SettlementComponent, IncomeLimitedPeriodicalComponent, UnitProducedEvent } from "./ESC_components";
+import { Entity, COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent, SpawnBuildingComponent, UpgradableBuildingComponent, BuffComponent, BUFF_TYPE, ReviveComponent, HeroAltarComponent, IncomeEvent, IncomeIncreaseEvent, SettlementComponent, IncomeLimitedPeriodicalComponent, UnitProducedEvent } from "./Components/ESC_components";
 import { Polygon, Cell as Cell, CfgAddUnitProducer, getCurrentTime, MetricType, distance_L1, distance_L2, CfgSetSpeed } from "./Utils";
-import { AI_Init } from "./AISystems";
+import { AI_Init } from "./Systems/AISystems";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;

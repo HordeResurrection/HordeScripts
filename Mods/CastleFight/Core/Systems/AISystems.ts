@@ -1,13 +1,13 @@
 import { LogLevel, log } from "library/common/logging";
-import { World } from "./World";
+import { World } from "../World";
 import { PointCommandArgs, ProduceAtCommandArgs, ProduceCommandArgs, UnitCommand, UnitFlags, UnitMapLayer } from "library/game-logic/horde-types";
-import { COMPONENT_TYPE, Entity, ReviveComponent, SpawnBuildingComponent, UnitComponent, UnitProducedEvent, UpgradableBuildingComponent } from "./ESC_components";
+import { COMPONENT_TYPE, Entity, ReviveComponent, SpawnBuildingComponent, UnitComponent, UnitProducedEvent, UpgradableBuildingComponent } from "../Components/ESC_components";
 import { createPoint, createResourcesAmount } from "library/common/primitives";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
-import { Cell, distance_L1 } from "./Utils";
+import { Cell, distance_L1 } from "../Utils";
 
 export const ResourcesAmount = HCL.HordeClassLibrary.World.Simple.ResourcesAmount;
 

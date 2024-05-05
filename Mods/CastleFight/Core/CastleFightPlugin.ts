@@ -1,9 +1,9 @@
 import HordePluginBase from "plugins/base-plugin";
-import { BalanceFindingSystem } from "./BalanceFindingSystem";
-import { WordClearSystem, IncomeSystem, SpawnBuildingSystem, AttackingAlongPathSystem, ReviveSystem, UpgradableBuildingSystem_Stage1, BuffSystem, UpgradableBuildingSystem_Stage2, UnitProducedSystem, DiplomacySystem, UpgradableBuildingSystem, BuffSystem_v2, AttackingAlongPathSystem2 } from "./ESC_systems";
+import { BalanceFindingSystem } from "./Systems/BalanceFindingSystem";
+import { WordClearSystem, IncomeSystem, SpawnBuildingSystem, AttackingAlongPathSystem, ReviveSystem, UpgradableBuildingSystem_Stage1, BuffSystem, UpgradableBuildingSystem_Stage2, UnitProducedSystem, DiplomacySystem, UpgradableBuildingSystem, BuffSystem_v2, AttackingAlongPathSystem2, AttackingAlongPathSystem3 } from "./Systems/ESC_systems";
 import { Polygon, Cell, MetricType } from "./Utils";
 import { AttackPathChoiser_NearDistance, AttackPathChoiser_Periodically, AttackPathChoiser_Periodically_WithCondCell, GameState, IAttackPathChoiser, World } from "./World";
-import { AI_ApplyBuildingPlanSystem, AI_FindBuildingPlanSystem, AI_SpiritManagementSystem, AI_System } from "./AISystems";
+import { AI_ApplyBuildingPlanSystem, AI_FindBuildingPlanSystem, AI_SpiritManagementSystem, AI_System } from "./Systems/AISystems";
 
 export var world = new World();
 
