@@ -1238,7 +1238,7 @@ export class World {
         // удаляем команду атаки
         this.configs["worker"].AllowedCommands.Remove(UnitCommand.Attack);
         // здоровье
-        ScriptUtils.SetValue(this.configs["worker"], "MaxHealth", 5000);
+        ScriptUtils.SetValue(this.configs["worker"], "MaxHealth", 2000);
         // число людей
         ScriptUtils.SetValue(this.configs["worker"].CostResources, "People", 0);
         // добавляем иммун к огню
