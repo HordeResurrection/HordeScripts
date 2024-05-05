@@ -311,7 +311,7 @@ export class MaraUtils {
         return result;
     }
     
-    static PrintMap(map: UnitComposition) {
+    static PrintMap(map: UnitComposition): void {
         map.forEach(
             (value, key, m) => {
                 Mara.Log(MaraLogLevel.Debug, `${key}: ${value}`);

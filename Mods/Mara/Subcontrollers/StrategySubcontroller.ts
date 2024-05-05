@@ -298,8 +298,11 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let minDistance = Infinity;
 
         for (let cluster of candidates) {
-            if (MaraUtils.ChebyshevDistance(cluster.Center, this.parentController.GetSettlementLocation()?.Center) < minDistance) {
+            let distance = MaraUtils.ChebyshevDistance(cluster.Center, this.parentController.GetSettlementLocation()?.Center);
+
+            if (distance < minDistance) {
                 result = cluster;
+                minDistance = distance;
             }
         }
 

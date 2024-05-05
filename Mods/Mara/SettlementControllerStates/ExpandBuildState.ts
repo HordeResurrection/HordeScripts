@@ -7,7 +7,7 @@ import { MaraUtils } from "../Utils/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 
 export class ExpandBuildState extends MaraSettlementControllerState {
-    private expandCluster: MaraSettlementCluster;
+    private expandSettlementCluster: MaraSettlementCluster;
     
     public OnEntry(): void {
         if (!this.fillExpandCluster()) {
@@ -73,19 +73,20 @@ export class ExpandBuildState extends MaraSettlementControllerState {
                 MaraUtils.ChebyshevDistance(cluster.Center, expandCenter!) < 
                 this.settlementController.Settings.ControllerStates.SettlementClustersRadius
             ) {
-                this.expandCluster = cluster;
+                this.expandSettlementCluster = cluster;
                 break;
             }
         }
 
-        if (!this.expandCluster) {
-            this.expandCluster = new MaraSettlementCluster();
-            this.expandCluster.Center = expandCenter;
-            this.settlementController.SettlementClusters.push(this.expandCluster);
+        if (!this.expandSettlementCluster) {
+            this.expandSettlementCluster = new MaraSettlementCluster();
+            this.expandSettlementCluster.Center = expandCenter;
+            this.expandSettlementCluster.SettlementController = this.settlementController;
+            this.settlementController.SettlementClusters.push(this.expandSettlementCluster);
         }
         
         if (targetResourceCluster) {
-            this.expandCluster.ResourceClusters.push(targetResourceCluster);
+            this.expandSettlementCluster.ResourceClusters.push(targetResourceCluster);
         }
 
         return true;
@@ -155,37 +156,59 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             this.orderMineProduction(targetExpand.Cluster!.MetalCells);
         }
 
-        //TODO: check if settlement cluster already has a metal stock
-        let metalStockConfigs = MaraUtils.GetAllMetalStockConfigs(this.settlementController.Settlement);
-        let cfgId = this.selectConfigId(metalStockConfigs);
+        let expandClusterBuildings = this.expandSettlementCluster.Buildings;
+        let isMetalStockPresent = false;
 
-        if (cfgId == null) {
-            this.settlementController.Debug(`Unable to order mining production: no metal stock config available`);
-            return;
+        for (let building of expandClusterBuildings) {
+            if (MaraUtils.IsMetalStockConfig(building.Cfg)) {
+                isMetalStockPresent = true;
+                break;
+            }
         }
 
-        let productionRequest = new MaraProductionRequest(cfgId, null, null);
-        this.settlementController.ProductionController.RequestProduction(productionRequest);
+        if (!isMetalStockPresent) {
+            let metalStockConfigs = MaraUtils.GetAllMetalStockConfigs(this.settlementController.Settlement);
+            let cfgId = this.selectConfigId(metalStockConfigs);
+
+            if (cfgId == null) {
+                this.settlementController.Debug(`Unable to order mining production: no metal stock config available`);
+                return;
+            }
+
+            let productionRequest = new MaraProductionRequest(cfgId, this.expandSettlementCluster.Center, null);
+            this.settlementController.ProductionController.RequestProduction(productionRequest);
+        }
     }
     
     private orderWoodcuttingProduction(): void {
-        //TODO: check if settlement cluster already has a sawmill
-        let sawmillConfigs = MaraUtils.GetAllSawmillConfigs(this.settlementController.Settlement);
-        let cfgId = this.selectConfigId(sawmillConfigs);
+        let expandClusterBuildings = this.expandSettlementCluster.Buildings;
+        let isSawmillPresent = false;
 
-        if (cfgId == null) {
-            this.settlementController.Debug(`Unable to order mine production: no sawmill config available`);
-            return;
+        for (let building of expandClusterBuildings) {
+            if (MaraUtils.IsSawmillConfig(building.Cfg)) {
+                isSawmillPresent = true;
+                break;
+            }
+        }
+        
+        if (!isSawmillPresent) {
+            let sawmillConfigs = MaraUtils.GetAllSawmillConfigs(this.settlementController.Settlement);
+            let cfgId = this.selectConfigId(sawmillConfigs);
+
+            if (cfgId == null) {
+                this.settlementController.Debug(`Unable to order woodcutting production: no sawmill config available`);
+                return;
+            }
+
+            let productionRequest = new MaraProductionRequest(cfgId, this.expandSettlementCluster.Center, null);
+            this.settlementController.ProductionController.RequestProduction(productionRequest);
         }
 
-        let productionRequest = new MaraProductionRequest(cfgId, this.expandCluster.Center, null);
-        this.settlementController.ProductionController.RequestProduction(productionRequest);
-
         let harvesterConfigs = MaraUtils.GetAllHarvesterConfigs(this.settlementController.Settlement);
-        cfgId = this.selectConfigId(harvesterConfigs);
+        let cfgId = this.selectConfigId(harvesterConfigs);
 
         if (cfgId == null) {
-            this.settlementController.Debug(`Unable to order mine production: no harvester config available`);
+            this.settlementController.Debug(`Unable to order woodcutting production: no harvester config available`);
             return;
         }
 
@@ -200,7 +223,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         let cfgId = this.selectConfigId(housingConfigs);
         
         if (cfgId == null) {
-            this.settlementController.Debug(`Unable to order mine production: no housing config available`);
+            this.settlementController.Debug(`Unable to order housing production: no housing config available`);
             return;
         }
 

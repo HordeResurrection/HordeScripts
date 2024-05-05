@@ -28,6 +28,10 @@ export class ExpandPrepareState extends ProductionState {
         let currentEconomy = this.settlementController.GetCurrentDevelopedEconomyComposition();
 
         let compositionToProduce = MaraUtils.SubstractCompositionLists(targetComposition!, currentEconomy);
+
+        this.settlementController.Debug(`Current unit composition to produce:`);
+        MaraUtils.PrintMap(compositionToProduce!);
+
         let compositionCost = this.calculateCompositionCost(compositionToProduce);
         
         let currentResources = this.settlementController.MiningController.GetTotalResources();
@@ -40,6 +44,7 @@ export class ExpandPrepareState extends ProductionState {
         let needProducePeople = false;
 
         if (currentResources.People < compositionCost.People) {
+            this.settlementController.Debug(`People production is scheduled`);
             needProducePeople = true;
         }
 
@@ -47,17 +52,21 @@ export class ExpandPrepareState extends ProductionState {
             let optimalCluster = this.selectOptimalResourceCluster(requiredResources);
 
             if (optimalCluster) {
+                this.settlementController.Debug(`Selected resource cluster ${optimalCluster.Center.ToString()} for expand`);
                 let requiredResourceTypes: MaraResourceType[] = [];
 
-                if (requiredResources.get("Gold")! > 0) {
+                if (requiredResources.get("Gold")! > 0 && optimalCluster.GoldAmount > 0) {
+                    this.settlementController.Debug(`Gold production is scheduled`);
                     requiredResourceTypes.push(MaraResourceType.Gold);
                 }
 
-                if (requiredResources.get("Metal")! > 0) {
+                if (requiredResources.get("Metal")! > 0 && optimalCluster.MetalAmount > 0) {
+                    this.settlementController.Debug(`Metal production is scheduled`);
                     requiredResourceTypes.push(MaraResourceType.Metal);
                 }
 
-                if (requiredResources.get("Wood")! > 0) {
+                if (requiredResources.get("Wood")! > 0 && optimalCluster.WoodAmount > 0) {
+                    this.settlementController.Debug(`Wood production is scheduled`);
                     requiredResourceTypes.push(MaraResourceType.Wood);
                 }
                 
@@ -118,6 +127,11 @@ export class ExpandPrepareState extends ProductionState {
                 candidates.push(value);
             }
         });
+
+        this.settlementController.Debug(`Candidate resource clusters:`);
+        for (let cluster of candidates) {
+            this.settlementController.Debug(`(${cluster.Center.ToString()})`);
+        }
 
         if (candidates.length > 0) {
             return this.settlementController.StrategyController.SelectOptimalResourceCluster(candidates);

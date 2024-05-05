@@ -48,6 +48,15 @@ class ReservedHarvestersData {
 export class MaraSettlementCluster {
     public Center: MaraPoint;
     public ResourceClusters: Array<MaraResourceCluster> = [];
+    public SettlementController: MaraSettlementController;
+
+    public get Buildings(): Array<any> {
+        return MaraUtils.GetUnitsInArea(
+            this.Center, 
+            this.SettlementController.Settings.ControllerStates.SettlementClustersRadius,
+            (unit) => {return MaraUtils.IsBuildingConfig(unit.Cfg.Uid)}
+        );
+    }
 }
 
 export class MaraSettlementController {
@@ -103,6 +112,8 @@ export class MaraSettlementController {
 
         this.TacticalController = new TacticalSubcontroller(this);
         this.subcontrollers.push(this.TacticalController);
+
+        this.createInitialSettlementCluster();
 
         this.State = SettlementControllerStateFactory.MakeDevelopingState(this);
     }
@@ -224,6 +235,17 @@ export class MaraSettlementController {
         }
         else {
             return null;
+        }
+    }
+
+    private createInitialSettlementCluster(): void {
+        let location = this.GetSettlementLocation();
+
+        if (location) {
+            let initialCluster = new MaraSettlementCluster();
+            initialCluster.Center = location.Center;
+            initialCluster.SettlementController = this;
+            this.SettlementClusters.push(initialCluster);
         }
     }
 }

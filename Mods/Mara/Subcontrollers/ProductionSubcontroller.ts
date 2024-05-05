@@ -31,7 +31,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             //!! most probably doesn't work as expected since producer is always free on this tick
             if (freeProducer) {
                 if (MaraUtils.RequestMasterMindProduction(request, mmProductionDepartament)) {
-                    this.parentController.Debug(`Added ${request} to the production list`);
+                    this.parentController.Debug(`Added ${request.ConfigId} to the production list`);
                     processedRequests.push(request);
                 }
             }
@@ -74,7 +74,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
     RequestProduction(request: MaraProductionRequest): void {
         this.productionList.push(request);
-        this.parentController.Debug(`Added ${request.ConfigId} at ${request.Point?.ToString()}:${request.Precision} to target production list`);
+        this.parentController.Debug(`Added ${request.ConfigId} at (${request.Point?.ToString()}):${request.Precision} to target production list`);
     }
 
     RequestSingleCfgIdProduction(configId: string): void {
