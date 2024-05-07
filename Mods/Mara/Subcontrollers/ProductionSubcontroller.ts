@@ -66,6 +66,23 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         return list;
     }
 
+    public get ProductionRequests(): Array<MaraProductionRequest> {
+        let list = [...this.productionList];
+
+        let masterMind = this.parentController.MasterMind;
+        let requests = enumerate(masterMind.Requests);
+        let request;
+
+        while ((request = eNext(requests)) !== undefined) {
+            if (request.RequestedCfg) {
+                let productionRequest = new MaraProductionRequest(request.RequestedCfg.Uid, request.TargetCell, null);
+                list.push(productionRequest);
+            }
+        }
+        
+        return list;
+    }
+
     RequestCfgIdProduction(configId: string): void {
         let request = new MaraProductionRequest(configId, null, null);
         this.productionList.push(request);

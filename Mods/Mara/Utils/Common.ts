@@ -62,4 +62,12 @@ export class MaraProductionRequest {
         this.Point = point;
         this.Precision = precision;
     }
+
+    public EqualsTo(other: MaraProductionRequest): boolean {
+        return (
+            this.ConfigId == other.ConfigId &&
+            this.Point == other.Point &&
+            (this.Precision == null || this.Precision == other.Precision)
+        );
+    }
 }
