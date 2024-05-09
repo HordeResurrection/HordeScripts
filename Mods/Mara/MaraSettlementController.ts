@@ -37,25 +37,69 @@ export class TargetExpandData {
     }
 }
 
-class ReservedHarvestersData {
-    public Tiers: Array<Array<any>> = [[], [], []];
-
-    public static readonly Builders = 0;
-    public static readonly Miners = 1;
-    public static readonly Woodworkers = 2;
+class MineData {
+    public Mine: any = null;
+    public Miners: Array<any> = [];
 }
 
 export class MaraSettlementCluster {
     public Center: MaraPoint;
     public ResourceClusters: Array<MaraResourceCluster> = [];
     public SettlementController: MaraSettlementController;
+    
+    public Woodcutters: Array<any> = [];
+    public Mines: Array<MineData> = [];
 
     public get Buildings(): Array<any> {
-        return MaraUtils.GetUnitsInArea(
+        let buildings = MaraUtils.GetSettlementUnitsInArea(
             this.Center, 
             this.SettlementController.Settings.ControllerStates.SettlementClustersRadius,
+            [this.SettlementController.Settlement],
             (unit) => {return MaraUtils.IsBuildingConfig(unit.Cfg.Uid)}
         );
+
+        for (let cluster of this.ResourceClusters) {
+            let clusterBuildings = MaraUtils.GetSettlementUnitsInArea(
+                cluster.Center, 
+                cluster.Size / 2,
+                [this.SettlementController.Settlement],
+                (unit) => {return MaraUtils.IsBuildingConfig(unit.Cfg.Uid)}
+            );
+
+            for (let building of clusterBuildings) {
+                if ( !buildings.find( (value) => {return value.Mine == building} ) ) {
+                    buildings.push(building);
+                }
+            }
+        }
+
+        return buildings;
+    }
+
+    public Tick(tickNumber: number): void {
+        if (tickNumber % 10 != 0) {
+            return;
+        }
+
+        this.Mines = this.Mines.filter((value) => {return value.Mine.IsAlive});
+
+        for (let mineData of this.Mines) {
+            mineData.Miners = mineData.Miners.filter((value) => {return value.IsAlive});
+        }
+
+        this.Woodcutters = this.Woodcutters.filter((value) => {return value.IsAlive});
+
+        for (let building of this.Buildings) {
+            if (MaraUtils.IsMineConfig(building.Cfg)) {
+                let mineData = this.Mines.find((value) => {return value == building});
+                
+                if (!mineData) {
+                    let mineData = new MineData();
+                    mineData.Mine = building;
+                    this.Mines.push(mineData);
+                }
+            }
+        }
     }
 }
 
@@ -76,7 +120,6 @@ export class MaraSettlementController {
     public TargetUnitsComposition: UnitComposition | null = null;
     public AttackToDefenseUnitRatio: number | null = null;
     public TargetExpand: TargetExpandData | null = null;
-    public ReservedHarvesters: ReservedHarvestersData;
     public SettlementClusters: Array<MaraSettlementCluster> = [];
     
     private subcontrollers: Array<MaraSubcontroller> = [];
@@ -115,7 +158,7 @@ export class MaraSettlementController {
 
         this.createInitialSettlementCluster();
 
-        this.State = SettlementControllerStateFactory.MakeDevelopingState(this);
+        this.State = SettlementControllerStateFactory.MakeRoutingState(this);
     }
 
     public get State(): MaraSettlementControllerState {
@@ -130,6 +173,10 @@ export class MaraSettlementController {
         this.currentUnitComposition = null;
         this.currentDevelopedUnitComposition = null;
         this.settlementLocation = null;
+
+        for (let cluster of this.SettlementClusters) {
+            cluster.Tick(tickNumber);
+        }
 
         for (let subcontroller of this.subcontrollers) {
             subcontroller.Tick(tickNumber);

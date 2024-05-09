@@ -34,6 +34,7 @@ export class MaraResourceMap {
 export class MaraResourceCluster {
     public readonly Index: MaraPoint;
     public readonly Coordinates: MaraPoint;
+    public readonly Size: number = CLUSTER_SIZE;
 
     public WoodCells: Array<MaraPoint> = [];
     public MetalCells: Array<MaraPoint> = [];

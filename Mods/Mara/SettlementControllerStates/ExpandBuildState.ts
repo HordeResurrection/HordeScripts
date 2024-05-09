@@ -13,7 +13,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     private targetComposition: UnitComposition;
     
     public OnEntry(): void {
-        if (!this.fillExpandCluster()) {
+        if (!this.fillExpandSettlementCluster()) {
             this.settlementController.State = SettlementControllerStateFactory.MakeIdleState(this.settlementController);
             return;
         }
@@ -63,8 +63,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         }
 
         if (this.isAllRequestsCompleted()) {
-            this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
-            //this.settlementController.State = SettlementControllerStateFactory.MakeIdleState(this.settlementController);
+            this.settlementController.State = SettlementControllerStateFactory.MakeRoutingState(this.settlementController);
             return;
         }
         else {
@@ -72,7 +71,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         }
     }
 
-    private fillExpandCluster(): boolean {
+    private fillExpandSettlementCluster(): boolean {
         let targetResourceCluster = this.settlementController.TargetExpand!.Cluster;
         let expandCenter: MaraPoint;
 
@@ -160,7 +159,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             return;
         }
 
-        for (let i = 0; i < 3; i++) { //TODO: add this 3 into settings
+        for (let i = 0; i < this.settlementController.Settings.ResourceMining.MinersPerMine; i++) {
             this.orderProducion(cfgId, null, null);
         }
     }
@@ -230,7 +229,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             return;
         }
 
-        for (let i = 0; i < 5; i++) { //TODO: add this 5 into settings
+        for (let i = 0; i < this.settlementController.Settings.ResourceMining.WoodcutterBatchSize; i++) {
             this.orderProducion(cfgId, null, null);
         }
     }
@@ -244,7 +243,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             return;
         }
 
-        for (let i = 0; i < 5; i++) { //TODO: add this 5 into settings
+        for (let i = 0; i < this.settlementController.Settings.ResourceMining.HousingBatchSize; i++) {
             this.orderProducion(cfgId, null, null);
         }
     }

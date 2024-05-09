@@ -236,11 +236,11 @@ export class MaraUtils {
         unitFilter?: (unit: any) => boolean
     ): Array<any> {
         let units = MaraUtils.GetUnitsInArea(cell, radius, unitFilter);
-        let enemies = units.filter((unit) => {
+        units = units.filter((unit) => {
             return settelements.indexOf(unit.Owner) > -1 && unit.IsAlive && unit.Cfg.HasNotFlags(UnitFlags.Passive)
         });
 
-        return enemies;
+        return units;
     }
 
     // This has neat side effect that resulting cells are ordered from closest to farthest from center
@@ -451,15 +451,40 @@ export class MaraUtils {
         return null;
     }
 
-    static IssueAttackCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true) {
-        MaraUtils.issueCommand(units, player, location, UnitCommand.Attack, isReplaceMode);
+    static IssueAttackCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
+        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.Attack, isReplaceMode);
     }
 
-    static IssueMoveCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true) {
-        MaraUtils.issueCommand(units, player, location, UnitCommand.MoveToPoint, isReplaceMode);
+    static IssueMoveCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
+        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.MoveToPoint, isReplaceMode);
     }
 
-    private static issueCommand(units: Array<any>, player: any, location: any, command: any, isReplaceMode: boolean = true) {
+    static IssueHarvestLumberCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
+        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.HarvestLumber, isReplaceMode);
+    }
+
+    static IssueMineCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
+        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.Mine, isReplaceMode);
+    }
+
+    static IssueSelfDestructCommand(units: Array<any>, player: any) {
+        MaraUtils.issueOneClickCommand(units, player, UnitCommand.DestroySelf);
+    }
+
+    private static issueOneClickCommand(units: Array<any>, player: any, command: any): void {
+        let virtualInput = MaraUtils.playersInput[player];
+        
+        if (!virtualInput) {
+            virtualInput = new PlayerVirtualInput(player);
+            MaraUtils.playersInput[player] = virtualInput;
+        }
+
+        let unitIds = units.map((unit) => unit.Id);
+        virtualInput.selectUnitsById(unitIds, VirtualSelectUnitsMode.Select);
+        virtualInput.oneClickCommand(command);
+    }
+
+    private static issuePointBasedCommand(units: Array<any>, player: any, location: any, command: any, isReplaceMode: boolean = true): void {
         let virtualInput = MaraUtils.playersInput[player];
         
         if (!virtualInput) {

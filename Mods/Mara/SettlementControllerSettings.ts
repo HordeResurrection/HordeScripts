@@ -4,6 +4,7 @@ export class MaraSettlementControllerSettings {
     public Timeouts: TimeoutsSettings = new TimeoutsSettings();
     public Squads: SquadsSettings = new SquadsSettings();
     public ControllerStates: ControllerStatesSettings = new ControllerStatesSettings();
+    public ResourceMining: ResourceMiningSettings = new ResourceMiningSettings();
 }
 
 class UnitSearchSettings {
@@ -38,4 +39,10 @@ class ControllerStatesSettings {
     public AttackStrengthToEnemyStrengthRatio: number = 1.5;
 
     public SettlementClustersRadius: number = 10;
+}
+
+class ResourceMiningSettings {
+    public MinersPerMine: number = 3;
+    public WoodcutterBatchSize: number = 5;
+    public HousingBatchSize: number = 5;
 }
