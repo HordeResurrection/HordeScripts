@@ -1,7 +1,7 @@
 import { MaraResourceCluster, MaraResourceMap, MaraResourceType } from "../MaraResourceMap";
 import { TargetExpandData } from "../MaraSettlementController";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
-import { MaraResources } from "../Utils/Common";
+import { MaraPoint, MaraResources } from "../Utils/Common";
 import { MaraUtils, UnitComposition } from "../Utils/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 import { ProductionState } from "./ProductionState";
@@ -109,6 +109,23 @@ export class ExpandPrepareState extends ProductionState {
         return result;
     }
 
+    private getUnoccupiedMinerals(cells: Array<MaraPoint>): number {
+        let freeMinerals = 0;
+
+        for (let cell of cells) {
+            let unit = MaraUtils.GetUnit(cell);
+
+            if (unit?.Owner == this.settlementController.Settlement) {
+                continue;
+            }
+            else {
+                freeMinerals += MaraUtils.GetCellMineralsAmount(cell.X, cell.Y);
+            }
+        }
+
+        return freeMinerals;
+    }
+
     private selectOptimalResourceCluster(requiredResources: Map<string, number>): MaraResourceCluster | null {
         let candidates: Array<MaraResourceCluster> = [];
         
@@ -117,11 +134,19 @@ export class ExpandPrepareState extends ProductionState {
         let requiredWood = requiredResources.get("Wood")!;
 
         MaraResourceMap.ResourceClusters.forEach((value) => {
-            if (requiredGold > 0 && value.GoldAmount >= requiredGold) {
-                candidates.push(value);
+            if (requiredGold > 0) {
+                let freeGold = this.getUnoccupiedMinerals(value.GoldCells);
+                
+                if (freeGold > requiredGold) {
+                    candidates.push(value);
+                }
             }
-            else if (requiredMetal > 0 && value.MetalAmount >= requiredMetal) {
-                candidates.push(value);
+            else if (requiredMetal > 0) {
+                let freeMetal = this.getUnoccupiedMinerals(value.MetalCells);
+                
+                if (freeMetal > requiredMetal) {
+                    candidates.push(value);
+                }
             }
             else if (requiredWood > 0 && value.WoodAmount >= requiredWood) {
                 candidates.push(value);

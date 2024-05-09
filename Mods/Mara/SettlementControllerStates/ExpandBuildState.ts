@@ -64,6 +64,8 @@ export class ExpandBuildState extends MaraSettlementControllerState {
 
         if (this.isAllRequestsCompleted()) {
             this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
+            //this.settlementController.State = SettlementControllerStateFactory.MakeIdleState(this.settlementController);
+            return;
         }
         else {
             this.updateProductionLists();

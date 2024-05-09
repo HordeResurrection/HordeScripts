@@ -91,7 +91,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
     RequestProduction(request: MaraProductionRequest): void {
         this.productionList.push(request);
-        this.parentController.Debug(`Added ${request.ConfigId} at (${request.Point?.ToString()}):${request.Precision} to target production list`);
+        this.parentController.Debug(`Added ${request.ToString()} to target production list`);
     }
 
     RequestSingleCfgIdProduction(configId: string): void {
