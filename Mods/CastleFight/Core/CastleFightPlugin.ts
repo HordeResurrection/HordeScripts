@@ -3,7 +3,7 @@ import { BalanceFindingSystem } from "./Systems/BalanceFindingSystem";
 import { WordClearSystem, IncomeSystem, SpawnBuildingSystem, AttackingAlongPathSystem, ReviveSystem, UpgradableBuildingSystem_Stage1, BuffSystem, UpgradableBuildingSystem_Stage2, UnitProducedSystem, DiplomacySystem, UpgradableBuildingSystem, BuffSystem_v2, AttackingAlongPathSystem2, AttackingAlongPathSystem3 } from "./Systems/ESC_systems";
 import { Polygon, Cell, MetricType } from "./Utils";
 import { AttackPathChoiser_NearDistance, AttackPathChoiser_Periodically, AttackPathChoiser_Periodically_WithCondCell, GameState, IAttackPathChoiser, World } from "./World";
-import { AI_ApplyBuildingPlanSystem, AI_FindBuildingPlanSystem, AI_SpiritManagementSystem, AI_System } from "./Systems/AISystems";
+import { AI_ApplyBuildingPlanSystem, AI_FindBuildingPlanSystem, AI_Init, AI_SpiritManagementSystem, AI_System } from "./Systems/AISystem";
 
 export var world = new World();
 
@@ -25,14 +25,6 @@ export class CastleFightPlugin extends HordePluginBase {
                     var scenaName = ActiveScena.GetRealScena().ScenaName;
                     if (scenaName == "Битва замков - лесная тропа с мостами (3х3)") {
                         world.settlementsCount                    = 6;
-                        world.settlements_field                   = [
-                            new Polygon([new Cell(0, 0), new Cell(45, 0), new Cell(45, 63), new Cell(0, 63)]),
-                            new Polygon([new Cell(0, 0), new Cell(45, 0), new Cell(45, 63), new Cell(0, 63)]),
-                            new Polygon([new Cell(0, 0), new Cell(45, 0), new Cell(45, 63), new Cell(0, 63)]),
-                            new Polygon([new Cell(162, 0), new Cell(207, 0), new Cell(207, 63), new Cell(162, 63)]),
-                            new Polygon([new Cell(162, 0), new Cell(207, 0), new Cell(207, 63), new Cell(162, 63)]),
-                            new Polygon([new Cell(162, 0), new Cell(207, 0), new Cell(207, 63), new Cell(162, 63)])
-                        ];
                         world.settlements_workers_reviveCells = [
                             [new Cell(0, 31)],
                             [new Cell(0, 31)],
@@ -63,14 +55,6 @@ export class CastleFightPlugin extends HordePluginBase {
                         }
                     } else if (scenaName == "Битва замков - лесная тропа (3х3)") {
                         world.settlementsCount                    = 6;
-                        world.settlements_field                   = [
-                            new Polygon([new Cell(0, 0), new Cell(45, 0), new Cell(45, 63), new Cell(0, 63)]),
-                            new Polygon([new Cell(0, 0), new Cell(45, 0), new Cell(45, 63), new Cell(0, 63)]),
-                            new Polygon([new Cell(0, 0), new Cell(45, 0), new Cell(45, 63), new Cell(0, 63)]),
-                            new Polygon([new Cell(162, 0), new Cell(207, 0), new Cell(207, 63), new Cell(162, 63)]),
-                            new Polygon([new Cell(162, 0), new Cell(207, 0), new Cell(207, 63), new Cell(162, 63)]),
-                            new Polygon([new Cell(162, 0), new Cell(207, 0), new Cell(207, 63), new Cell(162, 63)])
-                        ];
                         world.settlements_workers_reviveCells = [
                             [new Cell(0, 31)],
                             [new Cell(0, 31)],
@@ -101,14 +85,6 @@ export class CastleFightPlugin extends HordePluginBase {
                         }
                     } else if (scenaName == "Битва замков - две тропы (3х3)") {
                         world.settlementsCount                    = 6;
-                        world.settlements_field                   = [
-                            new Polygon([new Cell(0, 0), new Cell(48, 0), new Cell(48, 95), new Cell(0, 95)]),
-                            new Polygon([new Cell(0, 0), new Cell(48, 0), new Cell(48, 95), new Cell(0, 95)]),
-                            new Polygon([new Cell(0, 0), new Cell(48, 0), new Cell(48, 95), new Cell(0, 95)]),
-                            new Polygon([new Cell(207, 0), new Cell(255, 0), new Cell(255, 95), new Cell(207, 95)]),
-                            new Polygon([new Cell(207, 0), new Cell(255, 0), new Cell(255, 95), new Cell(207, 95)]),
-                            new Polygon([new Cell(207, 0), new Cell(255, 0), new Cell(255, 95), new Cell(207, 95)])
-                        ];
                         world.settlements_workers_reviveCells = [
                             [new Cell(0, 47)],
                             [new Cell(0, 47)],
@@ -157,14 +133,6 @@ export class CastleFightPlugin extends HordePluginBase {
                         }
                     } else if (scenaName == "Битва замков - царь горы (2x2x2)") {
                         world.settlementsCount                    = 6;
-                        world.settlements_field                   = [
-                            new Polygon([new Cell(68, 147), new Cell(122, 148), new Cell(135, 177), new Cell(95, 187), new Cell(55, 177)].reverse()),
-                            new Polygon([new Cell(68, 147), new Cell(122, 148), new Cell(135, 177), new Cell(95, 187), new Cell(55, 177)].reverse()),
-                            new Polygon([new Cell(63, 91), new Cell(3, 89), new Cell(16, 19), new Cell(44, 19), new Cell(64, 46)].reverse()),
-                            new Polygon([new Cell(63, 91), new Cell(3, 89), new Cell(16, 19), new Cell(44, 19), new Cell(64, 46)].reverse()),
-                            new Polygon([new Cell(126, 44), new Cell(145, 19), new Cell(174, 49), new Cell(186, 89), new Cell(154, 92)].reverse()),
-                            new Polygon([new Cell(126, 44), new Cell(145, 19), new Cell(174, 49), new Cell(186, 89), new Cell(154, 92)].reverse())
-                        ];
                         world.settlements_workers_reviveCells = [
                             [new Cell(95, 185)],
                             [new Cell(95, 185)],
@@ -203,12 +171,6 @@ export class CastleFightPlugin extends HordePluginBase {
                         }
                     } else if (scenaName == "Битва замков - царь горы (1x1x1x1)") {
                         world.settlementsCount                    = 4;
-                        world.settlements_field                   = [
-                            new Polygon([new Cell(73, 0), new Cell(120, 0), new Cell(120, 45), new Cell(73, 45)]),
-                            new Polygon([new Cell(148, 72), new Cell(194, 72), new Cell(194, 120), new Cell(148, 120)]),
-                            new Polygon([new Cell(72, 148), new Cell(120, 148), new Cell(120, 194), new Cell(72, 194)]),
-                            new Polygon([new Cell(0, 72), new Cell(45, 72), new Cell(45, 120), new Cell(0, 120)])
-                        ];
                         world.settlements_workers_reviveCells = [
                             [new Cell(96, 0)],
                             [new Cell(194, 96)],
@@ -240,14 +202,6 @@ export class CastleFightPlugin extends HordePluginBase {
                         }
                     } else if (scenaName == "Битва замков - союзник в тылу врага (2x2x2)") {
                         world.settlementsCount                    = 6;
-                        world.settlements_field                   = [
-                            new Polygon([new Cell(0, 135), new Cell(63, 135), new Cell(63, 72), new Cell(0, 72)].reverse()),
-                            new Polygon([new Cell(288, 135), new Cell(351, 135), new Cell(351, 72), new Cell(288, 72)].reverse()),
-                            new Polygon([new Cell(72, 63), new Cell(135, 63), new Cell(135, 0), new Cell(72, 0)].reverse()),
-                            new Polygon([new Cell(216, 207), new Cell(279, 207), new Cell(280, 144), new Cell(216, 144)].reverse()),
-                            new Polygon([new Cell(216, 63), new Cell(279, 63), new Cell(279, 0), new Cell(216, 0)].reverse()),
-                            new Polygon([new Cell(72, 207), new Cell(135, 207), new Cell(135, 144), new Cell(72, 144)].reverse())
-                        ];
                         world.settlements_workers_reviveCells = [
                             [new Cell(1, 103)],
                             [new Cell(350, 103)],
@@ -289,14 +243,6 @@ export class CastleFightPlugin extends HordePluginBase {
                         }
                     } else if (scenaName == "Битва замков - царь горы (2-6)") {
                         world.settlementsCount                    = 6;
-                        world.settlements_field                   = [
-                            new Polygon([new Cell(156, 157), new Cell(156, 162), new Cell(140, 164), new Cell(140, 155)]),
-                            new Polygon([new Cell(159, 151), new Cell(159, 156), new Cell(153, 156), new Cell(144, 145), new Cell(155, 139)]),
-                            new Polygon([new Cell(166, 156), new Cell(160, 156), new Cell(160, 151), new Cell(164, 139), new Cell(175, 145)]),
-                            new Polygon([new Cell(163, 157), new Cell(179, 155), new Cell(179, 164), new Cell(163, 162)]),
-                            new Polygon([new Cell(160, 163), new Cell(166, 163), new Cell(175, 174), new Cell(165, 180), new Cell(160, 168)]),
-                            new Polygon([new Cell(153, 163), new Cell(159, 163), new Cell(159, 168), new Cell(155, 180), new Cell(144, 173)])
-                        ];
                         world.settlements_workers_reviveCells = [
                             [new Cell(74, 160)],
                             [new Cell(118, 88)],
@@ -346,10 +292,6 @@ export class CastleFightPlugin extends HordePluginBase {
                         }
                     } else if (scenaName == "Битва замков - тест баланса") {
                         world.settlementsCount = 2;
-                        world.settlements_field                   = [
-                            new Polygon([]),
-                            new Polygon([])
-                        ];
                         world.settlements_workers_reviveCells = [
                             [new Cell(247, 0)],
                             [new Cell(255, 0)]
@@ -368,12 +310,6 @@ export class CastleFightPlugin extends HordePluginBase {
                         }
                     } else if (scenaName == "Битва замков - перекресток (1x1x1x1)") {
                         world.settlementsCount = 4;
-                        world.settlements_field                   = [
-                            new Polygon([new Cell(0, 0), new Cell(47, 0), new Cell(47, 47), new Cell(0, 47)]),
-                            new Polygon([new Cell(191, 0), new Cell(191, 47), new Cell(144, 47), new Cell(144, 0)]),
-                            new Polygon([new Cell(191, 191), new Cell(144, 191), new Cell(144, 144), new Cell(191, 144)]),
-                            new Polygon([new Cell(0, 191), new Cell(0, 144), new Cell(47, 144), new Cell(47, 191)])
-                        ];
                         world.settlements_workers_reviveCells = [
                             [new Cell(16, 16)],
                             [new Cell(175, 16)],
@@ -435,16 +371,6 @@ export class CastleFightPlugin extends HordePluginBase {
                         }
                     } else if (scenaName == "Битва замков - перекресток (2x2x2)") {
                         world.settlementsCount = 6;
-                        world.settlements_field                   = [
-                            new Polygon([new Cell(96, 96), new Cell(159, 96), new Cell(159, 159), new Cell(96, 159)]),
-                            new Polygon([new Cell(96, 96), new Cell(159, 96), new Cell(159, 159), new Cell(96, 159)]),
-
-                            new Polygon([new Cell(32, 32), new Cell(63, 32), new Cell(63, 63), new Cell(32, 63)]),
-                            new Polygon([new Cell(192, 32), new Cell(223, 32), new Cell(223, 63), new Cell(192, 63)]),
-
-                            new Polygon([new Cell(32, 192), new Cell(63, 192), new Cell(63, 223), new Cell(32, 223)]),
-                            new Polygon([new Cell(192, 192), new Cell(223, 192), new Cell(223, 223), new Cell(192, 223)])
-                        ];
                         world.settlements_workers_reviveCells = [
                             [new Cell(128, 71)],
                             [new Cell(127, 184)],
@@ -536,17 +462,16 @@ export class CastleFightPlugin extends HordePluginBase {
                         return;
                     }
 
-                    world.spawn_count_coeff = 3;
+                    //world.spawn_count_coeff = 3;
 
                     this.log.info("Скрипты для битвы замков активированы");
 
                     world.Init();
-
+                    
                     world.RegisterSystem(WordClearSystem, "WordClearSystem");
                     world.RegisterSystem(IncomeSystem, "IncomeSystem");
                     world.RegisterSystem(SpawnBuildingSystem, "SpawnBuildingSystem");
-                    //world.RegisterSystem(AttackingAlongPathSystem, "AttackingAlongPathSystem");
-                    world.RegisterSystem(AttackingAlongPathSystem2, "AttackingAlongPathSystem");
+                    world.RegisterSystem(AttackingAlongPathSystem, "AttackingAlongPathSystem");
                     world.RegisterSystem(ReviveSystem, "ReviveSystem");
                     world.RegisterSystem(UpgradableBuildingSystem, "UpgradableBuildingSystem");
 

@@ -7,7 +7,7 @@ import { spawnUnit } from "library/game-logic/unit-spawn";
 import { world } from "./CastleFightPlugin";
 import { Entity, COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent, SpawnBuildingComponent, UpgradableBuildingComponent, BuffComponent, BUFF_TYPE, ReviveComponent, HeroAltarComponent, IncomeEvent, IncomeIncreaseEvent, SettlementComponent, IncomeLimitedPeriodicalComponent, UnitProducedEvent } from "./Components/ESC_components";
 import { Polygon, Cell as Cell, CfgAddUnitProducer, getCurrentTime, MetricType, distance_L1, distance_L2, CfgSetSpeed } from "./Utils";
-import { AI_Init } from "./Systems/AISystems";
+import { AI_Init } from "./Systems/AISystem";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
@@ -138,7 +138,7 @@ export class AttackPathChoiser_Periodically_WithCondCell extends IAttackPathChoi
             // проверяем, что путь доступен
             var pathEmpty = true;
             for (var condUnitNum = 0; condUnitNum < this.settlements_attackPaths_condUnit[unitSettlementId][attackPathNum].length; condUnitNum++) {
-                if (this.settlements_attackPaths_condUnit[unitSettlementId][this.settlements_nextAttackPathNum[unitSettlementId]][condUnitNum]) {
+                if (this.settlements_attackPaths_condUnit[unitSettlementId][this.settlements_nextAttackPathNum[unitSettlementId]][condUnitNum] != null) {
                     pathEmpty = false;
                     break;
                 }
@@ -161,8 +161,6 @@ export class World {
     settlements_entities: Array<Array<Entity>>;
     /** для каждого поселения хранится ссылка на главного замка */
     settlements_castleUnit: Array<any>;
-    /** для каждого поселения хранится область вокруг главного замка, которую нужно охранять */
-    settlements_field: Array<Polygon>;
     /** для каждого поселения хранится точка спавна рабочих */
     settlements_workers_reviveCells: Array<Array<Cell>>;
     /** для каждого поселения хранится точка замка */
@@ -234,7 +232,6 @@ export class World {
         this._InitConfigs();
         this._InitSettlements();
         this._PlaceCastle();
-        AI_Init(this);
     }
 
     private _InitConfigs() {
@@ -410,6 +407,10 @@ export class World {
         ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].CostResources, "Metal",  0);
         ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].CostResources, "Lumber", 100);
         ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].CostResources, "People", 0);
+        // параметры атаки
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_1"], "Sight", 3);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_1"], "OrderDistance", 10);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].MainArmament, "Range", 10);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_1_1_1_1"));
@@ -452,6 +453,10 @@ export class World {
         ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "Shield", 0);
         // урон
         ScriptUtils.SetValue(this.configs["unit_1_1_1_2"].MainArmament.BulletCombatParams, "Damage", 1000);
+        // параметры атаки
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "Sight", 3);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "OrderDistance", 5);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"].MainArmament, "Range", 5);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_1_1_1_2"));
@@ -491,9 +496,14 @@ export class World {
         // здоровье
         ScriptUtils.SetValue(this.configs["unit_1_1_2"], "MaxHealth", 2000);
         // броня
-        ScriptUtils.SetValue(this.configs["unit_1_1_2"], "Shield", 300);
+        ScriptUtils.SetValue(this.configs["unit_1_1_2"], "Shield", 200);
         // урон
         ScriptUtils.SetValue(this.configs["unit_1_1_2"].MainArmament.BulletCombatParams, "Damage", 1000);
+        // параметры атаки
+        ScriptUtils.SetValue(this.configs["unit_1_1_2"], "Sight", 3);
+        ScriptUtils.SetValue(this.configs["unit_1_1_2"], "OrderDistance", 9);
+        ScriptUtils.SetValue(this.configs["unit_1_1_2"].MainArmament, "Range", 9);
+        ScriptUtils.SetValue(this.configs["unit_1_1_2"].MainArmament, "BaseAccuracy", 1);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_1_1_2"));
@@ -579,13 +589,13 @@ export class World {
         // здоровье
         ScriptUtils.SetValue(this.configs["unit_1_2_1"], "MaxHealth", 2000);
         // броня
-        ScriptUtils.SetValue(this.configs["unit_1_2_1"], "Shield", 300);
+        ScriptUtils.SetValue(this.configs["unit_1_2_1"], "Shield", 200);
         // урон
         ScriptUtils.SetValue(this.configs["unit_1_2_1"].MainArmament.BulletCombatParams, "Damage", 500);
         // параметры атаки
-        ScriptUtils.SetValue(this.configs["unit_1_2_1"], "Sight", 11);
-        ScriptUtils.SetValue(this.configs["unit_1_2_1"], "OrderDistance", 11);
-        ScriptUtils.SetValue(this.configs["unit_1_2_1"].MainArmament, "Range", 11);
+        ScriptUtils.SetValue(this.configs["unit_1_2_1"], "Sight", 3);
+        ScriptUtils.SetValue(this.configs["unit_1_2_1"], "OrderDistance", 10);
+        ScriptUtils.SetValue(this.configs["unit_1_2_1"].MainArmament, "Range", 10);
         ScriptUtils.SetValue(this.configs["unit_1_2_1"].MainArmament, "BaseAccuracy", 1);
         {
             var entity : Entity = new Entity();
@@ -1274,7 +1284,6 @@ export class World {
 
         for (var cfgId in this.configs) {
             if (this.configs[cfgId].MainArmament) {
-                //log.info(this.configs[cfgId].Name, " friend fire off, bullet = ", this.configs[cfgId].MainArmament.BulletConfig.Uid);
                 var bulletCfg = HordeContentApi.GetBulletConfig(this.configs[cfgId].MainArmament.BulletConfig.Uid);
                 ScriptUtils.SetValue(bulletCfg, "CanDamageAllied", false);
             }
@@ -1315,7 +1324,7 @@ export class World {
         }
 
         ////////////////////
-        // общие параметры для всех зданий
+        // общие параметры для конфигов
         ////////////////////
         
         for (var cfgId in this.configs) {
@@ -1354,6 +1363,18 @@ export class World {
                 ScriptUtils.SetValue(this.configs[cfgId].CostResources, "Metal",  0);
                 ScriptUtils.SetValue(this.configs[cfgId].CostResources, "Lumber", 0);
                 ScriptUtils.SetValue(this.configs[cfgId].CostResources, "People", 0);
+
+                // увеличиваем пехоте хп в 1.5 раза
+                if (this.configs[cfgId].MainArmament.Range == 1 &&
+                    !this.configs[cfgId].Specification.HasFlag(UnitSpecification.Rider) &&
+                    this.cfgUid_entity.has(this.configs[cfgId].Uid)) {
+                    
+                    var entity = this.cfgUid_entity.get(this.configs[cfgId].Uid) as Entity;
+                    
+                    if (entity.components.has(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT)) {
+                        ScriptUtils.SetValue(this.configs[cfgId], "MaxHealth", Math.floor(1.5 * this.configs[cfgId].MaxHealth));
+                    }
+                }
             }
 
             // проверяем наличие ECS сущности для конфига

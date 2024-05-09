@@ -120,26 +120,25 @@ export class SpawnBuildingComponent extends IComponent {
 }
 
 export class AttackingAlongPathComponent extends IComponent {
+    /** номер выбранного пути атаки */
+    selectedAttackPathNum: number;
     /** путь атаки */
     attackPath: Array<Cell>;
     /** номер точки в которую нужно сейчас идти */
     currentPathPointNum: number;
 
-    public constructor(attackPath?: Array<Cell>, currentPathPointNum?: number) {
+    public constructor(selectedAttackPathNum?: number, attackPath?: Array<Cell>, currentPathPointNum?: number) {
         super(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT);
 
+        this.selectedAttackPathNum = selectedAttackPathNum ?? 0;
         if (attackPath) {
             this.attackPath = attackPath;
         }
-        if (currentPathPointNum) {
-            this.currentPathPointNum = currentPathPointNum;
-        } else {
-            this.currentPathPointNum = 0;
-        }
+        this.currentPathPointNum = currentPathPointNum ?? 0;
     }
 
     public Clone(): AttackingAlongPathComponent {
-        return new AttackingAlongPathComponent(this.attackPath, this.currentPathPointNum);
+        return new AttackingAlongPathComponent(this.selectedAttackPathNum, this.attackPath, this.currentPathPointNum);
     }
 }
 
@@ -335,6 +334,23 @@ export enum BUFF_TYPE {
 
     SIZE
 };
+
+/** тип оптимальной цели */
+export enum BuffOptTargetType {
+    Melle = 0,
+    Range,
+    All
+};
+
+/** оптимальная цель баффа */
+export var BuffsOptTarget = [
+    BuffOptTargetType.All,
+    BuffOptTargetType.Range,
+    BuffOptTargetType.Range,
+    BuffOptTargetType.All,
+    BuffOptTargetType.All,
+    BuffOptTargetType.All
+];
 
 /** Компонент с информацией о текущем бафе, его наличие означает, что юнита можно баффать */
 export class BuffableComponent extends IComponent {

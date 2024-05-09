@@ -1,7 +1,7 @@
 import { LogLevel, log } from "library/common/logging";
 import { World } from "../World";
 import { PointCommandArgs, ProduceAtCommandArgs, ProduceCommandArgs, UnitCommand, UnitFlags, UnitMapLayer } from "library/game-logic/horde-types";
-import { COMPONENT_TYPE, Entity, ReviveComponent, SpawnBuildingComponent, UnitComponent, UnitProducedEvent, UpgradableBuildingComponent } from "../Components/ESC_components";
+import { BuffComponent, BuffOptTargetType, BuffsOptTarget, COMPONENT_TYPE, Entity, ReviveComponent, SpawnBuildingComponent, UnitComponent, UnitProducedEvent, UpgradableBuildingComponent } from "../Components/ESC_components";
 import { createPoint, createResourcesAmount } from "library/common/primitives";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
@@ -11,60 +11,71 @@ import { Cell, distance_L1 } from "../Utils";
 
 export const ResourcesAmount = HCL.HordeClassLibrary.World.Simple.ResourcesAmount;
 
-class Unit {
-    /** ид конфиг здания, где строится данный юнит */
-    buildingCfgId: string;
-    /** полная стоимость создания данного здания с нуля */
-    buildingTotalCost: any;
-    /** стоимость улучшения до текущего от предыдущего */
-    buildingUpgradeCost: any;
-    /** ид конфиг юнита */
-    unitCfgId: string;
-    /** номер предыдущего юнита */
-    prevUnitId: number;
+var Church_buildingId : number = 0;
 
-    constructor(buildingCfgId: string, buildingTotalCost: any, buildingUpgradeCost: any, unitCfgId: string, prevUnitId: number) {
-        this.buildingCfgId       = buildingCfgId;
-        this.buildingTotalCost   = buildingTotalCost;
-        this.buildingUpgradeCost = buildingUpgradeCost;
-        this.unitCfgId           = unitCfgId;
-        this.prevUnitId          = prevUnitId;
+class Building {
+    /** ид конфиг строения */
+    cfgId: string;
+    /** полная стоимость создания данного здания с нуля */
+    totalCost: any;
+    /** стоимость улучшения до текущего от предыдущего */
+    upgradeCost: any;
+    /** номер предыдущего строения в дереве улучшений */
+    upgradePrevBuildingId: number;
+
+    constructor(cfgId: string, totalCost: any, upgradeCost: any, upgradePrevBuildingId: number) {
+        this.cfgId                 = cfgId;
+        this.totalCost             = totalCost;
+        this.upgradeCost           = upgradeCost;
+        this.upgradePrevBuildingId = upgradePrevBuildingId;
     }
 };
 
 enum BotLogLevel {
-    Debug = 0,
-    Info = 1,
+    Debug   = 0,
+    Info    = 1,
     Warning = 2,
-    Error = 3
+    Error   = 3
 }
 
 enum BotBuildState {
-    Place = 0,
+    AccMoney = 0,
+    Place,
     Build,
     Upgrade
 }
 
 class IBot {
-    static LogLevel: BotLogLevel = BotLogLevel.Info;
+    static LogLevel: BotLogLevel = BotLogLevel.Error;
     static TestBuildingCfg: any  = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Test_Building");
 
     /** поселение */
     settlementId: number;
     /** имя бота */
     name: string;
-    /** возможные юниты */
-    units: Array<Unit>;
+    /** возможные строения */
+    buildings: Array<Building>;
+    /** возможные духи */
+    spiritsCfgId: Array<string>;
+    /** оператор перевода unitCfgId в id строения в котором спавнится юнит */
+    op_unitCfgId_buildingId: Map<string, number>;
 
     /** сущности рабочих */
     workers_entity: Array<Entity>;
 
-    constructor(settlementId: number, name: string, units: Array<Unit>) {
-        this.settlementId = settlementId;
-        this.name  = name;
-        this.units = units;
+    /** юниты церквей */
+    churchs_unit: Array<any>;
 
-        this._goalUnitId = -1;
+    constructor(settlementId: number, name: string, buildings: Array<Building>, spiritsCfgId: Array<string>, op_unitCfgId_buildingId: Map<string, number>) {
+        this.settlementId = settlementId;
+        this.name         = name;
+        this.buildings    = buildings;
+        this.spiritsCfgId = spiritsCfgId;
+        this.op_unitCfgId_buildingId = op_unitCfgId_buildingId;
+
+        this._building_goal_Id  = -1;
+
+        this.churchs_unit = new Array<any>();
     }
 
     world: World;
@@ -98,15 +109,25 @@ class IBot {
             }
         }
 
+        // логика церквей
+
+        this._church_logic();
+
+        // логика духов
+
+        this._spirits_logic();
+
         // если ничего не строится или пока идет улучшение здания, можно чинить окружающие здания
         
-        if (this._goalUnitId == -1 || this._buildingState == BotBuildState.Upgrade) {
+        if (this._building_goal_Id == -1 ||
+            this._buildingState == BotBuildState.AccMoney ||
+            this._buildingState == BotBuildState.Upgrade) {
             this._repairBuilding();
         }
 
         // выбираем, строим следующее здание
 
-        if (this._goalUnitId == -1) {
+        if (this._building_goal_Id == -1) {
             if (this.world.settlements[this.settlementId].Resources.Lumber > 0) {
                 this._selectNextBuilding();
             }
@@ -115,21 +136,25 @@ class IBot {
         }
     }
 
-    protected _selectNextBuilding(): void { };
+    // заглужки - виртуальные функции
 
-    /** целевой юнит */
-    private _goalUnitId: number;
+    protected _selectNextBuilding(): void { };
+    protected _selectNextSpiritNum(): number { return 0; };
+    protected _selectSpiritsTargets(spirits_entity: Array<Entity>, spirits_targetUnitComponent: Array<UnitComponent>): void { return; }
+
+    /** целевое строение */
+    private _building_goal_Id: number;
     /** состояние постройки */
     private _buildingState: BotBuildState;
     /** текущая рассматриваемая постройка (через это можно улучшить существующее здание) */
     private _building_curr_unit: any;
     private _building_cell : Cell | null;
     private _building_curr_baseEntity: Entity | null;
-    private _building_curr_unitId: number | null;
-    private _building_next_unitId: number | null;
+    private _building_curr_id: number | null;
+    private _building_next_id: number | null;
 
-    protected _setNextBuilding(goal_unitId: number, building_unit: any = null): void {
-        this._goalUnitId = goal_unitId;
+    protected _setNextBuilding(building_goal_Id: number, building_unit: any = null): void {
+        this._building_goal_Id = building_goal_Id;
 
         if (building_unit) {
             this._building_curr_unit = building_unit;
@@ -137,58 +162,82 @@ class IBot {
 
             // инициализируем ид постройки
 
-            this._building_next_unitId = this._goalUnitId
-            this._building_curr_unitId = this._goalUnitId;
-            while (this.world.configs[this.units[this._building_curr_unitId].buildingCfgId].Uid != this._building_curr_unit.Cfg.Uid) {
-                this._building_next_unitId = this._building_curr_unitId;
-                this._building_curr_unitId = this.units[this._building_curr_unitId].prevUnitId;
+            this._building_next_id = this._building_goal_Id
+            this._building_curr_id = this._building_goal_Id;
+            while (this.world.configs[this.buildings[this._building_curr_id].cfgId].Uid != this._building_curr_unit.Cfg.Uid) {
+                this._building_next_id = this._building_curr_id;
+                this._building_curr_id = this.buildings[this._building_curr_id].upgradePrevBuildingId;
             }
 
             // инициализируем точку постройку
 
             this._building_cell = new Cell(this._building_curr_unit.Cell.X, this._building_curr_unit.producedUnit.Cell.Y);
         } else {
-            this._buildingState      = BotBuildState.Place;
+            this._buildingState      = BotBuildState.AccMoney;
         }
     };
 
     private _buildClear() {
-        this._goalUnitId = -1;
+        this._building_goal_Id = -1;
         this._building_curr_unit = null;
 
         this._building_cell = null;
         this._building_curr_baseEntity = null;
-        this._building_curr_unitId = null;
-        this._building_next_unitId = null;
+        this._building_curr_id = null;
+        this._building_next_id = null;
     }
 
     private _buildNextBuilding(): void {
         switch (this._buildingState) {
+            case BotBuildState.AccMoney:
+                this.Log(BotLogLevel.Debug, "State = AccMoney");
+                this._accMoney();
+            break;
             case BotBuildState.Place:
+                this.Log(BotLogLevel.Debug, "State = Place");
                 this._placeBuilding();
             break;
             case BotBuildState.Build:
+                this.Log(BotLogLevel.Debug, "State = Build");
                 this._buildBuilding();
             break;
             case BotBuildState.Upgrade:
+                this.Log(BotLogLevel.Debug, "State = Upgrade");
                 this._upgradeBuilding();
             break;
         }
     }
 
-    private _placeBuilding(): void {
+    private _accMoney(): void {
         // инициализируем ид постройки
 
-        if (this._building_curr_unitId == null) {
-            var nextId = this._goalUnitId;
-            var prevId = this.units[nextId].prevUnitId;
+        if (this._building_curr_id == null) {
+            var nextId = this._building_goal_Id;
+            var prevId = this.buildings[nextId].upgradePrevBuildingId;
             while (prevId != -1) {
                 nextId = prevId;
-                prevId = this.units[nextId].prevUnitId;
+                prevId = this.buildings[nextId].upgradePrevBuildingId;
             }
-            this._building_curr_unitId = nextId;
+            this._building_curr_id = nextId;
 
-            this.Log(BotLogLevel.Debug, "до целевого здания нужно построить " + this.world.configs[this.units[this._building_curr_unitId].buildingCfgId].Name);
+            this.Log(BotLogLevel.Debug, "до целевого здания нужно построить [" + this._building_curr_id + "] = " + this.world.configs[this.buildings[this._building_curr_id].cfgId].Name);
+        }
+
+        // проверка, что хватает денег на размещение здания
+        
+        if (this.buildings[this._building_curr_id].totalCost.Gold <= this.world.settlements[this.settlementId].Resources.Gold &&
+            this.buildings[this._building_curr_id].totalCost.Metal <= this.world.settlements[this.settlementId].Resources.Metal &&
+            this.buildings[this._building_curr_id].totalCost.Lumber <= this.world.settlements[this.settlementId].Resources.Lumber &&
+            this.buildings[this._building_curr_id].totalCost.People <= this.world.settlements[this.settlementId].Resources.FreePeople) {
+            this._buildingState = BotBuildState.Place;
+            this.Log(BotLogLevel.Debug, "накопили денег, можно устанавливать здание");
+        }
+    }
+
+    private _placeBuilding(): void {
+        if (this._building_curr_id == null) {
+            this.Log(BotLogLevel.Error, "_placeBuilding:_building_curr_id = null = " + this._building_curr_id);
+            return;
         }
 
         // проверяем, что любой рабочий строит нужное здание, иначе отдаем приказ
@@ -200,21 +249,23 @@ class IBot {
                 continue;
             }
 
+            // проверка, что рабочий не занят
             if (!unitComponent.unit.OrdersMind.IsIdle()) {
                 continue;
             }
 
+            // проверка, что рабочий ничего не строит
             if (unitComponent.unit.OrdersMind.ActiveAct.GetType().Name == "ActProduce") {
                 break;
             }
 
+            // размещаем здание вокруг точки спавна рабочего
             var reviveComponent = this.workers_entity[i].components.get(COMPONENT_TYPE.REVIVE_COMPONENT) as ReviveComponent;
-
-            var config    = this.world.configs[this.units[this._building_curr_unitId].buildingCfgId];
+            var config    = this.world.configs[this.buildings[this._building_curr_id].cfgId];
             var generator = generateCellInSpiral(reviveComponent.cell.X, reviveComponent.cell.Y);
             for (var cell = generator.next(); !cell.done; cell = generator.next()) {
                 if (IBot.TestBuildingCfg.CanBePlacedByRealMap(this.world.realScena, cell.value.X, cell.value.Y)) {
-                    // делаем так, чтобы инженер не отвлекался, когда строит башню (убираем реакцию на инстинкты)
+                    // делаем так, чтобы инженер не отвлекался, когда строит (убираем реакцию на инстинкты)
                     unitComponent.unit.OrdersMind.AssignSmartOrder(unitComponent.unit.Cell, AssignOrderMode.Replace, 100000);
 
                     var produceAtCommandArgs = new ProduceAtCommandArgs(AssignOrderMode.Queue, config, createPoint(cell.value.X + 1, cell.value.Y + 1));
@@ -240,7 +291,7 @@ class IBot {
 
             var unitProducedEvent = entity.components.get(COMPONENT_TYPE.UNIT_PRODUCED_EVENT) as UnitProducedEvent;
 
-            if (unitProducedEvent.producedUnit.Cfg.Uid != this.world.configs[this.units[this._building_curr_unitId].buildingCfgId].Uid) {
+            if (unitProducedEvent.producedUnit.Cfg.Uid != this.world.configs[this.buildings[this._building_curr_id].cfgId].Uid) {
                 continue;
             }
 
@@ -319,7 +370,13 @@ class IBot {
                 }
             }
         } else {
-            if (this._goalUnitId == this._building_curr_unitId) {
+            if (this._building_goal_Id == this._building_curr_id) {
+                // если это церковь, то запоминаем её ид
+
+                if (this._building_goal_Id == Church_buildingId) {
+                    this.churchs_unit.push(this._building_curr_unit);
+                }
+
                 this._buildClear();
                 this.Log(BotLogLevel.Debug, "здание достроилось, стратегия выполнена");
             } else {
@@ -334,27 +391,27 @@ class IBot {
             this.Log(BotLogLevel.Error, "_building_cell = null");
             return;
         }
-        if (this._building_curr_unitId == null) {
-            this.Log(BotLogLevel.Error, "_building_curr_unitId = null");
+        if (this._building_curr_id == null) {
+            this.Log(BotLogLevel.Error, "_building_curr_id = null");
             return;
         }
 
         // инициализируем ид следующей постройки
 
-        if (this._building_next_unitId == null) {
-            var nextId = this._goalUnitId;
-            var prevId = this.units[nextId].prevUnitId;
-            while (prevId != this._building_curr_unitId) {
+        if (this._building_next_id == null) {
+            var nextId = this._building_goal_Id;
+            var prevId = this.buildings[nextId].upgradePrevBuildingId;
+            while (prevId != this._building_curr_id) {
                 nextId = prevId;
-                prevId = this.units[nextId].prevUnitId;
+                prevId = this.buildings[nextId].upgradePrevBuildingId;
             }
-            this._building_next_unitId = nextId;
+            this._building_next_id = nextId;
         }
 
         // инициализируем базовую сущность
 
         if (this._building_curr_baseEntity == null) {
-            this._building_curr_baseEntity = this.world.cfgUid_entity.get(this.world.configs[this.units[this._building_curr_unitId].buildingCfgId].Uid) as Entity;
+            this._building_curr_baseEntity = this.world.cfgUid_entity.get(this.world.configs[this.buildings[this._building_curr_id].cfgId].Uid) as Entity;
         }
 
         // если ссылка на юнит здания нет, тогда оно в процессе улучшения
@@ -373,7 +430,7 @@ class IBot {
 
             // проверяем, что это наше улучшенное здание
 
-            if (this._building_curr_unit.Cfg.Uid != this.world.configs[this.units[this._building_next_unitId].buildingCfgId].Uid) {
+            if (this._building_curr_unit.Cfg.Uid != this.world.configs[this.buildings[this._building_next_id].cfgId].Uid) {
                 this._building_curr_unit = null;
 
                 return;
@@ -381,7 +438,7 @@ class IBot {
 
             // здание улучшилось
 
-            if (this._building_next_unitId == this._goalUnitId) {
+            if (this._building_next_id == this._building_goal_Id) {
                 this._buildClear();
                 this.Log(BotLogLevel.Debug, "стратегия успешно выполнена, переходим к следующей");
                 return;
@@ -390,18 +447,18 @@ class IBot {
             // обновляем информацию о этапах улучшения
 
             this._building_curr_baseEntity = null;
-            this._building_curr_unitId     = this._building_next_unitId;
-            this._building_next_unitId     = null;
+            this._building_curr_id     = this._building_next_id;
+            this._building_next_id     = null;
             
             return;
         }
 
         // проверяем хватает ли денег на улучшение
 
-        if (this.units[this._building_next_unitId].buildingUpgradeCost.Gold <= this.world.settlements[this.settlementId].Resources.Gold &&
-            this.units[this._building_next_unitId].buildingUpgradeCost.Metal <= this.world.settlements[this.settlementId].Resources.Metal &&
-            this.units[this._building_next_unitId].buildingUpgradeCost.Lumber <= this.world.settlements[this.settlementId].Resources.Lumber &&
-            this.units[this._building_next_unitId].buildingUpgradeCost.People <= this.world.settlements[this.settlementId].Resources.FreePeople
+        if (this.buildings[this._building_next_id].upgradeCost.Gold <= this.world.settlements[this.settlementId].Resources.Gold &&
+            this.buildings[this._building_next_id].upgradeCost.Metal <= this.world.settlements[this.settlementId].Resources.Metal &&
+            this.buildings[this._building_next_id].upgradeCost.Lumber <= this.world.settlements[this.settlementId].Resources.Lumber &&
+            this.buildings[this._building_next_id].upgradeCost.People <= this.world.settlements[this.settlementId].Resources.FreePeople
         ) {
             // улучшаем
 
@@ -409,7 +466,7 @@ class IBot {
 
             var i = 0;
             for (i = 0; i < upgradableBuildingComponent.upgradeCfgIds.length; i++) {
-                if (upgradableBuildingComponent.upgradeCfgIds[i] == this.units[this._building_next_unitId].buildingCfgId) {
+                if (upgradableBuildingComponent.upgradeCfgIds[i] == this.buildings[this._building_next_id].cfgId) {
                     break;
                 }
             }
@@ -423,7 +480,7 @@ class IBot {
         }
     }
 
-    _repairBuilding(): void {
+    private _repairBuilding(): void {
         // ищем постройки, которые нужно чинить
 
         var brokenBuildings_unit : Array<any> = [];
@@ -500,6 +557,74 @@ class IBot {
         }
     }
 
+    private _church_logic(): void {
+        // удаляем уничтоженные церкви
+
+        for (var i = 0; i < this.churchs_unit.length; i++) {
+            if (this.churchs_unit[i].IsDead) {
+                this.churchs_unit.splice(i--, 1);
+            }
+        }
+
+        // заказываем духов
+
+        for (var i = 0; i < this.churchs_unit.length; i++) {
+            // проверяем, что церковь ничего не делает
+            if (!this.churchs_unit[i].OrdersMind.IsIdle()) {
+                continue;
+            }
+
+            // выбираем следующего духа
+            var nextSpiritNum = this._selectNextSpiritNum();
+
+            this.Log(BotLogLevel.Debug, "бот выбрал следующего духа [" + nextSpiritNum + "] = " +
+                this.spiritsCfgId[nextSpiritNum] + ", name = " + this.world.configs[this.spiritsCfgId[nextSpiritNum]].Name
+            );
+
+            // строим следующего духа
+            var produceCommandArgs = new ProduceCommandArgs(AssignOrderMode.Queue, this.world.configs[this.spiritsCfgId[nextSpiritNum]], 1);
+            this.churchs_unit[i].Cfg.GetOrderDelegate(this.churchs_unit[i], produceCommandArgs);
+        }
+    }
+
+    private _spirits_logic(): void {
+        // ищем духов
+
+        var spirits_entity                                     = new Array<Entity>();
+        var spirits_targetUnitComponent : Array<UnitComponent> = new Array<UnitComponent>();
+
+        for (var i = 0; i < this.world.settlements_entities[this.settlementId].length; i++) {
+            var entity = this.world.settlements_entities[this.settlementId][i] as Entity;
+
+            // только у духов есть данный компонент
+            if (!entity.components.has(COMPONENT_TYPE.BUFF_COMPONENT)) {
+                continue;
+            }
+
+            spirits_entity.push(entity);            
+        }
+
+        if (spirits_entity.length == 0) {
+            return;
+        }
+
+        this._selectSpiritsTargets(spirits_entity, spirits_targetUnitComponent);
+
+        // если цели не выбраны, то пропускаем
+
+        if (spirits_targetUnitComponent.length == 0) {
+            return;
+        }
+
+        for (var i = 0; i < spirits_targetUnitComponent.length; i++) {
+            var unitComponent = spirits_entity[i].components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
+
+            // даем команды
+            var pointCommandArgs = new PointCommandArgs(createPoint(spirits_targetUnitComponent[i].unit.Cell.X, spirits_targetUnitComponent[i].unit.Cell.Y), UnitCommand.Attack, AssignOrderMode.Replace);
+            unitComponent.unit.Cfg.GetOrderDelegate(unitComponent.unit, pointCommandArgs);
+        }
+    }
+
     Log(level: BotLogLevel, message: string) {
         if (IBot.LogLevel > level) {
             return;
@@ -539,22 +664,116 @@ class IBot {
 class RandomBot extends IBot {
     // Рандомизатор
     rnd : any;
+    // флаг, что церковь построена
+    church_isBuilding: boolean;
+    // номер текущей постройки
+    buildingCurrNum: number;
+    // номер постройки когда нужно построить церковь
+    church_planBuildingNum: number;
+    
+    constructor(settlementId: number, buildings: Array<Building>, spiritsCfgId: Array<string>, op_unitCfgId_buildingId: Map<string, number>) {
+        super(settlementId, "Рандомный", buildings, spiritsCfgId, op_unitCfgId_buildingId);
 
-    constructor(settlementId: number, units: Array<Unit>) {
-        super(settlementId, "Рандомный", units);
-
-        this.rnd = ActiveScena.GetRealScena().Context.Randomizer;
+        this.rnd                = ActiveScena.GetRealScena().Context.Randomizer;
+        this.church_isBuilding  = false;
+        this.buildingCurrNum    = 0;
+        this.church_planBuildingNum = this.rnd.RandomNumber(7, 11);
     }
 
     protected _selectNextBuilding(): void {
-        var goalUnitId = this.rnd.RandomNumber(0, this.units.length - 1);
-        this._setNextBuilding(goalUnitId);
-        this.Log(BotLogLevel.Debug, "Random bot выбрал следующую постройку " + this.world.configs[this.units[goalUnitId].buildingCfgId].Name);
+        this.buildingCurrNum++;
+
+        var goal_buildingId : number;
+        
+        while (true) {
+            if (!this.church_isBuilding && this.buildingCurrNum == this.church_planBuildingNum) {
+                goal_buildingId = Church_buildingId;
+            } else {
+                goal_buildingId = this.rnd.RandomNumber(0, this.buildings.length - 1);
+            }
+
+            if (goal_buildingId == Church_buildingId) {
+                // церковь строим одну и не раньше 6 здания
+                if (this.buildingCurrNum <= 6 || this.church_isBuilding == true) {
+                    continue;
+                } else {
+                    this.church_isBuilding = true;
+                }
+            }
+
+            break;
+        }
+        
+        this._setNextBuilding(goal_buildingId);
+        this.Log(BotLogLevel.Debug, "Random bot выбрал следующую постройку " + this.world.configs[this.buildings[goal_buildingId].cfgId].Name);
+    }
+
+    protected _selectNextSpiritNum(): number {
+        return this.rnd.RandomNumber(0, this.spiritsCfgId.length - 1);
+    }
+
+    protected _selectSpiritsTargets(spirits_entity: Array<Entity>, spirits_targetUnitComponent: Array<UnitComponent>): void {
+        // ищем возможные цели
+
+        class TargetInfo {
+            entityId: number;
+            power: number;
+
+            constructor (entityId: number, power: number) {
+                this.entityId       = entityId;
+                this.power          = power;
+            }
+        };
+
+        var possibleTargetsEntityId = new Array<TargetInfo>();
+
+        for (var i = 0; i < this.world.settlements_entities[this.settlementId].length; i++) {
+            var entity = this.world.settlements_entities[this.settlementId][i];
+
+            if (!entity.components.has(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT)) {
+                continue;
+            }
+
+            var buildingId = this.op_unitCfgId_buildingId.get((entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent).cfgId) as number;
+
+            possibleTargetsEntityId.push(new TargetInfo(i,
+                this.buildings[buildingId].totalCost.Gold + 
+                this.buildings[buildingId].totalCost.Metal + 
+                this.buildings[buildingId].totalCost.Lumber));
+        }
+
+        // сортируем по силе
+
+        possibleTargetsEntityId.sort((a: TargetInfo, b: TargetInfo) => {
+            return b.power - a.power;
+        });
+
+        // баффаем рандомно первые топ 40% сильнейших
+
+        for (var i = 0; i < spirits_entity.length; i++) {
+            if (possibleTargetsEntityId.length == 0) {
+                return;
+            }
+
+            var buffComponent     = spirits_entity[i].components.get(COMPONENT_TYPE.BUFF_COMPONENT) as BuffComponent;
+            var buffOptTargetType = BuffsOptTarget[buffComponent.buffType];
+
+            for (var j = 0; j < 4; j++) {
+                var targetId      = this.rnd.RandomNumber(0, Math.floor(0.4*possibleTargetsEntityId.length));
+                var targetInfo    = possibleTargetsEntityId[targetId];
+                
+                var unitComponent = this.world.settlements_entities[this.settlementId][targetInfo.entityId].components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
+                var unitType      = this.world.configs[unitComponent.cfgId].MainArmament.Range > 1 ? BuffOptTargetType.Range : BuffOptTargetType.Melle;
+
+                if (buffOptTargetType == BuffOptTargetType.All || j == 3 || buffOptTargetType == unitType) {
+                    spirits_targetUnitComponent.push(unitComponent);
+                    possibleTargetsEntityId.splice(targetId, 1);
+                    break;
+                }
+            }
+        }
     }
 };
-
-/** возможные юниты */
-var units : Array<Unit>;
 
 /** для каждого поселения хранит бота */
 var settlements_bot : Array<IBot>;
@@ -562,7 +781,8 @@ var settlements_bot : Array<IBot>;
 export function AI_Init(world: World) {
     // инициализируем все возможные планы строительства
 
-    units = new Array<Unit>();
+    var buildings = new Array<Building>();
+    var op_unitCfgId_buildingId = new Map<string, number>();
 
     const recurciveGetUnitInfo = (cfgId: string, shiftStr: string, accGold: number, accMetal: number, accLumber: number, accPeople: number) => {
         var Uid : string = world.configs[cfgId].Uid;
@@ -577,6 +797,10 @@ export function AI_Init(world: World) {
         }
         var spawnBuildingComponent = entity.components.get(COMPONENT_TYPE.SPAWN_BUILDING_COMPONENT) as SpawnBuildingComponent;
 
+        // информация о юните который спавнится
+
+        op_unitCfgId_buildingId.set(spawnBuildingComponent.spawnUnitConfigId, buildings.length);
+
         // обновляем накопленную стоимость здания
         
         var CostResources = world.configs[cfgId].CostResources;
@@ -587,9 +811,9 @@ export function AI_Init(world: World) {
 
         // сохраняем
 
-        var currentUnitId = units.length;
+        var currentUnitId = buildings.length;
 
-        units.push(new Unit(
+        buildings.push(new Building(
             cfgId,
             createResourcesAmount(
                 accGold,
@@ -598,7 +822,6 @@ export function AI_Init(world: World) {
                 accPeople
             ),
             CostResources,
-            spawnBuildingComponent.spawnUnitConfigId,
             -1
         ));
 
@@ -613,9 +836,9 @@ export function AI_Init(world: World) {
         for (var nextCfgId of upgradableBuildingComponent.upgradeCfgIds) {
             recurciveGetUnitInfo(nextCfgId, shiftStr + "\t", accGold, accMetal, accLumber, accPeople);
 
-            for (var i = currentUnitId + 1; i < units.length; i++) {
-                if (units[i].buildingCfgId == nextCfgId) {
-                    units[i].prevUnitId = currentUnitId;
+            for (var i = currentUnitId + 1; i < buildings.length; i++) {
+                if (buildings[i].cfgId == nextCfgId) {
+                    buildings[i].upgradePrevBuildingId = currentUnitId;
                 }
             }
         }
@@ -639,6 +862,39 @@ export function AI_Init(world: World) {
         recurciveGetUnitInfo(unitComponent.cfgId, "", 0, 0, 0, 0);
     }
 
+    // добавляем церковь
+
+    Church_buildingId = buildings.length;
+
+    buildings.push(new Building(
+        "church",
+        world.configs["church"].CostResources,
+        createResourcesAmount(0, 0, 0, 0),
+        -1
+    ));
+
+    var spiritsCfgId = new Array<string>();
+    var producerParams = world.configs["church"].GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+    var produceList    = producerParams.CanProduceList;
+    for (var i = 0; i < produceList.Count; i++) {
+        var produceUnit = produceList.Item.get(i);
+        if (!world.cfgUid_entity.has(produceUnit.Uid)) {
+            continue;
+        }
+        var entity = world.cfgUid_entity.get(produceUnit.Uid) as Entity;
+
+        if (!entity.components.has(COMPONENT_TYPE.UNIT_COMPONENT)) {
+            continue;
+        }
+        if (!entity.components.has(COMPONENT_TYPE.BUFF_COMPONENT)) {
+            continue;
+        }
+
+        var unitComponent = entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
+
+        spiritsCfgId.push(unitComponent.cfgId);
+    }
+
     // инициализируем ботов
 
     settlements_bot = new Array<IBot>(world.settlementsCount);
@@ -652,15 +908,19 @@ export function AI_Init(world: World) {
         var settlementId  = settlement.Uid;
         if (settlementId < world.settlementsCount) {
             if (!settlements_bot[settlementId]) {
-                settlements_bot[settlementId] = new RandomBot(settlementId, units);
+                settlements_bot[settlementId] = new RandomBot(settlementId, buildings, spiritsCfgId, op_unitCfgId_buildingId);
             }
         }
     }
 
-    //settlements_bot[3] = new RandomBot(3, units);
+    //settlements_bot[3] = new RandomBot(3, buildings);
 }
 
 export function AI_System(world: World, gameTickNum: number) {
+    if (!settlements_bot) {
+       AI_Init(world);
+    }
+
     for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
         if (!world.IsSettlementInGame(settlementId) || !settlements_bot[settlementId]) {
             continue;
