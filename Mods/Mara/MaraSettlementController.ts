@@ -67,7 +67,7 @@ export class MaraSettlementCluster {
             );
 
             for (let building of clusterBuildings) {
-                if ( !buildings.find( (value) => {return value.Mine == building} ) ) {
+                if ( !buildings.find( (value) => {return value == building} ) ) {
                     buildings.push(building);
                 }
             }
@@ -91,7 +91,7 @@ export class MaraSettlementCluster {
 
         for (let building of this.Buildings) {
             if (MaraUtils.IsMineConfig(building.Cfg)) {
-                let mineData = this.Mines.find((value) => {return value == building});
+                let mineData = this.Mines.find((value) => {return value.Mine == building});
                 
                 if (!mineData) {
                     let mineData = new MineData();
@@ -158,7 +158,7 @@ export class MaraSettlementController {
 
         this.createInitialSettlementCluster();
 
-        this.State = SettlementControllerStateFactory.MakeDevelopingState(this);
+        this.State = SettlementControllerStateFactory.MakeRoutingState(this);
     }
 
     public get State(): MaraSettlementControllerState {
@@ -290,7 +290,7 @@ export class MaraSettlementController {
 
         if (location) {
             let initialCluster = new MaraSettlementCluster();
-            initialCluster.Center = location.Center;
+            initialCluster.Center = new MaraPoint(location.Center.X, location.Center.Y);
             initialCluster.SettlementController = this;
             this.SettlementClusters.push(initialCluster);
         }

@@ -8,7 +8,7 @@ import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 
 export class ExpandBuildState extends MaraSettlementControllerState {
     private expandSettlementCluster: MaraSettlementCluster;
-    private positionedRequests: Array<MaraProductionRequest>;
+    private strictPositionRequests: Array<MaraProductionRequest>;
     private positionlessRequests: Array<MaraProductionRequest>;
     private targetComposition: UnitComposition;
     
@@ -18,7 +18,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             return;
         }
 
-        this.positionedRequests = [];
+        this.strictPositionRequests = [];
         this.positionlessRequests = [];
         let targetExpand = this.settlementController.TargetExpand!;
 
@@ -82,12 +82,14 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             let settlementLocation = this.settlementController.GetSettlementLocation();
 
             if (settlementLocation) {
-                expandCenter = settlementLocation.Center;
+                expandCenter = new MaraPoint(settlementLocation.Center.X, settlementLocation.Center.Y);
             }
             else { //all is lost
                 return false;
             }
         }
+
+        this.settlementController.Debug(`Expand center calculated: ${expandCenter.ToString()}`);
 
         for (let cluster of this.settlementController.SettlementClusters) {
             if (
@@ -95,6 +97,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
                 this.settlementController.Settings.ControllerStates.SettlementClustersRadius
             ) {
                 this.expandSettlementCluster = cluster;
+                this.settlementController.Debug(`Attached expand to existing settlement cluster ${cluster.Center.ToString()}`);
                 break;
             }
         }
@@ -104,6 +107,8 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             this.expandSettlementCluster.Center = expandCenter;
             this.expandSettlementCluster.SettlementController = this.settlementController;
             this.settlementController.SettlementClusters.push(this.expandSettlementCluster);
+            
+            this.settlementController.Debug(`Created new cluster for expand`);
         }
         
         if (targetResourceCluster) {
@@ -149,7 +154,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             return;
         }
 
-        this.orderProducion(cfgId, minePosition, null);
+        this.orderProducion(cfgId, minePosition, 0);
 
         let harvesterConfigs = MaraUtils.GetAllHarvesterConfigs(this.settlementController.Settlement);
         cfgId = this.selectConfigId(harvesterConfigs);
@@ -200,10 +205,13 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     
     private orderWoodcuttingProduction(): void {
         let expandClusterBuildings = this.expandSettlementCluster.Buildings;
+        let sawmills: Array<any> = expandClusterBuildings.filter((value => {return MaraUtils.IsSawmillConfig(value.Cfg)}));
+        
+        let targetResourceCluster = this.settlementController.TargetExpand!.Cluster!;
         let isSawmillPresent = false;
 
-        for (let building of expandClusterBuildings) {
-            if (MaraUtils.IsSawmillConfig(building.Cfg)) {
+        for (let sawmill of sawmills) {
+            if (MaraUtils.ChebyshevDistance(sawmill.CellCenter, targetResourceCluster.Center) <= targetResourceCluster.Size * 2) {
                 isSawmillPresent = true;
                 break;
             }
@@ -218,7 +226,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
                 return;
             }
 
-            this.orderProducion(cfgId, this.expandSettlementCluster.Center, null);
+            this.orderProducion(cfgId, targetResourceCluster.Center, null);
         }
 
         let harvesterConfigs = MaraUtils.GetAllHarvesterConfigs(this.settlementController.Settlement);
@@ -252,15 +260,15 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         let productionRequest = new MaraProductionRequest(configId, point, precision);
         this.settlementController.ProductionController.RequestProduction(productionRequest);
 
-        if (point) {
-            this.positionedRequests.push(productionRequest);
+        if (point && precision == 0) {
+            this.strictPositionRequests.push(productionRequest);
         }
         else {
             this.positionlessRequests.push(productionRequest);
         }
     }
 
-    private isPositionedRequestSatisfied(request: MaraProductionRequest): boolean {
+    private isStrictPositionRequestSatisfied(request: MaraProductionRequest): boolean {
         let unit = MaraUtils.GetUnit(request.Point);
             
         if (unit) {
@@ -278,7 +286,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     }
 
     private isAllRequestsCompleted(): boolean {
-        for (let request of this.positionedRequests) {
+        for (let request of this.strictPositionRequests) {
             let unit = MaraUtils.GetUnit(request.Point);
             
             if (unit) {
@@ -306,29 +314,29 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         let orderedRequests = this.settlementController.ProductionController.ProductionRequests;
         let unorderedRequests: Array<MaraProductionRequest> = [];
 
-        for (let request of [...this.positionedRequests, ...this.positionlessRequests]) {
+        let developedComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
+        let compositionToRequest = MaraUtils.SubstractCompositionLists(this.targetComposition, developedComposition);
+
+        for (let request of [...this.strictPositionRequests, ...this.positionlessRequests]) {
             let orderedRequest = orderedRequests.find((value) => {return value.EqualsTo(request)});
             
             if (!orderedRequest) {
                 unorderedRequests.push(request);
             }
+            else {
+                MaraUtils.AddToMapItem(compositionToRequest, request.ConfigId, -1);
+            }
         }
-
-        let unpositionedComposition: UnitComposition = new Map<string, number>();
 
         for (let request of unorderedRequests) {
-            if (request.Point) {
-                if (!this.isPositionedRequestSatisfied(request)) {
+            if (request.Point && request.Precision == 0) {
+                if (!this.isStrictPositionRequestSatisfied(request)) {
                     this.settlementController.ProductionController.RequestProduction(request);
                 }
-            }
-            else {
-                MaraUtils.IncrementMapItem(unpositionedComposition, request.ConfigId);
+
+                MaraUtils.AddToMapItem(compositionToRequest, request.ConfigId, -1);
             }
         }
-
-        let developedComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
-        let compositionToRequest = MaraUtils.SubstractCompositionLists(unpositionedComposition, developedComposition);
 
         compositionToRequest.forEach(
             (val, key) => {

@@ -23,7 +23,7 @@ export class MaraResourceMap {
             for (let colIndex = 0; colIndex < maxColIndex; colIndex ++) {
                 let cluster = new MaraResourceCluster(colIndex, rowIndex);
 
-                if (cluster.WoodAmount > 112 || cluster.MetalAmount > 0 || cluster.GoldAmount > 0) {
+                if (cluster.WoodAmount > 1120 || cluster.MetalAmount > 0 || cluster.GoldAmount > 0) {
                     MaraResourceMap.ResourceClusters.set(cluster.ToString(), cluster);
                 }
             }
@@ -79,7 +79,7 @@ export class MaraResourceCluster {
             amount += MaraUtils.GetCellTreesCount(cell.X, cell.Y);
         }
 
-        return amount;
+        return amount * 10;
     }
 
     public get GoldAmount() {

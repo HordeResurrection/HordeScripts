@@ -28,7 +28,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
         }
         else if (tickNumber > this.timeoutTick) {
             this.settlementController.Debug(`Attack is too long-drawn, discontinuing`);
-            this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
+            this.settlementController.State = SettlementControllerStateFactory.MakeRoutingState(this.settlementController);
             return;
         }
         
@@ -66,7 +66,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
         else {
             this.settlementController.Debug(`Current combativity index '${combativityIndex}' is too low. Retreating...`);
             this.settlementController.TacticalController.Retreat();
-            this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
+            this.settlementController.State = SettlementControllerStateFactory.MakeRoutingState(this.settlementController);
             return;
         }
     }

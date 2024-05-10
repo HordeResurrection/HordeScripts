@@ -28,7 +28,7 @@ export class ExpandSecureState extends MaraSettlementControllerState {
         }
         else if (tickNumber > this.timeoutTick) {
             this.settlementController.Debug(`Expand secure is too long-drawn, discontinuing`);
-            this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
+            this.settlementController.State = SettlementControllerStateFactory.MakeRoutingState(this.settlementController);
             return;
         }
         
@@ -60,7 +60,7 @@ export class ExpandSecureState extends MaraSettlementControllerState {
         else {
             this.settlementController.Debug(`Failed to secure expand: current combativity index '${combativityIndex}' is too low. Retreating...`);
             this.settlementController.TacticalController.Retreat();
-            this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
+            this.settlementController.State = SettlementControllerStateFactory.MakeRoutingState(this.settlementController);
             return;
         }
     }
