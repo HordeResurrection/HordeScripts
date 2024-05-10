@@ -1,6 +1,7 @@
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 import { ProductionState } from "./ProductionState";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
+import { MaraResources } from "../Utils/Common";
 
 export class BuildingUpState extends ProductionState {
     protected getProductionTimeout(): number | null {
@@ -33,5 +34,13 @@ export class BuildingUpState extends ProductionState {
 
     protected onTargetCompositionReached(): void {
         this.settlementController.State = SettlementControllerStateFactory.MakeExterminatingState(this.settlementController);
+    }
+
+    protected onInsufficientResources(insufficientResources: MaraResources): boolean {
+        this.settlementController.Debug(`Preparing expand`);
+        
+        this.fillExpandData(insufficientResources);
+        this.settlementController.State = SettlementControllerStateFactory.MakeExpandPrepareState(this.settlementController);
+        return false;
     }
 }

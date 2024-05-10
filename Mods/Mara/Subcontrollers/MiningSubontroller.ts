@@ -22,7 +22,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         let settlementResources = this.parentController.Settlement.Resources;
         
         let totalResources = new MaraResources(
-            settlementResources.Wood,
+            settlementResources.Lumber,
             settlementResources.Metal,
             settlementResources.Gold,
             settlementResources.FreePeople

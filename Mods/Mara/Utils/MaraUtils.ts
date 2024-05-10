@@ -672,7 +672,7 @@ export class MaraUtils {
     }
 
     static IsHousingConfig(unitConfig: any): boolean {
-        return unitConfig.ProducedPepole > 0 && !MaraUtils.IsProducerConfig(unitConfig);
+        return unitConfig.ProducedPeople > 0 && !MaraUtils.IsProducerConfig(unitConfig);
     }
 
     static IsMetalStockConfig(unitConfig: any): boolean {

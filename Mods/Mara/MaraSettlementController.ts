@@ -158,7 +158,7 @@ export class MaraSettlementController {
 
         this.createInitialSettlementCluster();
 
-        this.State = SettlementControllerStateFactory.MakeRoutingState(this);
+        this.State = SettlementControllerStateFactory.MakeDevelopingState(this);
     }
 
     public get State(): MaraSettlementControllerState {

@@ -73,6 +73,8 @@ export class MaraProductionRequest {
     }
 
     public ToString(): string {
-        return `${this.ConfigId} at (${this.Point?.ToString() ?? "any location"}):${this.Precision}`;
+        let location = this.Point ? this.Point.ToString() : "any location";
+        
+        return `${this.ConfigId} at (${location}):${this.Precision}`;
     }
 }

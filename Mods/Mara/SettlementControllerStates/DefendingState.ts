@@ -28,7 +28,7 @@ export class DefendingState extends MaraSettlementControllerState {
                 }
                 else {
                     this.settlementController.Debug(`Damage is too severe, starting to build up from lower tier`);
-                    this.settlementController.State = SettlementControllerStateFactory.MakeBuildingUpState(this.settlementController);
+                    this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
                 }
 
                 return;
