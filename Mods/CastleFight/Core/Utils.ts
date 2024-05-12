@@ -7,16 +7,21 @@ const SpawnUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.SpawnUnitP
 
 /** метрика измерения расстояния */
 export enum MetricType {
-    L1 = 0,
-    L2
+    Chebyshev = 0,
+    Minkovsky,
+    Euclid
 }
 
-/** расстояние L1 между 2 точками */ 
-export function distance_L1 (x1:number, y1:number, x2:number, y2:number) {
+/** расстояние Чебышева между 2 точками */ 
+export function distance_Chebyshev (x1:number, y1:number, x2:number, y2:number) {
+    return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
+}
+/** расстояние Минковского между 2 точками */
+export function distance_Minkovsky (x1:number, y1:number, x2:number, y2:number) {
     return Math.abs(x1 - x2) + Math.abs(y1 - y2);
 }
-/** расстояние L2 между 2 точками */ 
-export function distance_L2 (x1:number, y1:number, x2:number, y2:number) {
+/** расстояние Евклида между 2 точками */ 
+export function distance_Euclid (x1:number, y1:number, x2:number, y2:number) {
     return Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
 }
 /** получить текущее время в миллисекундах */
@@ -51,11 +56,11 @@ export function CfgSetSpeed(cfg: any, speeds: Map<TileType, number>) {
 };
 
 /** отдать юниту команду в ближайшую свободную точку */
-export function UnitGiveOrder (unit: any, point: Cell, unitCommant: any, assignOrderMode: any) {
+export function UnitGiveOrderToNearEmptyCell (unit: any, point: Cell, unitCommand: any, assignOrderMode: any) {
     var commandsMind       = unit.CommandsMind;
     var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
 
-    if (disallowedCommands.ContainsKey(unitCommant)) disallowedCommands.Remove(unitCommant);
+    if (disallowedCommands.ContainsKey(unitCommand)) disallowedCommands.Remove(unitCommand);
 
     //UnitAllowCommands(unit);
     // позиция для атаки цели
@@ -68,12 +73,27 @@ export function UnitGiveOrder (unit: any, point: Cell, unitCommant: any, assignO
             }
         }
     }
-    var pointCommandArgs = new PointCommandArgs(createPoint(goalPosition.value.X, goalPosition.value.Y), unitCommant, assignOrderMode);
+    var pointCommandArgs = new PointCommandArgs(createPoint(goalPosition.value.X, goalPosition.value.Y), unitCommand, assignOrderMode);
     // отдаем приказ
     unit.Cfg.GetOrderDelegate(unit, pointCommandArgs);
     //UnitDisallowCommands(unit);
 
-    disallowedCommands.Add(unitCommant, 1);
+    disallowedCommands.Add(unitCommand, 1);
+}
+
+/** отдать юниту команду в точку */
+export function UnitGiveOrderToCell (unit: any, point: Cell, unitCommand: any, assignOrderMode: any) {
+    var commandsMind       = unit.CommandsMind;
+    var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
+
+    if (disallowedCommands.ContainsKey(unitCommand)) disallowedCommands.Remove(unitCommand);
+
+    // позиция для атаки цели
+    var pointCommandArgs = new PointCommandArgs(createPoint(point.X, point.Y), unitCommand, assignOrderMode);
+    // отдаем приказ
+    unit.Cfg.GetOrderDelegate(unit, pointCommandArgs);
+
+    disallowedCommands.Add(unitCommand, 1);
 }
 
 /** запретить управление юнитом */

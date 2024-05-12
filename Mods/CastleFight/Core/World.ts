@@ -6,8 +6,7 @@ import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { world } from "./CastleFightPlugin";
 import { Entity, COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent, SpawnBuildingComponent, UpgradableBuildingComponent, BuffComponent, BUFF_TYPE, ReviveComponent, HeroAltarComponent, IncomeEvent, IncomeIncreaseEvent, SettlementComponent, IncomeLimitedPeriodicalComponent, UnitProducedEvent } from "./Components/ESC_components";
-import { Polygon, Cell as Cell, CfgAddUnitProducer, getCurrentTime, MetricType, distance_L1, distance_L2, CfgSetSpeed } from "./Utils";
-import { AI_Init } from "./Systems/AISystem";
+import { Cell as Cell, CfgAddUnitProducer, getCurrentTime, MetricType, distance_Chebyshev, distance_Euclid, CfgSetSpeed, distance_Minkovsky } from "./Utils";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
@@ -30,7 +29,7 @@ export class AttackPathChoiser_NearDistance extends IAttackPathChoiser {
     public constructor (metricType?: MetricType) {
         super();
 
-        this._metricType = metricType ?? MetricType.L1;
+        this._metricType = metricType ?? MetricType.Minkovsky;
     };
 
     public choiseAttackPath(unit: any, world: World) : number {
@@ -39,11 +38,14 @@ export class AttackPathChoiser_NearDistance extends IAttackPathChoiser {
         for (var attackPathNum = 0; attackPathNum < world.settlements_attack_paths[unit.Owner.Uid].length; attackPathNum++) {
             var distance = 0.0;
             switch (this._metricType) {
-                case MetricType.L1:
-                    distance = distance_L1(unit.Cell.X, unit.Cell.Y, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].X, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].Y);
+                case MetricType.Chebyshev:
+                    distance = distance_Chebyshev(unit.Cell.X, unit.Cell.Y, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].X, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].Y);
                     break;
-                case MetricType.L2:
-                    distance = distance_L2(unit.Cell.X, unit.Cell.Y, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].X, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].Y);
+                case MetricType.Minkovsky:
+                    distance = distance_Minkovsky(unit.Cell.X, unit.Cell.Y, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].X, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].Y);
+                    break;
+                case MetricType.Euclid:
+                    distance = distance_Euclid(unit.Cell.X, unit.Cell.Y, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].X, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].Y);
                     break;
             }
             if (distance < nearAttackPathDistance) {
@@ -109,9 +111,6 @@ export class AttackPathChoiser_Periodically_WithCondCell extends IAttackPathChoi
                             this.settlements_attackPaths_condCell[settlementId][attackPathNum][condUnitNum].X,
                             this.settlements_attackPaths_condCell[settlementId][attackPathNum][condUnitNum].Y
                         );
-                        if (!condUnit) {
-                            throw "Can't find condUnit";
-                        }
                         this.settlements_attackPaths_condUnit[settlementId][attackPathNum][condUnitNum] = condUnit;
                     }
                 }
@@ -450,13 +449,13 @@ export class World {
         // здоровье
         ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "MaxHealth", 2000);
         // броня
-        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "Shield", 0);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "Shield", 200);
         // урон
         ScriptUtils.SetValue(this.configs["unit_1_1_1_2"].MainArmament.BulletCombatParams, "Damage", 1000);
         // параметры атаки
         ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "Sight", 3);
-        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "OrderDistance", 5);
-        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"].MainArmament, "Range", 5);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "OrderDistance", 6);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"].MainArmament, "Range", 6);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_1_1_1_2"));
@@ -1364,9 +1363,8 @@ export class World {
                 ScriptUtils.SetValue(this.configs[cfgId].CostResources, "Lumber", 0);
                 ScriptUtils.SetValue(this.configs[cfgId].CostResources, "People", 0);
 
-                // увеличиваем пехоте хп в 1.5 раза
+                // увеличиваем ближникам хп в 1.5 раза
                 if (this.configs[cfgId].MainArmament.Range == 1 &&
-                    !this.configs[cfgId].Specification.HasFlag(UnitSpecification.Rider) &&
                     this.cfgUid_entity.has(this.configs[cfgId].Uid)) {
                     
                     var entity = this.cfgUid_entity.get(this.configs[cfgId].Uid) as Entity;

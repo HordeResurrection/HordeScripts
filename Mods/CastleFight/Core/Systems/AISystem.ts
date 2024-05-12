@@ -1,4 +1,4 @@
-import { LogLevel, log } from "library/common/logging";
+import { log } from "library/common/logging";
 import { World } from "../World";
 import { PointCommandArgs, ProduceAtCommandArgs, ProduceCommandArgs, UnitCommand, UnitFlags, UnitMapLayer } from "library/game-logic/horde-types";
 import { BuffComponent, BuffOptTargetType, BuffsOptTarget, COMPONENT_TYPE, Entity, ReviveComponent, SpawnBuildingComponent, UnitComponent, UnitProducedEvent, UpgradableBuildingComponent } from "../Components/ESC_components";
@@ -6,8 +6,8 @@ import { createPoint, createResourcesAmount } from "library/common/primitives";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { generateCellInSpiral } from "library/common/position-tools";
-import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
-import { Cell, distance_L1 } from "../Utils";
+import { Cell, distance_Chebyshev } from "../Utils";
+import { printObjectItems } from "library/common/introspection";
 
 export const ResourcesAmount = HCL.HordeClassLibrary.World.Simple.ResourcesAmount;
 
@@ -22,12 +22,16 @@ class Building {
     upgradeCost: any;
     /** номер предыдущего строения в дереве улучшений */
     upgradePrevBuildingId: number;
+    
+    /** тип атаки юнита спавнующего */
+    spawnedUnitAttackType: BuffOptTargetType;
 
-    constructor(cfgId: string, totalCost: any, upgradeCost: any, upgradePrevBuildingId: number) {
+    constructor(cfgId: string, totalCost: any, upgradeCost: any, upgradePrevBuildingId: number, spawnedUnitAttackType: BuffOptTargetType) {
         this.cfgId                 = cfgId;
         this.totalCost             = totalCost;
         this.upgradeCost           = upgradeCost;
         this.upgradePrevBuildingId = upgradePrevBuildingId;
+        this.spawnedUnitAttackType = spawnedUnitAttackType;
     }
 };
 
@@ -535,7 +539,7 @@ class IBot {
             var nearBuilding_num = -1;
             var nearBuilding_distance = 10000.0;
             for (var j = 0; j < brokenBuildings_unit.length; j++) {
-                var distance = distance_L1(unitComponent.unit.Cell.X, unitComponent.unit.Cell.Y,
+                var distance = distance_Chebyshev(unitComponent.unit.Cell.X, unitComponent.unit.Cell.Y,
                     brokenBuildings_unit[j].Cell.X, brokenBuildings_unit[j].Cell.Y
                 );
 
@@ -670,6 +674,8 @@ class RandomBot extends IBot {
     buildingCurrNum: number;
     // номер постройки когда нужно построить церковь
     church_planBuildingNum: number;
+    // номера зданий, который строит бот
+    allowBuildingsId: Array<number>;
     
     constructor(settlementId: number, buildings: Array<Building>, spiritsCfgId: Array<string>, op_unitCfgId_buildingId: Map<string, number>) {
         super(settlementId, "Рандомный", buildings, spiritsCfgId, op_unitCfgId_buildingId);
@@ -678,6 +684,10 @@ class RandomBot extends IBot {
         this.church_isBuilding  = false;
         this.buildingCurrNum    = 0;
         this.church_planBuildingNum = this.rnd.RandomNumber(7, 11);
+        this.allowBuildingsId       = new Array<number>(buildings.length);
+        for (var i = 0; i < buildings.length; i++) {
+            this.allowBuildingsId[i] = i;
+        }
     }
 
     protected _selectNextBuilding(): void {
@@ -689,7 +699,7 @@ class RandomBot extends IBot {
             if (!this.church_isBuilding && this.buildingCurrNum == this.church_planBuildingNum) {
                 goal_buildingId = Church_buildingId;
             } else {
-                goal_buildingId = this.rnd.RandomNumber(0, this.buildings.length - 1);
+                goal_buildingId = this.allowBuildingsId[this.rnd.RandomNumber(0, this.allowBuildingsId.length - 1)];
             }
 
             if (goal_buildingId == Church_buildingId) {
@@ -775,6 +785,53 @@ class RandomBot extends IBot {
     }
 };
 
+class RandomBotWithoutChurch extends RandomBot {
+    constructor(settlementId: number, buildings: Array<Building>, spiritsCfgId: Array<string>, op_unitCfgId_buildingId: Map<string, number>) {
+        super(settlementId, buildings, spiritsCfgId, op_unitCfgId_buildingId);
+
+        this.name = "Рандомный без церкви";
+
+        this.church_isBuilding = true;
+        for (var i = 0; i < this.allowBuildingsId.length; i++) {
+            var buildingId = this.allowBuildingsId[i];
+            if (this.buildings[buildingId].cfgId == "church") {
+                this.allowBuildingsId.splice(i--, 1);
+                break;
+            }
+        }
+    }
+};
+
+class RandomBotMelle extends RandomBot {
+    constructor(settlementId: number, buildings: Array<Building>, spiritsCfgId: Array<string>, op_unitCfgId_buildingId: Map<string, number>) {
+        super(settlementId, buildings, spiritsCfgId, op_unitCfgId_buildingId);
+
+        this.name              = "Рандомный только ближники";
+        this.church_isBuilding = true;
+        for (var i = 0; i < this.allowBuildingsId.length; i++) {
+            var buildingId = this.allowBuildingsId[i];
+            if (this.buildings[buildingId].spawnedUnitAttackType != BuffOptTargetType.Melle) {
+                this.allowBuildingsId.splice(i--, 1);
+            }
+        }
+    }
+};
+
+class RandomBotRange extends RandomBot {
+    constructor(settlementId: number, buildings: Array<Building>, spiritsCfgId: Array<string>, op_unitCfgId_buildingId: Map<string, number>) {
+        super(settlementId, buildings, spiritsCfgId, op_unitCfgId_buildingId);
+
+        this.name              = "Рандомный только дальники";
+        this.church_isBuilding = true;
+        for (var i = 0; i < this.allowBuildingsId.length; i++) {
+            var buildingId = this.allowBuildingsId[i];
+            if (this.buildings[buildingId].spawnedUnitAttackType != BuffOptTargetType.Range) {
+                this.allowBuildingsId.splice(i--, 1);
+            }
+        }
+    }
+};
+
 /** для каждого поселения хранит бота */
 var settlements_bot : Array<IBot>;
 
@@ -822,7 +879,8 @@ export function AI_Init(world: World) {
                 accPeople
             ),
             CostResources,
-            -1
+            -1,
+            world.configs[spawnBuildingComponent.spawnUnitConfigId].MainArmament.Range > 1 ? BuffOptTargetType.Range : BuffOptTargetType.Melle
         ));
 
         // идем по улучшению вглубь
@@ -870,7 +928,8 @@ export function AI_Init(world: World) {
         "church",
         world.configs["church"].CostResources,
         createResourcesAmount(0, 0, 0, 0),
-        -1
+        -1,
+        BuffOptTargetType.All
     ));
 
     var spiritsCfgId = new Array<string>();
@@ -904,16 +963,30 @@ export function AI_Init(world: World) {
         if (!realPlayer.IsBot) {
             continue;
         }
+        var characterUid  = realPlayer.MasterMind.Character.Uid;
         var settlement    = realPlayer.GetRealSettlement();
         var settlementId  = settlement.Uid;
         if (settlementId < world.settlementsCount) {
             if (!settlements_bot[settlementId]) {
-                settlements_bot[settlementId] = new RandomBot(settlementId, buildings, spiritsCfgId, op_unitCfgId_buildingId);
+                if (characterUid == "#CastleFight_MindCharacter_Random_WithChurch") {
+                    settlements_bot[settlementId] = new RandomBot(settlementId, buildings, spiritsCfgId, op_unitCfgId_buildingId);
+                } else if (characterUid == "#CastleFight_MindCharacter_Random_Melle") {
+                    settlements_bot[settlementId] = new RandomBotMelle(settlementId, buildings, spiritsCfgId, op_unitCfgId_buildingId);
+                } else if (characterUid == "#CastleFight_MindCharacter_Random_Range") {
+                    settlements_bot[settlementId] = new RandomBotRange(settlementId, buildings, spiritsCfgId, op_unitCfgId_buildingId);
+                } else  {
+                    settlements_bot[settlementId] = new RandomBotWithoutChurch(settlementId, buildings, spiritsCfgId, op_unitCfgId_buildingId);
+                }
+
+                log.info("settlement = ", settlementId, " attach bot = ", settlements_bot[settlementId].name, " characterUid = ", characterUid);
             }
         }
     }
 
-    //settlements_bot[3] = new RandomBot(3, buildings);
+    //settlements_bot[0] = new RandomBot(0, buildings, spiritsCfgId, op_unitCfgId_buildingId);
+    //settlements_bot[1] = new RandomBotMelle(1, buildings, spiritsCfgId, op_unitCfgId_buildingId);
+    //settlements_bot[2] = new RandomBotRange(2, buildings, spiritsCfgId, op_unitCfgId_buildingId);
+    //settlements_bot[3] = new RandomBotWithoutChurch(3, buildings, spiritsCfgId, op_unitCfgId_buildingId);
 }
 
 export function AI_System(world: World, gameTickNum: number) {

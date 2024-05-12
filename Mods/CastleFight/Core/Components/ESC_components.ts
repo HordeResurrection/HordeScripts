@@ -1,7 +1,6 @@
 import { printObjectItems } from "library/common/introspection";
 import { log } from "library/common/logging";
 import { Cell } from "../Utils";
-import { Int32 } from "library/dotnet/dotnet-types";
 
 export class Entity {
     /** компоненты */

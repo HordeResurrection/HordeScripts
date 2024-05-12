@@ -1,9 +1,10 @@
 import HordePluginBase from "plugins/base-plugin";
 import { BalanceFindingSystem } from "./Systems/BalanceFindingSystem";
-import { WordClearSystem, IncomeSystem, SpawnBuildingSystem, AttackingAlongPathSystem, ReviveSystem, UpgradableBuildingSystem_Stage1, BuffSystem, UpgradableBuildingSystem_Stage2, UnitProducedSystem, DiplomacySystem, UpgradableBuildingSystem, BuffSystem_v2, AttackingAlongPathSystem2, AttackingAlongPathSystem3 } from "./Systems/ESC_systems";
-import { Polygon, Cell, MetricType } from "./Utils";
+import { WordClearSystem, IncomeSystem, SpawnBuildingSystem, ReviveSystem, BuffSystem, UnitProducedSystem, DiplomacySystem, UpgradableBuildingSystem } from "./Systems/ESC_systems";
+import { Cell, MetricType } from "./Utils";
 import { AttackPathChoiser_NearDistance, AttackPathChoiser_Periodically, AttackPathChoiser_Periodically_WithCondCell, GameState, IAttackPathChoiser, World } from "./World";
-import { AI_ApplyBuildingPlanSystem, AI_FindBuildingPlanSystem, AI_Init, AI_SpiritManagementSystem, AI_System } from "./Systems/AISystem";
+import { AI_System } from "./Systems/AISystem";
+import { AttackingAlongPathSystem_stage1, AttackingAlongPathSystem_stage2 } from "./Systems/AttackingAlongPathSystem";
 
 export var world = new World();
 
@@ -167,7 +168,7 @@ export class CastleFightPlugin extends HordePluginBase {
                         ];
                         world.settlements_attackPathChoiser = new Array<IAttackPathChoiser>(world.settlementsCount);
                         for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
-                            world.settlements_attackPathChoiser[settlementId] = new AttackPathChoiser_NearDistance(MetricType.L2);
+                            world.settlements_attackPathChoiser[settlementId] = new AttackPathChoiser_NearDistance(MetricType.Euclid);
                         }
                     } else if (scenaName == "Битва замков - царь горы (1x1x1x1)") {
                         world.settlementsCount                    = 4;
@@ -471,7 +472,8 @@ export class CastleFightPlugin extends HordePluginBase {
                     world.RegisterSystem(WordClearSystem, "WordClearSystem");
                     world.RegisterSystem(IncomeSystem, "IncomeSystem");
                     world.RegisterSystem(SpawnBuildingSystem, "SpawnBuildingSystem");
-                    world.RegisterSystem(AttackingAlongPathSystem, "AttackingAlongPathSystem");
+                    world.RegisterSystem(AttackingAlongPathSystem_stage1, "AttackingAlongPathSystem_stage1");
+                    world.RegisterSystem(AttackingAlongPathSystem_stage2, "AttackingAlongPathSystem_stage2");
                     world.RegisterSystem(ReviveSystem, "ReviveSystem");
                     world.RegisterSystem(UpgradableBuildingSystem, "UpgradableBuildingSystem");
 
