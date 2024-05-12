@@ -242,6 +242,47 @@ export class CastleFightPlugin extends HordePluginBase {
                         for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
                             world.settlements_attackPathChoiser[settlementId] = new AttackPathChoiser_NearDistance();
                         }
+                    } else if (scenaName == "Битва замков - царь горы (1х1х1х1х1х1)") {
+                        world.settlementsCount                    = 6;
+                        world.settlements_workers_reviveCells = [
+                            [new Cell(1, 103)],
+                            [new Cell(350, 103)],
+                            [new Cell(103, 1)],
+                            [new Cell(247, 206)],
+                            [new Cell(247, 1)],
+                            [new Cell(103, 206)]
+                        ];
+                        world.settlements_castle_cell         = [
+                            new Cell(30, 102),
+                            new Cell(318, 102),
+                            new Cell(102, 30),
+                            new Cell(246, 174),
+                            new Cell(246, 30),
+                            new Cell(102, 174)
+                        ];
+                        world.settlements_attack_paths            = [
+                            [[new Cell(32, 32), new Cell(102, 30), new Cell(246, 30), new Cell(318, 102), new Cell(246, 174), new Cell(102, 174)],
+                                [new Cell(102, 30), new Cell(246, 30), new Cell(318, 102), new Cell(246, 174), new Cell(102, 174), new Cell(32, 175)].reverse()],
+
+                            [[new Cell(319, 32), new Cell(246, 30), new Cell(102, 30), new Cell(30, 102), new Cell(102, 174), new Cell(246, 174)],
+                                [new Cell(246, 30), new Cell(102, 30), new Cell(30, 102), new Cell(102, 174), new Cell(246, 174), new Cell(319, 175)].reverse()],
+
+                            [[new Cell(175, 32), new Cell(246, 30), new Cell(318, 102), new Cell(246, 174), new Cell(102, 174), new Cell(30, 102)],
+                                [new Cell(246, 30), new Cell(318, 102), new Cell(246, 174), new Cell(102, 174), new Cell(30, 102), new Cell(32, 32)].reverse()],
+
+                            [[new Cell(176, 175), new Cell(102, 174), new Cell(30, 102), new Cell(102, 30), new Cell(246, 30), new Cell(318, 102)],
+                                [new Cell(102, 174), new Cell(30, 102), new Cell(102, 30), new Cell(246, 30), new Cell(318, 102), new Cell(319, 175)].reverse()],
+
+                            [[new Cell(319, 32), new Cell(318, 102), new Cell(246, 174), new Cell(102, 174), new Cell(30, 102), new Cell(102, 30)],
+                                [new Cell(318, 102), new Cell(246, 174), new Cell(102, 174), new Cell(30, 102), new Cell(102, 30), new Cell(176, 32)].reverse()],
+
+                            [[new Cell(32, 175), new Cell(30, 102), new Cell(102, 30), new Cell(246, 30), new Cell(318, 102), new Cell(246, 174)],
+                                [new Cell(30, 102), new Cell(102, 30), new Cell(246, 30), new Cell(318, 102), new Cell(246, 174), new Cell(175, 175)].reverse()]
+                        ];
+                        world.settlements_attackPathChoiser = new Array<IAttackPathChoiser>(world.settlementsCount);
+                        for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+                            world.settlements_attackPathChoiser[settlementId] = new AttackPathChoiser_NearDistance();
+                        }
                     } else if (scenaName == "Битва замков - царь горы (2-6)") {
                         world.settlementsCount                    = 6;
                         world.settlements_workers_reviveCells = [
