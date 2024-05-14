@@ -37,12 +37,14 @@ class ControllerStatesSettings {
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;
     public AttackStrengthToEnemyStrengthRatio: number = 1.5;
-
-    public SettlementClustersRadius: number = 10;
 }
 
 class ResourceMiningSettings {
     public MinersPerMine: number = 3;
     public WoodcutterBatchSize: number = 5;
+    public WoodcuttersPerSawmill: number = 10;
     public HousingBatchSize: number = 5;
+
+    public WoodcuttingRadius: number = 10;
+    public MiningRadius: number = 15;
 }

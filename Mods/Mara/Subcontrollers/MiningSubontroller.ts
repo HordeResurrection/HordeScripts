@@ -1,9 +1,22 @@
 import { MaraPoint, MaraResources, eNext, enumerate } from "../Utils/Common";
 import { MaraUtils, ResourceType } from "../Utils/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
-import { MaraSettlementCluster, MaraSettlementController } from "Mara/MaraSettlementController";
+import { MaraSettlementController } from "Mara/MaraSettlementController";
+
+class MineData {
+    public Mine: any = null;
+    public Miners: Array<any> = [];
+}
+
+class SawmillData {
+    public Sawmill: any = null;
+    public Woodcutters: Array<any> = [];
+}
 
 export class MiningSubcontroller extends MaraSubcontroller {
+    public Mines: Array<MineData> = [];
+    public Sawmills: Array<SawmillData> = [];
+    
     constructor (parent: MaraSettlementController) {
         super(parent);
     }
@@ -13,9 +26,14 @@ export class MiningSubcontroller extends MaraSubcontroller {
             return;
         }
 
+        this.cleanup();
         this.destroyEmptyMines();
-        this.engageFreeHarvesters();
-        this.engageIdleHarvesters();
+
+        if (tickNumber % (5 * 50) == 0) {
+            this.checkForUnaccountingBuildings();
+            this.engageFreeHarvesters();
+            this.engageIdleHarvesters();
+        }
     }
 
     public GetTotalResources(): MaraResources {
@@ -28,31 +46,65 @@ export class MiningSubcontroller extends MaraSubcontroller {
             settlementResources.FreePeople
         );
 
-        for (let settlementCluster of this.parentController.SettlementClusters) {
-            let clusterBuildings = settlementCluster.Buildings;
-            let isSawmillPresent = false;
+        for (let mineData of this.Mines) {
+            let mineResources = this.getMineResources(mineData.Mine);
 
-            for (let building of clusterBuildings) {
-                if (MaraUtils.IsSawmillConfig(building.Cfg)) {
-                    isSawmillPresent = true;
+            totalResources.Gold += mineResources.Gold;
+            totalResources.Metal += mineResources.Metal;
+        }
+
+        for (let sawmillData of this.Sawmills) {
+            MaraUtils.ForEachCell(
+                sawmillData.Sawmill.CellCenter,
+                this.parentController.Settings.ResourceMining.WoodcuttingRadius,
+                (cell) => {
+                    let treesCount = MaraUtils.GetCellTreesCount(cell.X, cell.Y);
+                    totalResources.Wood += treesCount * 10;
                 }
-
-                if (MaraUtils.IsMineConfig(building.Cfg)) {
-                    let mineResources = this.getMineResources(building);
-
-                    totalResources.Gold += mineResources.Gold;
-                    totalResources.Metal += mineResources.Metal;
-                }
-            }
-
-            if (isSawmillPresent) {
-                for (let resourceCluster of settlementCluster.ResourceClusters) {
-                    totalResources.Wood += resourceCluster.WoodAmount;
-                }
-            }
+            );
         }
 
         return totalResources;
+    }
+
+    private cleanup() {
+        this.Mines = this.Mines.filter((value) => {return value.Mine.IsAlive});
+
+        for (let mineData of this.Mines) {
+            mineData.Miners = mineData.Miners.filter((value) => {return value.IsAlive});
+        }
+
+        this.Sawmills.filter((value) => {return value.Sawmill.IsAlive});
+
+        for (let sawmillData of this.Sawmills) {
+            sawmillData.Woodcutters = sawmillData.Woodcutters.filter((value) => {return value.IsAlive})
+        }
+    }
+
+    private checkForUnaccountingBuildings() {
+        let units = enumerate(this.parentController.Settlement.Units);
+        let unit;
+        
+        while ((unit = eNext(units)) !== undefined) {
+            if (MaraUtils.IsMineConfig(unit.Cfg)) {
+                let mineData = this.Mines.find((value) => {return value.Mine == unit});
+                
+                if (!mineData) {
+                    mineData = new MineData();
+                    mineData.Mine = unit;
+                    this.Mines.push(mineData);
+                }
+            }
+            else if (MaraUtils.IsSawmillConfig(unit.Cfg)) {
+                let sawmillData = this.Sawmills.find((value) => {return value.Sawmill == unit});
+
+                if (!sawmillData) {
+                    sawmillData = new SawmillData();
+                    sawmillData.Sawmill = unit;
+                    this.Sawmills.push(sawmillData);
+                }
+            }
+        }
     }
 
     private getMineResources(mine: any): MaraResources {
@@ -78,15 +130,25 @@ export class MiningSubcontroller extends MaraSubcontroller {
         return result;
     }
 
+    private findWoodCell(sawmill: any): MaraPoint | null {
+        let cell = MaraUtils.FindClosestCell(
+            sawmill.CellCenter,
+            this.parentController.Settings.ResourceMining.WoodcuttingRadius,
+            (cell) => {return MaraUtils.GetCellTreesCount(cell.X, cell.Y) > 0;}
+        )
+        
+        return cell;
+    }
+
     private engageFreeHarvesters(): void {
         let engagedHarvesters: Array<any> = [];
 
-        for (let settlementCluster of this.parentController.SettlementClusters) {
-            engagedHarvesters.push(...settlementCluster.Woodcutters);
+        for (let mineData of this.Mines) {
+            engagedHarvesters.push(...mineData.Miners);
+        }
 
-            for (let mineData of settlementCluster.Mines) {
-                engagedHarvesters.push(...mineData.Miners);
-            }
+        for (let sawmillData of this.Sawmills) {
+            engagedHarvesters.push(...sawmillData.Woodcutters);
         }
 
         let allHarvesters = this.findAllHarvesters();
@@ -98,90 +160,81 @@ export class MiningSubcontroller extends MaraSubcontroller {
             }
         );
 
-        for (let harvester of freeHarvesters) {
-            let harvesterEngaged = false;
-            
-            for (let settlementCluster of this.parentController.SettlementClusters) {
-                for (let mineData of settlementCluster.Mines) {
-                    if (mineData.Miners.length < this.parentController.Settings.ResourceMining.MinersPerMine) {
-                        mineData.Miners.push(harvester);
-                        harvesterEngaged = true;
-                        break;
-                    }
-                }
+        let freeHarvesterIndex = 0;
+        const maxMiners = this.parentController.Settings.ResourceMining.MinersPerMine;
+        const maxWoodcutters = this.parentController.Settings.ResourceMining.WoodcuttersPerSawmill;
 
-                if (harvesterEngaged) {
+        while (freeHarvesterIndex < freeHarvesters.length) {
+            let understaffedMineData = this.Mines.find(
+                (value) => {
+                    return value.Miners.length < maxMiners;
+                }
+            );
+
+            if (understaffedMineData) {
+                let minerCount = maxMiners - understaffedMineData.Miners.length;
+                let lastHarvesterIndex = Math.min(freeHarvesterIndex + minerCount, freeHarvesters.length);
+
+                let minersToAdd = freeHarvesters.slice(freeHarvesterIndex, lastHarvesterIndex); //last index is not included into result
+                understaffedMineData.Miners.push(...minersToAdd);
+                freeHarvesterIndex = lastHarvesterIndex;
+
+                continue;
+            }
+            else {
+                let understaffedSawmillData = this.Sawmills.find((value) => {
+                        return value.Woodcutters.length < maxWoodcutters && this.findWoodCell(value.Sawmill) != null;
+                    }
+                );
+
+                if (understaffedSawmillData) {
+                    let woodcutterCount = maxWoodcutters - understaffedSawmillData.Woodcutters.length;
+                    let lastHarvesterIndex = Math.min(freeHarvesterIndex + woodcutterCount, freeHarvesters.length);
+
+                    let woodcuttersToAdd = freeHarvesters.slice(freeHarvesterIndex, lastHarvesterIndex);
+                    understaffedSawmillData.Woodcutters.push(...woodcuttersToAdd);
+                    freeHarvesterIndex = lastHarvesterIndex;
+
+                    continue;
+                }
+                else {
                     break;
                 }
             }
-
-            if (!harvesterEngaged) {
-                for (let settlementCluster of this.parentController.SettlementClusters) {
-                    let sawmill = settlementCluster.Buildings.find((value) => {return MaraUtils.IsSawmillConfig(value.Cfg)});
-
-                    if (sawmill) {
-                        for (let resourceCluster of settlementCluster.ResourceClusters) {
-                            if (resourceCluster.WoodAmount > 0) {
-                                settlementCluster.Woodcutters.push(harvester);
-                                harvesterEngaged = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (harvesterEngaged) {
-                        break;
-                    }
-                }
-            }
         }
-    }
-
-    private findWoodCell(settlementCluster: MaraSettlementCluster): MaraPoint | null {
-        for (let resourceCluster of settlementCluster.ResourceClusters) {
-            for (let cell of resourceCluster.WoodCells) {
-                if (MaraUtils.GetCellTreesCount(cell.X, cell.Y) > 0) {
-                    return cell;
-                }
-            }
-        }
-
-        return null;
     }
 
     private engageIdleHarvesters(): void {
-        for (let settlementCluster of this.parentController.SettlementClusters) {
-            let woodCell = this.findWoodCell(settlementCluster);
-            
+        for (let mineData of this.Mines) {
+            for (let miner of mineData.Miners) {
+                if (miner.OrdersMind.IsIdle()) {
+                    MaraUtils.IssueMineCommand([miner], this.parentController.Player, mineData.Mine.Cell);
+                }
+            }
+        }
+
+        for (let sawmillData of this.Sawmills) {
+            let woodCell = this.findWoodCell(sawmillData.Sawmill);
+
             if (woodCell) {
-                for (let woodcutter of settlementCluster.Woodcutters) {
+                for (let woodcutter of sawmillData.Woodcutters) {
                     if (woodcutter.OrdersMind.IsIdle()) {
                         MaraUtils.IssueHarvestLumberCommand([woodcutter], this.parentController.Player, woodCell);
                     }
                 }
             }
             else {
-                settlementCluster.Woodcutters = [];
-            }
-
-            for (let mineData of settlementCluster.Mines) {
-                for (let miner of mineData.Miners) {
-                    if (miner.OrdersMind.IsIdle()) {
-                        MaraUtils.IssueMineCommand([miner], this.parentController.Player, mineData.Mine.Cell);
-                    }
-                }
+                sawmillData.Woodcutters = [];
             }
         }
     }
 
     private destroyEmptyMines(): void {
-        for (let settlementCluster of this.parentController.SettlementClusters) {
-            for (let mineData of settlementCluster.Mines) {
-                let mineResources = this.getMineResources(mineData.Mine);
+        for (let mineData of this.Mines) {
+            let mineResources = this.getMineResources(mineData.Mine);
 
-                if (mineResources.Gold == 0 && mineResources.Metal == 0) {
-                    MaraUtils.IssueSelfDestructCommand([mineData.Mine], this.parentController.Player);
-                }
+            if (mineResources.Gold == 0 && mineResources.Metal == 0) {
+                MaraUtils.IssueSelfDestructCommand([mineData.Mine], this.parentController.Player);
             }
         }
     }

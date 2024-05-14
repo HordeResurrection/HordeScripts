@@ -3,6 +3,7 @@
 import { MaraResourceMap, MaraResourceType } from "../MaraResourceMap";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 import { MaraResources } from "../Utils/Common";
+import { MaraUtils } from "../Utils/MaraUtils";
 // import { MaraPoint, MaraResources } from "../Utils/Common";
 // import { MaraUtils, UnitComposition } from "../Utils/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
@@ -29,17 +30,17 @@ export class RoutingState extends MaraSettlementControllerState {
         let needExpand = false;
         let resourcesToMine = new MaraResources(0, 0, 0, 0);
 
-        if (resources.Gold < 200 && leftResources.has(MaraResourceType.Gold)) {
+        if (resources.Gold < 1000 && leftResources.has(MaraResourceType.Gold)) {
             needExpand = true;
             resourcesToMine.Gold = 1;
         }
         
-        if (resources.Metal < 200 && leftResources.has(MaraResourceType.Metal)) {
+        if (resources.Metal < 1000 && leftResources.has(MaraResourceType.Metal)) {
             needExpand = true;
             resourcesToMine.Metal = 1;
         }
 
-        if (resources.Wood < 200 && leftResources.has(MaraResourceType.Wood)) {
+        if (resources.Wood < 1000 && leftResources.has(MaraResourceType.Wood)) {
             needExpand = true;
             resourcesToMine.Wood = 1;
         }
@@ -50,7 +51,15 @@ export class RoutingState extends MaraSettlementControllerState {
             return;
         }
         else {
-            this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
+            let pick = MaraUtils.Random(this.settlementController.MasterMind, 100);
+
+            if (pick < 75) {
+                this.settlementController.State = SettlementControllerStateFactory.MakeBuildingUpState(this.settlementController);
+            }
+            else {
+                this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
+            }
+            
             return;
         }
     }

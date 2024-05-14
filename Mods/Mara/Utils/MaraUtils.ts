@@ -4,7 +4,7 @@ import { createBox, createPoint } from "library/common/primitives";
 import { UnitFlags, UnitCommand, AllContent } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
-import { enumerate, eNext, MaraProductionRequest } from "./Common";
+import { enumerate, eNext, MaraProductionRequest, MaraPoint } from "./Common";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { ProduceRequestParameters } from "library/mastermind/matermind-types";
 
@@ -264,6 +264,28 @@ export class MaraUtils {
         }
 
         return result;
+    }
+
+    static FindClosestCell(
+        center: {X: number; Y: number;}, 
+        radius: number, 
+        predicate: (cell: any) => boolean
+    ): MaraPoint | null {
+        let result: any[] = [];
+        
+        let generator = generateCellInSpiral(center.X, center.Y);
+        let cell: any;
+        for (cell = generator.next(); !cell.done; cell = generator.next()) {
+            if (MaraUtils.ChebyshevDistance(cell.value, center) > radius) {
+                return null;
+            }
+
+            if ( predicate(cell.value) ) {
+                return new MaraPoint(cell.value.X, cell.value.Y);
+            }
+        }
+
+        return null;
     }
     
     static GetTileType(point: {X: number; Y: number;}): any {
@@ -561,16 +583,16 @@ export class MaraUtils {
 
     static ForEachCell(center: any, radius: any, action: (cell: any) => void): void {
         let endRow = Math.min(center.Y + radius, DotnetHolder.RealScena.Size.Height);
-        let endCol = Math.min(center.X + radius, DotnetHolder.RealScena.Size.Width)
+        let endCol = Math.min(center.X + radius, DotnetHolder.RealScena.Size.Width);
         
         for (
             let row = Math.max(center.Y - radius, 0);
-            row <= endRow;
+            row < endRow;
             row++
         ) {
             for (
                 let col = Math.max(center.X - radius, 0);
-                col <= endCol;
+                col < endCol;
                 col++
             ) {
                 action({X: col, Y: row});

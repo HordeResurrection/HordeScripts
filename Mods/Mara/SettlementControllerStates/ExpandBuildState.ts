@@ -1,21 +1,25 @@
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
 import { MaraResourceType } from "../MaraResourceMap";
-import { MaraSettlementCluster } from "../MaraSettlementController";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 import { MaraPoint, MaraProductionRequest } from "../Utils/Common";
 import { MaraUtils, UnitComposition } from "../Utils/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 
 export class ExpandBuildState extends MaraSettlementControllerState {
-    private expandSettlementCluster: MaraSettlementCluster;
     private strictPositionRequests: Array<MaraProductionRequest>;
     private positionlessRequests: Array<MaraProductionRequest>;
     private targetComposition: UnitComposition;
+    private expandCenter: MaraPoint;
     
     public OnEntry(): void {
-        if (!this.fillExpandSettlementCluster()) {
+        let center = this.calculateExpandCenter();
+        
+        if (!center) {
             this.settlementController.State = SettlementControllerStateFactory.MakeIdleState(this.settlementController);
             return;
+        }
+        else {
+            this.expandCenter = center;
         }
 
         this.strictPositionRequests = [];
@@ -71,7 +75,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         }
     }
 
-    private fillExpandSettlementCluster(): boolean {
+    private calculateExpandCenter(): MaraPoint | null {
         let targetResourceCluster = this.settlementController.TargetExpand!.Cluster;
         let expandCenter: MaraPoint;
 
@@ -85,37 +89,12 @@ export class ExpandBuildState extends MaraSettlementControllerState {
                 expandCenter = new MaraPoint(settlementLocation.Center.X, settlementLocation.Center.Y);
             }
             else { //all is lost
-                return false;
+                return null;
             }
         }
 
         this.settlementController.Debug(`Expand center calculated: ${expandCenter.ToString()}`);
-
-        for (let cluster of this.settlementController.SettlementClusters) {
-            if (
-                MaraUtils.ChebyshevDistance(cluster.Center, expandCenter!) < 
-                this.settlementController.Settings.ControllerStates.SettlementClustersRadius
-            ) {
-                this.expandSettlementCluster = cluster;
-                this.settlementController.Debug(`Attached expand to existing settlement cluster ${cluster.Center.ToString()}`);
-                break;
-            }
-        }
-
-        if (!this.expandSettlementCluster) {
-            this.expandSettlementCluster = new MaraSettlementCluster();
-            this.expandSettlementCluster.Center = expandCenter;
-            this.expandSettlementCluster.SettlementController = this.settlementController;
-            this.settlementController.SettlementClusters.push(this.expandSettlementCluster);
-            
-            this.settlementController.Debug(`Created new cluster for expand`);
-        }
-        
-        if (targetResourceCluster) {
-            this.expandSettlementCluster.ResourceClusters.push(targetResourceCluster);
-        }
-
-        return true;
+        return expandCenter;
     }
 
     private selectConfigId(configIds: Array<string>): string | null {
@@ -179,18 +158,14 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         if (targetExpand.ResourceType.findIndex((value) => {return value == MaraResourceType.Metal}) >= 0) {
             this.orderMineProduction(targetExpand.Cluster!.MetalCells);
         }
+        
+        let metalStocks = MaraUtils.GetUnitsInArea(
+            this.expandCenter, 
+            this.settlementController.Settings.ResourceMining.MiningRadius,
+            (unit) => {return MaraUtils.IsMetalStockConfig(unit.Cfg)}
+        );
 
-        let expandClusterBuildings = this.expandSettlementCluster.Buildings;
-        let isMetalStockPresent = false;
-
-        for (let building of expandClusterBuildings) {
-            if (MaraUtils.IsMetalStockConfig(building.Cfg)) {
-                isMetalStockPresent = true;
-                break;
-            }
-        }
-
-        if (!isMetalStockPresent) {
+        if (metalStocks.length == 0) {
             let metalStockConfigs = MaraUtils.GetAllMetalStockConfigs(this.settlementController.Settlement);
             let cfgId = this.selectConfigId(metalStockConfigs);
 
@@ -199,25 +174,20 @@ export class ExpandBuildState extends MaraSettlementControllerState {
                 return;
             }
 
-            this.orderProducion(cfgId, this.expandSettlementCluster.Center, null);
+            this.orderProducion(cfgId, this.expandCenter, null);
         }
     }
     
     private orderWoodcuttingProduction(): void {
-        let expandClusterBuildings = this.expandSettlementCluster.Buildings;
-        let sawmills: Array<any> = expandClusterBuildings.filter((value => {return MaraUtils.IsSawmillConfig(value.Cfg)}));
+        let sawmills = MaraUtils.GetUnitsInArea(
+            this.expandCenter, 
+            this.settlementController.Settings.ResourceMining.WoodcuttingRadius,
+            (unit) => {return MaraUtils.IsSawmillConfig(unit.Cfg)}
+        );
         
         let targetResourceCluster = this.settlementController.TargetExpand!.Cluster!;
-        let isSawmillPresent = false;
 
-        for (let sawmill of sawmills) {
-            if (MaraUtils.ChebyshevDistance(sawmill.CellCenter, targetResourceCluster.Center) <= targetResourceCluster.Size * 2) {
-                isSawmillPresent = true;
-                break;
-            }
-        }
-        
-        if (!isSawmillPresent) {
+        if (sawmills.length == 0) {
             let sawmillConfigs = MaraUtils.GetAllSawmillConfigs(this.settlementController.Settlement);
             let cfgId = this.selectConfigId(sawmillConfigs);
 
