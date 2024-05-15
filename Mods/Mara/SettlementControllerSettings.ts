@@ -5,6 +5,7 @@ export class MaraSettlementControllerSettings {
     public Squads: SquadsSettings = new SquadsSettings();
     public ControllerStates: ControllerStatesSettings = new ControllerStatesSettings();
     public ResourceMining: ResourceMiningSettings = new ResourceMiningSettings();
+    public CombatSettings: CombatSettings = new CombatSettings();
 }
 
 class UnitSearchSettings {
@@ -47,4 +48,8 @@ class ResourceMiningSettings {
 
     public WoodcuttingRadius: number = 10;
     public MiningRadius: number = 15;
+}
+
+class CombatSettings {
+    public ExpandDefenseStrength: number = 100;
 }

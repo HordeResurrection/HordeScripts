@@ -129,6 +129,37 @@ export class StrategySubcontroller extends MaraSubcontroller {
         }
     }
 
+    GetExpandGuardArmyComposition(expandLocation: MaraPoint): UnitComposition {
+        let expandGuardUnits = MaraUtils.GetSettlementUnitsInArea(
+            expandLocation, 
+            this.parentController.Settings.UnitSearch.ExpandEnemySearchRadius,
+            [this.parentController.Settlement],
+            (unit) => {return MaraUtils.IsCombatConfig(unit.Cfg.Uid) && MaraUtils.IsBuildingConfig(unit.Cfg.Uid)}
+        );
+
+        let currentStrength = 0;
+
+        for (let unit of expandGuardUnits) {
+            currentStrength += MaraUtils.GetUnitStrength(unit);
+        }
+        
+        let requiredStrength = Math.max(this.parentController.Settings.CombatSettings.ExpandDefenseStrength - currentStrength, 0);
+
+        if (requiredStrength > 0) {
+            this.parentController.Debug(`Required Strength to guard expand: ${requiredStrength}`);
+            let produceableCfgIds = this.parentController.ProductionController.GetProduceableCfgIds();
+            let composition = this.getGuardingUnitComposition(produceableCfgIds, requiredStrength);
+
+            this.parentController.Debug(`Unit composition to guard expand:`);
+            MaraUtils.PrintMap(composition);
+            
+            return composition;
+        }
+        else {
+            return new Map<string, number>();
+        }
+    }
+
     GetReinforcementCfgIds(): Array<string> {
         let economyComposition = this.parentController.GetCurrentDevelopedEconomyComposition();
         let combatUnitCfgIds = new Array<string>();
@@ -301,8 +332,19 @@ export class StrategySubcontroller extends MaraSubcontroller {
             let distance = MaraUtils.ChebyshevDistance(cluster.Center, this.parentController.GetSettlementLocation()?.Center);
 
             if (distance < minDistance) {
-                result = cluster;
-                minDistance = distance;
+                let units = MaraUtils.GetUnitsInArea(
+                    cluster.Center,
+                    cluster.Size, //radius = cluster radius * 2
+                    (unit) => {
+                        return unit.Owner != this.parentController.Settlement && 
+                            !this.EnemySettlements.find((value) => {return value.Owner == unit.Owner})
+                    }
+                );
+                
+                if (units.length == 0) {
+                    result = cluster;
+                    minDistance = distance;
+                }
             }
         }
 
@@ -320,6 +362,20 @@ export class StrategySubcontroller extends MaraSubcontroller {
         );
         this.parentController.Debug(`Offensive Cfg IDs: ${offensiveCfgIds}`);
         let allowedOffensiveCfgItems = MaraUtils.MakeAllowedCfgItems(offensiveCfgIds, new Map<string, number>(), this.parentController.Settlement);
+
+        return this.makeCombatUnitComposition(allowedOffensiveCfgItems, requiredStrength);
+    }
+
+    private getGuardingUnitComposition(produceableCfgIds: string[], requiredStrength: number): UnitComposition {
+        let cfgIds = produceableCfgIds.filter(
+            (value, index, array) => {
+                let config = MaraUtils.GetUnitConfig(value)
+                
+                return MaraUtils.IsCombatConfig(config) && MaraUtils.IsBuildingConfig(config);
+            }
+        );
+        this.parentController.Debug(`Guarding Cfg IDs: ${cfgIds}`);
+        let allowedOffensiveCfgItems = MaraUtils.MakeAllowedCfgItems(cfgIds, new Map<string, number>(), this.parentController.Settlement);
 
         return this.makeCombatUnitComposition(allowedOffensiveCfgItems, requiredStrength);
     }

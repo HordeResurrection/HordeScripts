@@ -50,6 +50,16 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             this.orderHousingProduction();
         }
 
+        let settlementLocation = this.settlementController.GetSettlementLocation();
+
+        if (settlementLocation) {
+            let distance = MaraUtils.ChebyshevDistance(this.expandCenter, settlementLocation.Center);
+
+            if (distance > settlementLocation.Radius) {
+                this.orderGuardProduction();
+            }
+        }
+
         this.targetComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
 
         for (let request of this.positionlessRequests) {
@@ -226,8 +236,20 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         }
     }
 
+    private orderGuardProduction() {
+        let guardComposition = this.settlementController.StrategyController.GetExpandGuardArmyComposition(this.expandCenter);
+
+        guardComposition.forEach(
+            (value, key) => {
+                for (let i = 0; i < value; i++) {
+                    this.orderProducion(key, this.expandCenter, null);
+                }
+            }
+        );
+    }
+
     private orderProducion(configId: string, point: MaraPoint | null, precision: number | null): void {
-        let productionRequest = new MaraProductionRequest(configId, point, precision);
+        let productionRequest = new MaraProductionRequest(configId, point, precision, true);
         this.settlementController.ProductionController.RequestProduction(productionRequest);
 
         if (point && precision == 0) {

@@ -29,7 +29,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             let freeProducer = this.getProducer(request.ConfigId);
             
             //!! most probably doesn't work as expected since producer is always free on this tick
-            if (freeProducer) {
+            if (freeProducer || request.IsForce) {
                 if (MaraUtils.RequestMasterMindProduction(request, mmProductionDepartament)) {
                     this.parentController.Debug(`Added ${request.ConfigId} to the production list`);
                     processedRequests.push(request);

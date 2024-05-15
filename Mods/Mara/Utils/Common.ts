@@ -50,17 +50,31 @@ export class MaraResources {
         this.Gold = gold;
         this.People = people;
     }
+
+    public ToString(): string {
+        return `W: ${this.Wood}, M: ${this.Metal}, G: ${this.Gold}, P: ${this.People}`;
+    }
 }
 
 export class MaraProductionRequest {
     public ConfigId: string;
     public Point: MaraPoint | null;
     public Precision: number | null;
+    public IsForce: boolean = false;
 
-    constructor(configId: string, point: MaraPoint | null, precision: number | null) {
+    constructor(
+        configId: string, 
+        point: MaraPoint | null, 
+        precision: number | null, 
+        isForce?: boolean
+    ) {
         this.ConfigId = configId;
         this.Point = point;
         this.Precision = precision;
+
+        if (isForce != null) {
+            this.IsForce = isForce;
+        }
     }
 
     public EqualsTo(other: MaraProductionRequest): boolean {

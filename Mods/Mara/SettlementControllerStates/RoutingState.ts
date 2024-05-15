@@ -27,9 +27,17 @@ export class RoutingState extends MaraSettlementControllerState {
         });
                 
         let resources = this.settlementController.MiningController.GetTotalResources();
+        this.settlementController.Debug(`Total resources: ${resources.ToString()}`);
+
         let needExpand = false;
         let resourcesToMine = new MaraResources(0, 0, 0, 0);
 
+        if (resources.People < 10) {
+            this.settlementController.Debug
+            needExpand = true;
+            resourcesToMine.People = 1;
+        }
+        
         if (resources.Gold < 1000 && leftResources.has(MaraResourceType.Gold)) {
             needExpand = true;
             resourcesToMine.Gold = 1;
