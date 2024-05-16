@@ -1,5 +1,5 @@
 import { createPoint } from "library/common/primitives";
-import { ProduceRequestParameters } from "library/mastermind/matermind-types";
+import { ProduceRequest, ProduceRequestParameters } from "library/mastermind/matermind-types";
 import HordeExampleBase from "./base-example";
 
 /**
@@ -46,10 +46,11 @@ export class Example_MasterMindRequest extends HordeExampleBase {
         produceRequestParameters.TargetCell = null;                     // Местоположение строительства (актуально только для зданий)
 
         // Добавление запроса
-        if (!productionDepartament.AddRequestToProduce(produceRequestParameters)) {
-            this.log.info('Не удалось добавить запрос на создание катапульты.');
+        let catapultRequestVar = host.newVar(ProduceRequest);
+        if (productionDepartament.AddRequestToProduce(produceRequestParameters, catapultRequestVar.out)) {
+            this.log.info('Добавлен запрос на создание катапульты:', catapultRequestVar);
         } else {
-            this.log.info('Добавлен запрос на создание 1 катапульты.');
+            this.log.info('Не удалось добавить запрос на создание катапульты.');
         }
 
         // Создадим запрос на производство одной избы
@@ -66,10 +67,11 @@ export class Example_MasterMindRequest extends HordeExampleBase {
         produceRequestParameters.Producer = producer;                   // Так можно задать юнита-исполнителя (если null, то будет выбран свободный подходящий производитель)
 
         // Добавление запроса
-        if (!productionDepartament.AddRequestToProduce(produceRequestParameters)) {
-            this.log.info('Не удалось добавить запрос на постройку избы.');
+        let farmRequestVar = host.newVar(ProduceRequest);
+        if (productionDepartament.AddRequestToProduce(produceRequestParameters, farmRequestVar.out)) {
+            this.log.info('Добавлен запрос на постройку избы:', farmRequestVar);
         } else {
-            this.log.info('Добавлен запрос на постройку избы.');
+            this.log.info('Не удалось добавить запрос на постройку избы.');
         }
 
         // Проверяем запросы
