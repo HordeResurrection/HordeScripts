@@ -47,7 +47,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
             0
         );
 
-        totalResources.People = settlement.Census.MaxPeople - settlement.Census.BusyAndReservedPeople;
+        let freeHousing = Math.max(settlement.Census.MaxPeople - settlement.Census.BusyAndReservedPeople, 0);
+        totalResources.People = settlementResources.FreePeople + freeHousing;
 
         for (let mineData of this.Mines) {
             let mineResources = this.getMineResources(mineData.Mine);
@@ -71,13 +72,13 @@ export class MiningSubcontroller extends MaraSubcontroller {
     }
 
     private cleanup() {
-        this.Mines = this.Mines.filter((value) => {return value.Mine.IsAlive});
+        this.Mines = this.Mines.filter((value) => {return value.Mine.IsAlive && value.Mine.Owner == this.parentController.Settlement});
 
         for (let mineData of this.Mines) {
             mineData.Miners = mineData.Miners.filter((value) => {return value.IsAlive});
         }
 
-        this.Sawmills.filter((value) => {return value.Sawmill.IsAlive});
+        this.Sawmills = this.Sawmills.filter((value) => {return value.Sawmill.IsAlive && value.Sawmill.Owner == this.parentController.Settlement});
 
         for (let sawmillData of this.Sawmills) {
             sawmillData.Woodcutters = sawmillData.Woodcutters.filter((value) => {return value.IsAlive})

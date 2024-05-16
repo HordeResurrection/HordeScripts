@@ -21,6 +21,8 @@ class TimeoutsSettings {
 
     public UnitProductionEstimationThreshold: number = 2 * 60 * 50;
     public ExterminatingTimeout: number = 5 * 60 * 50;
+    
+    public ExpandBuildTimeout: number = 3 * 60 * 50;
 }
 
 class SquadsSettings {

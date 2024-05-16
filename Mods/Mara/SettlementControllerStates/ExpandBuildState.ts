@@ -10,6 +10,8 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     private positionlessRequests: Array<MaraProductionRequest>;
     private targetComposition: UnitComposition;
     private expandCenter: MaraPoint;
+
+    private timeoutTick: number | null;
     
     public OnEntry(): void {
         let center = this.calculateExpandCenter();
@@ -65,6 +67,8 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         for (let request of this.positionlessRequests) {
             MaraUtils.IncrementMapItem(this.targetComposition, request.ConfigId);
         }
+
+        this.timeoutTick = null;
     }
 
     OnExit(): void {
@@ -72,6 +76,17 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     }
 
     Tick(tickNumber: number): void {
+        if (this.timeoutTick == null) {
+            let timeout = this.settlementController.Settings.Timeouts.ExpandBuildTimeout;
+            this.settlementController.Debug(`Set timeout to ${timeout} ticks`);
+            this.timeoutTick = tickNumber + timeout;
+        }
+        else if (tickNumber > this.timeoutTick) {
+            this.settlementController.Debug(`Expand build is too long-drawn, discontinuing`);
+            this.settlementController.State = SettlementControllerStateFactory.MakeRoutingState(this.settlementController);
+            return;
+        }
+        
         if (tickNumber % 10 != 0) {
             return;
         }
