@@ -249,6 +249,8 @@ export class World {
         ScriptUtils.SetValue(this.configs["castle"], "MaxHealth", Math.round(300000*this.castle_health_coeff));
         // броня
         ScriptUtils.SetValue(this.configs["castle"], "Shield", 200);
+        // увеличиваем видимость
+        ScriptUtils.SetValue(this.configs["castle"], "Sight", 12);
 
         ////////////////////
         // Стрельбище (лучник)
@@ -1247,7 +1249,7 @@ export class World {
         // удаляем команду атаки
         this.configs["worker"].AllowedCommands.Remove(UnitCommand.Attack);
         // здоровье
-        ScriptUtils.SetValue(this.configs["worker"], "MaxHealth", 2000);
+        ScriptUtils.SetValue(this.configs["worker"], "MaxHealth", 1000);
         // число людей
         ScriptUtils.SetValue(this.configs["worker"].CostResources, "People", 0);
         // добавляем иммун к огню
@@ -1256,6 +1258,8 @@ export class World {
         if (this.configs["worker"].ProfessionParams.ContainsKey(UnitProfession.Harvester)) {
             this.configs["worker"].ProfessionParams.Remove(UnitProfession.Harvester);
         }
+        // делаем его не даващимся
+        ScriptUtils.SetValue(this.configs["worker"], "Weight", 13);
         
         // добавляем постройки
         {
