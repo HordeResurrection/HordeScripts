@@ -251,7 +251,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["castle"], "Shield", 200);
         // увеличиваем видимость
-        ScriptUtils.SetValue(this.configs["castle"], "Sight", 12);
+        ScriptUtils.SetValue(this.configs["castle"], "Sight", 1);
 
         ////////////////////
         // Стрельбище (лучник)
@@ -1250,7 +1250,7 @@ export class World {
         // удаляем команду атаки
         this.configs["worker"].AllowedCommands.Remove(UnitCommand.Attack);
         // здоровье
-        ScriptUtils.SetValue(this.configs["worker"], "MaxHealth", 1000);
+        ScriptUtils.SetValue(this.configs["worker"], "MaxHealth", 2000);
         // число людей
         ScriptUtils.SetValue(this.configs["worker"].CostResources, "People", 0);
         // добавляем иммун к огню
@@ -1368,14 +1368,22 @@ export class World {
                 ScriptUtils.SetValue(this.configs[cfgId].CostResources, "Lumber", 0);
                 ScriptUtils.SetValue(this.configs[cfgId].CostResources, "People", 0);
 
-                // увеличиваем ближникам хп в 1.5 раза
-                if (this.configs[cfgId].MainArmament.Range == 1 &&
-                    this.cfgUid_entity.has(this.configs[cfgId].Uid)) {
-                    
+                // юниты, которые спавняться
+                if (this.cfgUid_entity.has(this.configs[cfgId].Uid)) {
                     var entity = this.cfgUid_entity.get(this.configs[cfgId].Uid) as Entity;
-                    
                     if (entity.components.has(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT)) {
-                        ScriptUtils.SetValue(this.configs[cfgId], "MaxHealth", Math.floor(1.5 * this.configs[cfgId].MaxHealth));
+                        // Ближники
+                            // увеличиваем хп в 1.5 раза
+                            // обзор ставим 8
+                        if (this.configs[cfgId].MainArmament.Range == 1) {
+                            ScriptUtils.SetValue(this.configs[cfgId], "MaxHealth", Math.floor(1.5 * this.configs[cfgId].MaxHealth));
+                            ScriptUtils.SetValue(this.configs[cfgId], "Sight", 6);
+                        }
+                        // Дальники
+                            // обзор делаем 4
+                        else {
+                            ScriptUtils.SetValue(this.configs[cfgId], "Sight", 4);
+                        }
                     }
                 }
             }
