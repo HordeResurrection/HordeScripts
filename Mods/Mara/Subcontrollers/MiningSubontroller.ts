@@ -30,7 +30,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
         this.destroyEmptyMines();
 
         if (tickNumber % (5 * 50) == 0) {
-            this.checkForUnaccountingBuildings();
+            this.checkForUnaccountedBuildings();
+            this.redistributeHarvesters();
             this.engageFreeHarvesters();
             this.engageIdleHarvesters();
         }
@@ -108,7 +109,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         return freeHarvesters;
     }
 
-    private checkForUnaccountingBuildings() {
+    private checkForUnaccountedBuildings() {
         let units = enumerate(this.parentController.Settlement.Units);
         let unit;
         
@@ -167,12 +168,43 @@ export class MiningSubcontroller extends MaraSubcontroller {
         return cell;
     }
 
+    private redistributeHarvesters(): void {
+        let minerRequrement = 0;
+        const minersPerMine = this.parentController.Settings.ResourceMining.MinersPerMine;
+
+        for (let mineData of this.Mines) {
+            if (mineData.Miners.length < minersPerMine) {
+                minerRequrement += minersPerMine - mineData.Miners.length;
+            }
+        }
+
+        const minWoodcuttersPerSawmill = this.parentController.Settings.ResourceMining.MinersPerMine;
+
+        if (minerRequrement > 0) {
+            for (let sawmillData of this.Sawmills) {
+                if (sawmillData.Woodcutters.length > minWoodcuttersPerSawmill) {
+                    // just remoe woodcutters from array which marks them as free
+                    // they will be processed in engageFreeHarvesters() later
+
+                    let maxWoodcuttersToRemove = Math.min(sawmillData.Woodcutters.length - minWoodcuttersPerSawmill, minerRequrement);
+                    sawmillData.Woodcutters = sawmillData.Woodcutters.splice(0, maxWoodcuttersToRemove);
+                    
+                    minerRequrement -= maxWoodcuttersToRemove;
+
+                    if (minerRequrement == 0) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     private engageFreeHarvesters(): void {
         let freeHarvesters = this.GetFreeHarvesters();
 
         let freeHarvesterIndex = 0;
         const maxMiners = this.parentController.Settings.ResourceMining.MinersPerMine;
-        const maxWoodcutters = this.parentController.Settings.ResourceMining.WoodcuttersPerSawmill;
+        const maxWoodcutters = this.parentController.Settings.ResourceMining.MaxWoodcuttersPerSawmill;
 
         while (freeHarvesterIndex < freeHarvesters.length) {
             let understaffedMineData = this.Mines.find(
@@ -187,6 +219,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
                 let minersToAdd = freeHarvesters.slice(freeHarvesterIndex, lastHarvesterIndex); //last index is not included into result
                 understaffedMineData.Miners.push(...minersToAdd);
+                MaraUtils.IssueMineCommand(minersToAdd, this.parentController.Player, understaffedMineData.Mine.Cell);
+
                 freeHarvesterIndex = lastHarvesterIndex;
 
                 continue;
@@ -203,6 +237,9 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
                     let woodcuttersToAdd = freeHarvesters.slice(freeHarvesterIndex, lastHarvesterIndex);
                     understaffedSawmillData.Woodcutters.push(...woodcuttersToAdd);
+                    
+                    let woodCell = this.findWoodCell(understaffedSawmillData.Sawmill);
+                    MaraUtils.IssueHarvestLumberCommand(woodcuttersToAdd, this.parentController.Player, woodCell);
                     freeHarvesterIndex = lastHarvesterIndex;
 
                     continue;
