@@ -16,7 +16,7 @@ class CellOfEnemyAttackingCastle {
 };
 
 /** радиус реагирования на врага, который атакует наш замок */
-const deffenceReactionRadius = 30;
+const deffenceReactionRadius = 50;
 /** радиус реагирования на текущую точку пути атаки, если <= то отправляем в следующую точку */
 const pathNodeReactionRadius = 5;
 /** для каждого поселения хранит позиции врагов, атакующие замок */
@@ -307,7 +307,7 @@ export function AttackingAlongPathSystem_stage2(world: World, gameTickNum: numbe
                         // < 0    - 2*90  градусов
                         // < -0.5 - 2*120 градусов
     
-                        if (attackVector.X*vectorToEnemy.X + attackVector.Y*vectorToEnemy.Y < 0) {
+                        if (attackVector.X*vectorToEnemy.X + attackVector.Y*vectorToEnemy.Y < -0.5) {
                             continue;
                         }
     
