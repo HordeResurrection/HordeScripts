@@ -10,6 +10,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     private positionlessRequests: Array<MaraProductionRequest>;
     private targetComposition: UnitComposition;
     private expandCenter: MaraPoint;
+    private harvestersToOrder: UnitComposition;
 
     private timeoutTick: number | null;
     
@@ -27,6 +28,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         this.strictPositionRequests = [];
         this.positionlessRequests = [];
         let targetExpand = this.settlementController.TargetExpand!;
+        this.harvestersToOrder = new Map<string, number>();
 
         if (
             targetExpand.ResourceType.findIndex(
@@ -51,6 +53,8 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         ) {
             this.orderHousingProduction();
         }
+
+        this.orderHarvestersProduction();
 
         let settlementLocation = this.settlementController.GetSettlementLocation();
 
@@ -168,9 +172,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             return;
         }
 
-        for (let i = 0; i < this.settlementController.Settings.ResourceMining.MinersPerMine; i++) {
-            this.orderProducion(cfgId, null, null);
-        }
+        MaraUtils.AddToMapItem(this.harvestersToOrder, cfgId, this.settlementController.Settings.ResourceMining.MinersPerMine);
     }
 
     private orderMiningProduction(): void {
@@ -232,12 +234,10 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             return;
         }
 
-        for (let i = 0; i < this.settlementController.Settings.ResourceMining.WoodcutterBatchSize; i++) {
-            this.orderProducion(cfgId, null, null);
-        }
+        MaraUtils.AddToMapItem(this.harvestersToOrder, cfgId, this.settlementController.Settings.ResourceMining.WoodcutterBatchSize);
     }
 
-    private orderHousingProduction() {
+    private orderHousingProduction(): void {
         let housingConfigs = MaraUtils.GetAllHousingConfigs(this.settlementController.Settlement);
         let cfgId = this.selectConfigId(housingConfigs);
         
@@ -251,7 +251,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         }
     }
 
-    private orderGuardProduction() {
+    private orderGuardProduction(): void {
         let guardComposition = this.settlementController.StrategyController.GetExpandGuardArmyComposition(this.expandCenter);
 
         guardComposition.forEach(
@@ -259,6 +259,23 @@ export class ExpandBuildState extends MaraSettlementControllerState {
                 for (let i = 0; i < value; i++) {
                     this.orderProducion(key, this.expandCenter, null);
                 }
+            }
+        );
+    }
+
+    private orderHarvestersProduction(): void {
+        let freeHarvesters = this.settlementController.MiningController.GetFreeHarvesters();
+        let freeHarvestersCount = freeHarvesters.length;
+
+        this.harvestersToOrder.forEach(
+            (value, key) => {
+                let harvesterCount = Math.max(value - freeHarvestersCount, 0);
+
+                for (let i = 0; i < harvesterCount; i++) {
+                    this.orderProducion(key, null, null);
+                }
+
+                freeHarvestersCount = Math.max(freeHarvestersCount - value, 0);
             }
         );
     }

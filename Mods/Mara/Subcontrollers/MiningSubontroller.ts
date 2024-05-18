@@ -85,6 +85,29 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
     }
 
+    GetFreeHarvesters(): Array<any> {
+        let engagedHarvesters: Array<any> = [];
+
+        for (let mineData of this.Mines) {
+            engagedHarvesters.push(...mineData.Miners);
+        }
+
+        for (let sawmillData of this.Sawmills) {
+            engagedHarvesters.push(...sawmillData.Woodcutters);
+        }
+
+        let allHarvesters = this.findAllHarvesters();
+        let freeHarvesters = allHarvesters.filter(
+            (value) => {
+                return !engagedHarvesters.find(
+                    (harvester) => {return harvester == value}
+                )
+            }
+        );
+
+        return freeHarvesters;
+    }
+
     private checkForUnaccountingBuildings() {
         let units = enumerate(this.parentController.Settlement.Units);
         let unit;
@@ -145,24 +168,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
     }
 
     private engageFreeHarvesters(): void {
-        let engagedHarvesters: Array<any> = [];
-
-        for (let mineData of this.Mines) {
-            engagedHarvesters.push(...mineData.Miners);
-        }
-
-        for (let sawmillData of this.Sawmills) {
-            engagedHarvesters.push(...sawmillData.Woodcutters);
-        }
-
-        let allHarvesters = this.findAllHarvesters();
-        let freeHarvesters = allHarvesters.filter(
-            (value) => {
-                return !engagedHarvesters.find(
-                    (harvester) => {return harvester == value}
-                )
-            }
-        );
+        let freeHarvesters = this.GetFreeHarvesters();
 
         let freeHarvesterIndex = 0;
         const maxMiners = this.parentController.Settings.ResourceMining.MinersPerMine;

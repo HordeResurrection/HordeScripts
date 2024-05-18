@@ -12,50 +12,44 @@ export abstract class MaraSettlementControllerState extends FsmState {
     }
 
     protected fillExpandData(requiredResources: MaraResources): void {
-        //let needProducePeople = requiredResources.People > 0;
+        let optimalCluster = this.selectOptimalResourceCluster(requiredResources);
 
-        //if (!needProducePeople) {
-            let optimalCluster = this.selectOptimalResourceCluster(requiredResources);
+        if (optimalCluster) {
+            this.settlementController.Debug(`Selected resource cluster ${optimalCluster.Center.ToString()} for expand`);
+            let requiredResourceTypes: MaraResourceType[] = [];
 
-            if (optimalCluster) {
-                this.settlementController.Debug(`Selected resource cluster ${optimalCluster.Center.ToString()} for expand`);
-                let requiredResourceTypes: MaraResourceType[] = [];
-
-                if (requiredResources.Gold > 0 && optimalCluster.GoldAmount > 0) {
-                    this.settlementController.Debug(`Gold production is scheduled`);
-                    requiredResourceTypes.push(MaraResourceType.Gold);
-                }
-
-                if (requiredResources.Metal > 0 && optimalCluster.MetalAmount > 0) {
-                    this.settlementController.Debug(`Metal production is scheduled`);
-                    requiredResourceTypes.push(MaraResourceType.Metal);
-                }
-
-                if (requiredResources.Wood > 0 && optimalCluster.WoodAmount > 0) {
-                    this.settlementController.Debug(`Wood production is scheduled`);
-                    requiredResourceTypes.push(MaraResourceType.Wood);
-                }
-                
-                this.settlementController.TargetExpand = new TargetExpandData(
-                    optimalCluster,
-                    requiredResourceTypes
-                );
+            if (requiredResources.Gold > 0 && optimalCluster.GoldAmount > 0) {
+                this.settlementController.Debug(`Gold production is scheduled`);
+                requiredResourceTypes.push(MaraResourceType.Gold);
             }
-            else {
-                this.settlementController.Debug(`Unable to find suitable resource cluster for mining`);
-                
-                this.settlementController.TargetExpand = new TargetExpandData( //when in doubt - build more izbas!!
-                    null,
-                    [MaraResourceType.People]
-                );
+
+            if (requiredResources.Metal > 0 && optimalCluster.MetalAmount > 0) {
+                this.settlementController.Debug(`Metal production is scheduled`);
+                requiredResourceTypes.push(MaraResourceType.Metal);
             }
-        // }
-        // else {
-        //     this.settlementController.TargetExpand = new TargetExpandData(
-        //         null,
-        //         [MaraResourceType.People]
-        //     );
-        // }
+
+            if (requiredResources.Wood > 0 && optimalCluster.WoodAmount > 0) {
+                this.settlementController.Debug(`Wood production is scheduled`);
+                requiredResourceTypes.push(MaraResourceType.Wood);
+            }
+
+            if (requiredResources.People > 0) {
+                requiredResourceTypes.push(MaraResourceType.People);
+            }
+            
+            this.settlementController.TargetExpand = new TargetExpandData(
+                optimalCluster,
+                requiredResourceTypes
+            );
+        }
+        else {
+            this.settlementController.Debug(`Unable to find suitable resource cluster for mining`);
+            
+            this.settlementController.TargetExpand = new TargetExpandData( //when in doubt - build more izbas!!
+                null,
+                [MaraResourceType.People]
+            );
+        }
     }
 
     private selectOptimalResourceCluster(requiredResources: MaraResources): MaraResourceCluster | null {
