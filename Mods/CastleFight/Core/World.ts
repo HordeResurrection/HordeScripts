@@ -10,6 +10,7 @@ import { Cell as Cell, CfgAddUnitProducer, getCurrentTime, MetricType, distance_
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
+const DeleteUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
 
 export enum GameState {
     INIT = 0,
@@ -1602,9 +1603,17 @@ export class World {
             while(enumerator.MoveNext()) {
                 var battleMind = enumerator.Current.BattleMind;
                 battleMind.InstantDeath(null, UnitDeathType.Mele);
-                break;
             }
             enumerator.Dispose();
+
+            // var units = this.settlements[settlementId].Units;
+            // var enumerator   = units.GetEnumerator();
+            // var deleteParams = new DeleteUnitParameters();
+            // while(enumerator.MoveNext()) {
+            //     deleteParams.UnitToDelete = enumerator.Current;
+            //     units.DeleteUnit(deleteParams)
+            // }
+            // enumerator.Dispose();
 
             // заполняем таблицу альянсов
             for (var other_settlementId = 0; other_settlementId < this.settlementsCount; other_settlementId++) {
