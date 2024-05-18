@@ -286,7 +286,6 @@ export class StrategySubcontroller extends MaraSubcontroller {
     }
 
     IsUnderAttack(): boolean {
-        //TODO: add enemy detection around expands
         let settlementLocation = this.parentController.GetSettlementLocation();
 
         if (!settlementLocation) {
@@ -299,7 +298,23 @@ export class StrategySubcontroller extends MaraSubcontroller {
             this.EnemySettlements
         );
         
-        return enemies.length > 0;
+        if (enemies.length > 0) {
+            return true;
+        }
+
+        for (let expandPoint of this.parentController.Expands) {
+            enemies = MaraUtils.GetSettlementUnitsInArea(
+                expandPoint, 
+                this.parentController.Settings.UnitSearch.ExpandEnemySearchRadius, 
+                this.EnemySettlements
+            );
+
+            if (enemies.length > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     GetEnemiesInArea(cell: any, radius: number): Array<any> {

@@ -56,14 +56,8 @@ export class ExpandBuildState extends MaraSettlementControllerState {
 
         this.orderHarvestersProduction();
 
-        let settlementLocation = this.settlementController.GetSettlementLocation();
-
-        if (settlementLocation) {
-            let distance = MaraUtils.ChebyshevDistance(this.expandCenter, settlementLocation.Center);
-
-            if (distance > settlementLocation.Radius) {
-                this.orderGuardProduction();
-            }
+        if (this.isRemoteExpand(this.expandCenter)) {
+            this.orderGuardProduction();
         }
 
         this.targetComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
@@ -76,7 +70,15 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     }
 
     OnExit(): void {
-        
+        if (this.isRemoteExpand(this.expandCenter)) {
+            if ( 
+                !this.settlementController.Expands.find( 
+                    (value) => {return value.EqualsTo(this.expandCenter)} 
+                ) 
+            ) {
+                this.settlementController.Expands.push(this.expandCenter);
+            }
+        }
     }
 
     Tick(tickNumber: number): void {
@@ -124,6 +126,19 @@ export class ExpandBuildState extends MaraSettlementControllerState {
 
         this.settlementController.Debug(`Expand center calculated: ${expandCenter.ToString()}`);
         return expandCenter;
+    }
+
+    private isRemoteExpand(expandCenter: MaraPoint): boolean {
+        let settlementLocation = this.settlementController.GetSettlementLocation();
+
+        if (settlementLocation) {
+            let distance = MaraUtils.ChebyshevDistance(this.expandCenter, settlementLocation.Center);
+
+            return distance > settlementLocation.Radius;
+        }
+        else {
+            return false;
+        }
     }
 
     private selectConfigId(configIds: Array<string>): string | null {

@@ -1,4 +1,6 @@
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
+import { MaraSquad } from "../Subcontrollers/Squads/MaraSquad";
+import { MaraPoint } from "../Utils/Common";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 import { MaraUtils } from "Mara/Utils/MaraUtils";
 
@@ -47,25 +49,41 @@ export class DefendingState extends MaraSettlementControllerState {
         }
     }
 
+    private registerHostileSquadsAroundPoint(point: MaraPoint, radius: number): Array<MaraSquad> {
+        let attackers = this.settlementController.StrategyController.GetEnemiesInArea(point, radius);
+        
+        return MaraUtils.GetSettlementsSquadsFromUnits(
+            attackers, 
+            this.settlementController.StrategyController.EnemySettlements,
+            (unit) => {return MaraUtils.ChebyshevDistance(unit.Cell, point) <= radius}
+        );
+    }
+
     private refreshAttackersList(): void {
         this.settlementController.HostileAttackingSquads = [];
-
-        //TODO: add enemy detection around expands
         let settlementLocation = this.settlementController.GetSettlementLocation();
 
         if (!settlementLocation) {
             return;
         }
 
-        let attackers = this.settlementController.StrategyController.GetEnemiesInArea(settlementLocation.Center, settlementLocation.Radius);
-        
-        let attackingSquads = MaraUtils.GetSettlementsSquadsFromUnits(
-            attackers, 
-            this.settlementController.StrategyController.EnemySettlements,
-            (unit) => {return MaraUtils.ChebyshevDistance(unit.Cell, settlementLocation!.Center) <= settlementLocation!.Radius}
+        let attackingSquads = this.registerHostileSquadsAroundPoint(
+            new MaraPoint(settlementLocation.Center.X, settlementLocation.Center.Y), 
+            settlementLocation.Radius
         );
-
+        
         this.settlementController.HostileAttackingSquads.push(...attackingSquads);
+
+        for (let expandPoint of this.settlementController.Expands) {
+            let expandAttackers = this.registerHostileSquadsAroundPoint(
+                expandPoint, 
+                this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
+            );
+
+            if (expandAttackers.length > 0) {
+                this.settlementController.HostileAttackingSquads.push(...expandAttackers);
+            }
+        }
     }
 
     private canRebuild(): boolean {

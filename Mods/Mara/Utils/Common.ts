@@ -36,6 +36,10 @@ export class MaraPoint {
     public ToString(): string {
         return `${this.X};${this.Y}`
     }
+
+    public EqualsTo(other: MaraPoint): boolean {
+        return this.X == other.X && this.Y == other.Y;
+    }
 }
 
 export class MaraResources {
@@ -97,5 +101,24 @@ export class MaraProductionRequest {
         }
         
         return `${this.ConfigId} at (${location}):${this.Precision}`;
+    }
+}
+
+export abstract class MaraCellDataHolder {
+    protected data: any;
+    
+    constructor () {
+        this.Clear();
+    }
+
+    abstract Get(cell: any): any;
+    abstract Set(cell: any, value: any): void;
+
+    Clear(): void {
+        this.data = {};
+    }
+
+    protected makeIndex(cell: any): string {
+        return `(${cell.X},${cell.Y})`;
     }
 }

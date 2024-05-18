@@ -11,7 +11,7 @@ import { ProductionSubcontroller } from "./Subcontrollers/ProductionSubcontrolle
 import { MaraSquad } from "./Subcontrollers/Squads/MaraSquad";
 import { StrategySubcontroller } from "./Subcontrollers/StrategySubcontroller";
 import { TacticalSubcontroller } from "./Subcontrollers/TacticalSubcontroller";
-import { eNext, enumerate } from "./Utils/Common";
+import { MaraPoint, eNext, enumerate } from "./Utils/Common";
 import { MaraUtils, UnitComposition } from "./Utils/MaraUtils";
 import { MaraSettlementControllerSettings } from "./SettlementControllerSettings";
 import { SettlementControllerStateFactory } from "./SettlementControllerStateFactory";
@@ -54,6 +54,7 @@ export class MaraSettlementController {
     public TargetUnitsComposition: UnitComposition | null = null;
     public AttackToDefenseUnitRatio: number | null = null;
     public TargetExpand: TargetExpandData | null = null;
+    public Expands: Array<MaraPoint> = [];
     
     private subcontrollers: Array<MaraSubcontroller> = [];
     private state: MaraSettlementControllerState;
@@ -104,6 +105,10 @@ export class MaraSettlementController {
         this.currentUnitComposition = null;
         this.currentDevelopedUnitComposition = null;
         this.settlementLocation = null;
+
+        if (tickNumber % 50 == 0) {
+            this.cleanupExpands();
+        }
 
         for (let subcontroller of this.subcontrollers) {
             subcontroller.Tick(tickNumber);
@@ -193,7 +198,7 @@ export class MaraSettlementController {
             let squads = MaraUtils.GetSettlementsSquadsFromUnits(
                 [centralProductionBuilding], 
                 [this.Settlement], 
-                (unit) => {return unit.Cfg.BuildingConfig != null},
+                (unit) => {return MaraUtils.IsBuildingConfig(unit.Cfg.Uid)},
                 this.Settings.UnitSearch.BuildingSearchRadius
             );
             
@@ -210,5 +215,20 @@ export class MaraSettlementController {
         else {
             return null;
         }
+    }
+
+    private cleanupExpands(): void {
+        this.Expands = this.Expands.filter(
+            (value) => {
+                let expandBuildings = MaraUtils.GetSettlementUnitsInArea(
+                    value,
+                    Math.max(this.Settings.ResourceMining.WoodcuttingRadius, this.Settings.ResourceMining.MiningRadius),
+                    [this.Settlement],
+                    (unit) => {return MaraUtils.IsBuildingConfig(unit.Cfg.Uid)}
+                );
+
+                return expandBuildings.length > 0;
+            }
+        )
     }
 }
