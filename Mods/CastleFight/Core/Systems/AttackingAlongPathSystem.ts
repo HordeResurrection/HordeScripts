@@ -16,7 +16,7 @@ class CellOfEnemyAttackingCastle {
 };
 
 /** радиус реагирования на врага, который атакует наш замок */
-const deffenceReactionRadius = 50;
+const deffenceReactionRadius = 30;
 /** радиус реагирования на текущую точку пути атаки, если <= то отправляем в следующую точку */
 const pathNodeReactionRadius = 5;
 /** для каждого поселения хранит позиции врагов, атакующие замок */
@@ -228,170 +228,150 @@ export function AttackingAlongPathSystem_stage2(world: World, gameTickNum: numbe
 
             // защита замка
 
-            if (settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId].length > 0 &&
-                distance_Chebyshev(
+            if (settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId].length > 0) {
+                if (distance_Chebyshev(
                     unitCell.X,
                     unitCell.Y,
                     world.settlements_castleUnit[settlementId].Cell.X,
                     world.settlements_castleUnit[settlementId].Cell.Y) < deffenceReactionRadius) {
-                /** вектор атаки */
-                var attackVector = new Cell(
-                    attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].X - unitComponent.unit.Cell.X,
-                    attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].Y - unitComponent.unit.Cell.Y);
-                var vectorInvLength = 1.0 / Math.sqrt(attackVector.X*attackVector.X + attackVector.Y*attackVector.Y);
-                attackVector.X *= vectorInvLength;
-                attackVector.Y *= vectorInvLength;
-                /** тип атаки юнита 0 - дальник, 1 ближник, 2 - всадник */
-                var unitAttackType = 
-                    world.configs[unitComponent.cfgId].MainArmament.Range > 1 ? 0
-                    : world.configs[unitComponent.cfgId].Specification.HasFlag(UnitSpecification.Rider) ? 1
-                    : 2;
+                    /** вектор атаки */
+                    var attackVector = new Cell(
+                        attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].X - unitComponent.unit.Cell.X,
+                        attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].Y - unitComponent.unit.Cell.Y);
+                    var vectorInvLength = 1.0 / Math.sqrt(attackVector.X*attackVector.X + attackVector.Y*attackVector.Y);
+                    attackVector.X *= vectorInvLength;
+                    attackVector.Y *= vectorInvLength;
+                    /** тип атаки юнита 0 - дальник, 1 ближник, 2 - всадник */
+                    var unitAttackType = 
+                        world.configs[unitComponent.cfgId].MainArmament.Range > 1 ? 0
+                        : world.configs[unitComponent.cfgId].Specification.HasFlag(UnitSpecification.Rider) ? 1
+                        : 2;
 
-                // ищем врага, атакующего наш замок
+                    // ищем врага, атакующего наш замок
 
-                var goalPos_num      = -1;
-                var goalPos_distance = 10000;
+                    var goalPos_num      = -1;
+                    var goalPos_distance = 10000;
 
-                    // ближайший враг относительно замка
+                        // ближайший враг
 
-                // for (var posNum = 0; posNum < settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId].length; posNum++) {
-                //     var enemyX = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.X;
-                //     var enemyY = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.Y;
-                //     // проверяем, что враг на пути атаки
-                //     if (attackVector.X*(enemyX - unitCelll.X)
-                //         + attackVector.Y*(enemyY - unitCell.Y) < 0) {
-                //         continue;
-                //     }
-                //     // ищем расстояние до цели
-                //     var posDistance = distance_Chebyshev(
-                //         //unitCell.X,
-                //         //unitCell.Y,
-                //         world.settlements_castleUnit[settlementId].Cell.X,
-                //         world.settlements_castleUnit[settlementId].Cell.Y,
-                //         enemyX,
-                //         enemyY);
-                //     // дальники идут на ближайшего
-                //     //if (world.configs[unitComponent.cfgId].MainArmament.Range > 1) {
-                //         if (goalPos_num == -1 || posDistance < goalPos_distance) {
-                //             goalPos_num      = posNum;
-                //             goalPos_distance = posDistance;
-                //         }
-                //     //}
-                //     // ближники идут на дальних
-                //     // else {
-                //     //     if (goalPos_num == -1 ||
-                //     //         (goalPos_distance < posDistance && posDistance <= deffenceReactionRadius)) {
-                //     //         goalPos_num      = posNum;
-                //     //         goalPos_distance = posDistance;
-                //     //     }
-                //     // }
-                // }
-                // if (deffenceReactionRadius < goalPos_distance) {
-                //     goalPos_num = -1;
-                // }
-
-                    // ближайший враг
-
-                // дальники атакуют ближних к себе
-                if (unitAttackType == 0) {
-                    for (var posNum = 0; posNum < settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId].length; posNum++) {
-                        var enemyX = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.X;
-                        var enemyY = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.Y;
-                        
-                        var vectorToEnemy = new Cell(enemyX - unitCell.X, enemyY - unitCell.Y);
-                        vectorInvLength = 1.0 / Math.sqrt(vectorToEnemy.X*vectorToEnemy.X + vectorToEnemy.Y*vectorToEnemy.Y);
-                        vectorToEnemy.X *= vectorInvLength;
-                        vectorToEnemy.Y *= vectorInvLength;
-    
-                        // проверяем, что враг на пути атаки
-                        // < 0    - 2*90  градусов
-                        // < -0.5 - 2*120 градусов
-    
-                        if (attackVector.X*vectorToEnemy.X + attackVector.Y*vectorToEnemy.Y < -0.5) {
-                            continue;
-                        }
-    
-                        /** расстояние до цели */
-                        var distanceToEnemy = distance_Chebyshev(
-                            unitCell.X,
-                            unitCell.Y,
-                            enemyX,
-                            enemyY);
-
-                        if (goalPos_num == -1 || distanceToEnemy < goalPos_distance) {
-                            goalPos_num      = posNum;
-                            goalPos_distance = distanceToEnemy;
-                        }
-                    }
-                }
-                // всадники атакуют дальних относительно замка
-                else if (unitAttackType == 1) {
-                    for (var posNum = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId].length - 1; posNum >= 0; posNum--) {
-                        var enemyX = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.X;
-                        var enemyY = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.Y;
-                        
-                        var vectorToEnemy = new Cell(enemyX - unitCell.X, enemyY - unitCell.Y);
-                        vectorInvLength = 1.0 / Math.sqrt(vectorToEnemy.X*vectorToEnemy.X + vectorToEnemy.Y*vectorToEnemy.Y);
-                        vectorToEnemy.X *= vectorInvLength;
-                        vectorToEnemy.Y *= vectorInvLength;
-    
-                        // проверяем, что враг на пути атаки
-                        // < 0    - 2*90  градусов
-                        // < -0.5 - 2*120 градусов
-    
-                        if (attackVector.X*vectorToEnemy.X + attackVector.Y*vectorToEnemy.Y < 0) {
-                            continue;
-                        }
-
-                        goalPos_num      = posNum;
-                        goalPos_distance = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].distanceToCastle;
-                        break;
-                    }
-                }
-                // ближники атакуют ближних относительно замка
-                else {
-                    for (var posNum = 0; posNum < settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId].length; posNum++) {
-                        var enemyX = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.X;
-                        var enemyY = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.Y;
-                        
-                        var vectorToEnemy = new Cell(enemyX - unitCell.X, enemyY - unitCell.Y);
-                        vectorInvLength = 1.0 / Math.sqrt(vectorToEnemy.X*vectorToEnemy.X + vectorToEnemy.Y*vectorToEnemy.Y);
-                        vectorToEnemy.X *= vectorInvLength;
-                        vectorToEnemy.Y *= vectorInvLength;
-    
-                        // проверяем, что враг на пути атаки
-                        // < 0    - 2*90  градусов
-                        // < -0.5 - 2*120 градусов
-    
-                        if (attackVector.X*vectorToEnemy.X + attackVector.Y*vectorToEnemy.Y < 0) {
-                            continue;
-                        }
-    
-                        goalPos_num      = posNum;
-                        goalPos_distance = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].distanceToCastle;
-                        break;
-                    }
-                }
-
-                // нашелся юнит по пути атаки идем его атаковать
-                if (goalPos_num != -1) {
-                    // дальников в свободную точку отправляем
+                    // дальники атакуют ближних к себе
                     if (unitAttackType == 0) {
-                        UnitGiveOrderToNearEmptyCell(unitComponent.unit,
-                            settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][goalPos_num].cell,
-                            UnitCommand.Attack,
-                            AssignOrderMode.Replace);
+                        for (var posNum = 0; posNum < settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId].length; posNum++) {
+                            var enemyX = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.X;
+                            var enemyY = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.Y;
+                            
+                            var vectorToEnemy = new Cell(enemyX - unitCell.X, enemyY - unitCell.Y);
+                            vectorInvLength = 1.0 / Math.sqrt(vectorToEnemy.X*vectorToEnemy.X + vectorToEnemy.Y*vectorToEnemy.Y);
+                            vectorToEnemy.X *= vectorInvLength;
+                            vectorToEnemy.Y *= vectorInvLength;
+        
+                            // проверяем, что враг на пути атаки
+                            // < 0    - 2*90  градусов
+                            // < -0.5 - 2*120 градусов
+        
+                            if (attackVector.X*vectorToEnemy.X + attackVector.Y*vectorToEnemy.Y < 0) {
+                                continue;
+                            }
+        
+                            /** расстояние до цели */
+                            var distanceToEnemy = distance_Chebyshev(
+                                unitCell.X,
+                                unitCell.Y,
+                                enemyX,
+                                enemyY);
+
+                            if (goalPos_num == -1 || distanceToEnemy < goalPos_distance) {
+                                goalPos_num      = posNum;
+                                goalPos_distance = distanceToEnemy;
+                            }
+                        }
                     }
-                    // ближников, всадники напрявляем прям за головой
+                    // всадники атакуют дальних относительно замка
+                    else if (unitAttackType == 1) {
+                        for (var posNum = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId].length - 1; posNum >= 0; posNum--) {
+                            var enemyX = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.X;
+                            var enemyY = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.Y;
+                            
+                            var vectorToEnemy = new Cell(enemyX - unitCell.X, enemyY - unitCell.Y);
+                            vectorInvLength = 1.0 / Math.sqrt(vectorToEnemy.X*vectorToEnemy.X + vectorToEnemy.Y*vectorToEnemy.Y);
+                            vectorToEnemy.X *= vectorInvLength;
+                            vectorToEnemy.Y *= vectorInvLength;
+        
+                            // проверяем, что враг на пути атаки
+                            // < 0    - 2*90  градусов
+                            // < -0.5 - 2*120 градусов
+        
+                            if (attackVector.X*vectorToEnemy.X + attackVector.Y*vectorToEnemy.Y < 0) {
+                                continue;
+                            }
+
+                            goalPos_num      = posNum;
+                            goalPos_distance = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].distanceToCastle;
+                            break;
+                        }
+                    }
+                    // ближники атакуют ближних относительно замка
                     else {
-                        UnitGiveOrderToCell(unitComponent.unit,
-                            settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][goalPos_num].cell,
+                        for (var posNum = 0; posNum < settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId].length; posNum++) {
+                            var enemyX = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.X;
+                            var enemyY = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].cell.Y;
+                            
+                            var vectorToEnemy = new Cell(enemyX - unitCell.X, enemyY - unitCell.Y);
+                            vectorInvLength = 1.0 / Math.sqrt(vectorToEnemy.X*vectorToEnemy.X + vectorToEnemy.Y*vectorToEnemy.Y);
+                            vectorToEnemy.X *= vectorInvLength;
+                            vectorToEnemy.Y *= vectorInvLength;
+        
+                            // проверяем, что враг на пути атаки
+                            // < 0    - 2*90  градусов
+                            // < -0.5 - 2*120 градусов
+        
+                            if (attackVector.X*vectorToEnemy.X + attackVector.Y*vectorToEnemy.Y < 0) {
+                                continue;
+                            }
+        
+                            goalPos_num      = posNum;
+                            goalPos_distance = settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][posNum].distanceToCastle;
+                            break;
+                        }
+                    }
+
+                    // нашелся юнит по пути атаки идем его атаковать
+                    if (goalPos_num != -1) {
+                        // дальников в свободную точку отправляем
+                        if (unitAttackType == 0) {
+                            UnitGiveOrderToNearEmptyCell(unitComponent.unit,
+                                settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][goalPos_num].cell,
+                                UnitCommand.Attack,
+                                AssignOrderMode.Replace);
+                        }
+                        // ближников, всадники напрявляем прям за головой
+                        else {
+                            UnitGiveOrderToCell(unitComponent.unit,
+                                settlements_sortedCellsOfEnemiesAttackingCastle[castleUnit_settlementId][goalPos_num].cell,
+                                UnitCommand.Attack,
+                                AssignOrderMode.Replace);
+                        }
+                    }
+                    // если юнит только появился
+                    else if (isAttackPathNull) {
+                        // сначала идем на базу
+                        UnitGiveOrderToNearEmptyCell(unitComponent.unit,
+                            world.settlements_castle_cell[settlementId],
                             UnitCommand.Attack,
                             AssignOrderMode.Replace);
+                        // потом на следующую точку
+                        UnitGiveOrderToNearEmptyCell(unitComponent.unit,
+                            attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum],
+                            UnitCommand.Attack,
+                            AssignOrderMode.Queue);
+                    } else if (unitComponent.unit.OrdersMind.IsIdle()) {
+                        // идем на следующую точку
+                        UnitGiveOrderToNearEmptyCell(unitComponent.unit,
+                            attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum],
+                            UnitCommand.Attack,
+                            AssignOrderMode.Queue);
                     }
-                }
-                // если юнит только появился
-                else if (isAttackPathNull) {
+                } else if (isAttackPathNull) {
                     // сначала идем на базу
                     UnitGiveOrderToNearEmptyCell(unitComponent.unit,
                         world.settlements_castle_cell[settlementId],
@@ -409,15 +389,12 @@ export function AttackingAlongPathSystem_stage2(world: World, gameTickNum: numbe
                         UnitCommand.Attack,
                         AssignOrderMode.Queue);
                 }
-            } else {
-                // если юнит бездействует
-                if (unitComponent.unit.OrdersMind.IsIdle()) {
-                    // идем на следующую точку
-                    UnitGiveOrderToNearEmptyCell(unitComponent.unit,
-                        attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum],
-                        UnitCommand.Attack,
-                        AssignOrderMode.Queue);
-                }
+            } else if (unitComponent.unit.OrdersMind.IsIdle()) {
+                // идем на следующую точку
+                UnitGiveOrderToNearEmptyCell(unitComponent.unit,
+                    attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum],
+                    UnitCommand.Attack,
+                    AssignOrderMode.Queue);
             }
         }
     }
