@@ -47,6 +47,7 @@ export function allExamples() {
     addExample(new Example_SettlementPeopleIncome());
     addExample(new Example_SettlementProductionFactor());
     addExample(new Example_SettlementDiplomacy());
+    addExample(new Example_PathFind());
 
     // - Примеры перечисления юнитов в области
     addExample(new Example_GetUnitsInArea_Bruteforce());
@@ -111,4 +112,5 @@ import { Example_ReplaceUnit } from "examples/unit-replace";
 import { Example_UnitCheckPath } from "examples/unit-path-example";
 import { Example_PlayerSelectedSquad } from "examples/player-selected-squad";
 import { Example_CustomUnitCanBePlaced } from "examples/custom-unit-can-be-placed";
+import { Example_PathFind } from "examples/path-find-example";
 
