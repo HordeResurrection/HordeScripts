@@ -38,6 +38,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
     }
 
     public GetTotalResources(): MaraResources {
+        this.checkForUnaccountedBuildings();
+        
         let settlement = this.parentController.Settlement;
         let settlementResources = settlement.Resources;
         
@@ -119,6 +121,10 @@ export class MiningSubcontroller extends MaraSubcontroller {
         let unit;
         
         while ((unit = eNext(units)) !== undefined) {
+            if (unit.EffectsMind.BuildingInProgress) {
+                continue;
+            }
+
             if (MaraUtils.IsMineConfig(unit.Cfg)) {
                 let mineData = this.Mines.find((value) => {return value.Mine == unit});
                 
