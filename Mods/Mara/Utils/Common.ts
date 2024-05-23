@@ -1,5 +1,7 @@
 //TODO: these are obsolete, get rid of this in the future
 
+import { BuildTrackerType, MaraUtils } from "./MaraUtils";
+
 export function* enumerate(enumerable) {
     var IEnumeratorT = xHost.type('System.Collections.IEnumerator');
     var enumerator = xHost.cast(IEnumeratorT, enumerable.GetEnumerator());
@@ -65,6 +67,9 @@ export class MaraProductionRequest {
     public Point: MaraPoint | null;
     public Precision: number | null;
     public IsForce: boolean = false;
+    public ProducedUnit: any = null;
+    public MasterMindRequest: any = null;
+    public Executor: any = null;
 
     constructor(
         configId: string, 
@@ -79,6 +84,45 @@ export class MaraProductionRequest {
         if (isForce != null) {
             this.IsForce = isForce;
         }
+    }
+
+    public get IsCompleted(): boolean {
+        if (this.MasterMindRequest) {
+            return !this.MasterMindRequest.State.IsUnfinished();
+        }
+        else {
+            return false;
+        }
+    }
+
+    public get IsSuccess(): boolean {
+        if (this.MasterMindRequest) {
+            return this.MasterMindRequest.State.IsSuccessfullyCompleted();
+        }
+        else {
+            return false;
+        }
+    }
+
+    public WipeResults(): void {
+        this.ProducedUnit = null;
+        this.MasterMindRequest = null;
+        this.Executor = null;
+    }
+
+    public Track(): void {
+        if (!this.MasterMindRequest) {
+            return;
+        }
+        
+        let buildTracker = MaraUtils.CastToType(this.MasterMindRequest.Tracker, BuildTrackerType);
+
+        if (!buildTracker) {
+            return;
+        }
+
+        let unit = MaraUtils.GetPropertyValue(buildTracker, "TrackUnit");
+        this.ProducedUnit = unit;
     }
 
     public EqualsTo(other: MaraProductionRequest): boolean {

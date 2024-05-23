@@ -6,8 +6,7 @@ import { MaraUtils, UnitComposition } from "../Utils/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 
 export class ExpandBuildState extends MaraSettlementControllerState {
-    private strictPositionRequests: Array<MaraProductionRequest>;
-    private positionlessRequests: Array<MaraProductionRequest>;
+    private requests: Array<MaraProductionRequest>;
     private targetComposition: UnitComposition;
     private expandCenter: MaraPoint;
     private harvestersToOrder: UnitComposition;
@@ -25,8 +24,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             this.expandCenter = center;
         }
 
-        this.strictPositionRequests = [];
-        this.positionlessRequests = [];
+        this.requests = [];
         let targetExpand = this.settlementController.TargetExpand!;
         this.harvestersToOrder = new Map<string, number>();
 
@@ -62,14 +60,14 @@ export class ExpandBuildState extends MaraSettlementControllerState {
 
         this.targetComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
 
-        for (let request of this.positionlessRequests) {
+        for (let request of this.requests) {
             MaraUtils.IncrementMapItem(this.targetComposition, request.ConfigId);
         }
 
         this.timeoutTick = null;
     }
 
-    OnExit(): void {
+    public OnExit(): void {
         if (this.isRemoteExpand(this.expandCenter)) {
             if ( 
                 !this.settlementController.Expands.find( 
@@ -81,7 +79,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         }
     }
 
-    Tick(tickNumber: number): void {
+    public Tick(tickNumber: number): void {
         if (this.timeoutTick == null) {
             let timeout = this.settlementController.Settings.Timeouts.ExpandBuildTimeout;
             this.settlementController.Debug(`Set timeout to ${timeout} ticks`);
@@ -97,12 +95,32 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             return;
         }
 
-        if (this.isAllRequestsCompleted()) {
-            this.settlementController.State = SettlementControllerStateFactory.MakeRoutingState(this.settlementController);
-            return;
+        for (let request of this.requests) {
+            request.Track();
+        }
+
+        let requestsToReorder = this.getRequestsToReorder();
+        
+        if (requestsToReorder.length == 0) {
+            let isAllRequestsCompleted = true;
+
+            for (let request of this.requests) {
+                if (!request.IsCompleted) {
+                    isAllRequestsCompleted = false;
+                    break;
+                }
+            }
+            
+            if (isAllRequestsCompleted) {
+                this.settlementController.State = SettlementControllerStateFactory.MakeRoutingState(this.settlementController);
+                return;
+            }
         }
         else {
-            this.updateProductionLists();
+            for (let request of requestsToReorder) {
+                request.WipeResults();
+                this.settlementController.ProductionController.RequestProduction(request);
+            }
         }
     }
 
@@ -132,7 +150,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         let settlementLocation = this.settlementController.GetSettlementLocation();
 
         if (settlementLocation) {
-            let distance = MaraUtils.ChebyshevDistance(this.expandCenter, settlementLocation.Center);
+            let distance = MaraUtils.ChebyshevDistance(expandCenter, settlementLocation.Center);
 
             return distance > settlementLocation.Radius;
         }
@@ -298,91 +316,58 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     private orderProducion(configId: string, point: MaraPoint | null, precision: number | null): void {
         let productionRequest = new MaraProductionRequest(configId, point, precision, true);
         this.settlementController.ProductionController.RequestProduction(productionRequest);
-
-        if (point && precision == 0) {
-            this.strictPositionRequests.push(productionRequest);
-        }
-        else {
-            this.positionlessRequests.push(productionRequest);
-        }
+        this.requests.push(productionRequest);
     }
 
-    private isStrictPositionRequestSatisfied(request: MaraProductionRequest): boolean {
-        let unit = MaraUtils.GetUnit(request.Point);
-            
-        if (unit) {
-            return (
-                unit.Cfg.Uid == request.ConfigId &&
-                unit.Cell.X == request.Point!.X &&
-                unit.Cell.Y == request.Point!.Y &&
-                !unit.EffectsMind.BuildingInProgress && 
-                !unit.IsNearDeath
-            );
-        }
-        else {
-            return false;
-        }
-    }
-
-    private isAllRequestsCompleted(): boolean {
-        for (let request of this.strictPositionRequests) {
-            let unit = MaraUtils.GetUnit(request.Point);
-            
-            if (unit) {
-                if (
-                    unit.Cfg.Uid == request.ConfigId &&
-                    unit.Cell.X == request.Point!.X &&
-                    unit.Cell.Y == request.Point!.Y &&
-                    !unit.EffectsMind.BuildingInProgress && 
-                    !unit.IsNearDeath
-                ) {
-                    continue;
-                }
-                else {
-                    return false;
-                }
-            }
-        }
-
-        let developedComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
-
-        return MaraUtils.SetContains(developedComposition, this.targetComposition);
-    }
-
-    private updateProductionLists(): void {
-        let orderedRequests = this.settlementController.ProductionController.ProductionRequests;
-        let unorderedRequests: Array<MaraProductionRequest> = [];
+    private getRequestsToReorder(): Array<MaraProductionRequest> {
+        let completedRequests = this.requests.filter((value) => {return value.IsCompleted});
+        let orderedRequests = this.requests.filter((value) => {return !value.IsCompleted});
 
         let developedComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
         let compositionToRequest = MaraUtils.SubstractCompositionLists(this.targetComposition, developedComposition);
 
-        for (let request of [...this.strictPositionRequests, ...this.positionlessRequests]) {
-            let orderedRequest = orderedRequests.find((value) => {return value.EqualsTo(request)});
-            
-            if (!orderedRequest) {
-                unorderedRequests.push(request);
-            }
-            else {
-                MaraUtils.AddToMapItem(compositionToRequest, request.ConfigId, -1);
-            }
+        for (let request of orderedRequests) {
+            MaraUtils.DecrementMapItem(compositionToRequest, request.ConfigId);
         }
 
-        for (let request of unorderedRequests) {
-            if (request.Point && request.Precision == 0) {
-                if (!this.isStrictPositionRequestSatisfied(request)) {
-                    this.settlementController.ProductionController.RequestProduction(request);
+        let requestsToReorder: Array<MaraProductionRequest> = [];
+        let unknownRequests: Array<MaraProductionRequest> = [];
+        
+        for (let request of completedRequests) {
+            if (request.IsSuccess) {
+                if (request.ProducedUnit) {
+                    if (!request.ProducedUnit.IsAlive) {
+                        requestsToReorder.push(request);
+                        MaraUtils.DecrementMapItem(compositionToRequest, request.ConfigId);
+                    }
                 }
-
-                MaraUtils.AddToMapItem(compositionToRequest, request.ConfigId, -1);
+                else {
+                    unknownRequests.push(request);
+                }
+            }
+            else {
+                requestsToReorder.push(request);
+                MaraUtils.DecrementMapItem(compositionToRequest, request.ConfigId);
             }
         }
 
         compositionToRequest.forEach(
-            (val, key) => {
-                for (let i = 0; i < val; i++) {
-                    this.settlementController.ProductionController.RequestCfgIdProduction(key);
+            (value, key) => {
+                let requestCount = value;
+                
+                for (let request of unknownRequests) {
+                    if (requestCount == 0) {
+                        break;
+                    }
+                    
+                    if (request.ConfigId == key) {
+                        requestsToReorder.push(request);
+                        requestCount --;
+                    }
                 }
             }
         );
+
+        return requestsToReorder;
     }
 }

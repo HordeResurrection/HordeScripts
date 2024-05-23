@@ -21,8 +21,6 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
 
         this.productionIndex = null;
-        
-        let mmProductionDepartament = this.parentController.MasterMind.ProductionDepartment;
         let processedRequests: Array<MaraProductionRequest> = [];
 
         for (let request of this.productionList) {
@@ -30,7 +28,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             
             //!! most probably doesn't work as expected since producer is always free on this tick
             if (freeProducer || request.IsForce) {
-                if (MaraUtils.RequestMasterMindProduction(request, mmProductionDepartament)) {
+                if (MaraUtils.RequestMasterMindProduction(request, this.parentController.MasterMind)) {
                     this.parentController.Debug(`Added ${request.ConfigId} to the production list`);
                     processedRequests.push(request);
                 }
@@ -113,9 +111,8 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             }
         }
         
-        let mmProductionDepartament = this.parentController.MasterMind.ProductionDepartment;
         let productionRequest = new MaraProductionRequest(configId, null, null);
-        MaraUtils.RequestMasterMindProduction(productionRequest, mmProductionDepartament);
+        MaraUtils.RequestMasterMindProduction(productionRequest, this.parentController.MasterMind);
     }
 
     CancelAllProduction(): void {

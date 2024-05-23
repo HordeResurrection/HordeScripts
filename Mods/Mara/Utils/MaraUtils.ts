@@ -114,11 +114,26 @@ const TileType = HCL.HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType
 const AlmostDefeatCondition = HCL.HordeClassLibrary.World.Settlements.Existence.AlmostDefeatCondition;
 const ResourceType = HCL.HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
 
+export const BuildTrackerType = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Intellect.Requests.Trackers.UnitProducing.BuildTracker", "HordeResurrection.Intellect"));
+
 export type UnitComposition = Map<string, number>;
 export { AlmostDefeatCondition }
 export { ResourceType }
 
 export class MaraUtils {
+    static GetPropertyValue(object: any, propertyName: string): any {
+        return ScriptUtils.GetValue(object, propertyName);
+    }
+
+    static CastToType(object: any, type: any): any {
+        try {
+            return host.cast(type, object);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
     static GetScenaWidth(): number {
         return DotnetHolder.RealScena.Size.Width;
     }
@@ -345,6 +360,12 @@ export class MaraUtils {
         MaraUtils.AddToMapItem(map, key, 1);
     }
 
+    static DecrementMapItem(map: UnitComposition, key: string): void {
+        if (map.has(key)) {
+            map.set(key, Math.max(map.get(key)! - 1, 0));
+        }
+    }
+
     static AddToMapItem(map: UnitComposition, key: string, value: number): void {
         if (map.has(key)) {
             map.set(key, (map.get(key) ?? 0) + value);
@@ -539,7 +560,18 @@ export class MaraUtils {
         return HordeContentApi.GetUnitConfig(configId);
     }
 
-    static RequestMasterMindProduction(productionRequest: MaraProductionRequest, productionDepartment: any, checkDuplicate: boolean = false) {
+    private static getAllMasterMindRequests(masterMind: any): Array<any> {
+        let result: Array<any> = [];
+
+        let requests = masterMind.Requests;
+        ForEach(requests, item => {
+            result.push(item);
+        });
+
+        return result;
+    }
+
+    static RequestMasterMindProduction(productionRequest: MaraProductionRequest, masterMind: any, checkDuplicate: boolean = false): boolean {
         let cfg = MaraUtils.GetUnitConfig(productionRequest.ConfigId);
 
         let produceRequestParameters = new ProduceRequestParameters(cfg, 1);
@@ -552,8 +584,25 @@ export class MaraUtils {
 
         produceRequestParameters.MaxRetargetAttempts = productionRequest.Precision;
         produceRequestParameters.DisableBuildPlaceChecking = productionRequest.Precision == 0;
+
+        let existingRequests = MaraUtils.getAllMasterMindRequests(masterMind);
         
-        return productionDepartment.AddRequestToProduce(produceRequestParameters);
+        if (masterMind.ProductionDepartment.AddRequestToProduce(produceRequestParameters)) {
+            let newRequests = MaraUtils.getAllMasterMindRequests(masterMind);
+            let addedRequests = newRequests.filter(
+                (value1) => {
+                    return !existingRequests.find((value2) => {return value1.Id == value2.Id})
+                }
+            );
+
+            let request = addedRequests.find((value) => {return value.RequestedCfg.Uid == productionRequest.ConfigId})
+            productionRequest.MasterMindRequest = request;
+
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     static ConfigHasProfession(unitConfig: any, profession: any): boolean {

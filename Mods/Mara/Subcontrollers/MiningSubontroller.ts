@@ -72,21 +72,12 @@ export class MiningSubcontroller extends MaraSubcontroller {
         return totalResources;
     }
 
-    private cleanup() {
-        this.Mines = this.Mines.filter((value) => {return value.Mine.IsAlive && value.Mine.Owner == this.parentController.Settlement});
-
-        for (let mineData of this.Mines) {
-            mineData.Miners = mineData.Miners.filter((value) => {return value.IsAlive});
-        }
-
-        this.Sawmills = this.Sawmills.filter((value) => {return value.Sawmill.IsAlive && value.Sawmill.Owner == this.parentController.Settlement});
-
-        for (let sawmillData of this.Sawmills) {
-            sawmillData.Woodcutters = sawmillData.Woodcutters.filter((value) => {return value.IsAlive})
-        }
+    public GetFreeHarvesters(): Array<any> {
+        this.engageFreeHarvesters();
+        return this.getUnengagedHarvesters();
     }
 
-    GetFreeHarvesters(): Array<any> {
+    private getUnengagedHarvesters(): Array<any> {
         let engagedHarvesters: Array<any> = [];
 
         for (let mineData of this.Mines) {
@@ -107,6 +98,20 @@ export class MiningSubcontroller extends MaraSubcontroller {
         );
 
         return freeHarvesters;
+    }
+
+    private cleanup() {
+        this.Mines = this.Mines.filter((value) => {return value.Mine.IsAlive && value.Mine.Owner == this.parentController.Settlement});
+
+        for (let mineData of this.Mines) {
+            mineData.Miners = mineData.Miners.filter((value) => {return value.IsAlive});
+        }
+
+        this.Sawmills = this.Sawmills.filter((value) => {return value.Sawmill.IsAlive && value.Sawmill.Owner == this.parentController.Settlement});
+
+        for (let sawmillData of this.Sawmills) {
+            sawmillData.Woodcutters = sawmillData.Woodcutters.filter((value) => {return value.IsAlive})
+        }
     }
 
     private checkForUnaccountedBuildings() {
@@ -200,7 +205,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
     }
 
     private engageFreeHarvesters(): void {
-        let freeHarvesters = this.GetFreeHarvesters();
+        let freeHarvesters = this.getUnengagedHarvesters();
 
         let freeHarvesterIndex = 0;
         const maxMiners = this.parentController.Settings.ResourceMining.MinersPerMine;
