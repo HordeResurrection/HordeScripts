@@ -37,6 +37,76 @@ export class TargetExpandData {
     }
 }
 
+class ReservedUnitsData {
+    public ReservableUnits: Array<Map<number, any>>;
+    private reservedUnits: Map<number, any>;
+
+    constructor() {
+        this.reservedUnits = new Map<number, any>();
+        this.ReservableUnits = [];
+        
+        this.ReservableUnits.push(new Map<number, any>());
+        this.ReservableUnits.push(new Map<number, any>());
+    }
+
+    public ReserveUnit(unit: any): void {
+        for (let map of this.ReservableUnits) {
+            if (map.has(unit.Id)) {
+                map.delete(unit.Id);
+            }
+        }
+
+        this.reservedUnits.set(unit.Id, unit);
+    }
+
+    public FreeUnit(unit: any): boolean {
+        if (!this.reservedUnits.has(unit.Id)) {
+            return false;
+        }
+        
+        this.reservedUnits.delete(unit.Id);
+        return true;
+    }
+
+    public AddReservableUnits(units: Array<any>, level: number): void {
+        for (let unit of units) {
+            for (let i = 0; i < this.ReservableUnits.length; i++) {
+                this.ReservableUnits[i].delete(unit.Id);
+            }
+            
+            this.ReservableUnits[level].set(unit.Id, unit);
+        }
+    }
+
+    public IsUnitReserved(unit: any): boolean {
+        return this.reservedUnits.has(unit.Id);
+    }
+
+    public Cleanup(): void {
+        this.cleanupMap(this.reservedUnits);
+        
+        for (let i = 0; i < this.ReservableUnits.length; i++) {
+            this.cleanupMap(this.ReservableUnits[i]);
+        }
+    }
+
+    private cleanupMap(map: Map<number, any>): void {
+        let keysToDelete: Array<number> = [];
+
+        map.forEach(
+            (value, key) => {
+                if (!value.IsAlive) {
+                    keysToDelete.push(key);
+                }
+            }
+        );
+
+        for (let key of keysToDelete) {
+            map.delete(key);
+        }
+    }
+}
+
 export class MaraSettlementController {
     public TickOffset: number = 0;
     
@@ -55,6 +125,7 @@ export class MaraSettlementController {
     public AttackToDefenseUnitRatio: number | null = null;
     public TargetExpand: TargetExpandData | null = null;
     public Expands: Array<MaraPoint> = [];
+    public ReservedUnitsData: ReservedUnitsData = new ReservedUnitsData();
     
     private subcontrollers: Array<MaraSubcontroller> = [];
     private state: MaraSettlementControllerState;
@@ -108,6 +179,10 @@ export class MaraSettlementController {
 
         if (tickNumber % 50 == 0) {
             this.cleanupExpands();
+        }
+
+        if (tickNumber % 10 == 0) {
+            this.ReservedUnitsData.Cleanup();
         }
 
         for (let subcontroller of this.subcontrollers) {

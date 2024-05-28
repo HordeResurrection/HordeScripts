@@ -93,30 +93,37 @@ export class MiningSubcontroller extends MaraSubcontroller {
         let allHarvesters = this.findAllHarvesters();
         let freeHarvesters = allHarvesters.filter(
             (value) => {
-                return !engagedHarvesters.find(
-                    (harvester) => {return harvester == value}
-                )
+                return (
+                    this.isFreeHarvester(value) &&
+                    !engagedHarvesters.find((harvester) => {return harvester == value})
+                );
             }
         );
 
         return freeHarvesters;
     }
 
-    private cleanup() {
+    private isFreeHarvester(unit: any) {
+        return (
+            unit.IsAlive && !this.parentController.ReservedUnitsData.IsUnitReserved(unit)
+        );
+    }
+
+    private cleanup(): void {
         this.Mines = this.Mines.filter((value) => {return value.Mine.IsAlive && value.Mine.Owner == this.parentController.Settlement});
 
         for (let mineData of this.Mines) {
-            mineData.Miners = mineData.Miners.filter((value) => {return value.IsAlive});
+            mineData.Miners = mineData.Miners.filter((value) => {return this.isFreeHarvester(value)});
         }
 
         this.Sawmills = this.Sawmills.filter((value) => {return value.Sawmill.IsAlive && value.Sawmill.Owner == this.parentController.Settlement});
 
         for (let sawmillData of this.Sawmills) {
-            sawmillData.Woodcutters = sawmillData.Woodcutters.filter((value) => {return value.IsAlive})
+            sawmillData.Woodcutters = sawmillData.Woodcutters.filter((value) => {return this.isFreeHarvester(value)})
         }
     }
 
-    private checkForUnaccountedBuildings() {
+    private checkForUnaccountedBuildings(): void {
         let units = enumerate(this.parentController.Settlement.Units);
         let unit;
         
@@ -230,6 +237,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
                 let minersToAdd = freeHarvesters.slice(freeHarvesterIndex, lastHarvesterIndex); //last index is not included into result
                 understaffedMineData.Miners.push(...minersToAdd);
+                this.parentController.ReservedUnitsData.AddReservableUnits(minersToAdd, 1);
                 MaraUtils.IssueMineCommand(minersToAdd, this.parentController.Player, understaffedMineData.Mine.Cell);
 
                 freeHarvesterIndex = lastHarvesterIndex;
@@ -248,6 +256,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
                     let woodcuttersToAdd = freeHarvesters.slice(freeHarvesterIndex, lastHarvesterIndex);
                     understaffedSawmillData.Woodcutters.push(...woodcuttersToAdd);
+                    this.parentController.ReservedUnitsData.AddReservableUnits(woodcuttersToAdd, 0);
                     
                     let woodCell = this.findWoodCell(understaffedSawmillData.Sawmill);
                     MaraUtils.IssueHarvestLumberCommand(woodcuttersToAdd, this.parentController.Player, woodCell);

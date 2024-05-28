@@ -9,6 +9,7 @@ import { MaraSubcontroller } from "./MaraSubcontroller";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
     private productionList: Array<MaraProductionRequest> = [];
+    private executingRequests: Array<MaraProductionRequest> = [];
     private productionIndex: Map<string, Array<any>> | null = null;
 
     constructor (parent: MaraSettlementController) {
@@ -21,30 +22,59 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
 
         this.productionIndex = null;
-        let processedRequests: Array<MaraProductionRequest> = [];
+        let addedRequests: Array<MaraProductionRequest> = [];
 
         for (let request of this.productionList) {
             let freeProducer = this.getProducer(request.ConfigId);
-            
-            //!! most probably doesn't work as expected since producer is always free on this tick
-            if (freeProducer || request.IsForce) {
+
+            if (freeProducer) {
+                request.Executor = freeProducer;
+                
                 if (MaraUtils.RequestMasterMindProduction(request, this.parentController.MasterMind)) {
                     this.parentController.Debug(`Added ${request.ConfigId} to the production list`);
-                    processedRequests.push(request);
+                    addedRequests.push(request);
+                    this.parentController.ReservedUnitsData.ReserveUnit(freeProducer);
+                }
+            }
+            else if (request.IsForce) {
+                if (!this.productionIndex!.has(request.ConfigId)) {
+                    if (MaraUtils.RequestMasterMindProduction(request, this.parentController.MasterMind)) {
+                        this.parentController.Debug(`(forcibly) Added ${request.ConfigId} to the production list`);
+                        addedRequests.push(request);
+                    }
                 }
             }
         }
 
-        if (processedRequests.length > 0) {
-            this.parentController.Debug(`Removed ${processedRequests.length} units from target production list`);
+        if (addedRequests.length > 0) {
+            this.parentController.Debug(`Removed ${addedRequests.length} units from target production list`);
 
-            for (let request of processedRequests) {
+            for (let request of addedRequests) {
                 let index = this.productionList.indexOf(request);
 
                 if (index > -1) {
                     this.productionList.splice(index, 1);
                 }
             }
+
+            this.executingRequests.push(...addedRequests);
+        }
+
+        if (this.executingRequests.length > 0) {
+            let filteredRequests: Array<MaraProductionRequest> = [];
+            
+            for (let request of this.executingRequests) {
+                if (request.IsCompleted) {
+                    if (request.Executor) {
+                        this.parentController.ReservedUnitsData.FreeUnit(request.Executor);
+                    }
+                }
+                else {
+                    filteredRequests.push(request);
+                }
+            }
+
+            this.executingRequests = filteredRequests;
         }
     }
 
@@ -184,14 +214,24 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         if (!this.productionIndex) {
             this.updateProductionIndex();
         }
-        
-        //TODO: implement engagement of workers that are busy gathering resources
+
         let producers = this.productionIndex!.get(configId);
 
         if (producers) {
             for (let producer of producers) {
-                if (producer.OrdersMind.OrdersCount === 0) {
+                if (
+                    producer.OrdersMind.OrdersCount == 0 &&
+                    !this.parentController.ReservedUnitsData.IsUnitReserved(producer)
+                ) {
                     return producer;
+                }
+            }
+
+            for (let i = 0; i < this.parentController.ReservedUnitsData.ReservableUnits.length; i++) {
+                for (let producer of producers) {
+                    if (this.parentController.ReservedUnitsData.ReservableUnits[i].has(producer.Id)) {
+                        return producer;
+                    }
                 }
             }
         }

@@ -577,6 +577,7 @@ export class MaraUtils {
         let produceRequestParameters = new ProduceRequestParameters(cfg, 1);
         produceRequestParameters.CheckExistsRequest = checkDuplicate;
         produceRequestParameters.AllowAuxiliaryProduceRequests = true;
+        produceRequestParameters.Producer = productionRequest.Executor;
         
         if (productionRequest.Point) {
             produceRequestParameters.TargetCell = createPoint(productionRequest.Point.X, productionRequest.Point.Y);
