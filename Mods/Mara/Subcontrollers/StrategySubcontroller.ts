@@ -134,7 +134,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
             expandLocation, 
             this.parentController.Settings.UnitSearch.ExpandEnemySearchRadius,
             [this.parentController.Settlement],
-            (unit) => {return MaraUtils.IsCombatConfig(unit.Cfg.Uid) && MaraUtils.IsBuildingConfig(unit.Cfg.Uid)}
+            (unit) => {return MaraUtils.IsCombatConfig(unit.Cfg) && MaraUtils.IsBuildingConfig(unit.Cfg)}
         );
 
         let currentStrength = 0;
@@ -328,7 +328,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         
         while ((unit = eNext(units)) !== undefined) {
             if (MaraUtils.IsCombatConfig(unit.Cfg) && unit.IsAlive) {
-                if (MaraUtils.IsBuildingConfig(unit.Cfg.Uid)) {
+                if (MaraUtils.IsBuildingConfig(unit.Cfg)) {
                     defensiveStrength += MaraUtils.GetUnitStrength(unit);
                 }
             }

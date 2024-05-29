@@ -725,9 +725,12 @@ export class MaraUtils {
         return false;
     }
 
-    static IsBuildingConfig(cfgId: string): boolean {
+    static IsBuildingConfigId(cfgId: string): boolean {
         let cfg = MaraUtils.GetUnitConfig(cfgId);
+        return MaraUtils.IsBuildingConfig(cfg);
+    }
 
+    static IsBuildingConfig(cfg: any): boolean {
         return cfg.BuildingConfig != null && cfg.HasNotFlags(UnitFlags.Passive);
     }
 

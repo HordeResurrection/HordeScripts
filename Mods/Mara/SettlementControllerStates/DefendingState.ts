@@ -97,7 +97,7 @@ export class DefendingState extends MaraSettlementControllerState {
         let currentBuildings = new Map<string, number>();
 
         currentEconomy.forEach((value, key) => {
-            if (MaraUtils.IsBuildingConfig(key)) {
+            if (MaraUtils.IsBuildingConfigId(key)) {
                 currentBuildings.set(key, value);
             }
         });
@@ -105,7 +105,7 @@ export class DefendingState extends MaraSettlementControllerState {
         let requiredBuildings = new Map<string, number>();
 
         requiredEconomy.forEach((value, key) => {
-            if (MaraUtils.IsBuildingConfig(key)) {
+            if (MaraUtils.IsBuildingConfigId(key)) {
                 requiredBuildings.set(key, value);
             }
         });

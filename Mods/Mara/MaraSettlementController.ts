@@ -273,7 +273,7 @@ export class MaraSettlementController {
             let squads = MaraUtils.GetSettlementsSquadsFromUnits(
                 [centralProductionBuilding], 
                 [this.Settlement], 
-                (unit) => {return MaraUtils.IsBuildingConfig(unit.Cfg.Uid)},
+                (unit) => {return MaraUtils.IsBuildingConfig(unit.Cfg)},
                 this.Settings.UnitSearch.BuildingSearchRadius
             );
             
@@ -299,7 +299,7 @@ export class MaraSettlementController {
                     value,
                     Math.max(this.Settings.ResourceMining.WoodcuttingRadius, this.Settings.ResourceMining.MiningRadius),
                     [this.Settlement],
-                    (unit) => {return MaraUtils.IsBuildingConfig(unit.Cfg.Uid)}
+                    (unit) => {return MaraUtils.IsBuildingConfig(unit.Cfg)}
                 );
 
                 return expandBuildings.length > 0;
