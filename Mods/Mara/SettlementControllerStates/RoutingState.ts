@@ -59,10 +59,18 @@ export class RoutingState extends MaraSettlementControllerState {
             return;
         }
         else {
-            let pick = MaraUtils.Random(this.settlementController.MasterMind, 100);
+            let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
+            let combatCfgId = produceableCfgIds.find( (value) => {return MaraUtils.IsCombatConfigId(value)} );
 
-            if (pick < 75) {
-                this.settlementController.State = SettlementControllerStateFactory.MakeBuildingUpState(this.settlementController);
+            if (combatCfgId) {
+                let pick = MaraUtils.Random(this.settlementController.MasterMind, 100);
+
+                if (pick < 75) {
+                    this.settlementController.State = SettlementControllerStateFactory.MakeBuildingUpState(this.settlementController);
+                }
+                else {
+                    this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
+                }
             }
             else {
                 this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);

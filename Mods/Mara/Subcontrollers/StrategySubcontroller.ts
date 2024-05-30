@@ -368,7 +368,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
     private getOffensiveUnitComposition(produceableCfgIds: string[], requiredStrength: number): UnitComposition {
         let offensiveCfgIds = produceableCfgIds.filter(
-            (value, index, array) => {
+            (value) => {
                 let config = MaraUtils.GetUnitConfig(value)
                 
                 return MaraUtils.IsCombatConfig(config) &&
@@ -383,7 +383,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
     private getGuardingUnitComposition(produceableCfgIds: string[], requiredStrength: number): UnitComposition {
         let cfgIds = produceableCfgIds.filter(
-            (value, index, array) => {
+            (value) => {
                 let config = MaraUtils.GetUnitConfig(value)
                 
                 return MaraUtils.IsCombatConfig(config) && MaraUtils.IsBuildingConfig(config);

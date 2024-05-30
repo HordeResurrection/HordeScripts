@@ -713,6 +713,11 @@ export class MaraUtils {
         return mainArmament != null && !isHarvester;
     }
 
+    static IsCombatConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId);
+        return MaraUtils.IsCombatConfig(cfg);
+    }
+
     static IsProducerConfig(cfg: any): boolean {
         return MaraUtils.ConfigHasProfession(cfg, UnitProfession.UnitProducer);
     }
