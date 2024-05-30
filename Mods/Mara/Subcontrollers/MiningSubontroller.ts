@@ -16,6 +16,8 @@ class SawmillData {
 export class MiningSubcontroller extends MaraSubcontroller {
     public Mines: Array<MineData> = [];
     public Sawmills: Array<SawmillData> = [];
+
+    private metalStocks: Array<any> | null = null;
     
     constructor (parent: MaraSettlementController) {
         super(parent);
@@ -79,6 +81,40 @@ export class MiningSubcontroller extends MaraSubcontroller {
         return this.getUnengagedHarvesters();
     }
 
+    private getClosestMetalStock(point: MaraPoint): any | null {
+        if (!this.metalStocks) {
+            let allUnits = MaraUtils.GetAllSettlementUnits(this.parentController.Settlement);
+            this.metalStocks = allUnits.filter( (value) => {return MaraUtils.IsMetalStockConfig(value.Cfg)} );
+        }
+        
+        let closestDistance = Infinity;
+        let closestMetalStock: any | null = null;
+
+        for (let metalStock of this.metalStocks) {
+            let distance = MaraUtils.ChebyshevDistance(point, metalStock.CellCenter)
+            
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestMetalStock = metalStock;
+            }
+        }
+
+        return closestMetalStock;
+    }
+
+    private getMinerCount(mine: any): number {
+        let minerCount = this.parentController.Settings.ResourceMining.MinMinersPerMine;
+        let closestStock = this.getClosestMetalStock(mine.CellCenter);
+
+        if (closestStock) {
+            let distance = MaraUtils.ChebyshevDistance(mine.CellCenter, closestStock.CellCenter);
+            let additionalMinerCount = Math.floor(distance / 8);
+            minerCount += additionalMinerCount;
+        }
+
+        return minerCount;
+    }
+
     private getUnengagedHarvesters(): Array<any> {
         let engagedHarvesters: Array<any> = [];
 
@@ -110,6 +146,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
     }
 
     private cleanup(): void {
+        this.metalStocks = null;
+        
         this.Mines = this.Mines.filter((value) => {return value.Mine.IsAlive && value.Mine.Owner == this.parentController.Settlement});
 
         for (let mineData of this.Mines) {
@@ -188,15 +226,16 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
     private redistributeHarvesters(): void {
         let minerRequrement = 0;
-        const minersPerMine = this.parentController.Settings.ResourceMining.MinersPerMine;
 
         for (let mineData of this.Mines) {
-            if (mineData.Miners.length < minersPerMine) {
-                minerRequrement += minersPerMine - mineData.Miners.length;
+            let requiredMiners = this.getMinerCount(mineData.Mine);
+            
+            if (mineData.Miners.length < requiredMiners) {
+                minerRequrement += requiredMiners - mineData.Miners.length;
             }
         }
 
-        const minWoodcuttersPerSawmill = this.parentController.Settings.ResourceMining.MinersPerMine;
+        const minWoodcuttersPerSawmill = this.parentController.Settings.ResourceMining.MinWoodcuttersPerSawmill;
 
         if (minerRequrement > 0) {
             for (let sawmillData of this.Sawmills) {
@@ -221,18 +260,19 @@ export class MiningSubcontroller extends MaraSubcontroller {
         let freeHarvesters = this.getUnengagedHarvesters();
 
         let freeHarvesterIndex = 0;
-        const maxMiners = this.parentController.Settings.ResourceMining.MinersPerMine;
         const maxWoodcutters = this.parentController.Settings.ResourceMining.MaxWoodcuttersPerSawmill;
 
         while (freeHarvesterIndex < freeHarvesters.length) {
             let understaffedMineData = this.Mines.find(
                 (value) => {
-                    return value.Miners.length < maxMiners;
+                    let requiredMiners = this.getMinerCount(value.Mine);
+                    return value.Miners.length < requiredMiners;
                 }
             );
 
             if (understaffedMineData) {
-                let minerCount = maxMiners - understaffedMineData.Miners.length;
+                let requiredMiners = this.getMinerCount(understaffedMineData.Mine);
+                let minerCount = requiredMiners - understaffedMineData.Miners.length;
                 let lastHarvesterIndex = Math.min(freeHarvesterIndex + minerCount, freeHarvesters.length);
 
                 let minersToAdd = freeHarvesters.slice(freeHarvesterIndex, lastHarvesterIndex); //last index is not included into result
@@ -308,17 +348,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
     private findAllHarvesters(): Array<any> {
         //TODO: maybe simplify this somehow by using ProfessionCenter.Workers
-        
-        let units = enumerate(this.parentController.Settlement.Units);
-        let unit;
-        let result: Array<any> = [];
-        
-        while ((unit = eNext(units)) !== undefined) {
-            if (MaraUtils.IsHarvesterConfig(unit.Cfg)) {
-                result.push(unit);
-            }
-        }
-
-        return result;
+        let allUnits = MaraUtils.GetAllSettlementUnits(this.parentController.Settlement);
+        return allUnits.filter( (value) => {return MaraUtils.IsHarvesterConfig(value.Cfg)} );
     }
 }

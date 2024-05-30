@@ -43,7 +43,7 @@ class ControllerStatesSettings {
 }
 
 class ResourceMiningSettings {
-    public MinersPerMine: number = 3;
+    public MinMinersPerMine: number = 3;
     public WoodcutterBatchSize: number = 5;
     public MinWoodcuttersPerSawmill: number = 3;
     public MaxWoodcuttersPerSawmill: number = 10;

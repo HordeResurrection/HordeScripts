@@ -258,6 +258,18 @@ export class MaraUtils {
         return units;
     }
 
+    static GetAllSettlementUnits(settlement: any): Array<any> {
+        let units = enumerate(settlement.Units);
+        let unit;
+        let result: Array<any> = [];
+        
+        while ((unit = eNext(units)) !== undefined) {
+            result.push(unit);
+        }
+
+        return result;
+    }
+
     // This has neat side effect that resulting cells are ordered from closest to farthest from center
     static FindCells(
         center: {X: number; Y: number;}, 

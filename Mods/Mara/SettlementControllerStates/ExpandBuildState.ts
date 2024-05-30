@@ -205,7 +205,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             return;
         }
 
-        MaraUtils.AddToMapItem(this.harvestersToOrder, cfgId, this.settlementController.Settings.ResourceMining.MinersPerMine);
+        MaraUtils.AddToMapItem(this.harvestersToOrder, cfgId, this.settlementController.Settings.ResourceMining.MinMinersPerMine);
     }
 
     private orderMiningProduction(): void {
