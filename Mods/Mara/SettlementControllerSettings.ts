@@ -47,7 +47,7 @@ class ResourceMiningSettings {
     public WoodcutterBatchSize: number = 5;
     public MinWoodcuttersPerSawmill: number = 3;
     public MaxWoodcuttersPerSawmill: number = 10;
-    public HousingBatchSize: number = 5;
+    public HousingBatchSize: number = 3;
 
     public WoodcuttingRadius: number = 10;
     public MiningRadius: number = 15;
