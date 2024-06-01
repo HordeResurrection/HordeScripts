@@ -145,16 +145,24 @@ export class MiningSubcontroller extends MaraSubcontroller {
         );
     }
 
+    private buildingFilter(building: any): boolean {
+        return (
+            building.IsAlive && 
+            building.Owner == this.parentController.Settlement &&
+            this.parentController.StrategyController.IsSafeExpand(building.CellCenter)
+        )
+    }
+
     private cleanup(): void {
         this.metalStocks = null;
         
-        this.Mines = this.Mines.filter((value) => {return value.Mine.IsAlive && value.Mine.Owner == this.parentController.Settlement});
+        this.Mines = this.Mines.filter((value) => {return this.buildingFilter(value.Mine)});
 
         for (let mineData of this.Mines) {
             mineData.Miners = mineData.Miners.filter((value) => {return this.isFreeHarvester(value)});
         }
 
-        this.Sawmills = this.Sawmills.filter((value) => {return value.Sawmill.IsAlive && value.Sawmill.Owner == this.parentController.Settlement});
+        this.Sawmills = this.Sawmills.filter((value) => {return this.buildingFilter(value.Sawmill)});
 
         for (let sawmillData of this.Sawmills) {
             sawmillData.Woodcutters = sawmillData.Woodcutters.filter((value) => {return this.isFreeHarvester(value)})

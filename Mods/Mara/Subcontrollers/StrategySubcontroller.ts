@@ -292,29 +292,39 @@ export class StrategySubcontroller extends MaraSubcontroller {
             return false;
         }
 
-        let enemies = MaraUtils.GetSettlementUnitsInArea(
-            settlementLocation.Center, 
-            settlementLocation.Radius, 
-            this.EnemySettlements
-        );
-        
-        if (enemies.length > 0) {
+        if (!this.isSafeLocation(settlementLocation.Center, settlementLocation.Radius))  {
             return true;
         }
 
         for (let expandPoint of this.parentController.Expands) {
-            enemies = MaraUtils.GetSettlementUnitsInArea(
-                expandPoint, 
-                this.parentController.Settings.UnitSearch.ExpandEnemySearchRadius, 
-                this.EnemySettlements
-            );
-
-            if (enemies.length > 0) {
+            if (
+                !this.isSafeLocation(
+                    expandPoint, 
+                    this.parentController.Settings.UnitSearch.ExpandEnemySearchRadius
+                )
+            ) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    public IsSafeExpand(point: any): boolean {
+        return this.isSafeLocation(
+            point, 
+            this.parentController.Settings.UnitSearch.ExpandEnemySearchRadius
+        );
+    }
+
+    private isSafeLocation(point: any, radius: number): boolean {
+        let enemies = MaraUtils.GetSettlementUnitsInArea(
+            point, 
+            radius, 
+            this.EnemySettlements
+        );
+
+        return enemies.length == 0;
     }
 
     GetEnemiesInArea(cell: any, radius: number): Array<any> {
