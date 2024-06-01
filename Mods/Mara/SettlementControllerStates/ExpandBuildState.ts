@@ -151,8 +151,13 @@ export class ExpandBuildState extends MaraSettlementControllerState {
 
         if (settlementLocation) {
             let distance = MaraUtils.ChebyshevDistance(expandCenter, settlementLocation.Center);
+            let radius = Math.max(
+                settlementLocation.Radius,
+                this.settlementController.Settings.ResourceMining.MiningRadius,
+                this.settlementController.Settings.ResourceMining.WoodcuttingRadius
+            );
 
-            return distance > settlementLocation.Radius;
+            return distance > radius;
         }
         else {
             return false;
