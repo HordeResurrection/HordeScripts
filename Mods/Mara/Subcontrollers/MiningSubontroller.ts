@@ -241,6 +241,9 @@ export class MiningSubcontroller extends MaraSubcontroller {
             if (mineData.Miners.length < requiredMiners) {
                 minerRequrement += requiredMiners - mineData.Miners.length;
             }
+            else if (mineData.Miners.length > requiredMiners) {
+                mineData.Miners.length = requiredMiners;
+            }
         }
 
         const minWoodcuttersPerSawmill = this.parentController.Settings.ResourceMining.MinWoodcuttersPerSawmill;
@@ -248,7 +251,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         if (minerRequrement > 0) {
             for (let sawmillData of this.Sawmills) {
                 if (sawmillData.Woodcutters.length > minWoodcuttersPerSawmill) {
-                    // just remoe woodcutters from array which marks them as free
+                    // just remove woodcutters from array which marks them as free
                     // they will be processed in engageFreeHarvesters() later
 
                     let maxWoodcuttersToRemove = Math.min(sawmillData.Woodcutters.length - minWoodcuttersPerSawmill, minerRequrement);
