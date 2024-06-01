@@ -22,6 +22,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         }
         else {
             this.expandCenter = center;
+            this.settlementController.TargetExpand!.BuildCenter = center;
         }
 
         this.requests = [];
@@ -68,6 +69,8 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     }
 
     public OnExit(): void {
+        this.settlementController.TargetExpand = null;
+        
         if (this.isRemoteExpand(this.expandCenter)) {
             if ( 
                 !this.settlementController.Expands.find( 
@@ -93,6 +96,13 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         
         if (tickNumber % 10 != 0) {
             return;
+        }
+
+        if (tickNumber % 50 == 0) {
+            if (this.settlementController.StrategyController.IsUnderAttack()) {
+                this.settlementController.State = SettlementControllerStateFactory.MakeDefendingState(this.settlementController);
+                return;
+            }
         }
 
         for (let request of this.requests) {

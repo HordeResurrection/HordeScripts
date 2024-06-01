@@ -84,6 +84,19 @@ export class DefendingState extends MaraSettlementControllerState {
                 this.settlementController.HostileAttackingSquads.push(...expandAttackers);
             }
         }
+ 
+        if (this.settlementController.TargetExpand) {
+            if (this.settlementController.TargetExpand.BuildCenter) {
+                let expandAttackers = this.registerHostileSquadsAroundPoint(
+                    this.settlementController.TargetExpand.BuildCenter, 
+                    this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
+                );
+    
+                if (expandAttackers.length > 0) {
+                    this.settlementController.HostileAttackingSquads.push(...expandAttackers);
+                }
+            }
+        }
     }
 
     private canRebuild(): boolean {

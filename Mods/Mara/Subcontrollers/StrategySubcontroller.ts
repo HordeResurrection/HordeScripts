@@ -307,6 +307,17 @@ export class StrategySubcontroller extends MaraSubcontroller {
             }
         }
 
+        if (this.parentController.TargetExpand?.BuildCenter) {
+            if (
+                !this.isSafeLocation(
+                    this.parentController.TargetExpand.BuildCenter, 
+                    this.parentController.Settings.UnitSearch.ExpandEnemySearchRadius
+                )
+            ) {
+                return true;
+            }
+        }
+
         return false;
     }
 

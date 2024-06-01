@@ -30,6 +30,7 @@ export class SettlementLocation {
 export class TargetExpandData {
     Cluster: MaraResourceCluster | null;
     ResourceType: MaraResourceType[] = [];
+    BuildCenter: MaraPoint | null = null;
 
     constructor(cluster: MaraResourceCluster | null, resourceType: MaraResourceType[]) {
         this.Cluster = cluster;
