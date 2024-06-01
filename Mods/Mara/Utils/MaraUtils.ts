@@ -293,13 +293,41 @@ export class MaraUtils {
         return result;
     }
 
+    static GetCircumscribingRect(points: Array<MaraPoint>): {topLeft: MaraPoint; bottomRight: MaraPoint;} {
+        let topPoint: MaraPoint = new MaraPoint(Infinity, Infinity);
+        let bottomPoint: MaraPoint = new MaraPoint(0, 0);
+        let leftPoint: MaraPoint = new MaraPoint(Infinity, Infinity);
+        let rightPoint: MaraPoint = new MaraPoint(0, 0);
+
+        for (let point of points) {
+            if (point.Y < topPoint.Y) {
+                topPoint = point;
+            }
+
+            if (point.X < leftPoint.X) {
+                leftPoint = point;
+            }
+
+            if (point.Y > bottomPoint.Y) {
+                bottomPoint = point;
+            }
+
+            if (point.X > rightPoint.X) {
+                rightPoint = point;
+            }
+        }
+
+        return {
+            topLeft: new MaraPoint(leftPoint.X, topPoint.Y), 
+            bottomRight: new MaraPoint(rightPoint.X, bottomPoint.Y)
+        };
+    }
+
     static FindClosestCell(
         center: {X: number; Y: number;}, 
         radius: number, 
         predicate: (cell: any) => boolean
     ): MaraPoint | null {
-        let result: any[] = [];
-        
         let generator = generateCellInSpiral(center.X, center.Y);
         let cell: any;
         for (cell = generator.next(); !cell.done; cell = generator.next()) {

@@ -1,4 +1,5 @@
-import { MaraResourceMap } from "../MaraResourceMap";
+import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
+import { MaraResourceCluster, MaraResourceMap, MaraResourceType } from "../MaraResourceMap";
 import { MaraPoint, MaraResources, eNext, enumerate } from "../Utils/Common";
 import { MaraUtils, ResourceType } from "../Utils/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
@@ -82,6 +83,60 @@ export class MiningSubcontroller extends MaraSubcontroller {
     public GetFreeHarvesters(): Array<any> {
         this.engageFreeHarvesters();
         return this.getUnengagedHarvesters();
+    }
+
+    public FindMinePosition(resourceCluster: MaraResourceCluster, mineConfig: any, targetResourceType: MaraResourceType): MaraPoint | null {
+        let mineralCells = [...resourceCluster.GoldCells, ...resourceCluster.MetalCells];
+        let rect = MaraUtils.GetCircumscribingRect(mineralCells);
+
+        let optimalPosition: MaraPoint | null = null;
+        let optimalPositionResources: MaraResources | null = null;
+
+        for (let row = rect.topLeft.Y - mineConfig.Size.Height; row <= rect.bottomRight.Y; row++) {
+            for (let col = rect.topLeft.X - mineConfig.Size.Width; col <= rect.bottomRight.X; col++) {
+                if (unitCanBePlacedByRealMap(mineConfig, col, row)) {
+                    let positionResources = this.getRectResources(
+                        new MaraPoint(col, row),
+                        new MaraPoint(col + mineConfig.Size.Width - 1, row + mineConfig.Size.Height - 1),
+                    );
+                    
+                    if (optimalPositionResources) {
+                        if (targetResourceType == MaraResourceType.Gold) {
+                            if (positionResources.Gold > optimalPositionResources.Gold) {
+                                optimalPosition = new MaraPoint(col, row);
+                                optimalPositionResources = positionResources;
+                            }
+                            else if (
+                                positionResources.Gold == optimalPositionResources.Gold &&
+                                positionResources.Metal > optimalPositionResources.Metal
+                            ) {
+                                optimalPosition = new MaraPoint(col, row);
+                                optimalPositionResources = positionResources;
+                            }
+                        }
+                        else {
+                            if (positionResources.Metal > optimalPositionResources.Metal) {
+                                optimalPosition = new MaraPoint(col, row);
+                                optimalPositionResources = positionResources;
+                            }
+                            else if (
+                                positionResources.Metal == optimalPositionResources.Metal &&
+                                positionResources.Gold > optimalPositionResources.Gold
+                            ) {
+                                optimalPosition = new MaraPoint(col, row);
+                                optimalPositionResources = positionResources;
+                            }
+                        }
+                    }
+                    else {
+                        optimalPosition = new MaraPoint(col, row);
+                        optimalPositionResources = positionResources;
+                    }
+                }
+            }
+        }
+
+        return optimalPosition;
     }
 
     private getClosestMetalStock(point: MaraPoint): any | null {
@@ -202,14 +257,11 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
     }
 
-    private getMineResources(mine: any): MaraResources {
-        let maxCol = mine.Cell.X + mine.Rect.Width;
-        let maxRow = mine.Cell.Y + mine.Rect.Height;
-
+    private getRectResources(topLeft: MaraPoint, bottomRight: MaraPoint): MaraResources {
         let result = new MaraResources(0, 0, 0, 0);
 
-        for (let row = mine.Cell.Y; row < maxRow; row++) {
-            for (let col = mine.Cell.X; col < maxCol; col++) {
+        for (let row = topLeft.Y; row <= bottomRight.Y; row++) {
+            for (let col = topLeft.X; col <= bottomRight.X; col++) {
                 let mineralType = MaraUtils.GetCellMineralType(col, row);
                 let mineralAmount = MaraUtils.GetCellMineralsAmount(col, row);
 
@@ -223,6 +275,13 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
 
         return result;
+    }
+
+    private getMineResources(mine: any): MaraResources {
+        return this.getRectResources(
+            new MaraPoint(mine.Cell.X, mine.Cell.Y),
+            new MaraPoint(mine.Cell.X + mine.Rect.Width - 1, mine.Cell.Y + mine.Rect.Height - 1)
+        );
     }
 
     private findWoodCell(sawmill: any): MaraPoint | null {

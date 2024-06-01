@@ -1,5 +1,4 @@
-import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
-import { MaraResourceType } from "../MaraResourceMap";
+import { MaraResourceCluster, MaraResourceType } from "../MaraResourceMap";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 import { MaraPoint, MaraProductionRequest } from "../Utils/Common";
 import { MaraUtils, UnitComposition } from "../Utils/MaraUtils";
@@ -187,7 +186,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         return configIds[index];
     }
 
-    private orderMineProduction(cells: Array<MaraPoint>): void {
+    private orderMineProduction(cluster: MaraResourceCluster, resourceType: MaraResourceType): void {
         let mineConfigs = MaraUtils.GetAllMineConfigs(this.settlementController.Settlement);
         let cfgId = this.selectConfigId(mineConfigs);
 
@@ -196,14 +195,11 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             return;
         }
 
-        let minePosition: MaraPoint | null = null;
-
-        for (let cell of cells) {
-            if (unitCanBePlacedByRealMap(MaraUtils.GetUnitConfig(cfgId), cell.X, cell.Y)) {
-                minePosition = cell;
-                break;
-            }
-        }
+        let minePosition: MaraPoint | null = this.settlementController.MiningController.FindMinePosition(
+            cluster, 
+            MaraUtils.GetUnitConfig(cfgId),
+            resourceType
+        );
 
         if (!minePosition) {
             this.settlementController.Debug(`Unable to order mine production: no suitable place for mine found`);
@@ -227,11 +223,11 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         let targetExpand = this.settlementController.TargetExpand!;
 
         if (targetExpand.ResourceType.findIndex((value) => {return value == MaraResourceType.Gold}) >= 0) {
-            this.orderMineProduction(targetExpand.Cluster!.GoldCells);
+            this.orderMineProduction(targetExpand.Cluster!, MaraResourceType.Gold);
         }
 
         if (targetExpand.ResourceType.findIndex((value) => {return value == MaraResourceType.Metal}) >= 0) {
-            this.orderMineProduction(targetExpand.Cluster!.MetalCells);
+            this.orderMineProduction(targetExpand.Cluster!, MaraResourceType.Metal);
         }
         
         let metalStocks = MaraUtils.GetSettlementUnitsInArea(
