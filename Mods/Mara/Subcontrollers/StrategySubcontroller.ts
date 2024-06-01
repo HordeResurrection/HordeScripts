@@ -362,7 +362,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
                     cluster.Size, //radius = cluster radius * 2
                     (unit) => {
                         return unit.Owner != this.parentController.Settlement && 
-                            !this.EnemySettlements.find((value) => {return value.Owner == unit.Owner})
+                            !this.EnemySettlements.find((value) => {return value == unit.Owner})
                     }
                 );
                 
