@@ -66,7 +66,7 @@ export class RoutingState extends MaraSettlementControllerState {
             if (offensiveCfgId) {
                 let pick = MaraUtils.Random(this.settlementController.MasterMind, 100);
 
-                if (pick < 75) {
+                if (pick < 50) {
                     this.settlementController.State = SettlementControllerStateFactory.MakeBuildingUpState(this.settlementController);
                 }
                 else {
