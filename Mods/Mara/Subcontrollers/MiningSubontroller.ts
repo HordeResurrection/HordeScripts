@@ -1,3 +1,4 @@
+import { MaraResourceMap } from "../MaraResourceMap";
 import { MaraPoint, MaraResources, eNext, enumerate } from "../Utils/Common";
 import { MaraUtils, ResourceType } from "../Utils/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
@@ -63,12 +64,14 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
 
         for (let sawmillData of this.Sawmills) {
-            MaraUtils.ForEachCell(
-                sawmillData.Sawmill.CellCenter,
-                this.parentController.Settings.ResourceMining.WoodcuttingRadius,
-                (cell) => {
-                    let treesCount = MaraUtils.GetCellTreesCount(cell.X, cell.Y);
-                    totalResources.Wood += treesCount * 10;
+            MaraResourceMap.ResourceClusters.forEach(
+                (value) => {
+                    if (
+                        MaraUtils.ChebyshevDistance(value.Center, sawmillData.Sawmill.CellCenter) <= 
+                            this.parentController.Settings.ResourceMining.WoodcuttingRadius
+                    ) {
+                        totalResources.Wood += value.WoodAmount;
+                    }
                 }
             );
         }

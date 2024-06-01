@@ -52,6 +52,25 @@ export abstract class MaraSettlementControllerState extends FsmState {
         }
     }
 
+    private isFreeWoodcuttingCluster(cluster: MaraResourceCluster): boolean {
+        let atLeastOneSawmillPresent = false;
+        
+        for (let sawmillData of this.settlementController.MiningController.Sawmills) {
+            if (
+                MaraUtils.ChebyshevDistance(cluster.Center, sawmillData.Sawmill.CellCenter) < 
+                    this.settlementController.Settings.ResourceMining.WoodcuttingRadius
+            ) {
+                atLeastOneSawmillPresent = true;
+                
+                if (sawmillData.Woodcutters.length < this.settlementController.Settings.ResourceMining.MaxWoodcuttersPerSawmill) {
+                    return true;
+                }
+            }
+        }
+        
+        return !atLeastOneSawmillPresent;
+    }
+
     private selectOptimalResourceCluster(requiredResources: MaraResources): MaraResourceCluster | null {
         let candidates: Array<MaraResourceCluster> = [];
         
@@ -75,7 +94,9 @@ export abstract class MaraSettlementControllerState extends FsmState {
                 }
             }
             else if (requiredWood > 0 && value.WoodAmount >= requiredWood) {
-                candidates.push(value);
+                if (this.isFreeWoodcuttingCluster(value)) {
+                    candidates.push(value);
+                }
             }
         });
 
