@@ -174,16 +174,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     }
 
     private selectConfigId(configIds: Array<string>): string | null {
-        let index = 0; 
-        
-        if (configIds.length == 0) {
-            return null;
-        } 
-        else if (configIds.length > 1) {
-            index = MaraUtils.Random(this.settlementController.MasterMind, configIds.length - 1);
-        }
-
-        return configIds[index];
+        return MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, configIds);
     }
 
     private orderMineProduction(cluster: MaraResourceCluster, resourceType: MaraResourceType): void {

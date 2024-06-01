@@ -71,6 +71,23 @@ export abstract class MaraSettlementControllerState extends FsmState {
         return !atLeastOneSawmillPresent;
     }
 
+    private canPlaceMine(cluster: MaraResourceCluster, resourceType: MaraResourceType): boolean {
+        let mineConfigs = MaraUtils.GetAllMineConfigs(this.settlementController.Settlement);
+        let cfgId = MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, mineConfigs);
+
+        if (cfgId == null) {
+            return false;
+        }
+
+        let position = this.settlementController.MiningController.FindMinePosition(
+            cluster, 
+            MaraUtils.GetUnitConfig(cfgId),
+            resourceType
+        );
+
+        return position != null;
+    }
+
     private selectOptimalResourceCluster(requiredResources: MaraResources): MaraResourceCluster | null {
         let candidates: Array<MaraResourceCluster> = [];
         
@@ -82,11 +99,11 @@ export abstract class MaraSettlementControllerState extends FsmState {
             if (requiredGold > 0) {
                 let freeGold = this.getUnoccupiedMinerals(value.GoldCells);
                 
-                if (freeGold > requiredGold) {
+                if (freeGold > requiredGold && this.canPlaceMine(value, MaraResourceType.Gold)) {
                     candidates.push(value);
                 }
             }
-            else if (requiredMetal > 0) {
+            else if (requiredMetal > 0 && this.canPlaceMine(value, MaraResourceType.Metal)) {
                 let freeMetal = this.getUnoccupiedMinerals(value.MetalCells);
                 
                 if (freeMetal > requiredMetal) {

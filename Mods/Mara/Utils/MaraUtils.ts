@@ -395,6 +395,19 @@ export class MaraUtils {
             }
         )
     }
+
+    static RandomSelect<Type>(masterMind: any, items: Array<Type>): Type | null {
+        let index = 0; 
+        
+        if (items.length == 0) {
+            return null;
+        } 
+        else if (items.length > 1) {
+            index = MaraUtils.Random(masterMind, items.length - 1);
+        }
+
+        return items[index];
+    }
     
     static IncrementMapItem(map: UnitComposition, key: string): void {
         MaraUtils.AddToMapItem(map, key, 1);
