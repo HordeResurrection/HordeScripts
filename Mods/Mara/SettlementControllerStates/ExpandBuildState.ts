@@ -9,6 +9,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     private targetComposition: UnitComposition;
     private expandCenter: MaraPoint;
     private harvestersToOrder: UnitComposition;
+    private minedMinerals: Set<MaraResourceType> = new Set<MaraResourceType>();
 
     private timeoutTick: number | null;
     
@@ -178,6 +179,11 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     }
 
     private orderMineProduction(cluster: MaraResourceCluster, resourceType: MaraResourceType): void {
+        if (this.minedMinerals.has(resourceType)) {
+            this.settlementController.Debug(`Resource type '${resourceType}' mining is already ordered`);
+            return;
+        }
+        
         let mineConfigs = MaraUtils.GetAllMineConfigs(this.settlementController.Settlement);
         let cfgId = this.selectConfigId(mineConfigs);
 
@@ -185,10 +191,12 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             this.settlementController.Debug(`Unable to order mine production: no mine config available`);
             return;
         }
-
+        
+        let mineConfig = MaraUtils.GetUnitConfig(cfgId);
+        
         let minePosition: MaraPoint | null = this.settlementController.MiningController.FindMinePosition(
             cluster, 
-            MaraUtils.GetUnitConfig(cfgId),
+            mineConfig,
             resourceType
         );
 
@@ -198,6 +206,19 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         }
 
         this.orderProducion(cfgId, minePosition, 0);
+        
+        let mineResources = this.settlementController.MiningController.GetRectResources(
+            minePosition,
+            new MaraPoint(minePosition.X + mineConfig.Size.Width - 1, minePosition.Y + mineConfig.Size.Height - 1)
+        );
+
+        if (mineResources.Gold > 0) {
+            this.minedMinerals.add(MaraResourceType.Gold);
+        }
+
+        if (mineResources.Metal > 0) {
+            this.minedMinerals.add(MaraResourceType.Metal);
+        }
 
         let harvesterConfigs = MaraUtils.GetAllHarvesterConfigs(this.settlementController.Settlement);
         cfgId = this.selectConfigId(harvesterConfigs);

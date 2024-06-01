@@ -85,6 +85,26 @@ export class MiningSubcontroller extends MaraSubcontroller {
         return this.getUnengagedHarvesters();
     }
 
+    GetRectResources(topLeft: MaraPoint, bottomRight: MaraPoint): MaraResources {
+        let result = new MaraResources(0, 0, 0, 0);
+
+        for (let row = topLeft.Y; row <= bottomRight.Y; row++) {
+            for (let col = topLeft.X; col <= bottomRight.X; col++) {
+                let mineralType = MaraUtils.GetCellMineralType(col, row);
+                let mineralAmount = MaraUtils.GetCellMineralsAmount(col, row);
+
+                if (mineralType == ResourceType.Metal) {
+                    result.Metal += mineralAmount;
+                }
+                else if (mineralType == ResourceType.Gold) {
+                    result.Gold += mineralAmount;
+                }
+            }
+        }
+
+        return result;
+    }
+
     public FindMinePosition(resourceCluster: MaraResourceCluster, mineConfig: any, targetResourceType: MaraResourceType): MaraPoint | null {
         let mineralCells = [...resourceCluster.GoldCells, ...resourceCluster.MetalCells];
         let rect = MaraUtils.GetCircumscribingRect(mineralCells);
@@ -95,9 +115,9 @@ export class MiningSubcontroller extends MaraSubcontroller {
         for (let row = rect.topLeft.Y - mineConfig.Size.Height; row <= rect.bottomRight.Y; row++) {
             for (let col = rect.topLeft.X - mineConfig.Size.Width; col <= rect.bottomRight.X; col++) {
                 if (unitCanBePlacedByRealMap(mineConfig, col, row)) {
-                    let positionResources = this.getRectResources(
+                    let positionResources = this.GetRectResources(
                         new MaraPoint(col, row),
-                        new MaraPoint(col + mineConfig.Size.Width - 1, row + mineConfig.Size.Height - 1),
+                        new MaraPoint(col + mineConfig.Size.Width - 1, row + mineConfig.Size.Height - 1)
                     );
                     
                     if (optimalPositionResources) {
@@ -263,28 +283,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
     }
 
-    private getRectResources(topLeft: MaraPoint, bottomRight: MaraPoint): MaraResources {
-        let result = new MaraResources(0, 0, 0, 0);
-
-        for (let row = topLeft.Y; row <= bottomRight.Y; row++) {
-            for (let col = topLeft.X; col <= bottomRight.X; col++) {
-                let mineralType = MaraUtils.GetCellMineralType(col, row);
-                let mineralAmount = MaraUtils.GetCellMineralsAmount(col, row);
-
-                if (mineralType == ResourceType.Metal) {
-                    result.Metal += mineralAmount;
-                }
-                else if (mineralType == ResourceType.Gold) {
-                    result.Gold += mineralAmount;
-                }
-            }
-        }
-
-        return result;
-    }
-
     private getMineResources(mine: any): MaraResources {
-        return this.getRectResources(
+        return this.GetRectResources(
             new MaraPoint(mine.Cell.X, mine.Cell.Y),
             new MaraPoint(mine.Cell.X + mine.Rect.Width - 1, mine.Cell.Y + mine.Rect.Height - 1)
         );
