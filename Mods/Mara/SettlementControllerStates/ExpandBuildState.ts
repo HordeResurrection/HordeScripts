@@ -219,10 +219,11 @@ export class ExpandBuildState extends MaraSettlementControllerState {
             this.orderMineProduction(targetExpand.Cluster!.MetalCells);
         }
         
-        let metalStocks = MaraUtils.GetUnitsInArea(
+        let metalStocks = MaraUtils.GetSettlementUnitsInArea(
             this.expandCenter, 
             this.settlementController.Settings.ResourceMining.MiningRadius,
-            (unit) => {return MaraUtils.IsMetalStockConfig(unit.Cfg)}
+            [this.settlementController.Settlement],
+            (unit) => {return MaraUtils.IsMetalStockConfig(unit.Cfg) && unit.IsAlive}
         );
 
         if (metalStocks.length == 0) {
@@ -239,10 +240,11 @@ export class ExpandBuildState extends MaraSettlementControllerState {
     }
     
     private orderWoodcuttingProduction(): void {
-        let sawmills = MaraUtils.GetUnitsInArea(
+        let sawmills = MaraUtils.GetSettlementUnitsInArea(
             this.expandCenter, 
             this.settlementController.Settings.ResourceMining.WoodcuttingRadius,
-            (unit) => {return MaraUtils.IsSawmillConfig(unit.Cfg)}
+            [this.settlementController.Settlement],
+            (unit) => {return MaraUtils.IsSawmillConfig(unit.Cfg) && unit.IsAlive}
         );
         
         let targetResourceCluster = this.settlementController.TargetExpand!.Cluster!;
