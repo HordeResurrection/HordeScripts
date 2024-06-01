@@ -58,7 +58,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
                 }
             }
             else {
-                if (!this.currentTarget || this.currentTarget.IsNearDeath) {
+                if (!this.currentTarget || !this.currentTarget.IsAlive) {
                     this.selectTarget(enemy);
                 }
             }
@@ -95,6 +95,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
     }
 
     private selectTarget(enemy: any) {
+        this.currentTarget = null;
         let target = this.settlementController.StrategyController.GetOffensiveTarget(enemy);
 
         if (target) {

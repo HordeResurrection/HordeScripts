@@ -50,7 +50,7 @@ export class ExpandSecureState extends MaraSettlementControllerState {
         let combativityIndex = this.settlementController.TacticalController.OffenseCombativityIndex;
 
         if (combativityIndex >= this.settlementController.Settings.ControllerStates.ExterminatingLossRatioThreshold) {
-            if (!this.currentTarget || this.currentTarget.IsNearDeath) {
+            if (!this.currentTarget || !this.currentTarget.IsAlive) {
                 if ( !this.selectTarget() ) {
                     this.proceedToBuildExpand();
                     return;
@@ -76,6 +76,7 @@ export class ExpandSecureState extends MaraSettlementControllerState {
     }
 
     private selectTarget(): boolean {
+        this.currentTarget = null;
         let targetCluster = this.settlementController.TargetExpand?.Cluster;
         
         if (!targetCluster) {
