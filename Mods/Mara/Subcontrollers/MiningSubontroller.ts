@@ -129,8 +129,14 @@ export class MiningSubcontroller extends MaraSubcontroller {
                         }
                     }
                     else {
-                        optimalPosition = new MaraPoint(col, row);
-                        optimalPositionResources = positionResources;
+                        if (targetResourceType == MaraResourceType.Gold && positionResources.Gold > 0) {
+                            optimalPosition = new MaraPoint(col, row);
+                            optimalPositionResources = positionResources;
+                        }
+                        else if (targetResourceType == MaraResourceType.Metal && positionResources.Metal > 0) {
+                            optimalPosition = new MaraPoint(col, row);
+                            optimalPositionResources = positionResources;
+                        }
                     }
                 }
             }
