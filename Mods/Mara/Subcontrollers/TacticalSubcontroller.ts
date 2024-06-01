@@ -192,6 +192,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.parentController.Debug(`${this.initialOffensiveSquadCount} offensive squads composed`);
     }
 
+    DismissSquads(): void {
+        this.offensiveSquads = [];
+        this.defensiveSquads = [];
+        this.reinforcementSquads = [];
+    }
+
     ReinforceSquads(): void {
         this.reinforceSquadsByFreeUnits();
 

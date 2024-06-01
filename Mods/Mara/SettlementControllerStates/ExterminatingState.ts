@@ -20,6 +20,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
 
     OnExit(): void {
         this.settlementController.StrategyController.ResetEnemy();
+        this.settlementController.TacticalController.DismissSquads();
     }
 
     Tick(tickNumber: number): void {
