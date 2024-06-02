@@ -12,6 +12,7 @@ export enum MaraResourceType {
 
 export class MaraResourceMap {
     public static ResourceClusters: Map<string, MaraResourceCluster>;
+    public static ProcessedCells: Set<string> = new Set<string>();
     
     public static Init() {
         let maxRowIndex = Math.floor(MaraUtils.GetScenaHeigth() / CLUSTER_SIZE);
@@ -46,27 +47,61 @@ export class MaraResourceCluster {
 
         let maxRow = Math.min(this.Coordinates.Y + CLUSTER_SIZE, MaraUtils.GetScenaHeigth());
         let maxCol = Math.min(this.Coordinates.X + CLUSTER_SIZE, MaraUtils.GetScenaWidth());
+
+        let nextCells: Array<MaraPoint> = [];
         
         for (let row = this.Coordinates.Y; row < maxRow; row ++) {
             for (let col = this.Coordinates.X; col < maxCol; col ++) {
-                let resourceType = MaraUtils.GetCellMineralType(col, row);
-                let point = new MaraPoint(col, row);
+                let cell = new MaraPoint(col, row);
+                nextCells.push(cell);
+            }
+        }
+
+        while (nextCells.length > 0) {
+            let currentCells = [...nextCells];
+            nextCells = [];
+
+            for (let cell of currentCells) {
+                if (MaraResourceMap.ProcessedCells.has(cell.ToString())) {
+                    continue;
+                }
+
+                MaraResourceMap.ProcessedCells.add(cell.ToString());
+                
+                let resourceType = MaraUtils.GetCellMineralType(cell.X, cell.Y);
+                let isMineralCell = false;
 
                 switch (resourceType) {
                     case ResourceType.Metal:
-                        this.MetalCells.push(point);
+                        this.MetalCells.push(cell);
+                        isMineralCell = true;
                         break;
                     case ResourceType.Gold:
-                        this.GoldCells.push(point);
+                        this.GoldCells.push(cell);
+                        isMineralCell = true;
                         break;
                     default:
-                        let treesCount = MaraUtils.GetCellTreesCount(col, row);
+                        let treesCount = MaraUtils.GetCellTreesCount(cell.X, cell.Y);
                         
                         if (treesCount > 0) {
-                            this.WoodCells.push(point);
+                            this.WoodCells.push(cell);
                         }
                         
                         break;
+                }
+
+                if (isMineralCell) {
+                    MaraUtils.ForEachCell(
+                        cell, 
+                        1, 
+                        (nextCell) => {
+                            let point = new MaraPoint(nextCell.X, nextCell.Y);
+
+                            if (!MaraResourceMap.ProcessedCells.has(point.ToString())) {
+                                nextCells.push(point);
+                            }
+                        }
+                    );
                 }
             }
         }
