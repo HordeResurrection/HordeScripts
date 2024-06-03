@@ -1,6 +1,6 @@
 
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
-import { MaraUtils, UnitComposition } from "../Utils/MaraUtils";
+import { MaraProductionRequest } from "../Utils/Common";
 import { ProductionState } from "./ProductionState";
 
 export class ExpandPrepareState extends ProductionState {
@@ -8,15 +8,24 @@ export class ExpandPrepareState extends ProductionState {
         this.settlementController.State = SettlementControllerStateFactory.MakeExpandSecureState(this.settlementController);
     }
     
-    protected getTargetUnitsComposition(): UnitComposition {
+    protected getProductionRequests(): Array<MaraProductionRequest> {
         if (this.settlementController.TargetExpand?.Cluster) {
-            let currentEconomy = this.settlementController.GetCurrentDevelopedEconomyComposition();
             let armyToProduce = this.settlementController.StrategyController.GetExpandAttackArmyComposition(this.settlementController.TargetExpand!.Cluster!.Center!);
+
+            let result = new Array<MaraProductionRequest>();
+
+            armyToProduce.forEach(
+                (value, key) => {
+                    for (let i = 0; i < value; i++) {
+                        result.push(this.makeProductionRequest(key, null, null));
+                    }
+                }
+            );
             
-            return MaraUtils.AddCompositionLists(currentEconomy, armyToProduce);
+            return result;
         }
         else {
-            return this.settlementController.GetCurrentDevelopedEconomyComposition();
+            return [];
         }
     }
 }

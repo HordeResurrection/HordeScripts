@@ -2,73 +2,29 @@ import { MaraResourceCluster, MaraResourceType } from "../MaraResourceMap";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 import { MaraPoint, MaraProductionRequest } from "../Utils/Common";
 import { MaraUtils, UnitComposition } from "../Utils/MaraUtils";
-import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
+import { ProductionState } from "./ProductionState";
 
-export class ExpandBuildState extends MaraSettlementControllerState {
-    private requests: Array<MaraProductionRequest>;
-    private targetComposition: UnitComposition;
+export class ExpandBuildState extends ProductionState {
     private expandCenter: MaraPoint;
     private harvestersToOrder: UnitComposition;
     private minedMinerals: Set<MaraResourceType> = new Set<MaraResourceType>();
 
-    private timeoutTick: number | null;
-    
-    public OnEntry(): void {
+    protected onEntry(): boolean {
         let center = this.calculateExpandCenter();
         
         if (!center) {
             this.settlementController.State = SettlementControllerStateFactory.MakeIdleState(this.settlementController);
-            return;
+            return false;
         }
         else {
             this.expandCenter = center;
             this.settlementController.TargetExpand!.BuildCenter = center;
+
+            return true;
         }
-
-        this.requests = [];
-        let targetExpand = this.settlementController.TargetExpand!;
-        this.harvestersToOrder = new Map<string, number>();
-
-        if (
-            targetExpand.ResourceType.findIndex(
-                (value) => {return value == MaraResourceType.Gold || value == MaraResourceType.Metal}
-            ) >= 0
-        ) {
-            this.orderMiningProduction();
-        }
-
-        if (
-            targetExpand.ResourceType.findIndex(
-                (value) => {return value == MaraResourceType.Wood}
-            ) >= 0
-        ) {
-            this.orderWoodcuttingProduction();
-        }
-
-        if (
-            targetExpand.ResourceType.findIndex(
-                (value) => {return value == MaraResourceType.People}
-            ) >= 0
-        ) {
-            this.orderHousingProduction();
-        }
-
-        this.orderHarvestersProduction();
-
-        if (this.isRemoteExpand(this.expandCenter)) {
-            this.orderGuardProduction();
-        }
-
-        this.targetComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
-
-        for (let request of this.requests) {
-            MaraUtils.IncrementMapItem(this.targetComposition, request.ConfigId);
-        }
-
-        this.timeoutTick = null;
     }
 
-    public OnExit(): void {
+    protected onExit(): void {
         this.settlementController.TargetExpand = null;
         
         if (this.isRemoteExpand(this.expandCenter)) {
@@ -82,56 +38,51 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         }
     }
 
-    public Tick(tickNumber: number): void {
-        if (this.timeoutTick == null) {
-            let timeout = this.settlementController.Settings.Timeouts.ExpandBuildTimeout;
-            this.settlementController.Debug(`Set timeout to ${timeout} ticks`);
-            this.timeoutTick = tickNumber + timeout;
-        }
-        else if (tickNumber > this.timeoutTick) {
-            this.settlementController.Debug(`Expand build is too long-drawn, discontinuing`);
-            this.settlementController.State = SettlementControllerStateFactory.MakeRoutingState(this.settlementController);
-            return;
-        }
+    protected onTargetCompositionReached(): void {
+        this.settlementController.State = SettlementControllerStateFactory.MakeRoutingState(this.settlementController);
+    }
+
+    protected getProductionRequests(): Array<MaraProductionRequest> {
+        let result = new Array<MaraProductionRequest>();
         
-        if (tickNumber % 10 != 0) {
-            return;
+        let targetExpand = this.settlementController.TargetExpand!;
+        this.harvestersToOrder = new Map<string, number>();
+
+        if (
+            targetExpand.ResourceType.findIndex(
+                (value) => {return value == MaraResourceType.Gold || value == MaraResourceType.Metal}
+            ) >= 0
+        ) {
+            result.push(...this.orderMiningProduction());
         }
 
-        if (tickNumber % 50 == 0) {
-            if (this.settlementController.StrategyController.IsUnderAttack()) {
-                this.settlementController.State = SettlementControllerStateFactory.MakeDefendingState(this.settlementController);
-                return;
-            }
+        if (
+            targetExpand.ResourceType.findIndex(
+                (value) => {return value == MaraResourceType.Wood}
+            ) >= 0
+        ) {
+            result.push(...this.orderWoodcuttingProduction());
         }
 
-        for (let request of this.requests) {
-            request.Track();
+        if (
+            targetExpand.ResourceType.findIndex(
+                (value) => {return value == MaraResourceType.People}
+            ) >= 0
+        ) {
+            result.push(...this.orderHousingProduction());
         }
 
-        let requestsToReorder = this.getRequestsToReorder();
-        
-        if (requestsToReorder.length == 0) {
-            let isAllRequestsCompleted = true;
+        result.push(...this.orderHarvestersProduction());
 
-            for (let request of this.requests) {
-                if (!request.IsCompleted) {
-                    isAllRequestsCompleted = false;
-                    break;
-                }
-            }
-            
-            if (isAllRequestsCompleted) {
-                this.settlementController.State = SettlementControllerStateFactory.MakeRoutingState(this.settlementController);
-                return;
-            }
+        if (this.isRemoteExpand(this.expandCenter)) {
+            result.push(...this.orderGuardProduction());
         }
-        else {
-            for (let request of requestsToReorder) {
-                request.WipeResults();
-                this.settlementController.ProductionController.RequestProduction(request);
-            }
-        }
+
+        return result;
+    }
+
+    protected getProductionTimeout(): number | null {
+        return this.settlementController.Settings.Timeouts.ExpandBuildTimeout;
     }
 
     private calculateExpandCenter(): MaraPoint | null {
@@ -178,10 +129,10 @@ export class ExpandBuildState extends MaraSettlementControllerState {
         return MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, configIds);
     }
 
-    private orderMineProduction(cluster: MaraResourceCluster, resourceType: MaraResourceType): void {
+    private orderMineProduction(cluster: MaraResourceCluster, resourceType: MaraResourceType): Array<MaraProductionRequest> {
         if (this.minedMinerals.has(resourceType)) {
             this.settlementController.Debug(`Resource type '${resourceType}' mining is already ordered`);
-            return;
+            return [];
         }
         
         let mineConfigs = MaraUtils.GetAllMineConfigs(this.settlementController.Settlement);
@@ -189,7 +140,7 @@ export class ExpandBuildState extends MaraSettlementControllerState {
 
         if (cfgId == null) {
             this.settlementController.Debug(`Unable to order mine production: no mine config available`);
-            return;
+            return [];
         }
         
         let mineConfig = MaraUtils.GetUnitConfig(cfgId);
@@ -202,10 +153,10 @@ export class ExpandBuildState extends MaraSettlementControllerState {
 
         if (!minePosition) {
             this.settlementController.Debug(`Unable to order mine production: no suitable place for mine found`);
-            return;
+            return [];
         }
 
-        this.orderProducion(cfgId, minePosition, 0);
+        let mineRequest = this.makeProductionRequest(cfgId, minePosition, 0, true);
         
         let mineResources = this.settlementController.MiningController.GetRectResources(
             minePosition,
@@ -225,21 +176,25 @@ export class ExpandBuildState extends MaraSettlementControllerState {
 
         if (cfgId == null) {
             this.settlementController.Debug(`Unable to order mine production: no harvester config available`);
-            return;
+            return [];
         }
 
         MaraUtils.AddToMapItem(this.harvestersToOrder, cfgId, this.settlementController.Settings.ResourceMining.MinMinersPerMine);
+
+        return [mineRequest];
     }
 
-    private orderMiningProduction(): void {
+    private orderMiningProduction(): Array<MaraProductionRequest> {
+        let result = new Array<MaraProductionRequest>();
+        
         let targetExpand = this.settlementController.TargetExpand!;
 
         if (targetExpand.ResourceType.findIndex((value) => {return value == MaraResourceType.Gold}) >= 0) {
-            this.orderMineProduction(targetExpand.Cluster!, MaraResourceType.Gold);
+            result.push(...this.orderMineProduction(targetExpand.Cluster!, MaraResourceType.Gold));
         }
 
         if (targetExpand.ResourceType.findIndex((value) => {return value == MaraResourceType.Metal}) >= 0) {
-            this.orderMineProduction(targetExpand.Cluster!, MaraResourceType.Metal);
+            result.push(...this.orderMineProduction(targetExpand.Cluster!, MaraResourceType.Metal));
         }
         
         let metalStocks = MaraUtils.GetSettlementUnitsInArea(
@@ -255,14 +210,18 @@ export class ExpandBuildState extends MaraSettlementControllerState {
 
             if (cfgId == null) {
                 this.settlementController.Debug(`Unable to order mining production: no metal stock config available`);
-                return;
+                return result;
             }
 
-            this.orderProducion(cfgId, this.expandCenter, null);
+            result.push(this.makeProductionRequest(cfgId, this.expandCenter, null, true));
         }
+
+        return result;
     }
     
-    private orderWoodcuttingProduction(): void {
+    private orderWoodcuttingProduction(): Array<MaraProductionRequest> {
+        let result = new Array<MaraProductionRequest>();
+        
         let sawmills = MaraUtils.GetSettlementUnitsInArea(
             this.expandCenter, 
             this.settlementController.Settings.ResourceMining.WoodcuttingRadius,
@@ -278,10 +237,10 @@ export class ExpandBuildState extends MaraSettlementControllerState {
 
             if (cfgId == null) {
                 this.settlementController.Debug(`Unable to order woodcutting production: no sawmill config available`);
-                return;
+                return [];
             }
 
-            this.orderProducion(cfgId, targetResourceCluster.Center, null);
+            result.push(this.makeProductionRequest(cfgId, targetResourceCluster.Center, null, true));
         }
 
         let harvesterConfigs = MaraUtils.GetAllHarvesterConfigs(this.settlementController.Settlement);
@@ -289,39 +248,51 @@ export class ExpandBuildState extends MaraSettlementControllerState {
 
         if (cfgId == null) {
             this.settlementController.Debug(`Unable to order woodcutting production: no harvester config available`);
-            return;
+            return [];
         }
 
         MaraUtils.AddToMapItem(this.harvestersToOrder, cfgId, this.settlementController.Settings.ResourceMining.WoodcutterBatchSize);
+
+        return result;
     }
 
-    private orderHousingProduction(): void {
+    private orderHousingProduction(): Array<MaraProductionRequest> {
+        let result = new Array<MaraProductionRequest>();
+        
         let housingConfigs = MaraUtils.GetAllHousingConfigs(this.settlementController.Settlement);
         let cfgId = this.selectConfigId(housingConfigs);
         
         if (cfgId == null) {
             this.settlementController.Debug(`Unable to order housing production: no housing config available`);
-            return;
+            return [];
         }
 
         for (let i = 0; i < this.settlementController.Settings.ResourceMining.HousingBatchSize; i++) {
-            this.orderProducion(cfgId, null, null);
+            result.push(this.makeProductionRequest(cfgId, null, null, true));
         }
+
+        return result;
     }
 
-    private orderGuardProduction(): void {
+    private orderGuardProduction(): Array<MaraProductionRequest> {
+        let result = new Array<MaraProductionRequest>();
+
         let guardComposition = this.settlementController.StrategyController.GetExpandGuardArmyComposition(this.expandCenter);
 
         guardComposition.forEach(
             (value, key) => {
                 for (let i = 0; i < value; i++) {
-                    this.orderProducion(key, this.expandCenter, null);
+                    result.push(this.makeProductionRequest(key, this.expandCenter, null, true));
                 }
             }
         );
+
+        return result;
     }
 
-    private orderHarvestersProduction(): void {
+    private orderHarvestersProduction(): Array<MaraProductionRequest> {
+        let result = new Array<MaraProductionRequest>();
+        
         let freeHarvesters = this.settlementController.MiningController.GetFreeHarvesters();
         let freeHarvestersCount = freeHarvesters.length;
 
@@ -330,69 +301,13 @@ export class ExpandBuildState extends MaraSettlementControllerState {
                 let harvesterCount = Math.max(value - freeHarvestersCount, 0);
 
                 for (let i = 0; i < harvesterCount; i++) {
-                    this.orderProducion(key, null, null);
+                    result.push(this.makeProductionRequest(key, null, null, true));
                 }
 
                 freeHarvestersCount = Math.max(freeHarvestersCount - value, 0);
             }
         );
-    }
 
-    private orderProducion(configId: string, point: MaraPoint | null, precision: number | null): void {
-        let productionRequest = new MaraProductionRequest(configId, point, precision, true);
-        this.settlementController.ProductionController.RequestProduction(productionRequest);
-        this.requests.push(productionRequest);
-    }
-
-    private getRequestsToReorder(): Array<MaraProductionRequest> {
-        let completedRequests = this.requests.filter((value) => {return value.IsCompleted});
-        let orderedRequests = this.requests.filter((value) => {return !value.IsCompleted});
-
-        let developedComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
-        let compositionToRequest = MaraUtils.SubstractCompositionLists(this.targetComposition, developedComposition);
-
-        for (let request of orderedRequests) {
-            MaraUtils.DecrementMapItem(compositionToRequest, request.ConfigId);
-        }
-
-        let requestsToReorder: Array<MaraProductionRequest> = [];
-        let unknownRequests: Array<MaraProductionRequest> = [];
-        
-        for (let request of completedRequests) {
-            if (request.IsSuccess) {
-                if (request.ProducedUnit) {
-                    if (!request.ProducedUnit.IsAlive) {
-                        requestsToReorder.push(request);
-                        MaraUtils.DecrementMapItem(compositionToRequest, request.ConfigId);
-                    }
-                }
-                else {
-                    unknownRequests.push(request);
-                }
-            }
-            else {
-                requestsToReorder.push(request);
-                MaraUtils.DecrementMapItem(compositionToRequest, request.ConfigId);
-            }
-        }
-
-        compositionToRequest.forEach(
-            (value, key) => {
-                let requestCount = value;
-                
-                for (let request of unknownRequests) {
-                    if (requestCount == 0) {
-                        break;
-                    }
-                    
-                    if (request.ConfigId == key) {
-                        requestsToReorder.push(request);
-                        requestCount --;
-                    }
-                }
-            }
-        );
-
-        return requestsToReorder;
+        return result;
     }
 }

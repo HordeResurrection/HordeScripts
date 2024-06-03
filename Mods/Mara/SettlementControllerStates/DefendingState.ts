@@ -2,13 +2,13 @@ import { SettlementControllerStateFactory } from "../SettlementControllerStateFa
 import { MaraSquad } from "../Subcontrollers/Squads/MaraSquad";
 import { MaraPoint } from "../Utils/Common";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
-import { MaraUtils } from "Mara/Utils/MaraUtils";
+import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 
 export class DefendingState extends MaraSettlementControllerState {
     private reinforcementsCfgIds: Array<string>;
     
     OnEntry(): void {
-        this.settlementController.TargetUnitsComposition = this.settlementController.GetCurrentEconomyComposition();
+        this.settlementController.TargetEconomySnapshot = this.settlementController.GetCurrentEconomySnapshot();
         
         this.refreshAttackersList();
         this.reinforcementsCfgIds = this.settlementController.StrategyController.GetReinforcementCfgIds();
@@ -100,31 +100,74 @@ export class DefendingState extends MaraSettlementControllerState {
     }
 
     private canRebuild(): boolean {
-        let requiredEconomy = this.settlementController.TargetUnitsComposition;
+        let requiredEconomy = this.settlementController.TargetEconomySnapshot;
 
         if (!requiredEconomy) {
             return true;
         }
 
-        let currentEconomy = this.settlementController.GetCurrentDevelopedEconomyComposition();
-        let currentBuildings = new Map<string, number>();
+        this.settlementController.СleanupExpands();
 
-        currentEconomy.forEach((value, key) => {
-            if (MaraUtils.IsBuildingConfigId(key)) {
-                currentBuildings.set(key, value);
+        requiredEconomy = requiredEconomy.filter(
+            (value) => {
+                if (MaraUtils.IsBuildingConfigId(value.ConfigId)) {
+                    let existingExpandIndex = this.settlementController.Expands.findIndex(
+                        (expand) => {
+                            return (
+                                MaraUtils.ChebyshevDistance(expand, value.Position) < 
+                                    Math.max(this.settlementController.Settings.ResourceMining.WoodcuttingRadius, this.settlementController.Settings.ResourceMining.MiningRadius)
+                            );
+                        }
+                    );
+
+                    if (existingExpandIndex > 0) {
+                        return true;
+                    }
+                    else {
+                        let settlementLocation = this.settlementController.GetSettlementLocation();
+
+                        if (settlementLocation) {
+                            return MaraUtils.ChebyshevDistance(value.Position, settlementLocation.Center) < settlementLocation.Radius;
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                }
+                else {
+                    return MaraUtils.IsHarvesterConfigId(value.ConfigId);
+                }
             }
-        });
+        );
 
-        let requiredBuildings = new Map<string, number>();
+        let requiredEconomyComposition: UnitComposition = new Map<string, number>();
 
-        requiredEconomy.forEach((value, key) => {
-            if (MaraUtils.IsBuildingConfigId(key)) {
-                requiredBuildings.set(key, value);
+        for (let item of requiredEconomy) {
+            MaraUtils.IncrementMapItem(requiredEconomyComposition, item.ConfigId);
+        }
+
+        let currentEconomySnapshot = this.settlementController.GetCurrentEconomySnapshot();
+        
+        currentEconomySnapshot = currentEconomySnapshot.filter(
+            (value) => {
+                if (MaraUtils.IsBuildingConfigId(value.ConfigId)) {
+                    return true;
+                }
+                else {
+                    return MaraUtils.IsHarvesterConfigId(value.ConfigId);
+                }
             }
-        });
+        );
 
-        let unbuiltBuildings = MaraUtils.SubstractCompositionLists(requiredBuildings, currentBuildings);
-        let productionEstimation = this.settlementController.ProductionController.EstimateProductionTime(unbuiltBuildings, false);
+        let currentEconomyComposition: UnitComposition = new Map<string, number>();
+
+        for (let item of currentEconomySnapshot) {
+            MaraUtils.IncrementMapItem(currentEconomyComposition, item.ConfigId);
+        }
+
+        let unitsToProduce = MaraUtils.SubstractCompositionLists(requiredEconomyComposition, currentEconomyComposition);
+
+        let productionEstimation = this.settlementController.ProductionController.EstimateProductionTime(unitsToProduce, false);
         let productionTime = 0;
 
         productionEstimation.forEach((value) => {

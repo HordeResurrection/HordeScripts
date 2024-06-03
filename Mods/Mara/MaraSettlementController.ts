@@ -38,6 +38,16 @@ export class TargetExpandData {
     }
 }
 
+export class EconomySnapshotItem {
+    ConfigId: string;
+    Position: MaraPoint | undefined;
+
+    constructor(configId: string, position?: MaraPoint) {
+        this.ConfigId = configId;
+        this.Position = position;
+    }
+}
+
 class ReservedUnitsData {
     public ReservableUnits: Array<Map<number, any>>;
     private reservedUnits: Map<number, any>;
@@ -122,7 +132,7 @@ export class MaraSettlementController {
     public TacticalController: TacticalSubcontroller;
     
     public HostileAttackingSquads: Array<MaraSquad> = [];
-    public TargetUnitsComposition: UnitComposition | null = null;
+    public TargetEconomySnapshot: Array<EconomySnapshotItem> | null = null;
     public AttackToDefenseUnitRatio: number | null = null;
     public TargetExpand: TargetExpandData | null = null;
     public Expands: Array<MaraPoint> = [];
@@ -179,7 +189,7 @@ export class MaraSettlementController {
         this.settlementLocation = null;
 
         if (tickNumber % 50 == 0) {
-            this.cleanupExpands();
+            this.СleanupExpands();
         }
 
         if (tickNumber % 10 == 0) {
@@ -243,6 +253,25 @@ export class MaraSettlementController {
         return new Map(this.currentUnitComposition);
     }
 
+    GetCurrentEconomySnapshot(): Array<EconomySnapshotItem> {
+        let result: Array<EconomySnapshotItem> = [];
+        
+        let units = enumerate(this.Settlement.Units);
+        let unit;
+        
+        while ((unit = eNext(units)) !== undefined) {
+            let snapshotItem = new EconomySnapshotItem(unit.Cfg.Uid);
+            
+            if (MaraUtils.IsBuildingConfig(unit.Cfg)) {
+                snapshotItem.Position = new MaraPoint(unit.Cell.X, unit.Cell.Y);
+            }
+
+            result.push(snapshotItem);
+        }
+
+        return result;
+    }
+
     GetCurrentDevelopedEconomyComposition(): UnitComposition {
         if (!this.currentDevelopedUnitComposition) {
             this.currentDevelopedUnitComposition = new Map<string, number>();
@@ -293,7 +322,7 @@ export class MaraSettlementController {
         }
     }
 
-    private cleanupExpands(): void {
+    СleanupExpands(): void {
         this.Expands = this.Expands.filter(
             (value) => {
                 let expandBuildings = MaraUtils.GetSettlementUnitsInArea(

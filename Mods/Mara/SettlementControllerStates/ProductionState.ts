@@ -1,19 +1,29 @@
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
-import { MaraResources } from "../Utils/Common";
+import { MaraPoint, MaraProductionRequest, MaraResources } from "../Utils/Common";
 
 export abstract class ProductionState extends MaraSettlementControllerState {
-    private targetUnitsComposition: UnitComposition = new Map<string, number>();
+    //protected abstract getTargetUnitsComposition(): UnitComposition;
+    //protected abstract onTargetCompositionReached(): void;
 
-    protected abstract getTargetUnitsComposition(): UnitComposition;
+    private requests: Array<MaraProductionRequest>;
+    private targetComposition: UnitComposition;
+
+    protected abstract getProductionRequests(): Array<MaraProductionRequest>;
     protected abstract onTargetCompositionReached(): void;
 
     private timeoutTick: number | null;
     
     OnEntry(): void {
+        if (!this.onEntry()) {
+            return;
+        }
+        
         this.settlementController.ProductionController.CancelAllProduction();
-        this.targetUnitsComposition = this.getTargetUnitsComposition();
+        
+        this.requests = this.getProductionRequests();
+        this.targetComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
         
         let insufficientResources = this.getInsufficientResources();
 
@@ -23,18 +33,21 @@ export abstract class ProductionState extends MaraSettlementControllerState {
             insufficientResources.Wood > 0 ||
             insufficientResources.People > 0
         ) {
-            this.settlementController.Debug(`Not enough resources to produce target composition`);
             if (!this.onInsufficientResources(insufficientResources)) {
+                this.settlementController.Debug(`Not enough resources to produce target composition`);
                 return;
             }
         }
 
-        this.refreshTargetProductionLists();
+        for (let request of this.requests) {
+            MaraUtils.IncrementMapItem(this.targetComposition, request.ConfigId);
+        }
+
         this.timeoutTick = null;
     }
 
     OnExit(): void {
-        //do nothing
+        this.onExit();
     }
 
     Tick(tickNumber: number): void {
@@ -63,14 +76,41 @@ export abstract class ProductionState extends MaraSettlementControllerState {
             }
         }
 
-        this.refreshTargetProductionLists();
-
-        let composition = this.settlementController.GetCurrentDevelopedEconomyComposition();
-
-        if (MaraUtils.SetContains(composition, this.targetUnitsComposition)) {
-            this.onTargetCompositionReached();
-            return;
+        for (let request of this.requests) {
+            request.Track();
         }
+
+        let requestsToReorder = this.getRequestsToReorder();
+        
+        if (requestsToReorder.length == 0) {
+            let isAllRequestsCompleted = true;
+
+            for (let request of this.requests) {
+                if (!request.IsCompleted) {
+                    isAllRequestsCompleted = false;
+                    break;
+                }
+            }
+            
+            if (isAllRequestsCompleted) {
+                this.onTargetCompositionReached();
+                return;
+            }
+        }
+        else {
+            for (let request of requestsToReorder) {
+                request.WipeResults();
+                this.settlementController.ProductionController.RequestProduction(request);
+            }
+        }
+    }
+
+    protected onEntry(): boolean {
+        return true;
+    }
+
+    protected onExit(): void {
+        //do nothing
     }
 
     protected getProductionTimeout(): number | null {
@@ -81,32 +121,74 @@ export abstract class ProductionState extends MaraSettlementControllerState {
         return true;
     }
 
-    private getRemainingProductionList(): UnitComposition {
-        let currentEconomy = this.settlementController.GetCurrentDevelopedEconomyComposition();
+    protected makeProductionRequest(
+        configId: string, 
+        point: MaraPoint | null, 
+        precision: number | null,
+        isForce: boolean = false
+    ): MaraProductionRequest {
+        let productionRequest = new MaraProductionRequest(configId, point, precision, isForce);
+        this.settlementController.ProductionController.RequestProduction(productionRequest);
         
-        for (let productionListItem of this.settlementController.ProductionController.ProductionList) {
-            MaraUtils.IncrementMapItem(currentEconomy, productionListItem);
-        }
-
-        return MaraUtils.SubstractCompositionLists(this.targetUnitsComposition, currentEconomy);
+        return productionRequest;
     }
 
-    private refreshTargetProductionLists(): void {
-        let trainingList = this.getRemainingProductionList();
+    private getRequestsToReorder(): Array<MaraProductionRequest> {
+        let completedRequests = this.requests.filter((value) => {return value.IsCompleted});
+        let orderedRequests = this.requests.filter((value) => {return !value.IsCompleted});
+
+        let developedComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
+        let compositionToRequest = MaraUtils.SubstractCompositionLists(this.targetComposition, developedComposition);
+
+        for (let request of orderedRequests) {
+            MaraUtils.DecrementMapItem(compositionToRequest, request.ConfigId);
+        }
+
+        let requestsToReorder: Array<MaraProductionRequest> = [];
+        let unknownRequests: Array<MaraProductionRequest> = [];
         
-        trainingList.forEach(
-            (val, key, map) => {
-                for (let i = 0; i < val; i++) {
-                    this.settlementController.ProductionController.RequestCfgIdProduction(key);
+        for (let request of completedRequests) {
+            if (request.IsSuccess) {
+                if (request.ProducedUnit) {
+                    if (!request.ProducedUnit.IsAlive) {
+                        requestsToReorder.push(request);
+                        MaraUtils.DecrementMapItem(compositionToRequest, request.ConfigId);
+                    }
+                }
+                else {
+                    unknownRequests.push(request);
+                }
+            }
+            else {
+                requestsToReorder.push(request);
+                MaraUtils.DecrementMapItem(compositionToRequest, request.ConfigId);
+            }
+        }
+
+        compositionToRequest.forEach(
+            (value, key) => {
+                let requestCount = value;
+                
+                for (let request of unknownRequests) {
+                    if (requestCount == 0) {
+                        break;
+                    }
+                    
+                    if (request.ConfigId == key) {
+                        requestsToReorder.push(request);
+                        requestCount --;
+                    }
                 }
             }
         );
+
+        return requestsToReorder;
     }
 
     private getInsufficientResources(): MaraResources {
         let currentEconomy = this.settlementController.GetCurrentDevelopedEconomyComposition();
         
-        let compositionToProduce = MaraUtils.SubstractCompositionLists(this.targetUnitsComposition, currentEconomy);
+        let compositionToProduce = MaraUtils.SubstractCompositionLists(this.targetComposition, currentEconomy);
 
         this.settlementController.Debug(`Current unit composition to produce:`);
         MaraUtils.PrintMap(compositionToProduce);

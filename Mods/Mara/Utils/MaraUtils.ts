@@ -796,12 +796,27 @@ export class MaraUtils {
         return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Mine);
     }
 
+    static IsMineConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId)
+        return MaraUtils.IsMineConfig(cfg);
+    }
+
     static IsSawmillConfig(unitConfig: any): boolean {
         return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Sawmill);
     }
 
+    static IsSawmillConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId)
+        return MaraUtils.IsSawmillConfig(cfg);
+    }
+
     static IsHarvesterConfig(unitConfig: any): boolean {
         return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Harvester);
+    }
+
+    static IsHarvesterConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId)
+        return MaraUtils.IsHarvesterConfig(cfg);
     }
 
     static IsHousingConfig(unitConfig: any): boolean {

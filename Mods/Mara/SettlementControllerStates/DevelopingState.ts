@@ -1,12 +1,10 @@
-import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
+import { MaraUtils } from "Mara/Utils/MaraUtils";
 import { ProductionState } from "./ProductionState";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
-import { MaraResources } from "../Utils/Common";
+import { MaraProductionRequest, MaraResources } from "../Utils/Common";
 
 export class DevelopingState extends ProductionState {
-    protected getTargetUnitsComposition(): UnitComposition {
-        var targetCompostion = new Map<string, number>();
-
+    protected getProductionRequests(): Array<MaraProductionRequest> {
         let economyComposition = this.settlementController.GetCurrentEconomyComposition();
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
         let absentProducers: string[] = [];
@@ -30,6 +28,8 @@ export class DevelopingState extends ProductionState {
             }
         }
 
+        let result = new Array<MaraProductionRequest>();
+
         if (absentProducers.length > 0 || absentTech.length > 0) {
             let selectedCfgIds: Array<string>;
 
@@ -51,7 +51,8 @@ export class DevelopingState extends ProductionState {
             }
             
             let index = MaraUtils.Random(this.settlementController.MasterMind, selectedCfgIds.length - 1);
-            MaraUtils.IncrementMapItem(targetCompostion, selectedCfgIds[index]);
+
+            result.push(this.makeProductionRequest(selectedCfgIds[index], null, null));
         }
 
         let combatComposition = this.settlementController.StrategyController.GetSettlementAttackArmyComposition();
@@ -65,18 +66,18 @@ export class DevelopingState extends ProductionState {
                     let index = MaraUtils.Random(this.settlementController.MasterMind, producingCfgIds.length - 1);
                     let producerCfgId = producingCfgIds[index];
 
-                    if (!targetCompostion.has(producerCfgId)) {
-                        targetCompostion.set(producerCfgId, 1);
+                    if (
+                        !result.find(
+                            (value) => {return value.ConfigId == producerCfgId}
+                        )
+                    ) {
+                        result.push(this.makeProductionRequest(producerCfgId, null, null));
                     }
                 }
             }
         });
 
-        economyComposition.forEach((value, key) => {
-            MaraUtils.AddToMapItem(targetCompostion, key, value);
-        });
-
-        return targetCompostion;
+        return result;
     }
 
     protected onTargetCompositionReached(): void {
