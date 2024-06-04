@@ -4,9 +4,6 @@ import { SettlementControllerStateFactory } from "../SettlementControllerStateFa
 import { MaraPoint, MaraProductionRequest, MaraResources } from "../Utils/Common";
 
 export abstract class ProductionState extends MaraSettlementControllerState {
-    //protected abstract getTargetUnitsComposition(): UnitComposition;
-    //protected abstract onTargetCompositionReached(): void;
-
     private requests: Array<MaraProductionRequest>;
     private targetComposition: UnitComposition;
 
@@ -33,8 +30,9 @@ export abstract class ProductionState extends MaraSettlementControllerState {
             insufficientResources.Wood > 0 ||
             insufficientResources.People > 0
         ) {
+            this.settlementController.Debug(`Not enough resources to produce target composition: ${insufficientResources.ToString()}`);
+
             if (!this.onInsufficientResources(insufficientResources)) {
-                this.settlementController.Debug(`Not enough resources to produce target composition`);
                 return;
             }
         }
@@ -186,24 +184,29 @@ export abstract class ProductionState extends MaraSettlementControllerState {
     }
 
     private getInsufficientResources(): MaraResources {
-        let currentEconomy = this.settlementController.GetCurrentDevelopedEconomyComposition();
-        
-        let compositionToProduce = MaraUtils.SubstractCompositionLists(this.targetComposition, currentEconomy);
+        let compositionToProduce: UnitComposition = new Map<string, number>();
+
+        for (let request of this.requests) {
+            MaraUtils.IncrementMapItem(compositionToProduce, request.ConfigId);
+        }
 
         this.settlementController.Debug(`Current unit composition to produce:`);
         MaraUtils.PrintMap(compositionToProduce);
 
         let compositionCost = this.calculateCompositionCost(compositionToProduce);
-        
+        this.settlementController.Debug(`Target composition cost: ${compositionCost.ToString()}`);
+
         let currentResources = this.settlementController.MiningController.GetTotalResources();
-        let requiredResources = new MaraResources(
+        this.settlementController.Debug(`Current resources: ${currentResources.ToString()}`);
+
+        let insufficientResources = new MaraResources(
             Math.max(compositionCost.Wood - currentResources.Wood, 0), 
             Math.max(compositionCost.Metal - currentResources.Metal, 0), 
             Math.max(compositionCost.Gold - currentResources.Gold, 0), 
             Math.max(compositionCost.People - currentResources.People, 0)
         );
 
-        return requiredResources;
+        return insufficientResources;
     }
 
     private calculateCompositionCost(composition: UnitComposition): MaraResources {
