@@ -125,6 +125,10 @@ export class MaraUtils {
         return ScriptUtils.GetValue(object, propertyName);
     }
 
+    static SetValue(object: any, propertyName: string, newValue: any): void {
+        ScriptUtils.SetValue(object, propertyName, newValue);
+    }
+
     static CastToType(object: any, type: any): any {
         try {
             return host.cast(type, object);
@@ -932,9 +936,5 @@ export class MaraUtils {
         let NetworkController = HordeEngine.HordeResurrection.Engine.Logic.Main.NetworkController;
         
         return NetworkController.NetWorker != null;
-    }
-
-    static SetValue(object: any, propertyName: string, newValue: any): void {
-        ScriptUtils.SetValue(object, propertyName, newValue);
     }
 }
