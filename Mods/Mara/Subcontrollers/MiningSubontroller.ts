@@ -225,7 +225,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         let freeHarvesters = allHarvesters.filter(
             (value) => {
                 return (
-                    this.isFreeHarvester(value) &&
+                    this.isUnreservedHarvester(value) &&
                     !engagedHarvesters.find((harvester) => {return harvester == value})
                 );
             }
@@ -234,7 +234,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         return freeHarvesters;
     }
 
-    private isFreeHarvester(unit: any) {
+    private isUnreservedHarvester(unit: any) {
         return (
             unit.IsAlive && !this.parentController.ReservedUnitsData.IsUnitReserved(unit)
         );
@@ -254,13 +254,13 @@ export class MiningSubcontroller extends MaraSubcontroller {
         this.Mines = this.Mines.filter((value) => {return this.buildingFilter(value.Mine)});
 
         for (let mineData of this.Mines) {
-            mineData.Miners = mineData.Miners.filter((value) => {return this.isFreeHarvester(value)});
+            mineData.Miners = mineData.Miners.filter((value) => {return this.isUnreservedHarvester(value)});
         }
 
         this.Sawmills = this.Sawmills.filter((value) => {return this.buildingFilter(value.Sawmill)});
 
         for (let sawmillData of this.Sawmills) {
-            sawmillData.Woodcutters = sawmillData.Woodcutters.filter((value) => {return this.isFreeHarvester(value)})
+            sawmillData.Woodcutters = sawmillData.Woodcutters.filter((value) => {return this.isUnreservedHarvester(value)})
         }
     }
 
@@ -276,7 +276,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
             if (MaraUtils.IsMineConfig(unit.Cfg)) {
                 let mineData = this.Mines.find((value) => {return value.Mine == unit});
                 
-                if (!mineData) {
+                if (!mineData && this.parentController.StrategyController.IsSafeExpand(unit.CellCenter)) {
                     mineData = new MineData();
                     mineData.Mine = unit;
                     this.Mines.push(mineData);
@@ -285,7 +285,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
             else if (MaraUtils.IsSawmillConfig(unit.Cfg)) {
                 let sawmillData = this.Sawmills.find((value) => {return value.Sawmill == unit});
 
-                if (!sawmillData) {
+                if (!sawmillData && this.parentController.StrategyController.IsSafeExpand(unit.CellCenter)) {
                     sawmillData = new SawmillData();
                     sawmillData.Sawmill = unit;
                     this.Sawmills.push(sawmillData);
