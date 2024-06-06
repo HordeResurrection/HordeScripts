@@ -129,20 +129,26 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     ForceRequestSingleCfgIdProduction(configId: string): void {
-        let masterMind = this.parentController.MasterMind;
-        let requests = enumerate(masterMind.Requests);
-        let request;
-
-        while ((request = eNext(requests)) !== undefined) {
-            if (request.RequestedCfg) {
-                if (request.RequestedCfg.Uid == configId)  {
-                    return;
-                }
-            }
+        if (this.ProductionList.indexOf(configId) >= 0) {
+            return;
         }
         
-        let productionRequest = new MaraProductionRequest(configId, null, null);
-        MaraUtils.RequestMasterMindProduction(productionRequest, this.parentController.MasterMind);
+        this.RequestCfgIdProduction(configId);
+
+        let requiredConfigs = MaraUtils.GetCfgIdProductionChain(configId, this.parentController.Settlement);
+        
+        let existingUnits = MaraUtils.GetAllSettlementUnits(this.parentController.Settlement);
+        let existingCfgIds = new Set<string>();
+
+        for (let unit of existingUnits) {
+            existingCfgIds.add(unit.Cfg.Uid);
+        }
+
+        for (let cfg of requiredConfigs) {
+            if (!existingCfgIds.has(cfg.Uid)) {
+                this.RequestCfgIdProduction(cfg.Uid);
+            }
+        }
     }
 
     CancelAllProduction(): void {

@@ -43,7 +43,7 @@ export abstract class MaraSettlementControllerState extends FsmState {
             );
         }
         else {
-            this.settlementController.Debug(`Unable to find suitable resource cluster for mining`);
+            this.settlementController.Debug(`No resource cluster for mining selected`);
             
             this.settlementController.TargetExpand = new TargetExpandData( //when in doubt - build more izbas!!
                 null,

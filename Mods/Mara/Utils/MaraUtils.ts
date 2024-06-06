@@ -1,7 +1,7 @@
 import { Mara, MaraLogLevel } from "Mara/Mara";
 import { MaraSquad } from "Mara/Subcontrollers/Squads/MaraSquad";
 import { createBox, createPoint } from "library/common/primitives";
-import { UnitFlags, UnitCommand, AllContent } from "library/game-logic/horde-types";
+import { UnitFlags, UnitCommand, AllContent, UnitConfig } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
 import { enumerate, eNext, MaraProductionRequest, MaraPoint } from "./Common";
@@ -531,6 +531,47 @@ export class MaraUtils {
         return unitsMap.GetUpperUnit(cell.X, cell.Y);
     }
 
+    private static techGetter(cfg: any, settlement: any): any {
+        return settlement.TechTree.AreRequirementsSatisfiedExt(cfg);
+    }
+    
+    private static productionGetter(cfg: any, settlement: any): any {
+        let listType = xHost.type('System.Collections.Generic.List');
+        let configType = UnitConfig;
+        let list = host.newObj(listType(configType), 0);
+    
+        settlement.TechTree.HypotheticalProducts.WhoCanProduce(cfg, list);
+    
+        return list;
+    }
+    
+    private static getChain(cfg: any, settlement: any, chain: Map<string, any>, nextLevelGetter: (cfg: any, settlement: any) => Array<any>): void {
+        let nextLevel = nextLevelGetter(cfg, settlement);
+    
+        ForEach(nextLevel, (item) => {
+                if (!chain.has(item.Uid)) {
+                    chain.set(item.Uid, item);
+                    MaraUtils.getChain(item, settlement, chain, nextLevelGetter);
+                }
+            }
+        );
+    }
+    
+    public static GetCfgIdProductionChain(cfgId: string, settlement: any): Array<any> {
+        let chain = new Map<string, any>();
+        let config = MaraUtils.GetUnitConfig(cfgId);
+    
+        MaraUtils.getChain(config, settlement, chain, MaraUtils.productionGetter);
+    
+        if (chain.size == 0) {
+            return [];
+        }
+    
+        MaraUtils.getChain(config, settlement, chain, MaraUtils.techGetter);
+    
+        return Array.from(chain.values());
+    }
+
     // finds a free cell nearest to given
     static FindFreeCell(point): any {
         let unitsMap = DotnetHolder.UnitsMap;
@@ -629,7 +670,7 @@ export class MaraUtils {
 
         let produceRequestParameters = new ProduceRequestParameters(cfg, 1);
         produceRequestParameters.CheckExistsRequest = checkDuplicate;
-        produceRequestParameters.AllowAuxiliaryProduceRequests = true;
+        produceRequestParameters.AllowAuxiliaryProduceRequests = false;
         produceRequestParameters.Producer = productionRequest.Executor;
         
         if (productionRequest.Point) {
