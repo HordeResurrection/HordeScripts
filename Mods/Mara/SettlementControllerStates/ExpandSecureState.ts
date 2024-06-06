@@ -39,7 +39,6 @@ export class ExpandSecureState extends MaraSettlementControllerState {
 
         if (tickNumber % 50 == 0) {
             if (this.settlementController.StrategyController.IsUnderAttack()) {
-                //TODO: change this to expand defend state
                 this.settlementController.State = SettlementControllerStateFactory.MakeDefendingState(this.settlementController);
                 return;
             }

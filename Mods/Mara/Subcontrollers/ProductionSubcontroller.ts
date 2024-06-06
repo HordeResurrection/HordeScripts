@@ -1,6 +1,4 @@
 
-//TODO: probably reorganize build list to a queue
-
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 import { MaraProductionRequest, eNext, enumerate } from "Mara/Utils/Common";
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
