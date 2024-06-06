@@ -165,6 +165,17 @@ export class MiningSubcontroller extends MaraSubcontroller {
         return optimalPosition;
     }
 
+    public GetMaxHarvesterCount(): number {
+        let maxMiners = 0;
+
+        for (let mineData of this.Mines) {
+            maxMiners += this.getMinerCount(mineData.Mine);
+        }
+        
+        return maxMiners +
+            this.Sawmills.length * this.parentController.Settings.ResourceMining.MaxWoodcuttersPerSawmill;
+    }
+
     private getClosestMetalStock(point: MaraPoint): any | null {
         if (!this.metalStocks) {
             let allUnits = MaraUtils.GetAllSettlementUnits(this.parentController.Settlement);

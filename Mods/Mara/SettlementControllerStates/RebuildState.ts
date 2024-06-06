@@ -77,11 +77,18 @@ export class RebuildState extends ProductionState {
         }
 
         let harvestersToProduce = MaraUtils.SubstractCompositionLists(requiredHarvesters, existingHarvesters);
+        let maxHarvesters = this.settlementController.MiningController.GetMaxHarvesterCount();
+        let harvestersCout = 0;
 
         harvestersToProduce.forEach(
             (value, key) => {
+                if (harvestersCout >= maxHarvesters) {
+                    return;
+                }
+                
                 for (let i = 0; i < value; i++) {
                     result.push(this.makeProductionRequest(key, null, null));
+                    harvestersCout ++;
                 }
             }
         );
