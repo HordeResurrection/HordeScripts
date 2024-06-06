@@ -4,48 +4,48 @@ state Develop #LightGreen: Build-up production
 state Rebuild #LightGreen: Rebuild economy after losses
 state Defend #LightGreen: Defend against attacks
 state BuildUp #LightGreen: Build an army that\ncounters enemy strategy
+state Routing: Decide on next general strategy
 
-state ExpandPrepare #LightBlue: Selecting expand location\nand preparing forces to\nsecure it
+state ExpandPrepare #LightBlue: Preparing forces\nto secure expand location
 state ExpandSecure #LightBlue: Move to selected location\nand secure it
 state ExpandBuild #LightBlue: Build expand\non secured location
-state ExpandDefend #LightBlue: Defend against attacks
 
 state Exterminate #LightCoral: Attack the enemy
 
-[*] --> Develop: Initial state
+[*] --> Routing: Initial state
 
 Defend --> Rebuild: Attack countered\nDamage is not severe
-Defend --> Develop: Attack countered\nDamage is too severe
+Defend -up-> Routing: Attack countered\nDamage is too severe
 
 Develop --> BuildUp: Economy\nfunctioning
-Develop --> Defend: Attacked
-Develop -left-> ExpandPrepare: Not enough resources to\nproduce estimated army
+Develop -down-> Defend: Attacked
+Develop -left-> ExpandPrepare: Not enough resources to\nperform settlement development
 
 BuildUp -down-> Exterminate: Army gathered\nOR\nTimeout Exceeded
 BuildUp --> Defend: Attacked
 BuildUp --> Develop: Impossible to produce\nany combat unit
+BuildUp -left-> ExpandPrepare: Not enough resources\nto produce necessary army
 
 Rebuild --> BuildUp: Economy\nRestored
 Rebuild --> Defend: Attacked
 
 ExpandPrepare --> ExpandSecure: Forces gathered
-ExpandPrepare -left-> ExpandDefend: Attacked
-ExpandPrepare --> Develop: No suitable\nexpand location
+ExpandPrepare -down-> Defend: Attacked
 
 ExpandSecure --> ExpandBuild: Expand secured
-ExpandSecure -left-> ExpandDefend: Attacked
-ExpandSecure --> Develop: Failed to\nsecure expand
+ExpandSecure -down-> Defend: Attacked
+ExpandSecure -up-> Routing: Failed to\nsecure expand
 
-ExpandBuild --> Develop: Expand up and running
-ExpandBuild -left-> ExpandDefend: Attacked
-
-ExpandDefend --> ExpandPrepare: Attack Countered\nDamage is not severe
-ExpandDefend --> Develop: Attack Countered\nDamage is too severe
+ExpandBuild -up-> Routing: Expand up and running
+ExpandBuild -down-> Defend: Attacked
 
 Exterminate --> [*]: Enemy defeated
-Exterminate --> Develop: Army slain\nOR\nTimeout exceeded
+Exterminate -up-> Routing: Army slain\nOR\nTimeout exceeded
 Exterminate --> Defend: Main or expand attacked
 
+Routing -down-> BuildUp: Current economy is enough\nto attack
+Routing -down-> Develop: Need to develop economy
+Routing -down-> ExpandPrepare: Not enough resources
 
 legend
 | **Color** | **Meaning** |
