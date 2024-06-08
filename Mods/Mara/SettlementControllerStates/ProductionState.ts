@@ -74,10 +74,6 @@ export abstract class ProductionState extends MaraSettlementControllerState {
             }
         }
 
-        for (let request of this.requests) {
-            request.Track();
-        }
-
         let requestsToReorder = this.getRequestsToReorder();
         
         if (requestsToReorder.length == 0) {
