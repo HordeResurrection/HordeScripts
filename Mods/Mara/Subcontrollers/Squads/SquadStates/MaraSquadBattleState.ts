@@ -5,25 +5,7 @@ import { MaraSquadMoveState } from "./MaraSquadMoveState";
 import { MaraSquadState } from "./MaraSquadState";
 import { TileType } from "library/game-logic/horde-types";
 import { MaraSquadPullbackState } from "./MaraSquadPullbackState";
-
-abstract class MaraCellDataHolder {
-    protected data: any;
-    
-    constructor () {
-        this.Clear();
-    }
-
-    abstract Get(cell: any): any;
-    abstract Set(cell: any, value: any): void;
-
-    Clear(): void {
-        this.data = {};
-    }
-
-    protected makeIndex(cell: any): string {
-        return `(${cell.X},${cell.Y})`;
-    }
-}
+import { MaraCellDataHolder } from "../../../Utils/Common";
 
 class MaraThreatMap extends MaraCellDataHolder {
     constructor () {

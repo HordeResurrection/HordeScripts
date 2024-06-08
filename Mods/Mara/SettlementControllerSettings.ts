@@ -4,10 +4,13 @@ export class MaraSettlementControllerSettings {
     public Timeouts: TimeoutsSettings = new TimeoutsSettings();
     public Squads: SquadsSettings = new SquadsSettings();
     public ControllerStates: ControllerStatesSettings = new ControllerStatesSettings();
+    public ResourceMining: ResourceMiningSettings = new ResourceMiningSettings();
+    public CombatSettings: CombatSettings = new CombatSettings();
 }
 
 class UnitSearchSettings {
     public BuildingSearchRadius: number = 5;
+    public ExpandEnemySearchRadius: number = 10;
 }
 
 class TimeoutsSettings {
@@ -16,8 +19,10 @@ class TimeoutsSettings {
     public MaxBuildUpProductionTimeout: number = 3 * 60 * 50;
     public MinBuildUpProductionTimeout: number = 1 * 60 * 50;
 
-    public UnitProductionEstimationThreshold: number = 2 * 60 * 50; //2 min
-    public ExterminatingTimeout: number = 5 * 60 * 50; //5 min
+    public UnitProductionEstimationThreshold: number = 2 * 60 * 50;
+    public ExterminatingTimeout: number = 5 * 60 * 50;
+    
+    public ExpandBuildTimeout: number = 3 * 60 * 50;
 }
 
 class SquadsSettings {
@@ -34,4 +39,20 @@ class ControllerStatesSettings {
     public ProducerProductionProbability: number = 66;
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;
+    public AttackStrengthToEnemyStrengthRatio: number = 1.5;
+}
+
+class ResourceMiningSettings {
+    public MinMinersPerMine: number = 3;
+    public WoodcutterBatchSize: number = 5;
+    public MinWoodcuttersPerSawmill: number = 3;
+    public MaxWoodcuttersPerSawmill: number = 10;
+    public HousingBatchSize: number = 3;
+
+    public WoodcuttingRadius: number = 10;
+    public MiningRadius: number = 15;
+}
+
+class CombatSettings {
+    public ExpandDefenseStrength: number = 100;
 }
