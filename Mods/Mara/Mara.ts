@@ -1,6 +1,7 @@
 import { log } from "library/common/logging";
 import { MaraSettlementController } from "./MaraSettlementController";
 import { MaraUtils } from "./Utils/MaraUtils";
+import { MaraResourceMap } from "./MaraResourceMap";
 
 export enum MaraLogLevel {
     Debug = 0,
@@ -58,6 +59,10 @@ export class Mara {
             Mara.CanRun = true;
             Mara.IsNetworkMode = MaraUtils.IsNetworkMode();
             Mara.controllers = [];
+
+            Mara.Debug(`Building resource map...`);
+            MaraResourceMap.Init();
+            Mara.Debug(`Done!`);
 
             let tickOffset = 0;
 

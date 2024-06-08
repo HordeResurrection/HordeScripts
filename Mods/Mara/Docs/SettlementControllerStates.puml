@@ -1,50 +1,57 @@
 @startuml controller states
 
-state EXPLOIT {
-    state Develop: Build-up economy
-    state Rebuild: Rebuild economy after losses
-    state Defend: Defend against attacks
-    state BuildUp: Build an army that\ncounters enemy strategy
+state Develop #LightGreen: Build-up production
+state Rebuild #LightGreen: Rebuild economy after losses
+state Defend #LightGreen: Defend against attacks
+state BuildUp #LightGreen: Build an army that\ncounters enemy strategy
+state Routing: Decide on next general strategy
 
-    state Exploit_Entry <<inputPin>>
+state ExpandPrepare #LightBlue: Preparing forces\nto secure expand location
+state ExpandSecure #LightBlue: Move to selected location\nand secure it
+state ExpandBuild #LightBlue: Build expand\non secured location
 
-    Exploit_Entry --> Develop
+state Exterminate #LightCoral: Attack the enemy
 
-    Defend --> Rebuild: Attack countered\nDamage is not severe
-    Defend --> Develop: Attack countered\nDamage is too severe
-    
-    Develop --> BuildUp: Economy\nfunctioning
-    Develop --> Defend: Attacked
+[*] --> Routing: Initial state
 
-    BuildUp -down-> Exploit_ArmyGathered <<outputPin>>: Army gathered\nOR\nTimeout Exceeded
-    BuildUp --> Defend: Attacked
-    BuildUp --> Develop: Impossible to produce\nany combat unit
+Defend --> Rebuild: Attack countered\nDamage is not severe
+Defend -up-> Routing: Attack countered\nDamage is too severe
 
-    Rebuild --> BuildUp: Economy\nRestored
-    Rebuild --> Defend: Attacked
-}
+Develop --> BuildUp: Economy\nfunctioning
+Develop -down-> Defend: Attacked
+Develop -left-> ExpandPrepare: Not enough resources to\nperform settlement development
 
-note left of EXPLOIT
-Building up economy,
-gathering resources 
-and training an army
-end note
+BuildUp -down-> Exterminate: Army gathered\nOR\nTimeout Exceeded
+BuildUp --> Defend: Attacked
+BuildUp --> Develop: Impossible to produce\nany combat unit
+BuildUp -left-> ExpandPrepare: Not enough resources\nto produce necessary army
 
-state EXPAND #pink: Choosing and securing expansion sites
-state Exterminate: Attack the enemy
+Rebuild --> BuildUp: Economy\nRestored
+Rebuild --> Defend: Attacked
 
-[*] -down-> Exploit_Entry: Initial state
+ExpandPrepare --> ExpandSecure: Forces gathered
+ExpandPrepare -down-> Defend: Attacked
 
-Exploit_ArmyGathered -right-> Exterminate: Army gathered
+ExpandSecure --> ExpandBuild: Expand secured
+ExpandSecure -down-> Defend: Attacked
+ExpandSecure -up-> Routing: Failed to\nsecure expand
+
+ExpandBuild -up-> Routing: Expand up and running
+ExpandBuild -down-> Defend: Attacked
 
 Exterminate --> [*]: Enemy defeated
-Exterminate --> Exploit_Entry: Army slain\nOR\nTimeout exceeded
+Exterminate -up-> Routing: Army slain\nOR\nTimeout exceeded
 Exterminate --> Defend: Main or expand attacked
 
+Routing -down-> BuildUp: Current economy is enough\nto attack
+Routing -down-> Develop: Need to develop economy
+Routing -down-> ExpandPrepare: Not enough resources
 
 legend
-Pink and red colors mean that this 
-state/transition is not implemented yet
+| **Color** | **Meaning** |
+|<#LightGreen>| Exploit |
+|<#LightBlue>| Expand |
+|<#LightCoral>| Exterminate |
 endlegend
 
 @enduml

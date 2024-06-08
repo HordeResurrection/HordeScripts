@@ -11,10 +11,11 @@ import { ProductionSubcontroller } from "./Subcontrollers/ProductionSubcontrolle
 import { MaraSquad } from "./Subcontrollers/Squads/MaraSquad";
 import { StrategySubcontroller } from "./Subcontrollers/StrategySubcontroller";
 import { TacticalSubcontroller } from "./Subcontrollers/TacticalSubcontroller";
-import { eNext, enumerate } from "./Utils/Common";
+import { MaraPoint, eNext, enumerate } from "./Utils/Common";
 import { MaraUtils, UnitComposition } from "./Utils/MaraUtils";
 import { MaraSettlementControllerSettings } from "./SettlementControllerSettings";
 import { SettlementControllerStateFactory } from "./SettlementControllerStateFactory";
+import { MaraResourceCluster, MaraResourceType } from "./MaraResourceMap";
 
 export class SettlementLocation {
     Center: any;
@@ -23,6 +24,97 @@ export class SettlementLocation {
     constructor(center: any, radius: number) {
         this.Center = center;
         this.Radius = radius;
+    }
+}
+
+export class TargetExpandData {
+    Cluster: MaraResourceCluster | null;
+    ResourceType: MaraResourceType[] = [];
+    BuildCenter: MaraPoint | null = null;
+
+    constructor(cluster: MaraResourceCluster | null, resourceType: MaraResourceType[]) {
+        this.Cluster = cluster;
+        this.ResourceType = resourceType;
+    }
+}
+
+export class EconomySnapshotItem {
+    ConfigId: string;
+    Position: MaraPoint | undefined;
+
+    constructor(configId: string, position?: MaraPoint) {
+        this.ConfigId = configId;
+        this.Position = position;
+    }
+}
+
+class ReservedUnitsData {
+    public ReservableUnits: Array<Map<number, any>>;
+    private reservedUnits: Map<number, any>;
+
+    constructor() {
+        this.reservedUnits = new Map<number, any>();
+        this.ReservableUnits = [];
+        
+        this.ReservableUnits.push(new Map<number, any>());
+        this.ReservableUnits.push(new Map<number, any>());
+    }
+
+    public ReserveUnit(unit: any): void {
+        for (let map of this.ReservableUnits) {
+            if (map.has(unit.Id)) {
+                map.delete(unit.Id);
+            }
+        }
+
+        this.reservedUnits.set(unit.Id, unit);
+    }
+
+    public FreeUnit(unit: any): boolean {
+        if (!this.reservedUnits.has(unit.Id)) {
+            return false;
+        }
+        
+        this.reservedUnits.delete(unit.Id);
+        return true;
+    }
+
+    public AddReservableUnits(units: Array<any>, level: number): void {
+        for (let unit of units) {
+            for (let i = 0; i < this.ReservableUnits.length; i++) {
+                this.ReservableUnits[i].delete(unit.Id);
+            }
+            
+            this.ReservableUnits[level].set(unit.Id, unit);
+        }
+    }
+
+    public IsUnitReserved(unit: any): boolean {
+        return this.reservedUnits.has(unit.Id);
+    }
+
+    public Cleanup(): void {
+        this.cleanupMap(this.reservedUnits);
+        
+        for (let i = 0; i < this.ReservableUnits.length; i++) {
+            this.cleanupMap(this.ReservableUnits[i]);
+        }
+    }
+
+    private cleanupMap(map: Map<number, any>): void {
+        let keysToDelete: Array<number> = [];
+
+        map.forEach(
+            (value, key) => {
+                if (!value.IsAlive) {
+                    keysToDelete.push(key);
+                }
+            }
+        );
+
+        for (let key of keysToDelete) {
+            map.delete(key);
+        }
     }
 }
 
@@ -40,8 +132,11 @@ export class MaraSettlementController {
     public TacticalController: TacticalSubcontroller;
     
     public HostileAttackingSquads: Array<MaraSquad> = [];
-    public TargetUnitsComposition: UnitComposition | null = null;
+    public TargetEconomySnapshot: Array<EconomySnapshotItem> | null = null;
     public AttackToDefenseUnitRatio: number | null = null;
+    public TargetExpand: TargetExpandData | null = null;
+    public Expands: Array<MaraPoint> = [];
+    public ReservedUnitsData: ReservedUnitsData = new ReservedUnitsData();
     
     private subcontrollers: Array<MaraSubcontroller> = [];
     private state: MaraSettlementControllerState;
@@ -77,7 +172,7 @@ export class MaraSettlementController {
         this.TacticalController = new TacticalSubcontroller(this);
         this.subcontrollers.push(this.TacticalController);
 
-        this.State = SettlementControllerStateFactory.MakeDevelopingState(this);
+        this.State = SettlementControllerStateFactory.MakeRoutingState(this);
     }
 
     public get State(): MaraSettlementControllerState {
@@ -92,6 +187,14 @@ export class MaraSettlementController {
         this.currentUnitComposition = null;
         this.currentDevelopedUnitComposition = null;
         this.settlementLocation = null;
+
+        if (tickNumber % 50 == 0) {
+            this.СleanupExpands();
+        }
+
+        if (tickNumber % 10 == 0) {
+            this.ReservedUnitsData.Cleanup();
+        }
 
         for (let subcontroller of this.subcontrollers) {
             subcontroller.Tick(tickNumber);
@@ -150,6 +253,25 @@ export class MaraSettlementController {
         return new Map(this.currentUnitComposition);
     }
 
+    GetCurrentEconomySnapshot(): Array<EconomySnapshotItem> {
+        let result: Array<EconomySnapshotItem> = [];
+        
+        let units = enumerate(this.Settlement.Units);
+        let unit;
+        
+        while ((unit = eNext(units)) !== undefined) {
+            let snapshotItem = new EconomySnapshotItem(unit.Cfg.Uid);
+            
+            if (MaraUtils.IsBuildingConfig(unit.Cfg)) {
+                snapshotItem.Position = new MaraPoint(unit.Cell.X, unit.Cell.Y);
+            }
+
+            result.push(snapshotItem);
+        }
+
+        return result;
+    }
+
     GetCurrentDevelopedEconomyComposition(): UnitComposition {
         if (!this.currentDevelopedUnitComposition) {
             this.currentDevelopedUnitComposition = new Map<string, number>();
@@ -181,7 +303,7 @@ export class MaraSettlementController {
             let squads = MaraUtils.GetSettlementsSquadsFromUnits(
                 [centralProductionBuilding], 
                 [this.Settlement], 
-                (unit) => {return unit.Cfg.BuildingConfig != null},
+                (unit) => {return MaraUtils.IsBuildingConfig(unit.Cfg)},
                 this.Settings.UnitSearch.BuildingSearchRadius
             );
             
@@ -198,5 +320,20 @@ export class MaraSettlementController {
         else {
             return null;
         }
+    }
+
+    СleanupExpands(): void {
+        this.Expands = this.Expands.filter(
+            (value) => {
+                let expandBuildings = MaraUtils.GetSettlementUnitsInArea(
+                    value,
+                    Math.max(this.Settings.ResourceMining.WoodcuttingRadius, this.Settings.ResourceMining.MiningRadius),
+                    [this.Settlement],
+                    (unit) => {return MaraUtils.IsBuildingConfig(unit.Cfg)}
+                );
+
+                return expandBuildings.length > 0;
+            }
+        )
     }
 }
