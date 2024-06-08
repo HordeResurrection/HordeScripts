@@ -192,6 +192,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.parentController.Debug(`${this.initialOffensiveSquadCount} offensive squads composed`);
     }
 
+    DismissSquads(): void {
+        this.offensiveSquads = [];
+        this.defensiveSquads = [];
+        this.reinforcementSquads = [];
+    }
+
     ReinforceSquads(): void {
         this.reinforceSquadsByFreeUnits();
 
@@ -204,7 +210,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     private getWeakestReinforceableSquad(checkReinforcements: boolean): MaraControllableSquad | null {
-        let weakestSquad = this.findWeakestReinforceableSquad(this.defensiveSquads);
+        let weakestSquad = this.findWeakestReinforceableSquad(this.defensiveSquads, (s) => s.IsIdle());
 
         if (weakestSquad == null) {
             weakestSquad = this.findWeakestReinforceableSquad(this.offensiveSquads, (s) => s.IsIdle());
