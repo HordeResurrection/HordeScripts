@@ -358,33 +358,54 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return defensiveStrength;
     }
 
-    SelectOptimalResourceCluster(candidates: Array<MaraResourceCluster>): MaraResourceCluster {
-        //TODO: add more sophisticated heuristic for best cluster
-        
-        let result: MaraResourceCluster;
-        let minDistance = Infinity;
+    SelectOptimalResourceCluster(candidates: Array<MaraResourceCluster>): MaraResourceCluster | null {
+        let acceptableClusters:Array<any> = [];
 
         for (let cluster of candidates) {
             let distance = MaraUtils.ChebyshevDistance(cluster.Center, this.parentController.GetSettlementLocation()?.Center);
 
-            if (distance < minDistance) {
-                let units = MaraUtils.GetUnitsInArea(
-                    cluster.Center,
-                    cluster.Size, //radius = cluster radius * 2
-                    (unit) => {
-                        return unit.Owner != this.parentController.Settlement && 
-                            !this.EnemySettlements.find((value) => {return value == unit.Owner})
-                    }
-                );
-                
-                if (units.length == 0) {
-                    result = cluster;
-                    minDistance = distance;
+            let units = MaraUtils.GetUnitsInArea(
+                cluster.Center,
+                cluster.Size, //radius = cluster radius * 2
+                (unit) => {
+                    return unit.Owner != this.parentController.Settlement
                 }
+            );
+
+            let totalEnemyStrength = 0;
+
+            for (let unit of units) {
+                if (this.EnemySettlements.find((value) => {return value == unit.Owner})) {
+                    totalEnemyStrength += MaraUtils.GetUnitStrength(unit);
+                }
+                else {
+                    continue;
+                }
+            }
+
+            distance += totalEnemyStrength / 10;
+            acceptableClusters.push({Cluster: cluster, Distance: distance});
+        }
+
+        let minDistance = Infinity;
+        
+        for (let item of acceptableClusters) {
+            if (minDistance > item.Distance) {
+                minDistance = item.Distance;
             }
         }
 
-        return result!;
+        let finalClusters: Array<MaraResourceCluster> = [];
+
+        for (let item of acceptableClusters) {
+            if (item.Distance / minDistance <= 1.1) {
+                finalClusters.push(item.Cluster);
+            }
+        }
+        
+        let result: MaraResourceCluster | null = MaraUtils.RandomSelect(this.parentController.MasterMind, finalClusters);
+
+        return result;
     }
 
     private getOffensiveUnitComposition(produceableCfgIds: string[], requiredStrength: number): UnitComposition {
