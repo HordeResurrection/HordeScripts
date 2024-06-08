@@ -58,9 +58,9 @@ export class MiningSubcontroller extends MaraSubcontroller {
         totalResources.People = settlementResources.FreePeople + freeHousing;
 
         for (let mineData of this.Mines) {
-            if (mineData.Miners.length == 0) {
-                continue;
-            }
+            // if (mineData.Miners.length == 0) {
+            //     continue;
+            // }
 
             let mineResources = this.getMineResources(mineData.Mine);
 
@@ -69,9 +69,9 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
 
         for (let sawmillData of this.Sawmills) {
-            if (sawmillData.Woodcutters.length == 0) {
-                continue;
-            }
+            // if (sawmillData.Woodcutters.length == 0) {
+            //     continue;
+            // }
             
             MaraResourceMap.ResourceClusters.forEach(
                 (value) => {
