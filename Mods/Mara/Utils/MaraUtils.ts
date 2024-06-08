@@ -110,6 +110,10 @@ export class AllowedCompositionItem {
     }
 }
 
+export interface NonUniformRandomSelectItem {
+    Weight: number;
+}
+
 const TileType = HCL.HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType;
 const AlmostDefeatCondition = HCL.HordeClassLibrary.World.Settlements.Existence.AlmostDefeatCondition;
 const ResourceType = HCL.HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
@@ -411,6 +415,35 @@ export class MaraUtils {
         }
 
         return items[index];
+    }
+
+    static NonUniformRandomSelect<Type extends NonUniformRandomSelectItem>(
+        masterMind: any, 
+        items:Array<Type>
+    ): Type | null {
+        if (items.length == 0) {
+            return null;
+        }
+        
+        let upperBound = 0;
+
+        for (let item of items) {
+            upperBound += item.Weight;
+        }
+
+        let pick = MaraUtils.Random(masterMind, upperBound);
+
+        let accumulatedBound = 0;
+
+        for (let item of items) {
+            accumulatedBound += item.Weight;
+
+            if (accumulatedBound <= pick) {
+                return item;
+            }
+        }
+
+        return items[0];
     }
     
     static IncrementMapItem(map: UnitComposition, key: string): void {
