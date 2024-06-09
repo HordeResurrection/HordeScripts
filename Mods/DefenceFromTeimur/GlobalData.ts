@@ -1,6 +1,7 @@
-import { IAttackPlan } from "./Types/AttackPlan";
 import { IUnit } from "./Types/IUnit";
 import { Team } from "./Types/Team";
+import { IIncomePlan } from "./Types/IIncomePlan";
+import { IAttackPlan } from "./Types/IAttackPlan";
 
 export enum GameState { PreInit, Init, ChoiseDifficult, ChoiseWave, Run, End };
 
@@ -8,16 +9,14 @@ export class GlobalVars {
     public static gameState : GameState;
     /** массив конфигов */
     public static configs: any;
-    /** ид поселения Теймура */
-    public static teimurSettlementId: number;
-    /** поселение Теймура */
-    public static teimurSettlement: any;
     /** команды */
     public static teams: Array<Team>;
     /** сложность игры */
     public static difficult: number;
     /** план атаки */
     public static attackPlan: IAttackPlan;
+    /** план инкома */
+    public static incomePlan: IIncomePlan;
     /** все юниты в игре */
     public static units: Array<IUnit>;
     /** время старта игры */
@@ -34,4 +33,6 @@ export class GlobalVars {
     public static HordeEngine: any;
     /** Players */
     public static Players: any;
+    public static scenaWidth : number;
+    public static scenaHeight : number;
 }

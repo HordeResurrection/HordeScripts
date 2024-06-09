@@ -14,22 +14,6 @@ export function CreateConfig(baseConfigUid: string, newConfigUid: string) {
     }
 }
 
-export function UnitGiveOrder(unit: any, cell: Cell, command: any, orderMode: any) {
-    // позиция для атаки цели
-    var goalPosition;
-    {
-        var generator = generateCellInSpiral(cell.X, cell.Y);
-        for (goalPosition = generator.next(); !goalPosition.done; goalPosition = generator.next()) {
-            if (unitCanBePlacedByRealMap(unit.Cfg, goalPosition.value.X, goalPosition.value.Y)) {
-                break;
-            }
-        }
-    }
-    var pointCommandArgs = new PointCommandArgs(createPoint(goalPosition.value.X, goalPosition.value.Y), command, orderMode);
-    // отдаем приказ
-    unit.Cfg.GetOrderDelegate(unit, pointCommandArgs);
-}
-
 export function unitCanBePlacedByRealMap(uCfg, x, y) {
     return uCfg.CanBePlacedByRealMap(ActiveScena.GetRealScena(), x, y);
 }
@@ -49,4 +33,32 @@ export function spawnUnits(settlement, uCfg, uCount, direction, generator) {
     }
 
     return outSpawnedUnits;
+}
+
+export function* generateRandomCellInRect(rectX, rectY, rectW, rectH) {
+    let scenaWidth = ActiveScena.GetRealScena().Size.Width;
+    let scenaHeight = ActiveScena.GetRealScena().Size.Height;
+    // Рандомизатор
+    let rnd = ActiveScena.GetRealScena().Context.Randomizer;
+
+    rectX = Math.max(0, rectX);
+    rectY = Math.max(0, rectY);
+    rectW = Math.min(scenaWidth - rectX, rectW);
+    rectH = Math.min(scenaHeight - rectY, rectH);
+
+    let randomNumbers : Array<any> = [];
+    for (let x = rectX; x < rectX + rectW; x++) {
+        for (let y = rectY; y < rectY + rectH; y++) {
+            randomNumbers.push({ X: x, Y: y });
+        }
+    }
+
+    while (randomNumbers.length > 0) {
+        let num = rnd.RandomNumber(0, randomNumbers.length - 1);
+        let randomNumber = randomNumbers[num];
+        randomNumbers.splice(num, 1);
+        yield randomNumber;
+    }
+
+    return;
 }

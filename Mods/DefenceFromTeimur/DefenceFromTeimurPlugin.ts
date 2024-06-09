@@ -1,25 +1,30 @@
 import { isReplayMode } from "library/game-logic/game-tools";
 import HordePluginBase from "plugins/base-plugin";
-import { AttackPlansClass, IAttackPlan } from "./Types/AttackPlan";
+import { AttackPlansClass } from "./Realizations/AttackPlans";
 import { Cell, Rectangle } from "./Types/Geometry";
-import { RectangleSpawner } from "./Types/ISpawner";
 import { Team } from "./Types/Team";
-import { createHordeColor, createPoint, createResourcesAmount } from "library/common/primitives";
-import { UnitCommand, UnitDirection } from "library/game-logic/horde-types";
+import { createHordeColor, createPoint } from "library/common/primitives";
+import { UnitDirection } from "library/game-logic/horde-types";
 import { spawnUnit } from "library/game-logic/unit-spawn";
-import { PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_GOALCASTLE } from "./Units/Player_units";
-import { TeimurUnitsClass, TeimurLegendaryUnitsClass } from "./Units/Teimur_units";
+import { PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_GOALCASTLE } from "./Realizations/Player_units";
+import { TeimurUnitsClass, TeimurLegendaryUnitsClass } from "./Realizations/Teimur_units";
 import { broadcastMessage } from "library/common/messages";
 import { GameState, GlobalVars } from "./GlobalData";
 import { IUnit } from "./Types/IUnit";
+import { IncomePlansClass } from "./Realizations/IncomePlans";
+import { RectangleSpawner, RingSpawner } from "./Realizations/Spawners";
 
 const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 
 // \TODO
-// - добавить здания в котором можно будет заказывать врагам легендарных юнитов
-// - довести работу до прежнего уровня
-// - вычислить сколько будет врагов
+// + легендарные юниты могли захватывать здания
+// - сделать голубятню дороже
+// - 2 раза поражение защитал, один раз при уничтожении замка, а второй при
+// - сделать однородные волны, и их можно рандомить, чтобы волна контрилась
+// на полукруге чуть выше
+// - легендарный инж чет плохо строит башни
+// + легендарный всадник бъет!, а не должен
 
 export class DefenceFromTeimurPlugin extends HordePluginBase {
     public constructor() {
@@ -32,18 +37,40 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         GlobalVars.HordeContentApi = HordeContentApi;
         GlobalVars.HordeEngine = HordeEngine;
         GlobalVars.Players     = Players;
+        GlobalVars.scenaWidth  = GlobalVars.ActiveScena.GetRealScena().Size.Width;
+        GlobalVars.scenaHeight = GlobalVars.ActiveScena.GetRealScena().Size.Height;
     }
 
     public onFirstRun() {
         var scenaName = GlobalVars.ActiveScena.GetRealScena().ScenaName;
 
         if (scenaName == "Оборона от Теймура - узкий проход (1-5)") {
-            GlobalVars.teimurSettlementId = 4;
             GlobalVars.teams = new Array<Team>(1);
             GlobalVars.teams[0] = new Team();
+            GlobalVars.teams[0].teimurSettlementId = 4;
             GlobalVars.teams[0].castleCell        = new Cell(88, 123);
             GlobalVars.teams[0].allSettlementsIdx = [0, 1, 2, 3, 5];
             GlobalVars.teams[0].spawner           = new RectangleSpawner(new Rectangle(0, 0, 182, 22), 0);
+        } else if (scenaName == "Оборона от Теймура - полукруг (1-5)") {
+            GlobalVars.teams = new Array<Team>(1);
+            GlobalVars.teams[0] = new Team();
+            GlobalVars.teams[0].teimurSettlementId = 4;
+            GlobalVars.teams[0].castleCell        = new Cell(98, 95);
+            GlobalVars.teams[0].allSettlementsIdx = [0, 1, 2, 3, 5];
+            GlobalVars.teams[0].spawner           = new RingSpawner(new Cell(99, 99), 80, 100, 0, Math.PI, 0);
+        } else if (scenaName == "Оборона от Теймура - легион (2x2)") {
+            GlobalVars.teams = new Array<Team>(2);
+            GlobalVars.teams[0] = new Team();
+            GlobalVars.teams[0].teimurSettlementId = 6;
+            GlobalVars.teams[0].castleCell        = new Cell(161, 19);
+            GlobalVars.teams[0].allSettlementsIdx = [0, 1, 2];
+            GlobalVars.teams[0].spawner           = new RectangleSpawner(new Rectangle(0, 0, 38, 42), 0);
+
+            GlobalVars.teams[1] = new Team();
+            GlobalVars.teams[1].teimurSettlementId = 7;
+            GlobalVars.teams[1].castleCell        = new Cell(161, 81);
+            GlobalVars.teams[1].allSettlementsIdx = [3, 4, 5];
+            GlobalVars.teams[1].spawner           = new RectangleSpawner(new Rectangle(0, 61, 38, 42), 1);
         }
 
         GlobalVars.gameState = GameState.PreInit;
@@ -79,8 +106,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
     private Init(gameTickNum: number) {
         GlobalVars.rnd = GlobalVars.ActiveScena.GetRealScena().Context.Randomizer;
-        GlobalVars.teimurSettlement = GlobalVars.ActiveScena.GetRealScena().Settlements.GetByUid('' + GlobalVars.teimurSettlementId);
-
+        
         //////////////////////////////////////////
         // инициализируем игроков в командах
         //////////////////////////////////////////
@@ -88,6 +114,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
             GlobalVars.teams[teamNum].settlementsIdx = new Array<number>();
             GlobalVars.teams[teamNum].settlements    = new Array<any>();
+            GlobalVars.teams[teamNum].teimurSettlement = GlobalVars.ActiveScena.GetRealScena().Settlements.GetByUid('' + GlobalVars.teams[teamNum].teimurSettlementId);
         }
 
         for (var player of GlobalVars.Players) {
@@ -97,7 +124,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
             this.log.info("player of settlementId ", settlementId);
 
-            if (settlementId == GlobalVars.teimurSettlementId ||
+            if (GlobalVars.teams.find((team) => { return team.teimurSettlementId == settlementId;}) ||
                 (isReplayMode() && !realPlayer.IsReplay)) {
                 continue;
             }
@@ -151,7 +178,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         // размещаем замок для выбора сложности
         //////////////////////////////////////////
 
-        Player_CASTLE_CHOISE_DIFFICULT.InitConfig(GlobalVars.configs, GlobalVars.difficult);
+        Player_CASTLE_CHOISE_DIFFICULT.InitConfig();
         for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
             if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
                 continue;
@@ -170,8 +197,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         // отбираем все деньги
 
         for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-            if (GlobalVars.teams[teamNum].settlementsIdx.length == 0 ||
-                GlobalVars.teams[teamNum].castle.unit.IsDead) {
+            if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
                 continue;
             }
 
@@ -201,7 +227,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             broadcastMessage("Была выбрана сложность " + GlobalVars.difficult, createHordeColor(255, 100, 100, 100));
 
             // заменяем данный замок на замок выбора волны
-            Player_CASTLE_CHOISE_ATTACKPLAN.InitConfig(GlobalVars.configs, GlobalVars.difficult);
+            Player_CASTLE_CHOISE_ATTACKPLAN.InitConfig();
 
             let replaceParams = new ReplaceUnitParameters();
             replaceParams.OldUnit = GlobalVars.teams[teamNum].castle.unit;
@@ -237,6 +263,8 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
             // выбранная волна
             choisedAttackPlanIdx = parseInt(GlobalVars.teams[teamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
+
+            break;
         }
 
         // проверяем, что выбран план атаки
@@ -252,34 +280,29 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             ...PlayerUnitsClass
         ];
         for (var i = 0; i < allUnitsClass.length; i++) {
-            allUnitsClass[i].InitConfig(GlobalVars.configs, GlobalVars.difficult);
-            if (GlobalVars.configs[allUnitsClass[i].CfgUid].AllowedCommands.ContainsKey(UnitCommand.Capture)) {
-                GlobalVars.configs[allUnitsClass[i].CfgUid].AllowedCommands.Remove(UnitCommand.Capture);
-            }
+            allUnitsClass[i].InitConfig();
         }
 
-        // инициализируем план
+        // инициализируем план атаки
+
         GlobalVars.attackPlan = new AttackPlansClass[choisedAttackPlanIdx]();
         broadcastMessage("Был выбран план атаки " + choisedAttackPlanIdx, createHordeColor(255, 100, 100, 100));
         broadcastMessage(AttackPlansClass[choisedAttackPlanIdx].Description, createHordeColor(255, 255, 50, 10));
 
+        // инициализируем план инкома
+
+        GlobalVars.incomePlan = new AttackPlansClass[choisedAttackPlanIdx].IncomePlanClass();
+        broadcastMessage(AttackPlansClass[choisedAttackPlanIdx].IncomePlanClass.Description, createHordeColor(255, 255, 50, 10));
+
         // считаем сколько будет врагов
 
-        var unitsTotalCount = {};
-        for (var wave of GlobalVars.attackPlan.waves) {
-            for (var waveUnit of wave.waveUnits) {
-                if (unitsTotalCount[waveUnit.unitClass.CfgUid] == undefined) {
-                    unitsTotalCount[waveUnit.unitClass.CfgUid] = 0;
-                }
-                unitsTotalCount[waveUnit.unitClass.CfgUid] += waveUnit.count;
-            }
-        }
+        var unitsTotalCount = GlobalVars.attackPlan.GetUnitsCount();
         for (var unitCfg in unitsTotalCount) {
             this.log.info(unitCfg, " ", unitsTotalCount[unitCfg]);
         }
 
         // создаем замки
-        Player_GOALCASTLE.InitConfig(GlobalVars.configs, GlobalVars.difficult);
+        Player_GOALCASTLE.InitConfig();
 
         for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
             // проверяем, что команда в игре
@@ -306,17 +329,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         }
 
         // даем стартовый капитал
-
-        for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-            if (GlobalVars.teams[teamNum].settlementsIdx.length == 0 ||
-                GlobalVars.teams[teamNum].castle.unit.IsDead) {
-                continue;
-            }
-
-            for (var settlement of GlobalVars.teams[teamNum].settlements) {
-                settlement.Resources.AddResources(createResourcesAmount(1000, 1000, 1000, 20));
-            }
-        } 
+        GlobalVars.incomePlan.OnStart();
 
         GlobalVars.startGameTickNum = gameTickNum;
         GlobalVars.gameState        = GameState.Run;
@@ -328,11 +341,52 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
         var FPS = GlobalVars.HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
 
-        // проверяем не конец игры ли 
+        // проверяем не конец игры ли
+
         if (GlobalVars.attackPlan.waves.length <= GlobalVars.attackPlan.waveNum) {
             GlobalVars.gameState = GameState.End;
+            // замок с максимальных ХП побеждает
+            var victory_teamNum = -1;
+            var victory_castleHP = 0;
+            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0 ||
+                    GlobalVars.teams[teamNum].castle.unit.IsDead) {
+                    continue;
+                }
+
+                if (victory_teamNum == -1 || (victory_castleHP < GlobalVars.teams[teamNum].castle.unit.Health)) {
+                    victory_teamNum  = teamNum;
+                    victory_castleHP = GlobalVars.teams[teamNum].castle.unit.Health;
+                }
+            }
+            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+                if (teamNum == victory_teamNum) {
+                    for (var settlement of GlobalVars.teams[teamNum].settlements) {
+                        settlement.Existence.ForceVictory();
+                    }
+                } else {
+                    for (var settlement of GlobalVars.teams[teamNum].settlements) {
+                        settlement.Existence.ForceTotalDefeat();
+                    }
+                }
+            }
             return;
         } else if (gameTickNum % 50 == 0) {
+            // присуждаем поражение, если замок уничтожен
+            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
+                    continue;
+                }
+
+                if (GlobalVars.teams[teamNum].castle.unit.IsDead && GlobalVars.teams[teamNum].castle.unit.ScriptData.DefenceFromTeimur_IsDefeat == undefined) {
+                    GlobalVars.teams[teamNum].castle.unit.ScriptData.DefenceFromTeimur_IsDefeat = true;
+                    for (var settlement of GlobalVars.teams[teamNum].settlements) {
+                        settlement.Existence.ForceTotalDefeat();
+                    }
+                }
+            }
+
+            // проверяем не уничтожены ли все замки
             var allCastlesDead = true;
             for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
                 if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
@@ -371,7 +425,6 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
                 GlobalVars.teams[teamNum].spawner.SpawnWave(GlobalVars.attackPlan.waves[GlobalVars.attackPlan.waveNum]);
             }
-
             GlobalVars.attackPlan.waveNum++;
         }
 
@@ -381,51 +434,31 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
                     GlobalVars.teams[teamNum].castle.unit.IsDead) {
                     continue;
                 }
-
                 GlobalVars.teams[teamNum].spawner.OnEveryTick(gameTickNum);
             }
         }
 
-        // обработка юнитов раз в секунду
+        // обработка юнитов
 
-        if (gameTickNum % 50 == 0) {
-            for (var unitNum = 0; unitNum < GlobalVars.units.length; unitNum++) {
-                if (GlobalVars.units[unitNum].unit.IsDead) {
-                    GlobalVars.units[unitNum].OnDead(gameTickNum);
-                    GlobalVars.units.splice(unitNum--, 1);
-                    continue;
-                }
+        for (var unitNum = 0; unitNum < GlobalVars.units.length; unitNum++) {
+            if (GlobalVars.units[unitNum].unit.IsDead) {
+                GlobalVars.units[unitNum].OnDead(gameTickNum);
+                GlobalVars.units.splice(unitNum--, 1);
+                continue;
+            }
+            if (gameTickNum % 50 == GlobalVars.units[unitNum].processingTick) {
                 GlobalVars.units[unitNum].OnEveryTick(gameTickNum);
             }
         }
 
         // инком
 
-        if (gameTickNum % (30*50) == 0) {
-            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0 ||
-                    GlobalVars.teams[teamNum].castle.unit.IsDead) {
-                    continue;
-                }
-
-                for (var settlement of GlobalVars.teams[teamNum].settlements) {
-                    // до 10 минуты линейно растет, а после константа
-                    const gameTickMax  = 10*60*50;
-                    const goldmetal_k  = 500.0 / gameTickMax);
-                    const lumber_k     = 300.0 / gameTickMax;
-                    const people_k     = 7.0   / gameTickMax;
-                    settlement.Resources.AddResources(createResourcesAmount(
-                        Math.min(500, Math.floor(goldmetal_k*gameTickNum)),
-                        Math.min(500, Math.floor(goldmetal_k*gameTickNum)),
-                        Math.min(300, Math.floor(lumber_k*gameTickNum)),
-                        Math.min(7, Math.floor(people_k*gameTickNum))));
-                }
-            } 
+        if (gameTickNum % 50 == 2) {
+            GlobalVars.incomePlan.OnEveryTick(gameTickNum);
         }
     }
 
     private End(gameTickNum: number) {
         // подводим итоги
-        
     }
 }

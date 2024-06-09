@@ -1,46 +1,10 @@
-import { log } from "library/common/logging";
-import { Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, TeimurLegendaryUnitsClass, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER } from "../Units/Teimur_units";
-import { ITeimurUnit } from "./ITeimurUnit";
-import { IUnit, RandomUnit } from "./IUnit";
 import { GlobalVars } from "../GlobalData";
-
-export class WaveUnit {
-    unitClass: typeof ITeimurUnit;
-    count: number;
-
-    constructor (unitClass: typeof ITeimurUnit, count: number) {
-        this.unitClass = unitClass;
-        this.count  = count;
-    }
-}
-
-export class Wave {
-    message: string;
-    gameTickNum: number;
-    waveUnits: Array<WaveUnit>;
-
-    constructor (message: string, gameTickNum: number, units: Array<WaveUnit>) {
-        this.message     = message;
-        this.gameTickNum = gameTickNum;
-        this.waveUnits       = units;
-    }
-}
-
-export class IAttackPlan {
-    static Description : string = "";
-
-    public waves: Array<Wave>;
-    public waveNum: number;
-
-    public constructor () {
-        this.waves   = new Array<Wave>();
-        this.waveNum = 0;
-    }
-
-    public IsEnd() {
-        return this.waveNum >= this.waves.length;
-    }
-}
+import { TeimurLegendaryUnitsClass, Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER } from "./Teimur_units";
+import { IAttackPlan, WaveUnit, Wave } from "../Types/IAttackPlan";
+import { IUnit, RandomUnit } from "../Types/IUnit";
+import { IIncomePlan } from "../Types/IIncomePlan";
+import { IncomePlan_1, IncomePlan_2 } from "./IncomePlans";
+import { ITeimurUnit } from "../Types/ITeimurUnit";
 
 export class AttackPlan_1 extends IAttackPlan {
     static Description : string = "15 волн, 1-ая на 1-ой минуте, сбалансированная армия врага.";
@@ -174,7 +138,7 @@ export class AttackPlan_1 extends IAttackPlan {
                 new WaveUnit(Teimur_Legendary_RAIDER, 1),
                 new WaveUnit(Teimur_Legendary_WORKER, 1)
             ]),
-            new Wave("", 40 * 60 * 50, [])
+            new Wave("Конец", 40 * 60 * 50, [])
         );
     }
 }
@@ -266,6 +230,8 @@ export class AttackPlan_2 extends IAttackPlan {
             }
         }
 
+        new Wave("Конец", timeEnd, [])
+
         // сортируем в порядке тиков
         this.waves.sort((a, b) => a.gameTickNum > b.gameTickNum ? 1 : -1);
     }
@@ -283,9 +249,138 @@ export class AttackPlan_3 extends IAttackPlan {
             this.waves.push(new Wave("", gameTick, [ new WaveUnit(Teimur_Swordmen, Math.round(GlobalVars.difficult*spawnCount)) ]));
             spawnCount *= 1.05;
         }
+
+        new Wave("Конец", timeEnd, [])
     
         // сортируем в порядке тиков
         this.waves.sort((a, b) => a.gameTickNum > b.gameTickNum ? 1 : -1);
+    }
+}
+export class AttackPlan_4 extends IAttackPlan {
+    static Description: string = "Битва малых масштабов. Первая волна на 2-ой минуте.";
+    static IncomePlanClass : typeof IIncomePlan = IncomePlan_1;
+    
+    constructor () {
+        super();
+
+        this.waves = [];
+
+        // 1 - 5 волны, 2, 4, 6, 8, 10 минут
+        for (var waveNum = 0; waveNum < 5; waveNum++) {
+            var unitType = GlobalVars.rnd.RandomNumber(0, waveNum < 2 ? 2 : 3);
+            var waveStr  = "";
+            var unitClass : any;
+            var unitCount = 0;
+            if (unitType == 0) {
+                waveStr   = "Рыцари";
+                unitClass = Teimur_Swordmen;
+                unitCount = 10*GlobalVars.difficult;
+            } else if (unitType == 1) {
+                waveStr   = "Тяжелые рыцари";
+                unitClass = Teimur_Heavymen;
+                unitCount = 7*GlobalVars.difficult;
+            } else if (unitType == 2) {
+                waveStr   = "Лучники";
+                unitClass = Teimur_Archer;
+                unitCount = 10*GlobalVars.difficult;
+            } else if (unitType == 3) {
+                waveStr   = "Поджигатели";
+                unitClass = Teimur_Archer_2;
+                unitCount = 7*GlobalVars.difficult;
+            }
+            unitCount = Math.round(unitCount * Math.sqrt(waveNum + 1));
+
+            this.waves.push(
+                new Wave("Волна " + (waveNum + 1) + ". " + waveStr, (waveNum + 1) * 2 * 60 * 50, [
+                    new WaveUnit(unitClass, unitCount)
+                ])
+            );
+        }
+
+        this.waves.push(
+            new Wave("БОСС ВОЛНА 6", 12 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([Teimur_Legendary_WORKER, Teimur_Legendary_ARCHER]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        
+        // 7 - 11 волны, 15, 17, 19, 21, 23 минут
+        for (var waveNum = 0; waveNum < 5; waveNum++) {
+            var unitType = GlobalVars.rnd.RandomNumber(0, 2);
+            var waveStr  = "";
+            var unitClass : any;
+            var unitCount = 0;
+            if (unitType == 0) {
+                waveStr   = "Всадники";
+                unitClass = Teimur_Raider;
+                unitCount = 12*GlobalVars.difficult;
+            } else if (unitType == 1) {
+                waveStr   = "Катапульты";
+                unitClass = Teimur_Catapult;
+                unitCount = 3*GlobalVars.difficult;
+            } else if (unitType == 2) {
+                waveStr   = "Баллисты";
+                unitClass = Teimur_Balista;
+                unitCount = 3*GlobalVars.difficult;
+            }
+            unitCount = Math.round(unitCount * Math.sqrt(waveNum + 1));
+
+            this.waves.push(
+                new Wave("Волна " + (waveNum + 7) + ". " + waveStr, waveNum * 2 * 60 * 50 + 15 * 60 * 50, [
+                    new WaveUnit(unitClass, unitCount)
+                ])
+            );
+        }
+
+        this.waves.push(
+            new Wave("БОСС ВОЛНА 12", 25 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([Teimur_Legendary_SWORDMEN, Teimur_Legendary_ARCHER_2, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_RAIDER]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+
+        // 13 - 17 волны, 27, 29, 31, 33, 35 минут
+        for (var waveNum = 0; waveNum < 5; waveNum++) {
+            var unitType = GlobalVars.rnd.RandomNumber(0, 2);
+            var waveStr  = "";
+            var unitClass : any;
+            var unitCount = 0;
+            if (unitType == 0) {
+                waveStr   = "Фантомы";
+                unitClass = Teimur_Mag_2;
+                unitCount = 3*GlobalVars.difficult;
+            } else if (unitType == 1) {
+                waveStr   = "Виллуры";
+                unitClass = Teimur_Villur;
+                unitCount = 1.5*GlobalVars.difficult;
+            } else if (unitType == 2) {
+                waveStr   = "Ольги";
+                unitClass = Teimur_Olga;
+                unitCount = 1.5*GlobalVars.difficult;
+            }
+            unitCount = Math.round(unitCount * Math.sqrt(waveNum + 1));
+
+            this.waves.push(
+                new Wave("Волна " + (waveNum + 13) + ". " + waveStr, waveNum * 2 * 60 * 50 + 27 * 60 * 50, [
+                    new WaveUnit(unitClass, unitCount)
+                ])
+            );
+        }
+
+        this.waves.push(
+            new Wave("БОСС ВОЛНА 18", 37 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([Teimur_Legendary_ARCHER_2, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_RAIDER]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        for (var gameTickNum = 37 * 60 * 50; gameTickNum < 40 * 60 * 50; gameTickNum += 10 * 50) {
+            this.waves.push(
+                new Wave("", gameTickNum, [
+                    new WaveUnit(Teimur_Swordmen, 20 * GlobalVars.difficult)
+                ])
+            );
+        }
+
+        this.waves.push(
+            new Wave("Конец", 42 * 60 * 50, [ ])
+        );
     }
 }
 
@@ -303,7 +398,7 @@ export class AttackPlan_test extends IAttackPlan {
         this.waves = [];
         this.waves.push(
             new Wave("ТЕСТ", 0, waveUnits),
-            new Wave("END", 40*60*50, [])
+            new Wave("END", 5*60*50, [])
         );
     }
 }
@@ -312,5 +407,6 @@ export const AttackPlansClass = [
     AttackPlan_1,
     AttackPlan_2,
     AttackPlan_3,
+    AttackPlan_4,
     AttackPlan_test
 ];
