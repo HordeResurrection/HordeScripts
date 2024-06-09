@@ -14,6 +14,7 @@ import { IUnit } from "./Types/IUnit";
 import { IncomePlansClass } from "./Realizations/IncomePlans";
 import { RectangleSpawner, RingSpawner } from "./Realizations/Spawners";
 
+const DeleteUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
 const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 
@@ -27,8 +28,12 @@ const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.
 // + легендарный всадник бъет!, а не должен
 
 export class DefenceFromTeimurPlugin extends HordePluginBase {
+    hostPlayerTeamNum : number;
+
     public constructor() {
         super("Оборона от Теймура");
+
+        this.hostPlayerTeamNum = -1;
 
         GlobalVars.units = new Array<IUnit>();
 
@@ -39,6 +44,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         GlobalVars.Players     = Players;
         GlobalVars.scenaWidth  = GlobalVars.ActiveScena.GetRealScena().Size.Width;
         GlobalVars.scenaHeight = GlobalVars.ActiveScena.GetRealScena().Size.Height;
+        GlobalVars.unitsMap    = GlobalVars.ActiveScena.GetRealScena().UnitsMap;
     }
 
     public onFirstRun() {
@@ -62,13 +68,13 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             GlobalVars.teams = new Array<Team>(2);
             GlobalVars.teams[0] = new Team();
             GlobalVars.teams[0].teimurSettlementId = 6;
-            GlobalVars.teams[0].castleCell        = new Cell(161, 19);
+            GlobalVars.teams[0].castleCell        = new Cell(138, 18);
             GlobalVars.teams[0].allSettlementsIdx = [0, 1, 2];
             GlobalVars.teams[0].spawner           = new RectangleSpawner(new Rectangle(0, 0, 38, 42), 0);
 
             GlobalVars.teams[1] = new Team();
             GlobalVars.teams[1].teimurSettlementId = 7;
-            GlobalVars.teams[1].castleCell        = new Cell(161, 81);
+            GlobalVars.teams[1].castleCell        = new Cell(138, 82);
             GlobalVars.teams[1].allSettlementsIdx = [3, 4, 5];
             GlobalVars.teams[1].spawner           = new RectangleSpawner(new Rectangle(0, 61, 38, 42), 1);
         }
@@ -147,6 +153,11 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
                 continue;
             }
 
+            // запоминаем хоста
+            if (this.hostPlayerTeamNum == -1) {
+                this.hostPlayerTeamNum = teamNum;
+            }
+
             // проверяем дубликаты
             if (GlobalVars.teams[teamNum].settlementsIdx.indexOf(settlementId) != -1) {
                 continue;
@@ -175,24 +186,57 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         this.log.info("current difficult = ", GlobalVars.difficult);
 
         //////////////////////////////////////////
-        // размещаем замок для выбора сложности
+        // ставим начальные замки замки
         //////////////////////////////////////////
 
         Player_CASTLE_CHOISE_DIFFICULT.InitConfig();
+
         for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
             if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
                 continue;
             }
 
-            GlobalVars.teams[teamNum].castle = new Player_CASTLE_CHOISE_DIFFICULT(spawnUnit(
-                GlobalVars.teams[teamNum].settlements[0],
-                GlobalVars.configs[Player_CASTLE_CHOISE_DIFFICULT.CfgUid],
-                createPoint(GlobalVars.teams[teamNum].castleCell.X, GlobalVars.teams[teamNum].castleCell.Y),
-                UnitDirection.Down
-            ), teamNum);
-
-            break;
+            var castleUnit = GlobalVars.unitsMap.GetUpperUnit(GlobalVars.teams[teamNum].castleCell.X, GlobalVars.teams[teamNum].castleCell.Y);
+            if (castleUnit) {
+                GlobalVars.teams[teamNum].castle = new IUnit(castleUnit, teamNum);
+            } else {
+                GlobalVars.teams[teamNum].castle = new IUnit(spawnUnit(
+                    GlobalVars.teams[teamNum].settlements[0],
+                    //GlobalVars.configs[Player_CASTLE_CHOISE_DIFFICULT.BaseCfgUid],
+                    GlobalVars.HordeContentApi.GetUnitConfig(Player_CASTLE_CHOISE_DIFFICULT.BaseCfgUid),
+                    createPoint(GlobalVars.teams[teamNum].castleCell.X, GlobalVars.teams[teamNum].castleCell.Y),
+                    UnitDirection.Down
+                ), teamNum);
+            }
         }
+
+        //////////////////////////////////////////
+        // размещаем замок для выбора сложности
+        //////////////////////////////////////////
+
+        let replaceParams                 = new ReplaceUnitParameters();
+        replaceParams.OldUnit             = GlobalVars.teams[this.hostPlayerTeamNum].castle.unit;
+        replaceParams.NewUnitConfig       = GlobalVars.configs[Player_CASTLE_CHOISE_DIFFICULT.CfgUid];
+        replaceParams.Cell                = null;  // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
+        replaceParams.PreserveHealthLevel = false; // Нужно ли передать уровень здоровья? (в процентном соотношении)
+        replaceParams.PreserveOrders      = false; // Нужно ли передать приказы?
+        replaceParams.Silent              = true;  // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
+        GlobalVars.teams[this.hostPlayerTeamNum].castle = new Player_CASTLE_CHOISE_DIFFICULT(GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.Owner.Units.ReplaceUnit(replaceParams), this.hostPlayerTeamNum);
+
+        // for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+        //     if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
+        //         continue;
+        //     }
+
+        //     GlobalVars.teams[teamNum].castle = new Player_CASTLE_CHOISE_DIFFICULT(spawnUnit(
+        //         GlobalVars.teams[teamNum].settlements[0],
+        //         GlobalVars.configs[Player_CASTLE_CHOISE_DIFFICULT.CfgUid],
+        //         createPoint(GlobalVars.teams[teamNum].castleCell.X, GlobalVars.teams[teamNum].castleCell.Y),
+        //         UnitDirection.Down
+        //     ), teamNum);
+
+        //     break;
+        // }
 
         // отбираем все деньги
 
@@ -210,67 +254,89 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
     private ChoiseDifficult(gameTickNum: number) {
         // проверяем, что выбрана сложность
-        
-        for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-            if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
-                continue;
-            }
 
-            // проверяем выбирается ли сложность
-            if (!GlobalVars.teams[teamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig) {
-                return;
-            }
-
-            // выбранная сложность
-            GlobalVars.difficult = parseInt(GlobalVars.teams[teamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
-            this.log.info("selected difficult = ", GlobalVars.difficult);
-            broadcastMessage("Была выбрана сложность " + GlobalVars.difficult, createHordeColor(255, 100, 100, 100));
-
-            // заменяем данный замок на замок выбора волны
-            Player_CASTLE_CHOISE_ATTACKPLAN.InitConfig();
-
-            let replaceParams = new ReplaceUnitParameters();
-            replaceParams.OldUnit = GlobalVars.teams[teamNum].castle.unit;
-            replaceParams.NewUnitConfig = GlobalVars.configs[Player_CASTLE_CHOISE_ATTACKPLAN.CfgUid];
-            replaceParams.Cell = null;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
-            replaceParams.PreserveHealthLevel = false;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
-            replaceParams.PreserveOrders = false;        // Нужно ли передать приказы?
-            replaceParams.Silent = true;                 // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
-            GlobalVars.teams[teamNum].castle = new Player_CASTLE_CHOISE_ATTACKPLAN(GlobalVars.teams[teamNum].castle.unit.Owner.Units.ReplaceUnit(replaceParams), teamNum);
-
-            // меняем состояние игры
-            GlobalVars.gameState = GameState.ChoiseWave;
-
-            break;
+        // проверяем выбирается ли сложность
+        if (!GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig) {
+            return;
         }
+
+        // выбранная сложность
+        GlobalVars.difficult = parseInt(GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
+        this.log.info("selected difficult = ", GlobalVars.difficult);
+        broadcastMessage("Была выбрана сложность " + GlobalVars.difficult, createHordeColor(255, 100, 100, 100));
+
+        // заменяем данный замок на замок выбора волны
+        Player_CASTLE_CHOISE_ATTACKPLAN.InitConfig();
+
+        let replaceParams = new ReplaceUnitParameters();
+        replaceParams.OldUnit = GlobalVars.teams[this.hostPlayerTeamNum].castle.unit;
+        replaceParams.NewUnitConfig = GlobalVars.configs[Player_CASTLE_CHOISE_ATTACKPLAN.CfgUid];
+        replaceParams.Cell = null;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
+        replaceParams.PreserveHealthLevel = false;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
+        replaceParams.PreserveOrders = false;        // Нужно ли передать приказы?
+        replaceParams.Silent = true;                 // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
+        GlobalVars.teams[this.hostPlayerTeamNum].castle = new Player_CASTLE_CHOISE_ATTACKPLAN(GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.Owner.Units.ReplaceUnit(replaceParams), this.hostPlayerTeamNum);
+
+        // меняем состояние игры
+        GlobalVars.gameState = GameState.ChoiseWave;
+
+        // for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+        //     if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
+        //         continue;
+        //     }
+
+        //     // проверяем выбирается ли сложность
+        //     if (!GlobalVars.teams[teamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig) {
+        //         return;
+        //     }
+
+        //     // выбранная сложность
+        //     GlobalVars.difficult = parseInt(GlobalVars.teams[teamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
+        //     this.log.info("selected difficult = ", GlobalVars.difficult);
+        //     broadcastMessage("Была выбрана сложность " + GlobalVars.difficult, createHordeColor(255, 100, 100, 100));
+
+        //     // заменяем данный замок на замок выбора волны
+        //     Player_CASTLE_CHOISE_ATTACKPLAN.InitConfig();
+
+        //     let replaceParams = new ReplaceUnitParameters();
+        //     replaceParams.OldUnit = GlobalVars.teams[teamNum].castle.unit;
+        //     replaceParams.NewUnitConfig = GlobalVars.configs[Player_CASTLE_CHOISE_ATTACKPLAN.CfgUid];
+        //     replaceParams.Cell = null;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
+        //     replaceParams.PreserveHealthLevel = false;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
+        //     replaceParams.PreserveOrders = false;        // Нужно ли передать приказы?
+        //     replaceParams.Silent = true;                 // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
+        //     GlobalVars.teams[teamNum].castle = new Player_CASTLE_CHOISE_ATTACKPLAN(GlobalVars.teams[teamNum].castle.unit.Owner.Units.ReplaceUnit(replaceParams), teamNum);
+
+        //     // меняем состояние игры
+        //     GlobalVars.gameState = GameState.ChoiseWave;
+
+        //     break;
+        // }
     }
 
     private ChoiseWave(gameTickNum: number) {
         //////////////////////////////////////////
-        // инициализируем конфиги
+        // выбор волны
         //////////////////////////////////////////
 
         var choisedAttackPlanIdx = -1;
-        for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-            if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
-                continue;
-            }
 
-            // проверяем выбирается ли волна
-            if (!GlobalVars.teams[teamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig) {
-                return;
-            }
-
-            // выбранная волна
-            choisedAttackPlanIdx = parseInt(GlobalVars.teams[teamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
-
-            break;
+        // проверяем выбирается ли волна
+        if (!GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig) {
+            return;
         }
+
+        // выбранная волна
+        choisedAttackPlanIdx = parseInt(GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
 
         // проверяем, что выбран план атаки
         if (choisedAttackPlanIdx == -1) {
             return;
         }
+
+        //////////////////////////////////////////
+        // инициализация
+        //////////////////////////////////////////
 
         // инициализируем конфиги
 
@@ -310,22 +376,14 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
                 continue;
             }
 
-            if (GlobalVars.teams[teamNum].castle) {
-                let replaceParams                 = new ReplaceUnitParameters();
-                replaceParams.OldUnit             = GlobalVars.teams[teamNum].castle.unit;
-                replaceParams.NewUnitConfig       = GlobalVars.configs[Player_GOALCASTLE.CfgUid];
-                replaceParams.Cell                = null;  // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
-                replaceParams.PreserveHealthLevel = false; // Нужно ли передать уровень здоровья? (в процентном соотношении)
-                replaceParams.PreserveOrders      = false; // Нужно ли передать приказы?
-                replaceParams.Silent              = true;  // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
-                GlobalVars.teams[teamNum].castle = new Player_GOALCASTLE(GlobalVars.teams[teamNum].castle.unit.Owner.Units.ReplaceUnit(replaceParams), teamNum);
-            } else {
-                GlobalVars.teams[teamNum].castle = new Player_GOALCASTLE(spawnUnit(GlobalVars.ActiveScena.GetRealScena().Settlements.GetByUid(GlobalVars.teams[teamNum].settlementsIdx[0]),
-                    GlobalVars.configs[Player_GOALCASTLE.CfgUid],
-                    createPoint(GlobalVars.teams[teamNum].castleCell.X, GlobalVars.teams[teamNum].castleCell.Y),
-                    UnitDirection.Down
-                ), teamNum);
-            }
+            let replaceParams                 = new ReplaceUnitParameters();
+            replaceParams.OldUnit             = GlobalVars.teams[teamNum].castle.unit;
+            replaceParams.NewUnitConfig       = GlobalVars.configs[Player_GOALCASTLE.CfgUid];
+            replaceParams.Cell                = null;  // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
+            replaceParams.PreserveHealthLevel = false; // Нужно ли передать уровень здоровья? (в процентном соотношении)
+            replaceParams.PreserveOrders      = false; // Нужно ли передать приказы?
+            replaceParams.Silent              = true;  // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
+            GlobalVars.teams[teamNum].castle = new Player_GOALCASTLE(GlobalVars.teams[teamNum].castle.unit.Owner.Units.ReplaceUnit(replaceParams), teamNum);
         }
 
         // даем стартовый капитал

@@ -35,4 +35,5 @@ export class GlobalVars {
     public static Players: any;
     public static scenaWidth : number;
     public static scenaHeight : number;
+    public static unitsMap : any;
 }
