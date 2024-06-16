@@ -37,18 +37,20 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
     }
 
     private processNewSquad(squad) {
+        let tickText = `${DataStorage.gameTickNum}`;
+
         if (squad.Count == 0) {
-            this.log.info("[*] Selected squad is empty");
+            this.log.info(`[*] [${tickText}] Selected squad is empty`);
             return;
         }
 
         if (squad.Count == 1) {
-            this.log.info("[*] Selected squad: 1 unit");
+            this.log.info(`[*] [${tickText}] Selected squad: 1 unit`);
         } else {
-            this.log.info("[*] Selected squad:", squad.Count, "units", "(print info for only first unit)");
+            this.log.info(`[*] [${tickText}] Selected squad:", squad.Count, "units", "(print info for only first unit)`);
         }
 
-        var u = squad.GetFirstUnit();
+        let u = squad.GetFirstUnit();
         if (!u) {
             this.log.info("== Selected unit is null");
             return;
