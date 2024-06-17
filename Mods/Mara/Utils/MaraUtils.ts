@@ -142,6 +142,10 @@ export class MaraUtils {
         }
     }
 
+    static GetScena(): any {
+        return DotnetHolder.RealScena;
+    }
+
     static GetScenaWidth(): number {
         return DotnetHolder.RealScena.Size.Width;
     }
@@ -759,6 +763,13 @@ export class MaraUtils {
         return unit.MapMind.CheckPathTo(createPoint(cell.X, cell.Y), false).Found;
     }
 
+    static IsPathExists(fromCell: MaraPoint, toCell: MaraPoint, unitCfg: any, pathFinder: any): boolean {
+        let from = createPoint(fromCell.X, fromCell.Y);
+        let to = createPoint(toCell.X, toCell.Y);
+        
+        return pathFinder.checkPath(unitCfg, from, to);
+    }
+
     static GetUnitTarget(unit: any): any {
         let action = unit.OrdersMind.ActiveAct;
 
@@ -879,23 +890,23 @@ export class MaraUtils {
         return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.MetalStock);
     }
 
-    static GetAllSawmillConfigs(settlement: any): Array<string> {
+    static GetAllSawmillConfigIds(settlement: any): Array<string> {
         return MaraUtils.getAllConfigs(settlement, MaraUtils.IsSawmillConfig);
     }
 
-    static GetAllMineConfigs(settlement: any): Array<string> {
+    static GetAllMineConfigIds(settlement: any): Array<string> {
         return MaraUtils.getAllConfigs(settlement, MaraUtils.IsMineConfig);
     }
 
-    static GetAllHarvesterConfigs(settlement: any): Array<string> {
+    static GetAllHarvesterConfigIds(settlement: any): Array<string> {
         return MaraUtils.getAllConfigs(settlement, MaraUtils.IsHarvesterConfig);
     }
 
-    static GetAllHousingConfigs(settlement: any): Array<string> {
+    static GetAllHousingConfigIds(settlement: any): Array<string> {
         return MaraUtils.getAllConfigs(settlement, MaraUtils.IsHousingConfig);
     }
 
-    static GetAllMetalStockConfigs(settlement: any): Array<string> {
+    static GetAllMetalStockConfigIds(settlement: any): Array<string> {
         return MaraUtils.getAllConfigs(settlement, MaraUtils.IsMetalStockConfig);
     }
 

@@ -135,7 +135,7 @@ export class ExpandBuildState extends ProductionState {
             return [];
         }
         
-        let mineConfigs = MaraUtils.GetAllMineConfigs(this.settlementController.Settlement);
+        let mineConfigs = MaraUtils.GetAllMineConfigIds(this.settlementController.Settlement);
         let cfgId = this.selectConfigId(mineConfigs);
 
         if (cfgId == null) {
@@ -171,7 +171,7 @@ export class ExpandBuildState extends ProductionState {
             this.minedMinerals.add(MaraResourceType.Metal);
         }
 
-        let harvesterConfigs = MaraUtils.GetAllHarvesterConfigs(this.settlementController.Settlement);
+        let harvesterConfigs = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
         cfgId = this.selectConfigId(harvesterConfigs);
 
         if (cfgId == null) {
@@ -205,7 +205,7 @@ export class ExpandBuildState extends ProductionState {
         );
 
         if (metalStocks.length == 0) {
-            let metalStockConfigs = MaraUtils.GetAllMetalStockConfigs(this.settlementController.Settlement);
+            let metalStockConfigs = MaraUtils.GetAllMetalStockConfigIds(this.settlementController.Settlement);
             let cfgId = this.selectConfigId(metalStockConfigs);
 
             if (cfgId == null) {
@@ -232,7 +232,7 @@ export class ExpandBuildState extends ProductionState {
         let targetResourceCluster = this.settlementController.TargetExpand!.Cluster!;
 
         if (sawmills.length == 0) {
-            let sawmillConfigs = MaraUtils.GetAllSawmillConfigs(this.settlementController.Settlement);
+            let sawmillConfigs = MaraUtils.GetAllSawmillConfigIds(this.settlementController.Settlement);
             let cfgId = this.selectConfigId(sawmillConfigs);
 
             if (cfgId == null) {
@@ -243,7 +243,7 @@ export class ExpandBuildState extends ProductionState {
             result.push(this.makeProductionRequest(cfgId, targetResourceCluster.Center, null, true));
         }
 
-        let harvesterConfigs = MaraUtils.GetAllHarvesterConfigs(this.settlementController.Settlement);
+        let harvesterConfigs = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
         let cfgId = this.selectConfigId(harvesterConfigs);
 
         if (cfgId == null) {
@@ -259,7 +259,7 @@ export class ExpandBuildState extends ProductionState {
     private orderHousingProduction(): Array<MaraProductionRequest> {
         let result = new Array<MaraProductionRequest>();
         
-        let housingConfigs = MaraUtils.GetAllHousingConfigs(this.settlementController.Settlement);
+        let housingConfigs = MaraUtils.GetAllHousingConfigIds(this.settlementController.Settlement);
         let cfgId = this.selectConfigId(housingConfigs);
         
         if (cfgId == null) {

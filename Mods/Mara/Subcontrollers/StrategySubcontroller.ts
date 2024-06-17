@@ -6,6 +6,7 @@ import { UnitComposition, MaraUtils, AlmostDefeatCondition, AllowedCompositionIt
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSquad } from "./Squads/MaraSquad";
 import { MaraResourceCluster } from "../MaraResourceMap";
+import { PathFinder } from "library/game-logic/path-find";
 
 export class StrategySubcontroller extends MaraSubcontroller {
     private currentEnemy: any; //but actually Settlement
@@ -359,10 +360,46 @@ export class StrategySubcontroller extends MaraSubcontroller {
     }
 
     SelectOptimalResourceCluster(candidates: Array<MaraResourceCluster>): MaraResourceCluster | null {
+        let harvesterConfigIds = MaraUtils.GetAllHarvesterConfigIds(this.parentController.Settlement);
+        let harvesterConfigs: Array<any> = [];
+
+        for (let cfgId of harvesterConfigIds) {
+            harvesterConfigs.push(MaraUtils.GetUnitConfig(cfgId));
+        }
+
+        let settlementLocation = this.parentController.GetSettlementLocation();
+        let settlementCenter: MaraPoint | null = null;
+
+        if (settlementLocation) {
+            let freeCell = MaraUtils.FindFreeCell(settlementLocation.Center);
+
+            if (freeCell) {
+                settlementCenter = new MaraPoint(freeCell.X, freeCell.Y);
+            }
+        }
+        else {
+            return null; //what's the point?..
+        }
+
         let acceptableClusters:Array<any> = [];
+        let pathFinder = new PathFinder(MaraUtils.GetScena());
 
         for (let cluster of candidates) {
-            let distance = MaraUtils.ChebyshevDistance(cluster.Center, this.parentController.GetSettlementLocation()?.Center);
+            let isClusterReachable = false;
+            let clusterCenter = MaraUtils.FindFreeCell(cluster.Center);
+
+            for (let harvesterCfg of harvesterConfigs) {
+                if (MaraUtils.IsPathExists(settlementCenter!, clusterCenter, harvesterCfg, pathFinder)) {
+                    isClusterReachable = true;
+                    break;
+                }
+            }
+
+            if (!isClusterReachable) {
+                continue;
+            }
+
+            let distance = MaraUtils.ChebyshevDistance(cluster.Center, settlementLocation.Center);
 
             let units = MaraUtils.GetUnitsInArea(
                 cluster.Center,

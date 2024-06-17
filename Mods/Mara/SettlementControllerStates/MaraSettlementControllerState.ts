@@ -72,7 +72,7 @@ export abstract class MaraSettlementControllerState extends FsmState {
     }
 
     private canPlaceMine(cluster: MaraResourceCluster, resourceType: MaraResourceType): boolean {
-        let mineConfigs = MaraUtils.GetAllMineConfigs(this.settlementController.Settlement);
+        let mineConfigs = MaraUtils.GetAllMineConfigIds(this.settlementController.Settlement);
         let cfgId = MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, mineConfigs);
 
         if (cfgId == null) {
