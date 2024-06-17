@@ -35,8 +35,12 @@ export class MaraPlugin extends HordePluginBase {
             let realPlayer = player.GetRealPlayer();
 
             if (realPlayer.IsBot) {
-                let settlementResources = realPlayer.GetRealSettlement().Resources;
-                settlementResources.AddResources(resourceIncrease);
+                let settlement = realPlayer.GetRealSettlement();
+                
+                if (settlement) {
+                    let settlementResources = settlement.Resources;
+                    settlementResources.AddResources(resourceIncrease);
+                }
             }
         }
 
