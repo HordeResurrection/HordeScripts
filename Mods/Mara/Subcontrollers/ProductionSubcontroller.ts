@@ -62,12 +62,12 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             let filteredRequests: Array<MaraProductionRequest> = [];
             
             for (let request of this.executingRequests) {
-                request.Track();
-                
                 if (request.IsCompleted) {
                     if (request.Executor) {
                         this.settlementController.ReservedUnitsData.FreeUnit(request.Executor);
                     }
+
+                    request.OnProductionFinished();
                 }
                 else {
                     filteredRequests.push(request);

@@ -68,8 +68,45 @@ export class MaraProductionRequest {
     public Precision: number | null;
     public IsForce: boolean = false;
     public ProducedUnit: any = null;
-    public MasterMindRequest: any = null;
     public Executor: any = null;
+    
+    public get MasterMindRequest(): any {
+        return this.masterMindRequest;
+    }
+
+    public set MasterMindRequest(value: any) {
+        this.masterMindRequest = value;
+
+        if (value == null) {
+            return;
+        }
+
+        let that = this;
+
+        this.trackerChangedHandler = this.masterMindRequest.TrackerChanged.connect(
+            function (sender, args) {
+                let tracker = MaraUtils.GetPropertyValue(args, "NewTracker");
+                let buildTracker;
+                
+                try {
+                    buildTracker = MaraUtils.CastToType(tracker, BuildTrackerType);
+
+                    if (!buildTracker) {
+                        return;
+                    }
+                }
+                catch (ex) {
+                    return;
+                }
+
+                let unit = MaraUtils.GetPropertyValue(buildTracker, "TrackUnit");
+                that.ProducedUnit = unit;
+            }
+        );
+    }
+
+    private masterMindRequest: any = null;
+    private trackerChangedHandler: any = null;
 
     constructor(
         configId: string, 
@@ -106,23 +143,14 @@ export class MaraProductionRequest {
 
     public WipeResults(): void {
         this.ProducedUnit = null;
-        this.MasterMindRequest = null;
+        this.masterMindRequest = null;
         this.Executor = null;
     }
 
-    public Track(): void {
-        if (!this.MasterMindRequest) {
-            return;
+    public OnProductionFinished(): void {
+        if (this.trackerChangedHandler) {
+            this.trackerChangedHandler.disconnect();
         }
-        
-        let buildTracker = MaraUtils.CastToType(this.MasterMindRequest.Tracker, BuildTrackerType);
-
-        if (!buildTracker) {
-            return;
-        }
-
-        let unit = MaraUtils.GetPropertyValue(buildTracker, "TrackUnit");
-        this.ProducedUnit = unit;
     }
 
     public EqualsTo(other: MaraProductionRequest): boolean {
