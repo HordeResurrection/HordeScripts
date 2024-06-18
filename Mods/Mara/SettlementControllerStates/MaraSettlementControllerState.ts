@@ -4,7 +4,7 @@ import { MaraResourceCluster, MaraResourceMap, MaraResourceType } from "../MaraR
 import { MaraUtils } from "../Utils/MaraUtils";
 
 export abstract class MaraSettlementControllerState extends FsmState {
-    protected settlementController: MaraSettlementController;
+    protected readonly settlementController: MaraSettlementController;
     
     constructor(settlementController: MaraSettlementController) {
         super();

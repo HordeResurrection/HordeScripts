@@ -44,7 +44,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
     public GetTotalResources(): MaraResources {
         this.checkForUnaccountedBuildings();
         
-        let settlement = this.parentController.Settlement;
+        let settlement = this.settlementController.Settlement;
         let settlementResources = settlement.Resources;
         
         let totalResources = new MaraResources(
@@ -77,7 +77,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
                 (value) => {
                     if (
                         MaraUtils.ChebyshevDistance(value.Center, sawmillData.Sawmill.CellCenter) <= 
-                            this.parentController.Settings.ResourceMining.WoodcuttingRadius
+                            this.settlementController.Settings.ResourceMining.WoodcuttingRadius
                     ) {
                         totalResources.Wood += value.WoodAmount;
                     }
@@ -188,12 +188,12 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
         
         return maxMiners +
-            this.Sawmills.length * this.parentController.Settings.ResourceMining.MaxWoodcuttersPerSawmill;
+            this.Sawmills.length * this.settlementController.Settings.ResourceMining.MaxWoodcuttersPerSawmill;
     }
 
     private getClosestMetalStock(point: MaraPoint): any | null {
         if (!this.metalStocks) {
-            let allUnits = MaraUtils.GetAllSettlementUnits(this.parentController.Settlement);
+            let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
             this.metalStocks = allUnits.filter( (value) => {return MaraUtils.IsMetalStockConfig(value.Cfg)} );
         }
         
@@ -213,7 +213,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
     }
 
     private getMinerCount(mine: any): number {
-        let minerCount = this.parentController.Settings.ResourceMining.MinMinersPerMine;
+        let minerCount = this.settlementController.Settings.ResourceMining.MinMinersPerMine;
         let closestStock = this.getClosestMetalStock(mine.CellCenter);
 
         if (closestStock) {
@@ -251,15 +251,15 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
     private isUnreservedHarvester(unit: any) {
         return (
-            unit.IsAlive && !this.parentController.ReservedUnitsData.IsUnitReserved(unit)
+            unit.IsAlive && !this.settlementController.ReservedUnitsData.IsUnitReserved(unit)
         );
     }
 
     private buildingFilter(building: any): boolean {
         return (
             building.IsAlive && 
-            building.Owner == this.parentController.Settlement &&
-            this.parentController.StrategyController.IsSafeExpand(building.CellCenter)
+            building.Owner == this.settlementController.Settlement &&
+            this.settlementController.StrategyController.IsSafeExpand(building.CellCenter)
         )
     }
 
@@ -280,7 +280,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
     }
 
     private checkForUnaccountedBuildings(): void {
-        let units = enumerate(this.parentController.Settlement.Units);
+        let units = enumerate(this.settlementController.Settlement.Units);
         let unit;
         
         while ((unit = eNext(units)) !== undefined) {
@@ -291,7 +291,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
             if (MaraUtils.IsMineConfig(unit.Cfg)) {
                 let mineData = this.Mines.find((value) => {return value.Mine == unit});
                 
-                if (!mineData && this.parentController.StrategyController.IsSafeExpand(unit.CellCenter)) {
+                if (!mineData && this.settlementController.StrategyController.IsSafeExpand(unit.CellCenter)) {
                     mineData = new MineData();
                     mineData.Mine = unit;
                     this.Mines.push(mineData);
@@ -300,7 +300,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
             else if (MaraUtils.IsSawmillConfig(unit.Cfg)) {
                 let sawmillData = this.Sawmills.find((value) => {return value.Sawmill == unit});
 
-                if (!sawmillData && this.parentController.StrategyController.IsSafeExpand(unit.CellCenter)) {
+                if (!sawmillData && this.settlementController.StrategyController.IsSafeExpand(unit.CellCenter)) {
                     sawmillData = new SawmillData();
                     sawmillData.Sawmill = unit;
                     this.Sawmills.push(sawmillData);
@@ -319,7 +319,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
     private findWoodCell(sawmill: any): MaraPoint | null {
         let cell = MaraUtils.FindClosestCell(
             sawmill.CellCenter,
-            this.parentController.Settings.ResourceMining.WoodcuttingRadius,
+            this.settlementController.Settings.ResourceMining.WoodcuttingRadius,
             (cell) => {return MaraUtils.GetCellTreesCount(cell.X, cell.Y) > 0;}
         )
         
@@ -340,7 +340,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
             }
         }
 
-        const minWoodcuttersPerSawmill = this.parentController.Settings.ResourceMining.MinWoodcuttersPerSawmill;
+        const minWoodcuttersPerSawmill = this.settlementController.Settings.ResourceMining.MinWoodcuttersPerSawmill;
 
         if (minerRequrement > 0) {
             for (let sawmillData of this.Sawmills) {
@@ -365,7 +365,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         let freeHarvesters = this.getUnengagedHarvesters();
 
         let freeHarvesterIndex = 0;
-        const maxWoodcutters = this.parentController.Settings.ResourceMining.MaxWoodcuttersPerSawmill;
+        const maxWoodcutters = this.settlementController.Settings.ResourceMining.MaxWoodcuttersPerSawmill;
 
         while (freeHarvesterIndex < freeHarvesters.length) {
             let understaffedMineData = this.Mines.find(
@@ -382,8 +382,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
                 let minersToAdd = freeHarvesters.slice(freeHarvesterIndex, lastHarvesterIndex); //last index is not included into result
                 understaffedMineData.Miners.push(...minersToAdd);
-                this.parentController.ReservedUnitsData.AddReservableUnits(minersToAdd, 1);
-                MaraUtils.IssueMineCommand(minersToAdd, this.parentController.Player, understaffedMineData.Mine.Cell);
+                this.settlementController.ReservedUnitsData.AddReservableUnits(minersToAdd, 1);
+                MaraUtils.IssueMineCommand(minersToAdd, this.settlementController.Player, understaffedMineData.Mine.Cell);
 
                 freeHarvesterIndex = lastHarvesterIndex;
 
@@ -401,10 +401,10 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
                     let woodcuttersToAdd = freeHarvesters.slice(freeHarvesterIndex, lastHarvesterIndex);
                     understaffedSawmillData.Woodcutters.push(...woodcuttersToAdd);
-                    this.parentController.ReservedUnitsData.AddReservableUnits(woodcuttersToAdd, 0);
+                    this.settlementController.ReservedUnitsData.AddReservableUnits(woodcuttersToAdd, 0);
                     
                     let woodCell = this.findWoodCell(understaffedSawmillData.Sawmill);
-                    MaraUtils.IssueHarvestLumberCommand(woodcuttersToAdd, this.parentController.Player, woodCell);
+                    MaraUtils.IssueHarvestLumberCommand(woodcuttersToAdd, this.settlementController.Player, woodCell);
                     freeHarvesterIndex = lastHarvesterIndex;
 
                     continue;
@@ -420,7 +420,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         for (let mineData of this.Mines) {
             for (let miner of mineData.Miners) {
                 if (miner.OrdersMind.IsIdle()) {
-                    MaraUtils.IssueMineCommand([miner], this.parentController.Player, mineData.Mine.Cell);
+                    MaraUtils.IssueMineCommand([miner], this.settlementController.Player, mineData.Mine.Cell);
                 }
             }
         }
@@ -431,7 +431,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
             if (woodCell) {
                 for (let woodcutter of sawmillData.Woodcutters) {
                     if (woodcutter.OrdersMind.IsIdle()) {
-                        MaraUtils.IssueHarvestLumberCommand([woodcutter], this.parentController.Player, woodCell);
+                        MaraUtils.IssueHarvestLumberCommand([woodcutter], this.settlementController.Player, woodCell);
                     }
                 }
             }
@@ -446,14 +446,14 @@ export class MiningSubcontroller extends MaraSubcontroller {
             let mineResources = this.getMineResources(mineData.Mine);
 
             if (mineResources.Gold == 0 && mineResources.Metal == 0) {
-                MaraUtils.IssueSelfDestructCommand([mineData.Mine], this.parentController.Player);
+                MaraUtils.IssueSelfDestructCommand([mineData.Mine], this.settlementController.Player);
             }
         }
     }
 
     private findAllHarvesters(): Array<any> {
         //TODO: maybe simplify this somehow by using ProfessionCenter.Workers
-        let allUnits = MaraUtils.GetAllSettlementUnits(this.parentController.Settlement);
+        let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
         return allUnits.filter( (value) => {return MaraUtils.IsHarvesterConfig(value.Cfg)} );
     }
 }
