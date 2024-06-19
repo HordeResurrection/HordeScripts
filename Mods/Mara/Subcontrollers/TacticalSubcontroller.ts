@@ -1,9 +1,9 @@
 import { MaraSettlementController, SettlementLocation } from "Mara/MaraSettlementController";
-import { eNext, enumerate } from "Mara/Utils/Common";
 import { MaraUtils } from "Mara/Utils/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraControllableSquad } from "./Squads/MaraControllableSquad";
 import { TileType } from "library/game-logic/horde-types";
+import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 
 export class TacticalSubcontroller extends MaraSubcontroller {
     private offensiveSquads: Array<MaraControllableSquad> = [];

@@ -1,12 +1,13 @@
 //TODO: add unit types analysis and listing from game configs
 
 import { MaraSettlementController } from "Mara/MaraSettlementController";
-import { MaraPoint, eNext, enumerate } from "Mara/Utils/Common";
+import { MaraPoint } from "Mara/Utils/Common";
 import { UnitComposition, MaraUtils, AlmostDefeatCondition, AllowedCompositionItem } from "Mara/Utils/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSquad } from "./Squads/MaraSquad";
 import { MaraResourceCluster } from "../MaraResourceMap";
 import { PathFinder } from "library/game-logic/path-find";
+import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 
 export class StrategySubcontroller extends MaraSubcontroller {
     private currentEnemy: any; //but actually Settlement

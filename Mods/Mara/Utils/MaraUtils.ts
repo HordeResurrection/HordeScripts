@@ -4,9 +4,10 @@ import { createBox, createPoint } from "library/common/primitives";
 import { UnitFlags, UnitCommand, AllContent, UnitConfig } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
-import { enumerate, eNext, MaraProductionRequest, MaraPoint } from "./Common";
+import { MaraProductionRequest, MaraPoint } from "./Common";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { ProduceRequest, ProduceRequestParameters } from "library/mastermind/matermind-types";
+import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 
 export class MaraSettlementData {
     public Settlement: any;

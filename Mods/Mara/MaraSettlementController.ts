@@ -11,11 +11,12 @@ import { ProductionSubcontroller } from "./Subcontrollers/ProductionSubcontrolle
 import { MaraSquad } from "./Subcontrollers/Squads/MaraSquad";
 import { StrategySubcontroller } from "./Subcontrollers/StrategySubcontroller";
 import { TacticalSubcontroller } from "./Subcontrollers/TacticalSubcontroller";
-import { MaraPoint, eNext, enumerate } from "./Utils/Common";
+import { MaraPoint } from "./Utils/Common";
 import { MaraUtils, UnitComposition } from "./Utils/MaraUtils";
 import { MaraSettlementControllerSettings } from "./SettlementControllerSettings";
 import { SettlementControllerStateFactory } from "./SettlementControllerStateFactory";
 import { MaraResourceCluster, MaraResourceType } from "./MaraResourceMap";
+import { eNext, enumerate } from "library/dotnet/dotnet-utils";
 
 export class SettlementLocation {
     Center: any;

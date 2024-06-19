@@ -1,9 +1,10 @@
 
 import { MaraSettlementController } from "Mara/MaraSettlementController";
-import { MaraProductionRequest, eNext, enumerate } from "Mara/Utils/Common";
+import { MaraProductionRequest } from "Mara/Utils/Common";
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { MaraSubcontroller } from "./MaraSubcontroller";
+import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
     private productionList: Array<MaraProductionRequest> = [];
