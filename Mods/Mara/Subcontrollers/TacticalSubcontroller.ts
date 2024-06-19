@@ -209,15 +209,15 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.reinforcementSquads = this.reinforcementSquads.filter((value, index, array) => {return value.CombativityIndex < 1});
     }
 
-    private getWeakestReinforceableSquad(checkReinforcements: boolean): MaraControllableSquad | null {
-        let weakestSquad = this.findWeakestReinforceableSquad(this.defensiveSquads, (s) => s.IsIdle());
+    private getWeakestReinforceableSquad(squadMovementType: string, checkReinforcements: boolean): MaraControllableSquad | null {
+        let weakestSquad = this.findWeakestReinforceableSquad(this.defensiveSquads, squadMovementType, (s) => s.IsIdle());
 
         if (weakestSquad == null) {
-            weakestSquad = this.findWeakestReinforceableSquad(this.offensiveSquads, (s) => s.IsIdle());
+            weakestSquad = this.findWeakestReinforceableSquad(this.offensiveSquads, squadMovementType, (s) => s.IsIdle());
         }
 
         if (weakestSquad == null && checkReinforcements) {
-            weakestSquad = this.findWeakestReinforceableSquad(this.reinforcementSquads);
+            weakestSquad = this.findWeakestReinforceableSquad(this.reinforcementSquads, squadMovementType);
         }
 
         return weakestSquad;
@@ -242,11 +242,22 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
     private findWeakestReinforceableSquad(
         squads: Array<MaraControllableSquad>, 
+        squadMovementType: string,
         squadFilter: ((squad: MaraControllableSquad) => boolean) | null = null
     ): MaraControllableSquad | null {
         let weakestSquad: MaraControllableSquad | null = null;
 
         for (let squad of squads) {
+            if (squad.Units.length == 0) {
+                continue;
+            }
+
+            let movementType = this.getUnitMovementType(squad.Units[0]);
+
+            if (movementType != squadMovementType) {
+                continue;
+            }
+            
             if (squadFilter) {
                 if (!squadFilter(squad)) {
                     continue;
@@ -290,48 +301,44 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             return;
         }
 
-        let weakestSquad = this.getWeakestReinforceableSquad(true);
+        let clusters = this.clusterizeUnitsByMovementType(freeUnits);
 
-        if (weakestSquad != null) {
-            weakestSquad.AddUnits(freeUnits);
-        
-            for (let unit of freeUnits) {
-                this.unitsInSquads.set(unit.Id, unit);
+        for (let cluster of clusters) {
+            let movementType = this.getUnitMovementType(cluster[0]);
+            let weakestSquad = this.getWeakestReinforceableSquad(movementType, true);
+
+            if (weakestSquad != null) {
+                weakestSquad.AddUnits(cluster);
+
+                for (let unit of cluster) {
+                    this.unitsInSquads.set(unit.Id, unit);
+                }
             }
-        }
-        else {
-            let newSquad = this.createSquad(freeUnits);
-            this.reinforcementSquads.push(newSquad);
+            else {
+                let newSquad = this.createSquad(cluster);
+                this.reinforcementSquads.push(newSquad);
+            }
         }
     }
 
     private reinforceSquadsByReinforcementSquads(): void {
-        let weakestSquad = this.getWeakestReinforceableSquad(false);
+        let usedReinforcementSquads: Array<MaraControllableSquad> = [];
 
-        if (!weakestSquad) {
-            return;
-        }
+        for (let squad of this.reinforcementSquads) {
+            let movementType = this.getUnitMovementType(squad.Units[0]);
+            let weakestSquad = this.getWeakestReinforceableSquad(movementType, false);
 
-        let strongestReinforcementIndex: number | null = null;
-        let maxStrength = 0;
-
-        for (let i = 0; i < this.reinforcementSquads.length; i++) {
-            if (strongestReinforcementIndex == null) {
-                strongestReinforcementIndex = i;
-                maxStrength = this.reinforcementSquads[i].Strength;
+            if (!weakestSquad) {
+                continue;
             }
 
-            if (this.reinforcementSquads[i].Strength > maxStrength) {
-                strongestReinforcementIndex = i;
-                maxStrength = this.reinforcementSquads[i].Strength;
-            }
+            weakestSquad.AddUnits(squad.Units);
+            usedReinforcementSquads.push(squad);
         }
 
-        if (strongestReinforcementIndex != null) {
-            let reinforcementSquad = this.reinforcementSquads[strongestReinforcementIndex];
-            weakestSquad.AddUnits(reinforcementSquad.Units);
-            this.reinforcementSquads.splice(strongestReinforcementIndex, 1);
-        }
+        this.reinforcementSquads = this.reinforcementSquads.filter(
+            (value) => {return usedReinforcementSquads.indexOf(value) < 0}
+        );
     }
 
     private calcTotalUnitsStrength(units: Array<any>): number {
@@ -342,7 +349,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     private createSquadsFromUnits(units: Array<any>): Array<MaraControllableSquad> {
-        let unitClusters = this.clusterizeUnits(units);
+        let unitClusters = this.clusterizeUnitsByMovementType(units);
         let result: Array<MaraControllableSquad> = [];
 
         for (let cluster of unitClusters) {
@@ -353,26 +360,30 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         return result;
     }
 
-    private clusterizeUnits(units: Array<any>): Array<Array<any>> {
+    private getUnitMovementType(unit: any) {
+        let moveType = unit.Cfg.MoveType.ToString();
+
+        let unitSpeed = unit.Cfg.Speeds.Item(TileType.Grass);
+        let speedGroupCode = "";
+
+        if (unitSpeed <= 9) {
+            speedGroupCode = "1";
+        }
+        else if (unitSpeed <= 14) {
+            speedGroupCode = "2";
+        }
+        else {
+            speedGroupCode = "3";
+        }
+
+        return `${moveType}:${speedGroupCode}`;
+    }
+
+    private clusterizeUnitsByMovementType(units: Array<any>): Array<Array<any>> {
         let clusters = new Map<string, Array<any>>();
 
         for (let unit of units) {
-            let moveType = unit.Cfg.MoveType.ToString();
-
-            let unitSpeed = unit.Cfg.Speeds.Item(TileType.Grass);
-            let speedGroupCode = "";
-
-            if (unitSpeed <= 9) {
-                speedGroupCode = "1";
-            }
-            else if (unitSpeed <= 14) {
-                speedGroupCode = "2";
-            }
-            else {
-                speedGroupCode = "3";
-            }
-
-            let clusterKey = `${moveType}:${speedGroupCode}`;
+            let clusterKey = this.getUnitMovementType(unit);
             let cluster: Array<any>;
             
             if (clusters.has(clusterKey)) {
