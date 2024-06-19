@@ -5,6 +5,7 @@ import { MaraSquadBattleState } from "./MaraSquadBattleState";
 import { MaraSquadIdleGatheringUpState } from "./MaraSquadIdleGatheringUpState";
 import { MaraSquadMoveState } from "./MaraSquadMoveState";
 import { MaraSquadState } from "./MaraSquadState";
+import { Mara } from "../../../Mara";
 
 export class MaraSquadIdleState extends MaraSquadState {
     OnEntry(): void {
@@ -49,8 +50,12 @@ export class MaraSquadIdleState extends MaraSquadState {
         for (let unit of this.squad.Units) {
             let tileType = MaraUtils.GetTileType(unit.Cell);
             
-            if (tileType !== TileType.Forest) { //run, Forest, run!!
-                unitsToDistribute.push(unit);
+            if (tileType != TileType.Forest) { //run, Forest, run!!
+                let moveType = unit.Cfg.MoveType.ToString();
+
+                if (moveType == "PlainAndForest") {
+                    unitsToDistribute.push(unit);
+                }
             }
             else {
                 MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, unit.Cell);
@@ -74,7 +79,15 @@ export class MaraSquadIdleState extends MaraSquadState {
                 MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, this.squad.CurrentTargetCell);
             }
             else {
-                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, forestCells[cellIndex]);
+                while (cellIndex < forestCells.length) {
+                    if (MaraUtils.IsPathExists(unit.Cell, forestCells[cellIndex], unit.Cfg, Mara.Pathfinder)) {
+                        MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, forestCells[cellIndex]);
+                        break;
+                    }
+    
+                    cellIndex++;
+                }
+
                 cellIndex++;
             }
         }

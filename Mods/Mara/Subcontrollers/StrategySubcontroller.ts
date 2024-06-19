@@ -6,8 +6,8 @@ import { UnitComposition, MaraUtils, AlmostDefeatCondition, AllowedCompositionIt
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSquad } from "./Squads/MaraSquad";
 import { MaraResourceCluster } from "../MaraResourceMap";
-import { PathFinder } from "library/game-logic/path-find";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
+import { Mara } from "../Mara";
 
 export class StrategySubcontroller extends MaraSubcontroller {
     private currentEnemy: any; //but actually Settlement
@@ -383,14 +383,13 @@ export class StrategySubcontroller extends MaraSubcontroller {
         }
 
         let acceptableClusters:Array<any> = [];
-        let pathFinder = new PathFinder(MaraUtils.GetScena());
 
         for (let cluster of candidates) {
             let isClusterReachable = false;
             let clusterCenter = MaraUtils.FindFreeCell(cluster.Center);
 
             for (let harvesterCfg of harvesterConfigs) {
-                if (MaraUtils.IsPathExists(settlementCenter!, clusterCenter, harvesterCfg, pathFinder)) {
+                if (MaraUtils.IsPathExists(settlementCenter!, clusterCenter, harvesterCfg, Mara.Pathfinder)) {
                     isClusterReachable = true;
                     break;
                 }
