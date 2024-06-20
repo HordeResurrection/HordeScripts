@@ -25,7 +25,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
 
     Tick(tickNumber: number): void {
         if (this.timeoutTick == null) {
-            this.timeoutTick = tickNumber + this.settlementController.Settings.Timeouts.ExterminatingTimeout;
+            this.timeoutTick = tickNumber + this.settlementController.Settings.Timeouts.Exterminate;
         }
         else if (tickNumber > this.timeoutTick) {
             this.settlementController.Debug(`Attack is too long-drawn, discontinuing`);

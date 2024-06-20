@@ -82,7 +82,7 @@ export class ExpandBuildState extends ProductionState {
     }
 
     protected getProductionTimeout(): number | null {
-        return this.settlementController.Settings.Timeouts.ExpandBuildTimeout;
+        return this.settlementController.Settings.Timeouts.ExpandBuild;
     }
 
     private calculateExpandCenter(): MaraPoint | null {
