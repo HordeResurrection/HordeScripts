@@ -67,8 +67,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         ofensiveStrengthToProduce = Math.max(ofensiveStrengthToProduce, 0);
         this.settlementController.Debug(`Offensive strength to produce: ${ofensiveStrengthToProduce}`);
 
-        let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
-        let unitList = this.getOffensiveUnitComposition(produceableCfgIds, ofensiveStrengthToProduce);
+        let unitList = this.getOffensiveUnitComposition(ofensiveStrengthToProduce);
 
         this.settlementController.Debug(`Offensive unit composition:`);
         MaraUtils.PrintMap(unitList);
@@ -78,6 +77,8 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let defensiveStrengthToProduce = Math.max(requiredDefensiveStrength - currentDefensiveStrength, 0);
         this.settlementController.Debug(`Calculated required defensive strength: ${defensiveStrengthToProduce}`);
         
+        let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
+
         let defensiveCfgIds = produceableCfgIds.filter(
             (value, index, array) => {
                 let config = MaraUtils.GetUnitConfig(value)
@@ -114,11 +115,9 @@ export class StrategySubcontroller extends MaraSubcontroller {
         
         if (requiredStrength > 0) {
             requiredStrength *= this.settlementController.Settings.ControllerStates.AttackStrengthToEnemyStrengthRatio;
-
             this.settlementController.Debug(`Required Strength to secure expand: ${requiredStrength}`);
-        
-            let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
-            let composition = this.getOffensiveUnitComposition(produceableCfgIds, requiredStrength);
+
+            let composition = this.getOffensiveUnitComposition(requiredStrength);
 
             this.settlementController.Debug(`Offensive unit composition to secure expand:`);
             MaraUtils.PrintMap(composition);
@@ -382,6 +381,9 @@ export class StrategySubcontroller extends MaraSubcontroller {
             return null; //what's the point?..
         }
 
+        let produceableOffensiveCfgIds = this.getOffensiveCfgIds();
+        let canAttack = produceableOffensiveCfgIds.length > 0;
+
         let acceptableClusters:Array<any> = [];
 
         for (let cluster of candidates) {
@@ -420,8 +422,10 @@ export class StrategySubcontroller extends MaraSubcontroller {
                 }
             }
 
-            distance += totalEnemyStrength / 10;
-            acceptableClusters.push({Cluster: cluster, Distance: distance});
+            if (totalEnemyStrength == 0 || canAttack) {
+                distance += totalEnemyStrength / 10;
+                acceptableClusters.push({Cluster: cluster, Distance: distance});
+            }
         }
 
         let minDistance = Infinity;
@@ -445,7 +449,17 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return result;
     }
 
-    private getOffensiveUnitComposition(produceableCfgIds: string[], requiredStrength: number): UnitComposition {
+    private getOffensiveUnitComposition(requiredStrength: number): UnitComposition {
+        let offensiveCfgIds = this.getOffensiveCfgIds();
+        this.settlementController.Debug(`Offensive Cfg IDs: ${offensiveCfgIds}`);
+        let allowedOffensiveCfgItems = MaraUtils.MakeAllowedCfgItems(offensiveCfgIds, new Map<string, number>(), this.settlementController.Settlement);
+
+        return this.makeCombatUnitComposition(allowedOffensiveCfgItems, requiredStrength);
+    }
+
+    private getOffensiveCfgIds(): Array<string> {
+        let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
+        
         let offensiveCfgIds = produceableCfgIds.filter(
             (value) => {
                 let config = MaraUtils.GetUnitConfig(value)
@@ -454,10 +468,8 @@ export class StrategySubcontroller extends MaraSubcontroller {
                     config.BuildingConfig == null;
             }
         );
-        this.settlementController.Debug(`Offensive Cfg IDs: ${offensiveCfgIds}`);
-        let allowedOffensiveCfgItems = MaraUtils.MakeAllowedCfgItems(offensiveCfgIds, new Map<string, number>(), this.settlementController.Settlement);
 
-        return this.makeCombatUnitComposition(allowedOffensiveCfgItems, requiredStrength);
+        return offensiveCfgIds;
     }
 
     private getGuardingUnitComposition(produceableCfgIds: string[], requiredStrength: number): UnitComposition {
