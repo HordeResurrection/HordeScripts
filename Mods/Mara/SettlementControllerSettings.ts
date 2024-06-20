@@ -10,7 +10,7 @@ export class MaraSettlementControllerSettings {
 
 class UnitSearchSettings {
     public BuildingSearchRadius: number = 5;
-    public ExpandEnemySearchRadius: number = 15;
+    public ExpandEnemySearchRadius: number = 12;
 }
 
 class TimeoutsSettings {
