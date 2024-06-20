@@ -6,7 +6,7 @@ import { UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
 import { enumerate, eNext, MaraProductionRequest, MaraPoint } from "./Common";
 import { generateCellInSpiral } from "library/common/position-tools";
-import { ProduceRequestParameters } from "library/mastermind/matermind-types";
+import { ProduceRequest, ProduceRequestParameters } from "library/mastermind/matermind-types";
 
 export class MaraSettlementData {
     public Settlement: any;
@@ -140,6 +140,10 @@ export class MaraUtils {
         catch (e) {
             return null;
         }
+    }
+
+    static GetScena(): any {
+        return DotnetHolder.RealScena;
     }
 
     static GetScenaWidth(): number {
@@ -685,17 +689,6 @@ export class MaraUtils {
         return HordeContentApi.GetUnitConfig(configId);
     }
 
-    private static getAllMasterMindRequests(masterMind: any): Array<any> {
-        let result: Array<any> = [];
-
-        let requests = masterMind.Requests;
-        ForEach(requests, item => {
-            result.push(item);
-        });
-
-        return result;
-    }
-
     static RequestMasterMindProduction(productionRequest: MaraProductionRequest, masterMind: any, checkDuplicate: boolean = false): boolean {
         let cfg = MaraUtils.GetUnitConfig(productionRequest.ConfigId);
 
@@ -711,19 +704,10 @@ export class MaraUtils {
         produceRequestParameters.MaxRetargetAttempts = productionRequest.Precision;
         produceRequestParameters.DisableBuildPlaceChecking = productionRequest.Precision == 0;
 
-        let existingRequests = MaraUtils.getAllMasterMindRequests(masterMind);
+        let addedRequest = host.newVar(ProduceRequest);
         
-        if (masterMind.ProductionDepartment.AddRequestToProduce(produceRequestParameters)) {
-            let newRequests = MaraUtils.getAllMasterMindRequests(masterMind);
-            let addedRequests = newRequests.filter(
-                (value1) => {
-                    return !existingRequests.find((value2) => {return value1.Id == value2.Id})
-                }
-            );
-
-            let request = addedRequests.find((value) => {return value.RequestedCfg.Uid == productionRequest.ConfigId})
-            productionRequest.MasterMindRequest = request;
-
+        if (masterMind.ProductionDepartment.AddRequestToProduce(produceRequestParameters, addedRequest.out)) {
+            productionRequest.MasterMindRequest = addedRequest;
             return true;
         }
         else {
@@ -777,6 +761,13 @@ export class MaraUtils {
 
     static IsCellReachable(cell: any, unit: any): boolean {
         return unit.MapMind.CheckPathTo(createPoint(cell.X, cell.Y), false).Found;
+    }
+
+    static IsPathExists(fromCell: MaraPoint, toCell: MaraPoint, unitCfg: any, pathFinder: any): boolean {
+        let from = createPoint(fromCell.X, fromCell.Y);
+        let to = createPoint(toCell.X, toCell.Y);
+        
+        return pathFinder.checkPath(unitCfg, from, to);
     }
 
     static GetUnitTarget(unit: any): any {
@@ -899,23 +890,23 @@ export class MaraUtils {
         return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.MetalStock);
     }
 
-    static GetAllSawmillConfigs(settlement: any): Array<string> {
+    static GetAllSawmillConfigIds(settlement: any): Array<string> {
         return MaraUtils.getAllConfigs(settlement, MaraUtils.IsSawmillConfig);
     }
 
-    static GetAllMineConfigs(settlement: any): Array<string> {
+    static GetAllMineConfigIds(settlement: any): Array<string> {
         return MaraUtils.getAllConfigs(settlement, MaraUtils.IsMineConfig);
     }
 
-    static GetAllHarvesterConfigs(settlement: any): Array<string> {
+    static GetAllHarvesterConfigIds(settlement: any): Array<string> {
         return MaraUtils.getAllConfigs(settlement, MaraUtils.IsHarvesterConfig);
     }
 
-    static GetAllHousingConfigs(settlement: any): Array<string> {
+    static GetAllHousingConfigIds(settlement: any): Array<string> {
         return MaraUtils.getAllConfigs(settlement, MaraUtils.IsHousingConfig);
     }
 
-    static GetAllMetalStockConfigs(settlement: any): Array<string> {
+    static GetAllMetalStockConfigIds(settlement: any): Array<string> {
         return MaraUtils.getAllConfigs(settlement, MaraUtils.IsMetalStockConfig);
     }
 

@@ -1,10 +1,10 @@
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 
 export abstract class MaraSubcontroller {
-    protected readonly parentController: MaraSettlementController;
+    protected readonly settlementController: MaraSettlementController;
 
     constructor (parent: MaraSettlementController) {
-        this.parentController = parent;
+        this.settlementController = parent;
     }
 
     abstract Tick(tickNumber: number): void;
