@@ -16,6 +16,8 @@ export class RebuildState extends ProductionState {
 
         let requiredBuildings: Array<EconomySnapshotItem> = [];
         let requiredHarvesters: UnitComposition = new Map<string, number>();
+        let maxHarvesterCount = this.settlementController.MiningController.GetOptimalHarvesterCount();
+        let initialHarvesterCount = 0;
 
         for (let item of requiredEconomy) {
             if (MaraUtils.IsBuildingConfigId(item.ConfigId)) {
@@ -42,7 +44,10 @@ export class RebuildState extends ProductionState {
                 }
             }
             else if (MaraUtils.IsHarvesterConfigId(item.ConfigId)) {
-                MaraUtils.IncrementMapItem(requiredHarvesters, item.ConfigId);
+                if (initialHarvesterCount < maxHarvesterCount) {
+                    MaraUtils.IncrementMapItem(requiredHarvesters, item.ConfigId);
+                    initialHarvesterCount++;
+                }
             }
         }
 
@@ -77,21 +82,25 @@ export class RebuildState extends ProductionState {
         }
 
         let harvestersToProduce = MaraUtils.SubstractCompositionLists(requiredHarvesters, existingHarvesters);
-        let maxHarvesters = this.settlementController.MiningController.GetMaxHarvesterCount();
-        let harvestersCout = 0;
 
         harvestersToProduce.forEach(
             (value, key) => {
-                if (harvestersCout >= maxHarvesters) {
-                    return;
-                }
-                
                 for (let i = 0; i < value; i++) {
                     result.push(this.makeProductionRequest(key, null, null));
-                    harvestersCout ++;
                 }
             }
         );
+
+        if (initialHarvesterCount < maxHarvesterCount) {
+            let harvesterConfigIds = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
+            let cfgId = MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, harvesterConfigIds);
+
+            if (cfgId != null) {
+                for (let i = 0; i < maxHarvesterCount - initialHarvesterCount; i++) {
+                    result.push(this.makeProductionRequest(cfgId, null, null));
+                }
+            }
+        }
 
         return result;
     }

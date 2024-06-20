@@ -30,6 +30,27 @@ export class DevelopingState extends ProductionState {
 
         let result = new Array<MaraProductionRequest>();
 
+        let harvesterCount = 0;
+
+        economyComposition.forEach((value, key) => {
+            if (MaraUtils.IsHarvesterConfigId(key)) {
+                harvesterCount += value;
+            }
+        });
+
+        let maxHarvesterCount = this.settlementController.MiningController.GetOptimalHarvesterCount();
+
+        if (harvesterCount < maxHarvesterCount) {
+            let harvesterConfigIds = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
+            let cfgId = MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, harvesterConfigIds);
+
+            if (cfgId != null) {
+                for (let i = 0; i < maxHarvesterCount - harvesterCount; i++) {
+                    result.push(this.makeProductionRequest(cfgId, null, null));
+                }
+            }
+        }
+
         if (absentProducers.length > 0 || absentTech.length > 0) {
             let selectedCfgIds: Array<string>;
 

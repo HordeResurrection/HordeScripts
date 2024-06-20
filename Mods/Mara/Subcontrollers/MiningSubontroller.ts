@@ -181,7 +181,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
         return optimalPosition;
     }
 
-    public GetMaxHarvesterCount(): number {
+    public GetOptimalHarvesterCount(): number {
+        this.checkForUnaccountedBuildings();
         let maxMiners = 0;
 
         for (let mineData of this.Mines) {
@@ -189,7 +190,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
         
         return maxMiners +
-            this.Sawmills.length * this.settlementController.Settings.ResourceMining.MaxWoodcuttersPerSawmill;
+            this.Sawmills.length * this.settlementController.Settings.ResourceMining.WoodcutterBatchSize;
     }
 
     private getClosestMetalStock(point: MaraPoint): any | null {
