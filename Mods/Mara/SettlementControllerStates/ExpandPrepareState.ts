@@ -28,4 +28,8 @@ export class ExpandPrepareState extends ProductionState {
             return [];
         }
     }
+
+    protected getProductionTimeout(): number | null {
+        return this.settlementController.Settings.Timeouts.ExpandPrepareTimeout;
+    }
 }
