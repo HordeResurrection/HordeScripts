@@ -2,7 +2,7 @@ import { ProductionState } from "./ProductionState";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 import { MaraUtils, UnitComposition } from "../Utils/MaraUtils";
 import { EconomySnapshotItem } from "../MaraSettlementController";
-import { MaraProductionRequest } from "../Utils/Common";
+import { MaraPoint, MaraProductionRequest } from "../Utils/Common";
 
 export class RebuildState extends ProductionState {
     protected getProductionRequests(): Array<MaraProductionRequest> {
@@ -77,6 +77,20 @@ export class RebuildState extends ProductionState {
                     }
                 )
             ) {
+                if (MaraUtils.IsMineConfigId(building.ConfigId)) {
+                    let config = MaraUtils.GetUnitConfig(building.ConfigId);
+                    let bottomRight = new MaraPoint(
+                        building.Position!.X + config.Size.Width - 1, 
+                        building.Position!.Y + config.Size.Height - 1
+                    );
+
+                    let minerals = this.settlementController.MiningController.GetRectResources(building.Position!, bottomRight);
+
+                    if (minerals.Gold == 0 && minerals.Metal == 0) {
+                        continue;
+                    }
+                }
+                
                 result.push(this.makeProductionRequest(building.ConfigId, building.Position!, 0));
             }
         }
