@@ -74,6 +74,13 @@ export class MaraSquadBattleState extends MaraSquadState {
     
     OnEntry(): void {
         this.updateThreats();
+
+        if (this.enemyUnits.length == 0) {
+            this.squad.Attack(this.squad.CurrentTargetCell);
+            this.squad.SetState(new MaraSquadAttackState(this.squad));
+            return;
+        }
+
         this.initialLocation = this.squad.GetLocation();
         this.initialEnemyLocation = this.enemySquads[0].GetLocation().Point;
     }
