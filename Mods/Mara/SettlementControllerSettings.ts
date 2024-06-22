@@ -34,6 +34,7 @@ class SquadsSettings {
     public MinStrength: number = 100;
     public DefaultMovementPrecision: number = 3;
     public KiteTimeout: number = 8 * 50; // 8 sec
+    public KiteThresholdPositionChangeDistance: number = 5;
 }
 
 class ControllerStatesSettings {

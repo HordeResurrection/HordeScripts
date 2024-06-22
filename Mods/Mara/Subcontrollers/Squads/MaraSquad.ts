@@ -1,15 +1,12 @@
 import { MaraUtils } from "Mara/Utils/MaraUtils";
+import { MaraPoint } from "../../Utils/Common";
 
 export class MaraSquadLocation {
-    Point: {
-        X: number;
-        Y: number;
-    };
-    
+    Point: MaraPoint;
     Spread: number;
 
     constructor(x: number, y: number, spread: number) {
-        this.Point = {X: x, Y: y};
+        this.Point = new MaraPoint(x, y);
         this.Spread = spread;
     }
 }
