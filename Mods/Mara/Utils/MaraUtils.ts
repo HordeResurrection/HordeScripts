@@ -154,20 +154,9 @@ export class MaraUtils {
     static GetScenaHeigth(): number {
         return DotnetHolder.RealScena.Size.Height;
     }
-    
-    static GetCellMineralType(x: number, y: number): any {
-        let res = DotnetHolder.ResourceMap.Item.get(x, y);
-        return res.ResourceType;
-    }
 
-    static GetCellMineralsAmount(x: number, y: number): number {
-        let res = DotnetHolder.ResourceMap.Item.get(x, y);
-        return res.ResourceAmount;
-    }
-
-    static GetCellTreesCount(x: number, y: number): number {
-        let res = DotnetHolder.ResourceMap.Item.get(x, y);
-        return res.TreesCount;
+    static GetCellResourceData(x: number, y: number): any {
+        return DotnetHolder.ResourceMap.Item.get(x, y);
     }
     
     static MakeAllowedCfgItems(cfgIds: string[], currentComposition: UnitComposition, settlement: any): AllowedCompositionItem[] {

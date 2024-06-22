@@ -140,7 +140,7 @@ export abstract class MaraSettlementControllerState extends FsmState {
                 continue;
             }
             else {
-                freeMinerals += MaraUtils.GetCellMineralsAmount(cell.X, cell.Y);
+                freeMinerals += MaraResourceMap.GetCellMineralsAmount(cell.X, cell.Y);
             }
         }
 

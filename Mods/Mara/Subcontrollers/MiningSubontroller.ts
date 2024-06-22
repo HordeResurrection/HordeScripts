@@ -106,8 +106,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
         for (let row = topLeft.Y; row <= bottomRight.Y; row++) {
             for (let col = topLeft.X; col <= bottomRight.X; col++) {
-                let mineralType = MaraUtils.GetCellMineralType(col, row);
-                let mineralAmount = MaraUtils.GetCellMineralsAmount(col, row);
+                let mineralType = MaraResourceMap.GetCellMineralType(col, row);
+                let mineralAmount = MaraResourceMap.GetCellMineralsAmount(col, row);
 
                 if (mineralType == ResourceType.Metal) {
                     result.Metal += mineralAmount;
@@ -322,7 +322,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         let cell = MaraUtils.FindClosestCell(
             sawmill.CellCenter,
             this.settlementController.Settings.ResourceMining.WoodcuttingRadius,
-            (cell) => {return MaraUtils.GetCellTreesCount(cell.X, cell.Y) > 0;}
+            (cell) => {return MaraResourceMap.GetCellTreesCount(cell.X, cell.Y) > 0;}
         )
         
         return cell;
