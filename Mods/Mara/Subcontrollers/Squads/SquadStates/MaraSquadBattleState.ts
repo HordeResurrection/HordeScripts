@@ -86,6 +86,12 @@ export class MaraSquadBattleState extends MaraSquadState {
             return;
         }
 
+        if (tickNumber % 10 == 0) {
+            if (this.isAtLeastOneUnitAttacking()) {
+                this.lastNonKitedTick = tickNumber;
+            }
+        }
+
         if (tickNumber % 50 == 0) {
             this.updateThreats();
             
@@ -95,10 +101,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                 return;
             }
 
-            if (this.isAtLeastOneUnitAttacking()) {
-                this.lastNonKitedTick = tickNumber;
-            }
-            else if (this.isKitingDetected(tickNumber)) {
+            if (this.isKitingDetected(tickNumber)) {
                 this.squad.SetState(new MaraSquadPullbackState(this.squad, this.initialLocation.Point));
                 return;
             }
