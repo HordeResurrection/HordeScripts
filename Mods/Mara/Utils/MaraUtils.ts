@@ -919,8 +919,12 @@ export class MaraUtils {
     }
 
     static GetUnitStrength(unit: any): number {
-        if (this.IsCombatConfig(unit.Cfg) && unit.IsAlive) {
-            return Math.max(unit.Health, 0);
+        let unitCfg = unit.Cfg;
+
+        if (this.IsCombatConfig(unitCfg) && unit.IsAlive) {
+            let maxStrength = MaraUtils.GetConfigStrength(unitCfg);
+
+            return maxStrength * (unit.Health / unitCfg.MaxHealth);
         }
         else {
             return 0;
@@ -929,7 +933,7 @@ export class MaraUtils {
 
     static GetConfigStrength(unitConfig: any): number {
         if (MaraUtils.IsCombatConfig(unitConfig)) {
-            return unitConfig.MaxHealth;
+            return unitConfig.MaxHealth * (unitConfig.Shield + 1);
         }
         else {
             return 0;
