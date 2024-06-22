@@ -56,4 +56,5 @@ class ResourceMiningSettings {
 
 class CombatSettings {
     public ExpandDefenseStrength: number = 100;
+    public MaxCompositionUnitCount: number = 40;
 }

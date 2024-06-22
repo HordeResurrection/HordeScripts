@@ -513,8 +513,12 @@ export class StrategySubcontroller extends MaraSubcontroller {
         }
 
         let currentStrength = 0;
+        let totalUnitCount = 0;
 
-        while (currentStrength < requiredStrength) {
+        while (
+            currentStrength < requiredStrength &&
+            totalUnitCount < this.settlementController.Settings.CombatSettings.MaxCompositionUnitCount
+        ) {
             if (allowedConfigs.length == 0) {
                 this.settlementController.Debug(`Unable to compose required strength: unit limits reached`);
                 break;
@@ -533,6 +537,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
                 MaraUtils.AddToMapItem(unitComposition, configItem.UnitConfig.Uid, unitCount);
                 configItem.MaxCount -= unitCount;
                 currentStrength += unitCount * unitStrength;
+                totalUnitCount += unitCount;
 
                 allowedConfigs = allowedConfigs.filter((value) => {return value.MaxCount > 0});
             }
