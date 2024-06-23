@@ -33,7 +33,7 @@ export class MaraSquadIdleState extends MaraSquadState {
         
         if (
             this.squad.IsAllUnitsIdle() &&
-            this.squad.GetLocation().Spread > this.squad.MinSpread * this.squad.Controller.SquadsSettings.MinSpreadMultiplier
+            this.squad.GetLocation().Spread > this.squad.MinSpread * this.squad.Controller.SquadsSettings.MaxSpreadMultiplier
         ) {
             this.squad.SetState(new MaraSquadIdleGatheringUpState(this.squad));
             return;

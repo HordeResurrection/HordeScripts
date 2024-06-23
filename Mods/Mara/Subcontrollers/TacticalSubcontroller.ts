@@ -192,12 +192,6 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.settlementController.Debug(`${this.initialOffensiveSquadCount} offensive squads composed`);
     }
 
-    DismissSquads(): void {
-        this.offensiveSquads = [];
-        this.defensiveSquads = [];
-        this.reinforcementSquads = [];
-    }
-
     ReinforceSquads(): void {
         this.reinforceSquadsByFreeUnits();
 
@@ -233,7 +227,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
             if (MaraUtils.ChebyshevDistance(squadLocation.Point, location.Center) > location.Radius) {
                 let spread = squad.MinSpread * 3;
-                let precision = Math.max(location.Radius - spread, 0)
+                let precision = Math.max(location.Radius - spread, 0);
                 
                 squad.Move(location.Center, precision);
             }
