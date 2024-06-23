@@ -6,7 +6,11 @@ import { MaraProductionRequest, MaraResources } from "../Utils/Common";
 export class DevelopingState extends ProductionState {
     protected getProductionRequests(): Array<MaraProductionRequest> {
         let economyComposition = this.settlementController.GetCurrentEconomyComposition();
+        let requiredProductionChain = this.settlementController.StrategyController.GetRequiredProductionChainCfgIds();
+        
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
+        produceableCfgIds = produceableCfgIds.filter((value) => requiredProductionChain.has(value));
+        
         let absentProducers: string[] = [];
         let absentTech: string[] = [];
 
@@ -54,26 +58,15 @@ export class DevelopingState extends ProductionState {
         if (absentProducers.length > 0 || absentTech.length > 0) {
             let selectedCfgIds: Array<string>;
 
-            if (absentProducers.length > 0 && absentTech.length > 0) {
-                let pick = MaraUtils.Random(this.settlementController.MasterMind, 100, 1);
-                
-                if (pick > this.settlementController.Settings.ControllerStates.ProducerProductionProbability) {
-                    selectedCfgIds = absentTech;
-                }
-                else {
-                    selectedCfgIds = absentProducers;
-                }
-            }
-            else if (absentProducers.length > 0) {
+            if (absentProducers.length > 0) {
                 selectedCfgIds = absentProducers;
             }
             else {
                 selectedCfgIds = absentTech;
             }
             
-            let index = MaraUtils.Random(this.settlementController.MasterMind, selectedCfgIds.length - 1);
-
-            result.push(this.makeProductionRequest(selectedCfgIds[index], null, null));
+            let cfgId =  MaraUtils.RandomSelect(this.settlementController.MasterMind, selectedCfgIds);
+            result.push(this.makeProductionRequest(cfgId!, null, null));
         }
 
         let combatComposition = this.settlementController.StrategyController.GetSettlementAttackArmyComposition();
@@ -82,6 +75,7 @@ export class DevelopingState extends ProductionState {
         estimation.forEach((value, key) => {
             if (value > this.settlementController.Settings.Timeouts.UnitProductionEstimationThreshold / 2) {
                 let producingCfgIds = this.settlementController.ProductionController.GetProducingCfgIds(key);
+                producingCfgIds = producingCfgIds.filter((value) => requiredProductionChain.has(value));
 
                 if (producingCfgIds.length > 0) {
                     let index = MaraUtils.Random(this.settlementController.MasterMind, producingCfgIds.length - 1);

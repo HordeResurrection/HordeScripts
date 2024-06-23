@@ -881,26 +881,26 @@ export class MaraUtils {
     }
 
     static GetAllSawmillConfigIds(settlement: any): Array<string> {
-        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsSawmillConfig);
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsSawmillConfig);
     }
 
     static GetAllMineConfigIds(settlement: any): Array<string> {
-        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsMineConfig);
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsMineConfig);
     }
 
     static GetAllHarvesterConfigIds(settlement: any): Array<string> {
-        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsHarvesterConfig);
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsHarvesterConfig);
     }
 
     static GetAllHousingConfigIds(settlement: any): Array<string> {
-        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsHousingConfig);
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsHousingConfig);
     }
 
     static GetAllMetalStockConfigIds(settlement: any): Array<string> {
-        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsMetalStockConfig);
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsMetalStockConfig);
     }
 
-    private static getAllConfigs(settlement: any, configFilter: (config: any) => boolean) {
+    static GetAllConfigIds(settlement: any, configFilter: (config: any) => boolean): Array<string> {
         let result: Array<string> = [];
 
         ForEach(AllContent.UnitConfigs.Configs, kv => {

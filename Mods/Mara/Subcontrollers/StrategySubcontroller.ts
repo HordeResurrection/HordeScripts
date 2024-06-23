@@ -9,13 +9,125 @@ import { MaraResourceCluster } from "../MaraResourceMap";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { Mara } from "../Mara";
 
+class SelectionResult {
+    CfgIds: Set<string>;
+    ProductionChainCfgIds: Set<string>;
+    LowestTechCfgId: string = "";
+}
+
+class GlobalStrategy {
+    OffensiveCfgIds: Set<string>;
+    DefensiveBuildingsCfgIds: Set<string>;
+    ProductionChainCfgIds: Set<string>;
+    LowestTechOffensiveCfgId: string;
+    
+    private isInited: boolean = false;
+
+    Init(settlementController: MaraSettlementController): void {
+        if (this.isInited) {
+            return;
+        }
+
+        this.isInited = true;
+
+        let availableCfgIds = MaraUtils.GetAllConfigIds(
+            settlementController.Settlement, 
+            (config) => true
+        );
+        
+        let availableOffensiveCfgs = availableCfgIds.filter(
+            (value) => MaraUtils.IsCombatConfigId(value) && !MaraUtils.IsBuildingConfigId(value)
+        );
+
+        let offensiveResults = this.initCfgIdsType(
+            settlementController, 
+            availableOffensiveCfgs, 
+            settlementController.Settings.CombatSettings.MaxUsedOffensiveCfgIdCount
+        );
+
+        this.OffensiveCfgIds = offensiveResults.CfgIds;
+        this.LowestTechOffensiveCfgId = offensiveResults.LowestTechCfgId;
+
+        let availableDefensiveCfgIds = availableCfgIds.filter(
+            (value) => MaraUtils.IsCombatConfigId(value) && MaraUtils.IsBuildingConfigId(value)
+        );
+
+        let defensiveResults = this.initCfgIdsType(
+            settlementController, 
+            availableDefensiveCfgIds, 
+            settlementController.Settings.CombatSettings.MaxUsedDefensiveCfgIdCount
+        );
+
+        this.DefensiveBuildingsCfgIds = defensiveResults.CfgIds;
+
+        this.ProductionChainCfgIds = new Set<string>();
+
+        offensiveResults.ProductionChainCfgIds.forEach((value) => {this.ProductionChainCfgIds.add(value)});
+        defensiveResults.ProductionChainCfgIds.forEach((value) => {this.ProductionChainCfgIds.add(value)});
+
+        settlementController.Debug(`Inited global strategy`);
+        settlementController.Debug(`Offensive CfgIds: ${Array.from(this.OffensiveCfgIds.keys()).join(",")}`);
+        settlementController.Debug(`Defensive CfgIds: ${Array.from(this.DefensiveBuildingsCfgIds.keys()).join(",")}`);
+        settlementController.Debug(`Tech Chain: ${Array.from(this.ProductionChainCfgIds.keys()).join(",")}`);
+    }
+
+    private initCfgIdsType(
+        settlementController: MaraSettlementController,
+        availableCfgIds: Array<string>,
+        maxCfgIdCount: number
+    ): SelectionResult {
+        let result = new SelectionResult();
+        let cfgIdCount = 0;
+        
+        if (availableCfgIds.length <= cfgIdCount) {
+            result.CfgIds = new Set(availableCfgIds);
+        }
+        else {
+            result.CfgIds = new Set<string>();
+            
+            while (cfgIdCount < maxCfgIdCount) {
+                let cfgId = MaraUtils.RandomSelect<string>(settlementController.MasterMind, availableCfgIds);
+
+                if (!cfgId) {
+                    break;
+                }
+
+                result.CfgIds.add(cfgId);
+                cfgIdCount ++;
+                availableCfgIds = availableCfgIds.filter((value) => {return value != cfgId});
+            }
+        }
+
+        result.ProductionChainCfgIds = new Set<string>();
+        let shortestProductionChainLen = Infinity;
+
+        result.CfgIds.forEach((value) => {
+            let productionChain = MaraUtils.GetCfgIdProductionChain(value, settlementController.Settlement);
+            
+            for (let item of productionChain) {
+                result.ProductionChainCfgIds.add(item.Uid);
+            }
+
+            if (productionChain.length < shortestProductionChainLen) {
+                shortestProductionChainLen = productionChain.length;
+                result.LowestTechCfgId = value;
+            }
+        });
+
+        return result;
+    }
+}
+
 export class StrategySubcontroller extends MaraSubcontroller {
-    private currentEnemy: any; //but actually Settlement
     EnemySettlements: Array<any> = []; //but actually Settlement
+
+    private currentEnemy: any; //but actually Settlement
+    private globalStrategy: GlobalStrategy = new GlobalStrategy();
     
     constructor (parent: MaraSettlementController) {
         super(parent);
         this.buildEnemyList();
+        this.globalStrategy.Init(this.settlementController);
     }
 
     public get Player(): any {
@@ -80,10 +192,8 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
 
         let defensiveCfgIds = produceableCfgIds.filter(
-            (value, index, array) => {
-                let config = MaraUtils.GetUnitConfig(value)
-                
-                return MaraUtils.IsCombatConfig(config);
+            (value) => {
+                return this.globalStrategy.OffensiveCfgIds.has(value) || this.globalStrategy.DefensiveBuildingsCfgIds.has(value);
             }
         );
         this.settlementController.Debug(`Defensive Cfg IDs: ${defensiveCfgIds}`);
@@ -179,10 +289,14 @@ export class StrategySubcontroller extends MaraSubcontroller {
         );
 
         if (combatUnitCfgIds.length == 0) {
-            combatUnitCfgIds.push("#UnitConfig_Slavyane_Swordmen"); //TODO: calculate this dynamically based on current configs
+            combatUnitCfgIds.push(this.globalStrategy.LowestTechOffensiveCfgId);
         }
         
         return combatUnitCfgIds;
+    }
+
+    GetRequiredProductionChainCfgIds(): Set<string> {
+        return this.globalStrategy.ProductionChainCfgIds;
     }
 
     SelectEnemy(): any { //but actually Settlement
@@ -462,10 +576,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         
         let offensiveCfgIds = produceableCfgIds.filter(
             (value) => {
-                let config = MaraUtils.GetUnitConfig(value)
-                
-                return MaraUtils.IsCombatConfig(config) &&
-                    config.BuildingConfig == null;
+                return this.globalStrategy.OffensiveCfgIds.has(value)
             }
         );
 
@@ -475,9 +586,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
     private getGuardingUnitComposition(produceableCfgIds: string[], requiredStrength: number): UnitComposition {
         let cfgIds = produceableCfgIds.filter(
             (value) => {
-                let config = MaraUtils.GetUnitConfig(value)
-                
-                return MaraUtils.IsCombatConfig(config) && MaraUtils.IsBuildingConfig(config);
+                return this.globalStrategy.DefensiveBuildingsCfgIds.has(value);
             }
         );
         this.settlementController.Debug(`Guarding Cfg IDs: ${cfgIds}`);
