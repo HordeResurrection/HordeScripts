@@ -4,13 +4,23 @@ import { createPoint } from "library/common/primitives";
 import { PointCommandArgs } from "library/game-logic/horde-types";
 import { Cell } from "./Types/Geometry";
 
-export function CreateConfig(baseConfigUid: string, newConfigUid: string) {
+export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
     if (HordeContentApi.HasUnitConfig(newConfigUid)) {
         log.info("GET baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
         return HordeContentApi.GetUnitConfig(newConfigUid);
     } else {
         log.info("CREATE baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
         return HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig(baseConfigUid), newConfigUid);
+    }
+}
+
+export function CreateBulletConfig(baseConfigUid: string, newConfigUid: string) {
+    if (HordeContentApi.HasBulletConfig(newConfigUid)) {
+        log.info("GET baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
+        return HordeContentApi.GetBulletConfig(newConfigUid);
+    } else {
+        log.info("CREATE baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
+        return HordeContentApi.CloneConfig(HordeContentApi.GetBulletConfig(baseConfigUid), newConfigUid);
     }
 }
 
@@ -33,6 +43,17 @@ export function spawnUnits(settlement, uCfg, uCount, direction, generator) {
     }
 
     return outSpawnedUnits;
+}
+export function spawnUnit(settlement, uCfg, direction, position) {
+    if (unitCanBePlacedByRealMap(uCfg, position.X, position.Y)) {
+        let spawnParams = new SpawnUnitParameters();
+        spawnParams.ProductUnitConfig = uCfg;
+        spawnParams.Direction = direction;
+        spawnParams.Cell = createPoint(position.X, position.Y);
+        return settlement.Units.SpawnUnit(spawnParams);
+    } else {
+        return null;
+    }
 }
 
 export function* generateRandomCellInRect(rectX, rectY, rectW, rectH) {

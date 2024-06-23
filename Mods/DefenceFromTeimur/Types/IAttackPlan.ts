@@ -53,4 +53,24 @@ export class IAttackPlan {
         }
         return unitsTotalCount;
     }
+
+    public AutoGenerateWaveNames() : void {
+        // сортируем в порядке тиков
+        this.waves.sort((a, b) => a.gameTickNum > b.gameTickNum ? 1 : -1);
+
+        // генерируем имена волнам
+        for (var waveNum = 0; waveNum < this.waves.length; waveNum++) {
+            var waveMsg = "";
+            for (var waveUnit of this.waves[waveNum].waveUnits) {
+                waveMsg += waveUnit.count + "x{" + GlobalVars.configs[waveUnit.unitClass.CfgUid].Name + "} ";
+            }
+            this.waves[waveNum].message = waveMsg;
+        }
+        for (var waveNum = 0; waveNum < this.waves.length; waveNum++) {
+            this.waves[waveNum].message = "Волна " + waveNum + ": " + this.waves[waveNum].message + "\n";
+            if (waveNum + 1 < this.waves.length) {
+                this.waves[waveNum].message += "Следующая: " + this.waves[waveNum + 1].message;
+            }
+        }
+    }
 }

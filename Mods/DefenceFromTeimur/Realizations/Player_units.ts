@@ -1,6 +1,6 @@
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 import { IUnit } from "../Types/IUnit";
-import { CreateConfig } from "../Utils";
+import { CreateUnitConfig } from "../Utils";
 import { AttackPlansClass } from "./AttackPlans";
 import { GlobalVars } from "../GlobalData";
 import { UnitCommand, UnitDeathType } from "library/game-logic/horde-types";
@@ -64,7 +64,7 @@ export class Player_CASTLE_CHOISE_DIFFICULT extends IUnit {
             var choise_CfgUid     = this.CfgUid + "_";
             for (var difficultIdx = 1; difficultIdx <= GlobalVars.difficult + 2; difficultIdx++) {
                 var unitChoise_CfgUid = choise_CfgUid + difficultIdx;
-                GlobalVars.configs[unitChoise_CfgUid] = CreateConfig(choise_BaseCfgUid, unitChoise_CfgUid);
+                GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(choise_BaseCfgUid, unitChoise_CfgUid);
 
                 // назначаем имя
                 GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Name", "Выбрать сложность " + difficultIdx);
@@ -123,7 +123,7 @@ export class Player_CASTLE_CHOISE_ATTACKPLAN extends IUnit {
             var choise_CfgUid     = this.CfgUid + "_";
             for (var planIdx = 0; planIdx < AttackPlansClass.length; planIdx++) {
                 var unitChoise_CfgUid = choise_CfgUid + planIdx;
-                GlobalVars.configs[unitChoise_CfgUid] = CreateConfig(choise_BaseCfgUid, unitChoise_CfgUid);
+                GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(choise_BaseCfgUid, unitChoise_CfgUid);
 
                 // назначаем имя
                 GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Name", "Выбрать волну " + planIdx);
@@ -180,7 +180,7 @@ export class Player_Teimur_Dovehouse extends IUnit {
 
             for (var unitNum = 0; unitNum < TeimurLegendaryUnitsClass.length; unitNum++) {
                 var unitCfgUid = this.CfgUid + "_" + unitNum;
-                GlobalVars.configs[unitCfgUid] = CreateConfig(TeimurLegendaryUnitsClass[unitNum].CfgUid, unitCfgUid);
+                GlobalVars.configs[unitCfgUid] = CreateUnitConfig(TeimurLegendaryUnitsClass[unitNum].CfgUid, unitCfgUid);
 
                 // стоимость легендарного юнита в здании для отправки врагам
                 GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid].CostResources, "Gold",   500);

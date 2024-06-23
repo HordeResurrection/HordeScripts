@@ -1,4 +1,4 @@
-import { CreateConfig } from "../Utils";
+import { CreateUnitConfig } from "../Utils";
 import { Cell } from "./Geometry";
 import { PointCommandArgs, ProduceAtCommandArgs } from "library/game-logic/horde-types";
 import { createPoint } from "library/common/primitives";
@@ -10,6 +10,9 @@ export class IUnit {
     teamNum: number;
     processingTick: number;
 
+    /** флаг, что юнита нужно удалить из списка юнитов, чтобы отключить обработку */
+    needDeleted: boolean;
+
     static CfgUid      : string = "";
     static BaseCfgUid  : string = "";
 
@@ -18,10 +21,13 @@ export class IUnit {
         this.teamNum         = teamNum;
         this.unit_ordersMind = this.unit.OrdersMind;
         this.processingTick  = this.unit.PseudoTickCounter % 50;
+        this.needDeleted     = true;
     }
 
     public static InitConfig() {
-        GlobalVars.configs[this.CfgUid] = CreateConfig(this.BaseCfgUid, this.CfgUid);
+        if (this.BaseCfgUid != "" && this.CfgUid != "") {
+            GlobalVars.configs[this.CfgUid] = CreateUnitConfig(this.BaseCfgUid, this.CfgUid);
+        }
     }
 
     public OnEveryTick(gameTickNum: number) {}

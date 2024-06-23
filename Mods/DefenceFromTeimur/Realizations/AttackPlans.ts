@@ -1,9 +1,9 @@
 import { GlobalVars } from "../GlobalData";
-import { TeimurLegendaryUnitsClass, Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER } from "./Teimur_units";
+import { TeimurLegendaryUnitsClass, Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER, Teimur_Legendary_HORSE, Teimur_Legendary_DARK_DRAIDER, Teimur_Legendary_FIRE_MAGE } from "./Teimur_units";
 import { IAttackPlan, WaveUnit, Wave } from "../Types/IAttackPlan";
 import { IUnit, RandomUnit } from "../Types/IUnit";
 import { IIncomePlan } from "../Types/IIncomePlan";
-import { IncomePlan_1, IncomePlan_2 } from "./IncomePlans";
+import { IncomePlan_1 } from "./IncomePlans";
 import { ITeimurUnit } from "../Types/ITeimurUnit";
 
 export class AttackPlan_1 extends IAttackPlan {
@@ -299,7 +299,13 @@ export class AttackPlan_4 extends IAttackPlan {
 
         this.waves.push(
             new Wave("БОСС ВОЛНА 6", 12 * 60 * 50, [
-                new WaveUnit(RandomUnit<typeof ITeimurUnit>([Teimur_Legendary_WORKER, Teimur_Legendary_ARCHER]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+                new WaveUnit(
+                    RandomUnit<typeof ITeimurUnit>([
+                            Teimur_Legendary_WORKER,
+                            Teimur_Legendary_ARCHER,
+                            Teimur_Legendary_HORSE,
+                            Teimur_Legendary_DARK_DRAIDER]),
+                        Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
             ])
         );
         
@@ -333,7 +339,14 @@ export class AttackPlan_4 extends IAttackPlan {
 
         this.waves.push(
             new Wave("БОСС ВОЛНА 12", 25 * 60 * 50, [
-                new WaveUnit(RandomUnit<typeof ITeimurUnit>([Teimur_Legendary_SWORDMEN, Teimur_Legendary_ARCHER_2, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_RAIDER]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_SWORDMEN,
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER]),
+                    Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
             ])
         );
 
@@ -367,16 +380,18 @@ export class AttackPlan_4 extends IAttackPlan {
 
         this.waves.push(
             new Wave("БОСС ВОЛНА 18", 37 * 60 * 50, [
-                new WaveUnit(RandomUnit<typeof ITeimurUnit>([Teimur_Legendary_ARCHER_2, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_RAIDER]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER]),
+                    7*Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
             ])
         );
-        for (var gameTickNum = 37 * 60 * 50; gameTickNum < 40 * 60 * 50; gameTickNum += 10 * 50) {
-            this.waves.push(
-                new Wave("", gameTickNum, [
-                    new WaveUnit(Teimur_Swordmen, 20 * GlobalVars.difficult)
-                ])
-            );
-        }
+
+        // генерируем имена волнам
+        this.AutoGenerateWaveNames();
 
         this.waves.push(
             new Wave("Конец", 42 * 60 * 50, [ ])
@@ -390,15 +405,13 @@ export class AttackPlan_test extends IAttackPlan {
     constructor () {
         super();
 
-        var waveUnits = new Array<WaveUnit>(TeimurLegendaryUnitsClass.length);
-        for (var i = 0; i < TeimurLegendaryUnitsClass.length; i++) {
-            waveUnits[i] = new WaveUnit(TeimurLegendaryUnitsClass[i], 1);
-        }
+        var waveUnits = new Array<WaveUnit>();
+        waveUnits.push(new WaveUnit(Teimur_Legendary_HORSE, 1));
 
         this.waves = [];
         this.waves.push(
             new Wave("ТЕСТ", 0, waveUnits),
-            new Wave("END", 5*60*50, [])
+            new Wave("END", 20*60*50, [])
         );
     }
 }

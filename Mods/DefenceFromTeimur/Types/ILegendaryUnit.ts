@@ -1,5 +1,5 @@
 import { GlobalVars } from "../GlobalData";
-import { CreateConfig } from "../Utils";
+import { CreateUnitConfig } from "../Utils";
 import { Cell } from "./Geometry";
 import { ITeimurUnit } from "./ITeimurUnit";
 

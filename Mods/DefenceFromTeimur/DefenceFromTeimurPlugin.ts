@@ -8,24 +8,18 @@ import { UnitDirection } from "library/game-logic/horde-types";
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_GOALCASTLE } from "./Realizations/Player_units";
 import { TeimurUnitsClass, TeimurLegendaryUnitsClass } from "./Realizations/Teimur_units";
-import { broadcastMessage } from "library/common/messages";
+import { broadcastMessage, createGameMessageWithNoSound, createGameMessageWithSound } from "library/common/messages";
 import { GameState, GlobalVars } from "./GlobalData";
 import { IUnit } from "./Types/IUnit";
 import { IncomePlansClass } from "./Realizations/IncomePlans";
-import { RectangleSpawner, RingSpawner } from "./Realizations/Spawners";
+import { RandomSpawner, RectangleSpawner, RingSpawner } from "./Realizations/Spawners";
 
 const DeleteUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
 const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 
 // \TODO
-// + легендарные юниты могли захватывать здания
-// - сделать голубятню дороже
-// - 2 раза поражение защитал, один раз при уничтожении замка, а второй при
-// - сделать однородные волны, и их можно рандомить, чтобы волна контрилась
-// на полукруге чуть выше
-// - легендарный инж чет плохо строит башни
-// + легендарный всадник бъет!, а не должен
+
 
 export class DefenceFromTeimurPlugin extends HordePluginBase {
     hostPlayerTeamNum : number;
@@ -64,19 +58,43 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             GlobalVars.teams[0].castleCell        = new Cell(98, 95);
             GlobalVars.teams[0].allSettlementsIdx = [0, 1, 2, 3, 5];
             GlobalVars.teams[0].spawner           = new RingSpawner(new Cell(99, 99), 80, 100, 0, Math.PI, 0);
+        } else if (scenaName == "Оборона от Теймура - стороны света (1-6)") {
+            GlobalVars.teams = new Array<Team>(1);
+            GlobalVars.teams[0] = new Team();
+            GlobalVars.teams[0].teimurSettlementId = 6;
+            GlobalVars.teams[0].castleCell        = new Cell(94, 94);
+            GlobalVars.teams[0].allSettlementsIdx = [0, 1, 2, 3, 4, 5];
+            GlobalVars.teams[0].spawner           = new RandomSpawner([
+                new RectangleSpawner(new Rectangle(0,     0, 32, 32), 0),
+                new RectangleSpawner(new Rectangle(160,   0, 32, 32), 0),
+                new RectangleSpawner(new Rectangle(160, 160, 32, 32), 0),
+                new RectangleSpawner(new Rectangle(0,   160, 32, 32), 0)], 0);
         } else if (scenaName == "Оборона от Теймура - легион (2x2)") {
             GlobalVars.teams = new Array<Team>(2);
             GlobalVars.teams[0] = new Team();
             GlobalVars.teams[0].teimurSettlementId = 6;
-            GlobalVars.teams[0].castleCell        = new Cell(138, 18);
+            GlobalVars.teams[0].castleCell        = new Cell(170, 18);
             GlobalVars.teams[0].allSettlementsIdx = [0, 1, 2];
             GlobalVars.teams[0].spawner           = new RectangleSpawner(new Rectangle(0, 0, 38, 42), 0);
 
             GlobalVars.teams[1] = new Team();
             GlobalVars.teams[1].teimurSettlementId = 7;
-            GlobalVars.teams[1].castleCell        = new Cell(138, 82);
+            GlobalVars.teams[1].castleCell        = new Cell(170, 82);
             GlobalVars.teams[1].allSettlementsIdx = [3, 4, 5];
             GlobalVars.teams[1].spawner           = new RectangleSpawner(new Rectangle(0, 61, 38, 42), 1);
+        } else if (scenaName == "Оборона от Теймура - крестный легион (2x2)") {
+            GlobalVars.teams = new Array<Team>(2);
+            GlobalVars.teams[0] = new Team();
+            GlobalVars.teams[0].teimurSettlementId = 6;
+            GlobalVars.teams[0].castleCell        = new Cell(32, 156);
+            GlobalVars.teams[0].allSettlementsIdx = [0, 1, 2];
+            GlobalVars.teams[0].spawner           = new RectangleSpawner(new Rectangle(160, 0, 32, 32), 0);
+
+            GlobalVars.teams[1] = new Team();
+            GlobalVars.teams[1].teimurSettlementId = 7;
+            GlobalVars.teams[1].castleCell        = new Cell(155, 156);
+            GlobalVars.teams[1].allSettlementsIdx = [3, 4, 5];
+            GlobalVars.teams[1].spawner           = new RectangleSpawner(new Rectangle(0, 0, 32, 32), 1);
         }
 
         GlobalVars.gameState = GameState.PreInit;
@@ -469,7 +487,17 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             var minutesLeft = Math.floor(secondsLeft / 60);
             secondsLeft    -= minutesLeft * 60;
             secondsLeft     = Math.round(secondsLeft);
-            broadcastMessage("Осталось продержаться " + (minutesLeft > 0 ? minutesLeft + " минут " : "") + secondsLeft + " секунд", createHordeColor(255, 100, 100, 100));
+            let msg         = createGameMessageWithNoSound("Осталось продержаться " + (minutesLeft > 0 ? minutesLeft + " минут " : "") + secondsLeft + " секунд", createHordeColor(255, 100, 100, 100));
+            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0 ||
+                    GlobalVars.teams[teamNum].castle.unit.IsDead) {
+                    continue;
+                }
+
+                for (var settlement of GlobalVars.teams[teamNum].settlements) {
+                    settlement.Messages.AddMessage(msg);
+                }
+            }
         }
 
         // спавним врагов
@@ -499,8 +527,14 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         // обработка юнитов
 
         for (var unitNum = 0; unitNum < GlobalVars.units.length; unitNum++) {
+            // юнит умер, удаляем из списка
             if (GlobalVars.units[unitNum].unit.IsDead) {
                 GlobalVars.units[unitNum].OnDead(gameTickNum);
+                GlobalVars.units.splice(unitNum--, 1);
+                continue;
+            }
+            // юнит сам запросил, что его нужно удалить из списка
+            else if (GlobalVars.units[unitNum].needDeleted) {
                 GlobalVars.units.splice(unitNum--, 1);
                 continue;
             }
