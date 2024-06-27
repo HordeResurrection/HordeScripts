@@ -150,10 +150,10 @@ export class RoutingState extends MaraSettlementControllerState {
         let offensiveCfgId = produceableCfgIds.find( (value) => {return MaraUtils.IsCombatConfigId(value) && !MaraUtils.IsBuildingConfigId(value)} );
 
         if (offensiveCfgId) {
-            this.pickBuildUpOrDevelopment(50);
+            this.pickBuildUpOrDevelopment(this.settlementController.Settings.ControllerStates.BuildUpProbabilityWhenOffensePossible * 100);
         }
         else if (combatCfgId) {
-            this.pickBuildUpOrDevelopment(25);
+            this.pickBuildUpOrDevelopment(this.settlementController.Settings.ControllerStates.BuildUpProbabilityWhenDefensePossible * 100);
         }
         else {
             this.settlementController.Debug(`No produceable combat units, developing...`);
