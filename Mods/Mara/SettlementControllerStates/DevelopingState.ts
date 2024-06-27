@@ -55,22 +55,9 @@ export class DevelopingState extends ProductionState {
             }
         }
 
-        if (absentProducers.length > 0 || absentTech.length > 0) {
-            let selectedCfgIds: Array<string>;
-
-            if (absentProducers.length > 0) {
-                selectedCfgIds = absentProducers;
-            }
-            else {
-                selectedCfgIds = absentTech;
-            }
-            
-            let cfgId =  MaraUtils.RandomSelect(this.settlementController.MasterMind, selectedCfgIds);
-            result.push(this.makeProductionRequest(cfgId!, null, null));
-        }
-
         let combatComposition = this.settlementController.StrategyController.GetSettlementAttackArmyComposition();
         let estimation = this.settlementController.ProductionController.EstimateProductionTime(combatComposition);
+        let reinforcementProducers:Array<string> = [];
 
         estimation.forEach((value, key) => {
             if (value > this.settlementController.Settings.Timeouts.UnitProductionEstimationThreshold / 2) {
@@ -78,19 +65,28 @@ export class DevelopingState extends ProductionState {
                 producingCfgIds = producingCfgIds.filter((value) => requiredProductionChain.has(value));
 
                 if (producingCfgIds.length > 0) {
-                    let index = MaraUtils.Random(this.settlementController.MasterMind, producingCfgIds.length - 1);
-                    let producerCfgId = producingCfgIds[index];
-
-                    if (
-                        !result.find(
-                            (value) => {return value.ConfigId == producerCfgId}
-                        )
-                    ) {
-                        result.push(this.makeProductionRequest(producerCfgId, null, null));
-                    }
+                    let producerCfgId = MaraUtils.RandomSelect(this.settlementController.MasterMind, producingCfgIds);
+                    reinforcementProducers.push(producerCfgId!);
                 }
             }
         });
+
+        let selectedCfgIds: Array<string> | null = null;
+
+        if (reinforcementProducers. length > 0) {
+            selectedCfgIds = reinforcementProducers;
+        } 
+        else if (absentProducers.length > 0) {
+            selectedCfgIds = absentProducers;
+        }
+        else if (absentTech.length > 0) {
+            selectedCfgIds = absentTech;
+        }
+
+        if (selectedCfgIds) {
+            let cfgId =  MaraUtils.RandomSelect(this.settlementController.MasterMind, selectedCfgIds);
+            result.push(this.makeProductionRequest(cfgId!, null, null));
+        }
 
         return result;
     }
