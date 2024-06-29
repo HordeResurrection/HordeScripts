@@ -138,6 +138,7 @@ export class MaraSettlementController {
     public TargetExpand: TargetExpandData | null = null;
     public Expands: Array<MaraPoint> = [];
     public ReservedUnitsData: ReservedUnitsData = new ReservedUnitsData();
+    public CanMineResources: boolean = true;
     
     private subcontrollers: Array<MaraSubcontroller> = [];
     private state: MaraSettlementControllerState;

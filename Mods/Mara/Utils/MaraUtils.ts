@@ -876,8 +876,18 @@ export class MaraUtils {
         return unitConfig.ProducedPeople > 0 && !MaraUtils.IsProducerConfig(unitConfig);
     }
 
+    static IsHousingConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId)
+        return MaraUtils.IsHousingConfig(cfg);
+    }
+
     static IsMetalStockConfig(unitConfig: any): boolean {
         return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.MetalStock);
+    }
+
+    static IsMetalStockConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId)
+        return MaraUtils.IsMetalStockConfig(cfg);
     }
 
     static GetAllSawmillConfigIds(settlement: any): Array<string> {

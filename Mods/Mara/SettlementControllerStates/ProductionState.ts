@@ -32,8 +32,13 @@ export abstract class ProductionState extends MaraSettlementControllerState {
         ) {
             this.settlementController.Debug(`Not enough resources to produce target composition: ${insufficientResources.ToString()}`);
 
-            if (!this.onInsufficientResources(insufficientResources)) {
-                return;
+            if (this.settlementController.CanMineResources) {
+                if (!this.onInsufficientResources(insufficientResources)) {
+                    return;
+                }
+            }
+            else {
+                this.settlementController.Debug(`Unable to build expand, proceeding to production anyway`);
             }
         }
 

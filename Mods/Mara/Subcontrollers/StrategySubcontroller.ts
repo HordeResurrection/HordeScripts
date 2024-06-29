@@ -9,7 +9,6 @@ import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { Mara } from "../Mara";
 import { SettlementGlobalStrategy } from "../Utils/SettlementControllerGlobalStrategy";
 
-
 export class StrategySubcontroller extends MaraSubcontroller {
     EnemySettlements: Array<any> = []; //but actually Settlement
 

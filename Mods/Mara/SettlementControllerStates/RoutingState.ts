@@ -9,115 +9,51 @@ class NextStrategyItem implements NonUniformRandomSelectItem {
     NeedExpand: boolean;
 }
 
+class NeedExpandResult {
+    NeedExpand: boolean;
+    MinResourceAmount: number;
+    MinResourceThreshold: number;
+    ResourcesToMine: MaraResources;
+}
+
 const RESOURCE_THRESHOLD = 1000;
 const PEOPLE_THRESHOLD = 10;
 
 export class RoutingState extends MaraSettlementControllerState {
     OnEntry(): void {
-        let leftResources = new Set<MaraResourceType>();
+        this.settlementController.CanMineResources = this.canMineResources();
         
-        MaraResourceMap.ResourceClusters.forEach((value) => {
-            if (value.GoldAmount > 0) {
-                leftResources.add(MaraResourceType.Gold);
-            }
+        if (this.settlementController.CanMineResources) {
+            let expandData = this.isExpandNeeded();
 
-            if (value.MetalAmount > 0) {
-                leftResources.add(MaraResourceType.Metal);
-            }
+            if (expandData.NeedExpand) {
+                this.settlementController.Debug(`Low on one or more resource`);
 
-            if (value.WoodAmount > 0) {
-                leftResources.add(MaraResourceType.Wood);
-            }
-        });
+                let positiveItem = new NextStrategyItem();
+                positiveItem.NeedExpand = true;
+                positiveItem.Weight = expandData.MinResourceAmount;
+
+                let negativeItem = new NextStrategyItem();
+                negativeItem.NeedExpand = false;
+                negativeItem.Weight = expandData.MinResourceThreshold - expandData.MinResourceAmount;
+
+                let pick = MaraUtils.NonUniformRandomSelect(this.settlementController.MasterMind, [positiveItem, negativeItem]);
+
+                if (pick!.NeedExpand) {
+                    this.settlementController.Debug(`Proceeding to expand...`);
+                    this.fillExpandData(expandData.ResourcesToMine);
+                    this.settlementController.State = SettlementControllerStateFactory.MakeExpandPrepareState(this.settlementController);
+                }
+                else {
+                    this.defineOffensiveStrategy();
+                }
                 
-        let resources = this.settlementController.MiningController.GetTotalResources();
-        this.settlementController.Debug(`Total resources: ${resources.ToString()}`);
-
-        let needExpand = false;
-        let resourcesToMine = new MaraResources(0, 0, 0, 0);
-        let minResourceAmount = Infinity;
-        let minResourceToThresholdRatio = Infinity;
-        let minResourceThreshold = 0;
-
-        if (resources.People < PEOPLE_THRESHOLD) {
-            this.settlementController.Debug(`Low people`);
-            needExpand = true;
-            resourcesToMine.People = 1;
-
-            let ratio = resources.People / PEOPLE_THRESHOLD;
-
-            if (minResourceToThresholdRatio > ratio) {
-                minResourceAmount = resources.People;
-                minResourceThreshold = PEOPLE_THRESHOLD;
-                minResourceToThresholdRatio = ratio;
-            }
-        }
-        
-        if (resources.Gold < RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Gold)) {
-            this.settlementController.Debug(`Low gold`);
-            needExpand = true;
-            resourcesToMine.Gold = 1;
-
-            let ratio = resources.Gold / RESOURCE_THRESHOLD;
-
-            if (minResourceToThresholdRatio > ratio) {
-                minResourceAmount = resources.Gold;
-                minResourceThreshold = RESOURCE_THRESHOLD;
-                minResourceToThresholdRatio = ratio;
-            }
-        }
-        
-        if (resources.Metal < RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Metal)) {
-            this.settlementController.Debug(`Low metal`);
-            needExpand = true;
-            resourcesToMine.Metal = 1;
-
-            let ratio = resources.Metal / RESOURCE_THRESHOLD;
-
-            if (minResourceToThresholdRatio > ratio) {
-                minResourceAmount = resources.Metal;
-                minResourceThreshold = RESOURCE_THRESHOLD;
-                minResourceToThresholdRatio = ratio;
-            }
-        }
-
-        if (resources.Wood < RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Wood)) {
-            this.settlementController.Debug(`Low lumber`);
-            needExpand = true;
-            resourcesToMine.Wood = 1;
-
-            let ratio = resources.Wood / RESOURCE_THRESHOLD;
-
-            if (minResourceToThresholdRatio > ratio) {
-                minResourceAmount = resources.Wood;
-                minResourceThreshold = RESOURCE_THRESHOLD;
-                minResourceToThresholdRatio = ratio;
-            }
-        }
-
-        if (needExpand) {
-            this.settlementController.Debug(`Low on one or more resource`);
-
-            let positiveItem = new NextStrategyItem();
-            positiveItem.NeedExpand = true;
-            positiveItem.Weight = minResourceAmount;
-
-            let negativeItem = new NextStrategyItem();
-            negativeItem.NeedExpand = false;
-            negativeItem.Weight = minResourceThreshold - minResourceAmount;
-
-            let pick = MaraUtils.NonUniformRandomSelect(this.settlementController.MasterMind, [positiveItem, negativeItem]);
-
-            if (pick!.NeedExpand) {
-                this.settlementController.Debug(`Proceeding to expand...`);
-                this.fillExpandData(resourcesToMine);
-                this.settlementController.State = SettlementControllerStateFactory.MakeExpandPrepareState(this.settlementController);
+                return;
             }
             else {
                 this.defineOffensiveStrategy();
+                return;
             }
-            
-            return;
         }
         else {
             this.defineOffensiveStrategy();
@@ -159,5 +95,144 @@ export class RoutingState extends MaraSettlementControllerState {
             this.settlementController.Debug(`No produceable combat units, developing...`);
             this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
         }
+    }
+
+    private canMineResources(): boolean {
+        let economy = this.settlementController.GetCurrentDevelopedEconomyComposition();
+
+        let atLeastOneHarvesterPresent = false;
+        let atLeastOneMetalStockPresent = false;
+
+        economy.forEach((value, key) => {
+            if (MaraUtils.IsHarvesterConfigId(key)) {
+                atLeastOneHarvesterPresent = true;
+            }
+            else if (MaraUtils.IsMetalStockConfigId(key)) {
+                atLeastOneMetalStockPresent = true;
+            }
+        });
+
+        if (!atLeastOneHarvesterPresent) {
+            let harvesterCfgIds = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
+            
+            if (harvesterCfgIds.length == 0) {
+                return false;
+            }
+        }
+
+        if (!atLeastOneMetalStockPresent) {
+            let metalStockCfgIds = MaraUtils.GetAllMetalStockConfigIds(this.settlementController.Settlement);
+
+            if (metalStockCfgIds.length == 0) {
+                return false;
+            }
+        }
+
+        let sawmillCfgIds = MaraUtils.GetAllSawmillConfigIds(this.settlementController.Settlement);
+
+        if (sawmillCfgIds.length == 0) {
+            return false;
+        }
+
+        let mineCfgIds = MaraUtils.GetAllMineConfigIds(this.settlementController.Settlement);
+
+        if (mineCfgIds.length == 0) {
+            return false;
+        }
+
+        let housingCfgIds = MaraUtils.GetAllHousingConfigIds(this.settlementController.Settlement);
+
+        if (housingCfgIds.length == 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private isExpandNeeded(): NeedExpandResult {
+        let leftResources = new Set<MaraResourceType>();
+        
+        MaraResourceMap.ResourceClusters.forEach((value) => {
+            if (value.GoldAmount > 0) {
+                leftResources.add(MaraResourceType.Gold);
+            }
+
+            if (value.MetalAmount > 0) {
+                leftResources.add(MaraResourceType.Metal);
+            }
+
+            if (value.WoodAmount > 0) {
+                leftResources.add(MaraResourceType.Wood);
+            }
+        });
+                
+        let resources = this.settlementController.MiningController.GetTotalResources();
+        this.settlementController.Debug(`Total resources: ${resources.ToString()}`);
+
+        let result = new NeedExpandResult();
+        result.NeedExpand = false;
+        result.ResourcesToMine = new MaraResources(0, 0, 0, 0);
+        result.MinResourceAmount = Infinity;
+        result.MinResourceThreshold = 0;
+
+        let minResourceToThresholdRatio = Infinity;
+
+        if (resources.People < PEOPLE_THRESHOLD) {
+            this.settlementController.Debug(`Low people`);
+            result.NeedExpand = true;
+            result.ResourcesToMine.People = 1;
+
+            let ratio = resources.People / PEOPLE_THRESHOLD;
+
+            if (minResourceToThresholdRatio > ratio) {
+                result.MinResourceAmount = resources.People;
+                result.MinResourceThreshold = PEOPLE_THRESHOLD;
+                minResourceToThresholdRatio = ratio;
+            }
+        }
+        
+        if (resources.Gold < RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Gold)) {
+            this.settlementController.Debug(`Low gold`);
+            result.NeedExpand = true;
+            result.ResourcesToMine.Gold = 1;
+
+            let ratio = resources.Gold / RESOURCE_THRESHOLD;
+
+            if (minResourceToThresholdRatio > ratio) {
+                result.MinResourceAmount = resources.Gold;
+                result.MinResourceThreshold = RESOURCE_THRESHOLD;
+                minResourceToThresholdRatio = ratio;
+            }
+        }
+        
+        if (resources.Metal < RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Metal)) {
+            this.settlementController.Debug(`Low metal`);
+            result.NeedExpand = true;
+            result.ResourcesToMine.Metal = 1;
+
+            let ratio = resources.Metal / RESOURCE_THRESHOLD;
+
+            if (minResourceToThresholdRatio > ratio) {
+                result.MinResourceAmount = resources.Metal;
+                result.MinResourceThreshold = RESOURCE_THRESHOLD;
+                minResourceToThresholdRatio = ratio;
+            }
+        }
+
+        if (resources.Wood < RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Wood)) {
+            this.settlementController.Debug(`Low lumber`);
+            result.NeedExpand = true;
+            result.ResourcesToMine.Wood = 1;
+
+            let ratio = resources.Wood / RESOURCE_THRESHOLD;
+
+            if (minResourceToThresholdRatio > ratio) {
+                result.MinResourceAmount = resources.Wood;
+                result.MinResourceThreshold = RESOURCE_THRESHOLD;
+                minResourceToThresholdRatio = ratio;
+            }
+        }
+
+        return result;
     }
 }
