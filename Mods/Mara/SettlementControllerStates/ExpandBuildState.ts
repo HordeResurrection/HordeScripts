@@ -222,16 +222,20 @@ export class ExpandBuildState extends ProductionState {
     private orderWoodcuttingProduction(): Array<MaraProductionRequest> {
         let result = new Array<MaraProductionRequest>();
         
-        let sawmills = MaraUtils.GetSettlementUnitsInArea(
-            this.expandCenter, 
-            this.settlementController.Settings.ResourceMining.WoodcuttingRadius,
-            [this.settlementController.Settlement],
-            (unit) => {return MaraUtils.IsSawmillConfig(unit.Cfg) && unit.IsAlive}
-        );
-        
+        let isSawmillPresent = false;
+
+        for (let sawmillData of this.settlementController.MiningController.Sawmills) {
+            let distance = MaraUtils.ChebyshevDistance(sawmillData.Sawmill.CellCenter, this.expandCenter);
+            
+            if (distance < this.settlementController.Settings.ResourceMining.WoodcuttingRadius) {
+                isSawmillPresent = true;
+                break;
+            }
+        }
+
         let targetResourceCluster = this.settlementController.TargetExpand!.Cluster!;
 
-        if (sawmills.length == 0) {
+        if (!isSawmillPresent) {
             let sawmillConfigs = MaraUtils.GetAllSawmillConfigIds(this.settlementController.Settlement);
             let cfgId = this.selectConfigId(sawmillConfigs);
 
