@@ -113,40 +113,49 @@ export class RoutingState extends MaraSettlementControllerState {
         });
 
         if (!atLeastOneHarvesterPresent) {
-            let harvesterCfgIds = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
-            
-            if (harvesterCfgIds.length == 0) {
+            if (!this.checkConfigIds(MaraUtils.GetAllHarvesterConfigIds)) {
                 return false;
             }
         }
 
         if (!atLeastOneMetalStockPresent) {
-            let metalStockCfgIds = MaraUtils.GetAllMetalStockConfigIds(this.settlementController.Settlement);
-
-            if (metalStockCfgIds.length == 0) {
+            if (!this.checkConfigIds(MaraUtils.GetAllMetalStockConfigIds)) {
                 return false;
             }
         }
 
-        let sawmillCfgIds = MaraUtils.GetAllSawmillConfigIds(this.settlementController.Settlement);
-
-        if (sawmillCfgIds.length == 0) {
+        if (!this.checkConfigIds(MaraUtils.GetAllSawmillConfigIds)) {
             return false;
         }
 
-        let mineCfgIds = MaraUtils.GetAllMineConfigIds(this.settlementController.Settlement);
-
-        if (mineCfgIds.length == 0) {
+        if (!this.checkConfigIds(MaraUtils.GetAllMineConfigIds)) {
             return false;
         }
 
-        let housingCfgIds = MaraUtils.GetAllHousingConfigIds(this.settlementController.Settlement);
-
-        if (housingCfgIds.length == 0) {
+        if (!this.checkConfigIds(MaraUtils.GetAllHousingConfigIds)) {
             return false;
         }
 
         return true;
+    }
+
+    private checkConfigIds(configIdsGetter: (any) => Array<string>): boolean {
+        let availableCfgIds = configIdsGetter(this.settlementController.Settlement);
+
+        if (availableCfgIds.length == 0) {
+            return false;
+        }
+
+        let economy = this.settlementController.GetCurrentDevelopedEconomyComposition();
+        let allowedItems = MaraUtils.MakeAllowedCfgItems(availableCfgIds, economy, this.settlementController.Settlement);
+
+        for (let item of allowedItems) {
+            if (item.MaxCount > 0) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     private isExpandNeeded(): NeedExpandResult {

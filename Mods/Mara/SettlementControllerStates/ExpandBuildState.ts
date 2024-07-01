@@ -126,7 +126,18 @@ export class ExpandBuildState extends ProductionState {
     }
 
     private selectConfigId(configIds: Array<string>): string | null {
-        return MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, configIds);
+        let economy = this.settlementController.GetCurrentDevelopedEconomyComposition();
+        let allowedItems = MaraUtils.MakeAllowedCfgItems(configIds, economy, this.settlementController.Settlement);
+        
+        let allowedCfgIds: Array<string> = [];
+
+        for (let item of allowedItems) {
+            if (item.MaxCount > 0) {
+                allowedCfgIds.push(item.UnitConfig.Uid);
+            }
+        }
+        
+        return MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, allowedCfgIds);
     }
 
     private orderMineProduction(cluster: MaraResourceCluster, resourceType: MaraResourceType): Array<MaraProductionRequest> {
