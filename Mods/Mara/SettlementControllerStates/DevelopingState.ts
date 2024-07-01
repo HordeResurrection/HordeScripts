@@ -72,15 +72,15 @@ export class DevelopingState extends ProductionState {
         });
 
         let selectedCfgIds: Array<string> | null = null;
-
-        if (reinforcementProducers. length > 0) {
-            selectedCfgIds = reinforcementProducers;
-        } 
-        else if (absentProducers.length > 0) {
+ 
+        if (absentProducers.length > 0) {
             selectedCfgIds = absentProducers;
         }
         else if (absentTech.length > 0) {
             selectedCfgIds = absentTech;
+        }
+        if (reinforcementProducers.length > 0) {
+            selectedCfgIds = reinforcementProducers;
         }
 
         if (selectedCfgIds) {
