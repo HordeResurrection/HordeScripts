@@ -35,5 +35,6 @@ export class GlobalVars {
     public static Players: any;
     public static scenaWidth : number;
     public static scenaHeight : number;
+    /** скриптованные юниты на карте */
     public static unitsMap : any;
 }

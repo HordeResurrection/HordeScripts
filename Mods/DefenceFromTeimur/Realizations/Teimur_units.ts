@@ -1,7 +1,7 @@
-import { createHordeColor, createPoint } from "library/common/primitives";
-import { UnitFlags, UnitCommand, UnitDirection, ProduceAtCommandArgs, UnitDeathType, UnitSpecification } from "library/game-logic/horde-types";
+import { createHordeColor, createPF, createPoint, createResourcesAmount } from "library/common/primitives";
+import { UnitFlags, UnitCommand, UnitDirection, ProduceAtCommandArgs, UnitDeathType, UnitSpecification, BattleController, BulletState, UnitMapLayer } from "library/game-logic/horde-types";
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
-import { CreateBulletConfig, CreateUnitConfig, generateRandomCellInRect, spawnUnit, spawnUnits, unitCanBePlacedByRealMap } from "../Utils";
+import { ChebyshevDistance, CreateBulletConfig, CreateUnitConfig, EuclidDistance, L1Distance, generateRandomCellInRect, spawnUnit, spawnUnits, unitCanBePlacedByRealMap } from "../Utils";
 import { ILegendaryUnit } from "../Types/ILegendaryUnit";
 import { ITeimurUnit } from "../Types/ITeimurUnit";
 import { generateCellInSpiral } from "library/common/position-tools";
@@ -13,6 +13,8 @@ import { log } from "library/common/logging";
 import { iterateOverUnitsInBox, unitCheckPathTo } from "library/game-logic/unit-and-map";
 import { printObjectItems } from "library/common/introspection";
 import { setBulletInitializeWorker, setBulletProcessWorker } from "library/game-logic/workers-tools";
+import { Cell } from "../Types/Geometry";
+import { createGameMessageWithSound } from "library/common/messages";
 
 const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 
@@ -452,7 +454,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
     static BaseCfgUid  : string = "#DefenceTeimur_Raider";
     static Description : string = "Слабости: окружение, огонь. Преимущества: скорость, захват юнитов.";
 
-    static CapturePeriod     : number = 300;
+    static CapturePeriod     : number = 250;
     /** максимальное количество юнитов, которое может захватить */
     static CaptureUnitsLimit : number = 20;
 
@@ -473,9 +475,9 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
         // назначаем имя
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный всадник разума");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 255, 100, 100));
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 100, 100, 255));
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(100 * Math.sqrt(GlobalVars.difficult)));
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(120 * Math.sqrt(GlobalVars.difficult)));
         // делаем урон = 0
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.BulletCombatParams, "Damage", 0);
 
@@ -488,10 +490,10 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
             this.capturePrevStart = gameTickNum;
 
             // количество юнитов за раз
-            var captureUnitsLimit = 3;
+            var captureUnitsLimit = 2;
 
             // ищем ближайших вражеских юнитов
-            let unitsIter = iterateOverUnitsInBox(createPoint(this.unit.Cell.X, this.unit.Cell.Y), 8);
+            let unitsIter = iterateOverUnitsInBox(createPoint(this.unit.Cell.X, this.unit.Cell.Y), 4);
             var unitsShowFlag = {};
             for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
                 var _unit = u.value;
@@ -530,7 +532,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
         // если в очереди меньше 2 приказов, то генерируем новые
         if (this.unit_ordersMind.OrdersCount <= 1) {
             // генерируем 5 рандомных достижимых точек вокруг цели
-            var generator_  = generateRandomCellInRect(GlobalVars.teams[this.teamNum].castleCell.X - 20, GlobalVars.teams[this.teamNum].castleCell.Y - 20, 40, 40);
+            var generator_  = generateRandomCellInRect(GlobalVars.teams[this.teamNum].castleCell.X - 10, GlobalVars.teams[this.teamNum].castleCell.Y - 10, 40, 40);
             var ordersCount = 5 - this.unit_ordersMind.OrdersCount;
             for (var position = generator_.next(), orderNum = 0; !position.done && orderNum < ordersCount; position = generator_.next(), orderNum++) {
                 if (unitCheckPathTo(this.unit, createPoint(position.value.X, position.value.Y))) {
@@ -579,7 +581,7 @@ export class Teimur_RevivedUnit extends ITeimurUnit {
 export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
     static CfgUid      : string = "#DefenceTeimur_legendary_Dark_Draider";
     static BaseCfgUid  : string = "#DefenceTeimur_Raider";
-    static Description : string = "Слабости: окружение, огонь. Преимущества: скорость, оживление свежих трупов";
+    static Description : string = "Слабости: окружение, огонь, дальний бой. Преимущества: скорость, оживление свежих трупов, ближний бой";
 
     /** максимальное количество юнитов, которое может оживить */
     static ReviveUnitsLimit : number = 30;
@@ -596,6 +598,10 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
         this.revivePrevStart = 0;
         this.reviveUnits     = new Array<Teimur_RevivedUnit>();
         this.mapReviveUnits  = new Map<number, boolean>();
+
+        // поскольку трупы на карте живут не долго, то делаем обработку юнита чаще
+        this.processingTickModule   = 10;
+        this.processingTick         = this.unit.PseudoTickCounter % this.processingTickModule;
     }
 
     static InitConfig() {
@@ -694,54 +700,295 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
 export class Teimur_Legendary_FIRE_MAGE extends ILegendaryUnit {
     static CfgUid      : string = "#DefenceTeimur_legendary_FIRE_MAGE";
     static BaseCfgUid  : string = "#UnitConfig_Mage_Villur";
-    static Description : string = "Слабости: окружение. Преимущества: траектория огненного шара";
+    static Description : string = "Слабости: дальний бой, скорострельность. Преимущества: плащ огня, смертоносный огненный шар";
 
     static FireballCfgUid : string = "#DefenceTeimur_legendary_FIRE_MAGE_FIREBALL";
     static FireballCfg    : any;
 
+    static FireCfgUid     : string = "#BulletConfig_Fire";
+    static FireCfg        : any;
+
+    static SpellFireFlashCooldown : number = 50 * 3;
+    spellFireFlashPrevCast : number = 0;
+
     constructor (unit: any, teamNum: number) {
         super(unit, teamNum);
-
-        //printObjectItems(unit.Cfg.MainArmament, 2);
     }
 
     static InitConfig() {
         ILegendaryUnit.InitConfig.call(this);
 
+        this.FireCfg = GlobalVars.HordeContentApi.GetBulletConfig(this.FireCfgUid);
+
         // создаем снаряд
-        this.FireballCfg = CreateBulletConfig("#BulletConfig_Fireball", this.FireballCfgUid);
+        this.FireballCfg = CreateBulletConfig("#BulletConfig_ScriptBullet_Template", this.FireballCfgUid);
         // кастомные обработчики снаряда
         setBulletInitializeWorker(this, this.FireballCfg, this.Fireball_initializeWorker);
         setBulletProcessWorker(this, this.FireballCfg, this.Fireball_processWorker);
+        // Установка скорости полета
+        GlobalVars.ScriptUtils.SetValue(this.FireballCfg, "BaseBulletSpeed", createPF(2, 0));
+        // отключаем баллистику
+        GlobalVars.ScriptUtils.SetValue(this.FireballCfg, "IsBallistic", false);
+        GlobalVars.ScriptUtils.SetValue(this.FireballCfg, "LoopAnimation", true);
+        // включаем нужную анимацию
+        GlobalVars.ScriptUtils.GetValue(this.FireballCfg, "BulletAnimationsCatalogRef").SetConfig(GlobalVars.HordeContentApi.GetAnimationCatalog("#AnimCatalog_Bullets_DragonFire"));
+        // количество направлений
+        GlobalVars.ScriptUtils.SetValue(this.FireballCfg, "DirectionsCount", 8);
+        // огонь
+        //GlobalVars.ScriptUtils.GetValue(this.FireballCfg.SpecialParams, "FireConfigRef").SetConfig(GlobalVars.HordeContentApi.GetBulletConfig(this.FireCfgUid));
 
         // назначаем имя
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный маг огня");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 255, 100, 100));
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(150 * Math.sqrt(GlobalVars.difficult)));
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(120 * Math.sqrt(GlobalVars.difficult)));
         // задаем кастомный снаряд
         GlobalVars.ScriptUtils.GetValue(GlobalVars.configs[this.CfgUid].MainArmament, "BulletConfigRef").SetConfig(this.FireballCfg);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "ReloadTime", 150);
     }
 
-    protected static Fireball_initializeWorker(bullet: any, emitArgs: any) {
+    public OnEveryTick(gameTickNum: number): void {
+        ITeimurUnit.prototype.OnEveryTick.call(this, gameTickNum);
+
+        // кастуем огненную вспышку вокруг себя
+        if (this.spellFireFlashPrevCast + Teimur_Legendary_FIRE_MAGE.SpellFireFlashCooldown < gameTickNum) {
+            this.spellFireFlashPrevCast = gameTickNum;
+
+            const cellX     = this.unit.Cell.X;
+            const cellY     = this.unit.Cell.Y;
+            const xs        = Math.max(0, cellX - 2);
+            const xe        = Math.min(GlobalVars.scenaWidth - 1, cellX + 2);
+            const ys        = Math.max(0, cellY - 2);
+            const ye        = Math.min(GlobalVars.scenaHeight - 1, cellY + 2);
+            for (var x = xs; x <= xe; x++) {
+                for (var y = ys; y <= ye; y++) {
+                    HCL.HordeClassLibrary.World.Objects.Bullets.Implementations.Fire.BaseFireBullet.MakeFire(
+                        this.unit, createPoint(x << 5, y << 5), UnitMapLayer.Main, Teimur_Legendary_FIRE_MAGE.FireCfg);
+                }
+            }
+        }
+    }
+
+    protected static Fireball_initializeWorker(bull: any, emitArgs: any) {
         // Настройка анимации по данным из конфига
-        bullet.SetupAnimation();
+        bull.SetupAnimation();
 
         // Звук выстрела (берет из каталога заданного в конфиге снаряда)
-        bullet.UtterSound("Shot", bullet.Position);
+        //bullet.UtterSound("Shot", bullet.Position);
 
-        log.info("ВЫСТРЕЛ!");
+        //bull.ScriptData.animationInverted = false;
+        bull.ScriptData.damagedCells = new Map<number, Map<number, boolean>>();
 
-        //bullet.Position = emitArgs.SourceUnit.Position;
+        /** время запуска снаряда */
+        const launchTick           : number = BattleController.GameTimer.GameFramesCounter;
+        /** расстояние до цели */
+        const distanceToTarget     : number = EuclidDistance(bull.Position.X, bull.Position.Y, bull.TargetPos.X, bull.TargetPos.Y);
+        
+        // траектория полета снаряда
+
+        const nPoints : number = 8;
+        bull.ScriptData.Speed               = bull.Cfg.BaseBulletSpeed;// + bull.CombatParams.AdditiveBulletSpeed;
+        bull.ScriptData.Trajectories        = {};
+        bull.ScriptData.Trajectories.points = new Array<any>(nPoints);
+        bull.ScriptData.Trajectories.times  = new Array<number>(nPoints);
+        bull.ScriptData.Trajectories.frame  = 0;
+
+        // угол от TargetPos до LaunchPos
+
+        const angle : number = Math.atan2(bull.TargetPos.Y - bull.Position.Y, bull.TargetPos.X - bull.Position.X);
+        const cosA  : number = Math.cos(angle);
+        const sinA  : number = Math.sin(angle);
+
+        const inv_speed            : number = 1.0 / bull.ScriptData.Speed;
+        const inv_distanceToTarget : number = 1.0 / distanceToTarget;
+        const inv_nPoints          : number = 1.0 / nPoints;
+        for (var pointNum = 0; pointNum < nPoints; pointNum++) {
+            const t = (pointNum + 1) * inv_nPoints * distanceToTarget;
+            //const f = 0; // полет по прямой
+            const f = 200 * Math.sin(2.0 * Math.PI * t * inv_distanceToTarget); // синусоида
+
+            bull.ScriptData.Trajectories.points[pointNum] = createPoint(Math.round(bull.Position.X + t*cosA - f*sinA), Math.round(bull.Position.Y + t*sinA + f*cosA));
+            if (pointNum == 0) {
+                bull.ScriptData.Trajectories.times[pointNum] =
+                    launchTick + ChebyshevDistance(bull.Position.X, bull.Position.Y, bull.ScriptData.Trajectories.points[pointNum].X, bull.ScriptData.Trajectories.points[pointNum].Y)
+                        * inv_speed;
+            } else {
+                bull.ScriptData.Trajectories.times[pointNum] = 
+                    bull.ScriptData.Trajectories.times[pointNum - 1] + ChebyshevDistance(bull.ScriptData.Trajectories.points[pointNum - 1].X, bull.ScriptData.Trajectories.points[pointNum - 1].Y, bull.ScriptData.Trajectories.points[pointNum].X, bull.ScriptData.Trajectories.points[pointNum].Y)
+                        * inv_speed;
+            }
+        }
+
+        bull.SetTargetPosition(bull.ScriptData.Trajectories.points[0], bull.ScriptData.Speed);
+        bull.SetupAnimation();
     }
 
-    protected static Fireball_processWorker(bullet: any) {
-        bullet.UpdateAnimation();
-        // bullet.State = BulletState.ReachedTheGoal
-        // BaseFireBullet.MakeFire(SourceUnit, Position, MapLayer, fireBulletCfg);
+    protected static Fireball_processWorker(bull: any) {
+        ///////////////// УРОН
+
+        const bullCellX    = Math.floor(bull.Position.X >> 5);
+        const bullCellY    = Math.floor(bull.Position.Y >> 5);
+        const xs           = Math.max(0, bullCellX - 1);
+        const xe           = Math.min(GlobalVars.scenaWidth - 1, bullCellX + 1);
+        const ys           = Math.max(0, bullCellY - 1);
+        const ye           = Math.min(GlobalVars.scenaHeight - 1, bullCellY + 1);
+
+        var  damagedCells = bull.ScriptData.damagedCells as Map<number, Map<number, boolean>>;
+
+        for (var x = xs; x <= xe; x++) {
+            for (var y = ys; y <= ye; y++) {
+                var isCellUnique = false;
+
+                if (!damagedCells.has(x)) {
+                    isCellUnique = true;
+                    damagedCells.set(x, new Map<number, boolean>());
+                    var damagedCellsY = damagedCells.get(x) as Map<number, boolean>;
+                    damagedCellsY.set(y, true);
+                } else {
+                    var damagedCellsY = damagedCells.get(x) as Map<number, boolean>;
+
+                    if (!damagedCellsY.has(y)) {
+                        isCellUnique = true; 
+                        damagedCellsY.set(y, true);
+                    }
+                }
+
+                if (isCellUnique) {
+                    var firePosition = createPoint(x << 5, y << 5);
+                    HCL.HordeClassLibrary.World.Objects.Bullets.Implementations.Fire.BaseFireBullet.MakeFire(
+                        bull.SourceUnit, firePosition, UnitMapLayer.Main, Teimur_Legendary_FIRE_MAGE.FireCfg);
+                    if (x == y) {
+                        bull.DamageArea(1);
+                    }
+                }
+            }
+        }
+
+        ///////////////// ТРАЕКТОРИЯ
+
+        // зацикливаем анимацию с 8 кадра до конца
+        if (bull.Visual.Animator.CurrentAnimFrame == bull.Visual.CurrentAnimation.FramesCount - 1) {
+            bull.Visual.Animator.SetFrame(8);
+            // bull.ScriptData.animationInverted = !bull.ScriptData.animationInverted;
+            // if (bull.ScriptData.animationInverted) {
+            //     bull.Visual.Animator.SetFramesSwitchDirection(HCL.HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.FramesSwitcher.SwitchDirection.Forward);
+            // } else {
+            //     bull.Visual.Animator.SetFramesSwitchDirection(HCL.HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.FramesSwitcher.SwitchDirection.Inverse)
+            // }
+        }
+
+        // обновляем анимацию
+        bull.UpdateAnimation();
+        // автоматический полет снаряда
+        bull.DistanceDecrease();
+        // проверка, что снаряд достиг следующей точки траектории
+        if (bull.ScriptData.Trajectories.frame < bull.ScriptData.Trajectories.points.length &&
+            BattleController.GameTimer.GameFramesCounter > bull.ScriptData.Trajectories.times[bull.ScriptData.Trajectories.frame]) {
+            bull.ScriptData.Trajectories.frame++;
+            // проверка, что существует следующая точка траектории
+            if (bull.ScriptData.Trajectories.frame < bull.ScriptData.Trajectories.points.length) {
+                // устанавливаем следующую целевую позицию
+                bull.SetTargetPosition(bull.ScriptData.Trajectories.points[bull.ScriptData.Trajectories.frame], bull.ScriptData.Speed);
+                // запоминаем кадр анимации
+                const frame = bull.Visual.Animator.CurrentAnimFrame;
+                // обновляем анимацию, чтобы снаряд был повернут в сторону цели
+                bull.SetupAnimation();
+                // кадр будет 0-ой, поэтому устанавливаем сохраненный
+                bull.Visual.Animator.SetFrame(frame);
+            }
+            // точки нет, снаряд долетел
+            else {
+                // ставим состояние, что снаряд долетел
+                GlobalVars.ScriptUtils.SetValue(bull, "State", BulletState.ReachedTheGoal);
+            }
+        }
     }
 }
+export class Teimur_Legendary_GREED_HORSE extends ILegendaryUnit {
+    static CfgUid      : string = "#DefenceTeimur_legendary_Greed_Horse";
+    static BaseCfgUid  : string = "#UnitConfig_Nature_Horse";
+    static Description : string = "Если успеете убить за 30 секунд с момента первой атаки, то принесет каждому 1000/1000/1000/10 ресурсов, иначе отнимет по 500/500/500/5 ресурсов";
+
+    static RewardResources  : any =  createResourcesAmount(1000, 1000, 1000, 10);
+    static PaymentResources : any =  createResourcesAmount(500, 500, 500, 5);
+    
+    static CountdownTicks : number = 50 * 30;
+
+    countdownStartTick : number = -1;
+    isChallengeEnd     : boolean    = false;
+
+    static InitConfig() {
+        ILegendaryUnit.InitConfig.call(this);
+
+        // назначаем имя
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный конь алчности");
+        // меняем цвет
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 255, 155, 0));
+        // задаем количество здоровья от числа игроков
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(130 * Math.sqrt(GlobalVars.difficult)));
+    }
+
+    public OnEveryTick(gameTickNum: number): void {
+        // если в очереди меньше 2 приказов, то генерируем новые
+        if (this.unit_ordersMind.OrdersCount <= 1) {
+            // генерируем 5 рандомных достижимых точек вокруг цели
+            var generator_  = generateRandomCellInRect(GlobalVars.teams[this.teamNum].castleCell.X - 15, GlobalVars.teams[this.teamNum].castleCell.Y - 15, 40, 40);
+            var ordersCount = 5 - this.unit_ordersMind.OrdersCount;
+            for (var position = generator_.next(), orderNum = 0; !position.done && orderNum < ordersCount; position = generator_.next(), orderNum++) {
+                if (unitCheckPathTo(this.unit, createPoint(position.value.X, position.value.Y))) {
+                    this.unit_ordersMind.AssignSmartOrder(createPoint(position.value.X, position.value.Y), AssignOrderMode.Queue, 100000);
+                }
+            }
+        }
+
+        // отсчет
+
+        if (!this.isChallengeEnd) {
+            if (this.countdownStartTick >= 0) {
+                if (this.countdownStartTick + Teimur_Legendary_GREED_HORSE.CountdownTicks < gameTickNum) {
+                    this.isChallengeEnd = true;
+                    for (var settlement of GlobalVars.teams[this.teamNum].settlements) {
+                        let msg2 = createGameMessageWithSound("Вы не успели, время расплаты!", createHordeColor(255, 255, 50, 10));
+                        settlement.Messages.AddMessage(msg2);
+                        settlement.Resources.TakeResources(Teimur_Legendary_GREED_HORSE.PaymentResources);
+                    }
+                } else {
+                    var FPS         = GlobalVars.HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
+                    var secondsLeft = Math.round((this.countdownStartTick + Teimur_Legendary_GREED_HORSE.CountdownTicks - gameTickNum) / FPS);
+
+                    if (secondsLeft <= 5 || secondsLeft % 5 == 0) {
+                        for (var settlement of GlobalVars.teams[this.teamNum].settlements) {
+                            let msg2 = createGameMessageWithSound("Осталось: " + secondsLeft + " секунд", createHordeColor(255, 255, 50, 10));
+                            settlement.Messages.AddMessage(msg2);
+                        }
+                    }
+                }
+            } else {
+                // отлавливаем первый удар
+                if (this.unit.Health != GlobalVars.configs[Teimur_Legendary_GREED_HORSE.CfgUid].MaxHealth) {
+                    for (var settlement of GlobalVars.teams[this.teamNum].settlements) {
+                        let msg2 = createGameMessageWithSound("Обратный отсчет начался!", createHordeColor(255, 255, 50, 10));
+                        settlement.Messages.AddMessage(msg2);
+                    }
+                    this.countdownStartTick = gameTickNum;
+                }
+            }
+        }
+    }
+
+    public OnDead(gameTickNum: number) {
+        // даем награду
+        if (!this.isChallengeEnd) {
+            for (var settlement of GlobalVars.teams[this.teamNum].settlements) {
+                let msg2 = createGameMessageWithSound("Вы успели, получите награду!", createHordeColor(255, 0, 128, 0));
+                settlement.Messages.AddMessage(msg2);
+                settlement.Resources.AddResources(Teimur_Legendary_GREED_HORSE.RewardResources);
+            }
+        }
+    }
+}
+
 
 export const TeimurLegendaryUnitsClass : Array<typeof IUnit> = [
     Teimur_Legendary_SWORDMEN,
@@ -751,8 +998,9 @@ export const TeimurLegendaryUnitsClass : Array<typeof IUnit> = [
     Teimur_Legendary_RAIDER,
     Teimur_Legendary_WORKER,
     Teimur_Legendary_HORSE,
-    Teimur_Legendary_DARK_DRAIDER//,
-    //Teimur_Legendary_FIRE_MAGE
+    Teimur_Legendary_DARK_DRAIDER,
+    Teimur_Legendary_FIRE_MAGE,
+    Teimur_Legendary_GREED_HORSE
 ];
 
 export const TeimurUnitsClass : Array<typeof IUnit> = [

@@ -28,6 +28,18 @@ export function unitCanBePlacedByRealMap(uCfg, x, y) {
     return uCfg.CanBePlacedByRealMap(ActiveScena.GetRealScena(), x, y);
 }
 
+export function ChebyshevDistance(x1: number, y1: number, x2: number, y2: number) {
+    return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
+}
+
+export function EuclidDistance(x1: number, y1: number, x2: number, y2: number) {
+    return Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
+}
+
+export function L1Distance(x1: number, y1: number, x2: number, y2: number) {
+    return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+}
+
 const SpawnUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
 export function spawnUnits(settlement, uCfg, uCount, direction, generator) {
     let spawnParams = new SpawnUnitParameters();

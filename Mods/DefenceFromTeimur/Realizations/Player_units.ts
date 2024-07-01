@@ -4,7 +4,7 @@ import { CreateUnitConfig } from "../Utils";
 import { AttackPlansClass } from "./AttackPlans";
 import { GlobalVars } from "../GlobalData";
 import { UnitCommand, UnitDeathType } from "library/game-logic/horde-types";
-import { TeimurLegendaryUnitsClass } from "./Teimur_units";
+import { TeimurLegendaryUnitsClass, Teimur_Legendary_GREED_HORSE } from "./Teimur_units";
 import { log } from "library/common/logging";
 import { WaveUnit } from "../Types/IAttackPlan";
 import { IncomePlanClass, IncomePlansClass } from "./IncomePlans";
@@ -179,6 +179,11 @@ export class Player_Teimur_Dovehouse extends IUnit {
             produceList.Clear();
 
             for (var unitNum = 0; unitNum < TeimurLegendaryUnitsClass.length; unitNum++) {
+                // некоторых юнитов спавнить нельзя
+                if (TeimurLegendaryUnitsClass[unitNum].CfgUid == Teimur_Legendary_GREED_HORSE.CfgUid) {
+                    continue;
+                }
+
                 var unitCfgUid = this.CfgUid + "_" + unitNum;
                 GlobalVars.configs[unitCfgUid] = CreateUnitConfig(TeimurLegendaryUnitsClass[unitNum].CfgUid, unitCfgUid);
 

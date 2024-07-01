@@ -1,5 +1,5 @@
 import { GlobalVars } from "../GlobalData";
-import { TeimurLegendaryUnitsClass, Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER, Teimur_Legendary_HORSE, Teimur_Legendary_DARK_DRAIDER, Teimur_Legendary_FIRE_MAGE } from "./Teimur_units";
+import { TeimurLegendaryUnitsClass, Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER, Teimur_Legendary_HORSE, Teimur_Legendary_DARK_DRAIDER, Teimur_Legendary_FIRE_MAGE, Teimur_Legendary_GREED_HORSE } from "./Teimur_units";
 import { IAttackPlan, WaveUnit, Wave } from "../Types/IAttackPlan";
 import { IUnit, RandomUnit } from "../Types/IUnit";
 import { IIncomePlan } from "../Types/IIncomePlan";
@@ -303,8 +303,7 @@ export class AttackPlan_4 extends IAttackPlan {
                     RandomUnit<typeof ITeimurUnit>([
                             Teimur_Legendary_WORKER,
                             Teimur_Legendary_ARCHER,
-                            Teimur_Legendary_HORSE,
-                            Teimur_Legendary_DARK_DRAIDER]),
+                            Teimur_Legendary_HORSE]),
                         Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
             ])
         );
@@ -345,7 +344,9 @@ export class AttackPlan_4 extends IAttackPlan {
                         Teimur_Legendary_HEAVYMAN,
                         Teimur_Legendary_RAIDER,
                         Teimur_Legendary_HORSE,
-                        Teimur_Legendary_DARK_DRAIDER]),
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]),
                     Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
             ])
         );
@@ -385,7 +386,9 @@ export class AttackPlan_4 extends IAttackPlan {
                         Teimur_Legendary_HEAVYMAN,
                         Teimur_Legendary_RAIDER,
                         Teimur_Legendary_HORSE,
-                        Teimur_Legendary_DARK_DRAIDER]),
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]),
                     7*Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
             ])
         );
@@ -406,7 +409,7 @@ export class AttackPlan_test extends IAttackPlan {
         super();
 
         var waveUnits = new Array<WaveUnit>();
-        waveUnits.push(new WaveUnit(Teimur_Legendary_HORSE, 1));
+        waveUnits.push(new WaveUnit(Teimur_Legendary_GREED_HORSE, 1));
 
         this.waves = [];
         this.waves.push(

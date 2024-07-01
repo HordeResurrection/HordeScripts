@@ -19,7 +19,7 @@ const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceU
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 
 // \TODO
-
+// DefenceFromTeimurPlugin.GlobalStorage - сохранение
 
 export class DefenceFromTeimurPlugin extends HordePluginBase {
     hostPlayerTeamNum : number;
@@ -538,7 +538,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
                 GlobalVars.units.splice(unitNum--, 1);
                 continue;
             }
-            if (gameTickNum % 50 == GlobalVars.units[unitNum].processingTick) {
+            if (gameTickNum % GlobalVars.units[unitNum].processingTickModule == GlobalVars.units[unitNum].processingTick) {
                 GlobalVars.units[unitNum].OnEveryTick(gameTickNum);
             }
         }
