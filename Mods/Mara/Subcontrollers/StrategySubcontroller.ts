@@ -511,12 +511,27 @@ export class StrategySubcontroller extends MaraSubcontroller {
             this.settlementController.Debug(`Unable to compose required strength: no allowed configs provided`);
             return unitComposition;
         }
+        
+        let maxStrength = 0;
+
+        for (let item of allowedConfigs) {
+            let strength = MaraUtils.GetConfigStrength(item.UnitConfig);
+
+            if (strength > maxStrength) {
+                maxStrength = strength;
+            }
+        }
+
+        let strengthToProduce = Math.min(
+            requiredStrength, 
+            maxStrength * this.settlementController.Settings.CombatSettings.MaxCompositionUnitCount
+        );
 
         let currentStrength = 0;
         let totalUnitCount = 0;
 
         while (
-            currentStrength < requiredStrength &&
+            currentStrength < strengthToProduce &&
             totalUnitCount < this.settlementController.Settings.CombatSettings.MaxCompositionUnitCount
         ) {
             if (allowedConfigs.length == 0) {
@@ -524,18 +539,17 @@ export class StrategySubcontroller extends MaraSubcontroller {
                 break;
             }
             
-            let index = MaraUtils.Random(this.settlementController.MasterMind, allowedConfigs.length - 1);
-            let configItem = allowedConfigs[index];
+            let configItem = MaraUtils.RandomSelect(this.settlementController.MasterMind, allowedConfigs);
 
-            if (configItem.MaxCount > 0) {
-                let leftStrength = requiredStrength - currentStrength;
-                let unitStrength = MaraUtils.GetConfigStrength(configItem.UnitConfig);
-                let maxUnitCount = Math.min(Math.round(leftStrength / unitStrength), configItem.MaxCount);
+            if (configItem!.MaxCount > 0) {
+                let leftStrength = strengthToProduce - currentStrength;
+                let unitStrength = MaraUtils.GetConfigStrength(configItem!.UnitConfig);
+                let maxUnitCount = Math.min(Math.round(leftStrength / unitStrength), configItem!.MaxCount);
 
                 let unitCount = Math.max(Math.round(maxUnitCount / 2), 1);
                 
-                MaraUtils.AddToMapItem(unitComposition, configItem.UnitConfig.Uid, unitCount);
-                configItem.MaxCount -= unitCount;
+                MaraUtils.AddToMapItem(unitComposition, configItem!.UnitConfig.Uid, unitCount);
+                configItem!.MaxCount -= unitCount;
                 currentStrength += unitCount * unitStrength;
                 totalUnitCount += unitCount;
 
