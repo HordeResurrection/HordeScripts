@@ -71,14 +71,18 @@ export class MaraProfiler {
     private executionTime: number;
     private startTime: number;
 
-    constructor(message: string) {
+    constructor(message: string, start: boolean = false) {
         this.message = message;
         this.callCount = 0;
         this.executionTime = 0;
+
+        if (start) {
+            this.Start();
+        }
     }
 
     public Print(): void {
-        Mara.Debug(this.message + ` took ${this.executionTime} ms, call count: ${this.callCount}`);
+        Mara.Debug(`${this.message} took ${this.executionTime} ms, call count: ${this.callCount}`);
     }
 
     public Profile(call: () => void): void {
@@ -95,9 +99,13 @@ export class MaraProfiler {
         this.startTime = Date.now();
     }
 
-    public Stop() {
+    public Stop(print: boolean = false) {
         this.executionTime += Date.now() - this.startTime;
         this.callCount++;
+
+        if (print) {
+            this.Print();
+        }
     }
 }
 
@@ -886,7 +894,7 @@ export class MaraUtils {
     }
 
     static IsMetalStockConfigId(cfgId: string): boolean {
-        let cfg = MaraUtils.GetUnitConfig(cfgId)
+        let cfg = MaraUtils.GetUnitConfig(cfgId);
         return MaraUtils.IsMetalStockConfig(cfg);
     }
 
@@ -908,6 +916,10 @@ export class MaraUtils {
 
     static GetAllMetalStockConfigIds(settlement: any): Array<string> {
         return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsMetalStockConfig);
+    }
+
+    static GetAllProducerConfigIds(settlement: any): Array<string> {
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsProducerConfig);
     }
 
     static GetAllConfigIds(settlement: any, configFilter: (config: any) => boolean): Array<string> {
