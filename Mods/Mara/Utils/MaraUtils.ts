@@ -220,7 +220,7 @@ export class MaraUtils {
         
         while (newUnitsPresent) {
             let squadLocation = currentSquad.GetLocation();
-            let newRadius = radius = squadLocation.Spread / 2;
+            let newRadius = radius + squadLocation.Spread / 2;
 
             let newUnits = MaraUtils.GetSettlementUnitsInArea(
                 squadLocation.SpreadCenter, 
