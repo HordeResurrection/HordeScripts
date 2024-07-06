@@ -214,44 +214,35 @@ export class MaraUtils {
         unitFilter?: (unit: any) => boolean
     ): MaraSquad {
         let unitSettlement = unit.Owner;
+
+        let newUnitsPresent = true;
+        let currentSquad = new MaraSquad([unit]);
         
-        let newUnits: any[] = [unit];
-        let currentUnits: any[] = [];
-        let units: any[] = [];
+        while (newUnitsPresent) {
+            let squadLocation = currentSquad.GetLocation();
+            let newRadius = radius = squadLocation.Spread / 2;
 
-        do {
-            units.push(...newUnits);
-            currentUnits = [...newUnits];
-            
-            newUnits = [];
-            let newUnitIds = new Set<number>();
+            let newUnits = MaraUtils.GetSettlementUnitsInArea(
+                squadLocation.SpreadCenter, 
+                newRadius,
+                settlements,
+                unitFilter
+            );
 
-            for (let curUnit of currentUnits) {
-                if (processedUnitIds.has(curUnit.Id)) {
-                    continue;
-                }
+            newUnits = newUnits.filter((unit) => {
+                return unit.Owner === unitSettlement && 
+                    !processedUnitIds.has(unit.Id)
+            });
 
-                processedUnitIds.add(curUnit.Id);
-
-                let friends = MaraUtils.GetSettlementUnitsInArea(curUnit.CellCenter, radius, settlements, unitFilter);
-
-                friends = friends.filter((unit) => {
-                    return  unit.Owner === unitSettlement && 
-                        !processedUnitIds.has(unit.Id) &&
-                        currentUnits.indexOf(unit) == -1
-                });
-
-                for (let friend of friends) {
-                    if (!newUnitIds.has(friend.Id)) {
-                        newUnits.push(friend);
-                        newUnitIds.add(friend.Id);
-                    }
-                }
+            if (newUnits.length == currentSquad.Units.length) {
+                newUnitsPresent = false;
+            }
+            else {
+                currentSquad = new MaraSquad(newUnits);
             }
         }
-        while (newUnits.length > 0);
 
-        return new MaraSquad(units);
+        return currentSquad;
     }
     
     static GetSettlementUnitsInArea(
