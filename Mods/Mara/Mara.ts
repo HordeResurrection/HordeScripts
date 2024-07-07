@@ -41,6 +41,10 @@ export class Mara {
     static Tick(tickNumber: number): void {
         try {
             if (Mara.CanRun) {
+                if (tickNumber < 10) { //doing nothing for first 10 ticks since not all core objects could be properly inited
+                    return;
+                }
+                
                 for (let controller of Mara.controllers) {
                     if (!controller.Settlement.Existence.IsTotalDefeat) {
                         controller.Tick(tickNumber - controller.TickOffset);
