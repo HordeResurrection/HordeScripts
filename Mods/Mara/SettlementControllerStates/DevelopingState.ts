@@ -32,6 +32,9 @@ export class DevelopingState extends ProductionState {
             }
         }
 
+        this.settlementController.Debug(`Absent producers: ${absentProducers.join(", ")}`);
+        this.settlementController.Debug(`Absent tech: ${absentTech.join(", ")}`);
+
         let result = new Array<MaraProductionRequest>();
 
         let harvesterCount = 0;
@@ -71,6 +74,8 @@ export class DevelopingState extends ProductionState {
             }
         });
 
+        this.settlementController.Debug(`Reinforcements producers: ${reinforcementProducers.join(", ")}`)
+
         let selectedCfgIds: Array<string> | null = null;
  
         if (absentProducers.length > 0) {
@@ -79,7 +84,7 @@ export class DevelopingState extends ProductionState {
         else if (absentTech.length > 0) {
             selectedCfgIds = absentTech;
         }
-        if (reinforcementProducers.length > 0) {
+        else if (reinforcementProducers.length > 0) {
             selectedCfgIds = reinforcementProducers;
         }
 

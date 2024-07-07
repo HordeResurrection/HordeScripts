@@ -58,9 +58,9 @@ export class SettlementGlobalStrategy {
         defensiveResults.ProductionChainCfgIds.forEach((value) => {this.ProductionChainCfgIds.add(value)});
 
         settlementController.Debug(`Inited global strategy`);
-        settlementController.Debug(`Offensive CfgIds: ${Array.from(this.OffensiveCfgIds.keys()).join(",")}`);
-        settlementController.Debug(`Defensive CfgIds: ${Array.from(this.DefensiveBuildingsCfgIds.keys()).join(",")}`);
-        settlementController.Debug(`Tech Chain: ${Array.from(this.ProductionChainCfgIds.keys()).join(",")}`);
+        settlementController.Debug(`Offensive CfgIds: ${Array.from(this.OffensiveCfgIds.keys()).join(", ")}`);
+        settlementController.Debug(`Defensive CfgIds: ${Array.from(this.DefensiveBuildingsCfgIds.keys()).join(", ")}`);
+        settlementController.Debug(`Tech Chain: ${Array.from(this.ProductionChainCfgIds.keys()).join(", ")}`);
     }
 
     private initCfgIdsType(
