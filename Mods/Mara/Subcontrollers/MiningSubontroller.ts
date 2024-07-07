@@ -77,7 +77,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
             MaraResourceMap.ResourceClusters.forEach(
                 (value) => {
                     if (
-                        MaraUtils.ChebyshevDistance(value.Center, sawmillData.Sawmill.CellCenter) <= 
+                        MaraUtils.ChebyshevDistance(value.Center, sawmillData.Sawmill.CellCenter) < 
                             this.settlementController.Settings.ResourceMining.WoodcuttingRadius
                     ) {
                         totalResources.Wood += value.WoodAmount;

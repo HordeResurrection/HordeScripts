@@ -189,7 +189,7 @@ export class RoutingState extends MaraSettlementControllerState {
         if (resources.People < PEOPLE_THRESHOLD) {
             this.settlementController.Debug(`Low people`);
             result.NeedExpand = true;
-            result.ResourcesToMine.People = 1;
+            result.ResourcesToMine.People = PEOPLE_THRESHOLD - resources.People;
 
             let ratio = resources.People / PEOPLE_THRESHOLD;
 
@@ -203,7 +203,7 @@ export class RoutingState extends MaraSettlementControllerState {
         if (resources.Gold < RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Gold)) {
             this.settlementController.Debug(`Low gold`);
             result.NeedExpand = true;
-            result.ResourcesToMine.Gold = 1;
+            result.ResourcesToMine.Gold = RESOURCE_THRESHOLD - resources.Gold;
 
             let ratio = resources.Gold / RESOURCE_THRESHOLD;
 
@@ -217,7 +217,7 @@ export class RoutingState extends MaraSettlementControllerState {
         if (resources.Metal < RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Metal)) {
             this.settlementController.Debug(`Low metal`);
             result.NeedExpand = true;
-            result.ResourcesToMine.Metal = 1;
+            result.ResourcesToMine.Metal = RESOURCE_THRESHOLD - resources.Metal;
 
             let ratio = resources.Metal / RESOURCE_THRESHOLD;
 
@@ -231,7 +231,7 @@ export class RoutingState extends MaraSettlementControllerState {
         if (resources.Wood < RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Wood)) {
             this.settlementController.Debug(`Low lumber`);
             result.NeedExpand = true;
-            result.ResourcesToMine.Wood = 1;
+            result.ResourcesToMine.Wood = RESOURCE_THRESHOLD - resources.Wood;
 
             let ratio = resources.Wood / RESOURCE_THRESHOLD;
 
