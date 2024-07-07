@@ -242,6 +242,10 @@ export class MaraUtils {
             }
         }
 
+        for (let unit of currentSquad.Units) {
+            processedUnitIds.add(unit.Id);
+        }
+
         return currentSquad;
     }
     
