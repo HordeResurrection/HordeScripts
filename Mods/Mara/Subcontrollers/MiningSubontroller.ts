@@ -321,7 +321,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
     private findWoodCell(sawmill: any): MaraPoint | null {
         let cell = MaraUtils.FindClosestCell(
             sawmill.CellCenter,
-            this.settlementController.Settings.ResourceMining.WoodcuttingRadius,
+            this.settlementController.Settings.ResourceMining.WoodcuttingRadius + MaraResourceMap.CLUSTER_SIZE / 2,
             (cell) => {return MaraResourceMap.GetCellTreesCount(cell.X, cell.Y) > 0;}
         )
         
