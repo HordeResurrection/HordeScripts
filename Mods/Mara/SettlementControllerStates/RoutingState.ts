@@ -27,7 +27,7 @@ export class RoutingState extends MaraSettlementControllerState {
             let expandData = this.isExpandNeeded();
 
             if (expandData.NeedExpand) {
-                this.settlementController.Debug(`Low on one or more resource`);
+                this.settlementController.Debug(`Low on one or more resource, required resources: ${expandData.ResourcesToMine.ToString()}`);
 
                 let positiveItem = new NextStrategyItem();
                 positiveItem.NeedExpand = true;
