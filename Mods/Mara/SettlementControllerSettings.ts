@@ -55,6 +55,8 @@ class ResourceMiningSettings {
 
     public WoodcuttingRadius: number = 10;
     public MiningRadius: number = 15;
+
+    public MinResourceClusterDistanceSpread: number = 10;
 }
 
 class CombatSettings {

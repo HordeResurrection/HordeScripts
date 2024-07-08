@@ -441,6 +441,11 @@ export class StrategySubcontroller extends MaraSubcontroller {
             }
         }
 
+        minDistance = Math.max(
+            minDistance,
+            this.settlementController.Settings.ResourceMining.MinResourceClusterDistanceSpread
+        );
+        
         let finalClusters: Array<MaraResourceCluster> = [];
 
         for (let item of acceptableClusters) {
