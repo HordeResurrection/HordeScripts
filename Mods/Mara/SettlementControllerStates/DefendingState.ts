@@ -16,7 +16,7 @@ export class DefendingState extends MaraSettlementControllerState {
     }
 
     OnExit(): void {
-        this.settlementController.TacticalController.DismissSquads();
+        
     }
 
     Tick(tickNumber: number): void {

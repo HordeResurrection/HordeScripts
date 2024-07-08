@@ -1,9 +1,10 @@
 
 import { MaraSettlementController } from "Mara/MaraSettlementController";
-import { MaraProductionRequest, eNext, enumerate } from "Mara/Utils/Common";
+import { MaraProductionRequest } from "Mara/Utils/Common";
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { MaraSubcontroller } from "./MaraSubcontroller";
+import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
     private productionList: Array<MaraProductionRequest> = [];
@@ -248,38 +249,53 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     private updateProductionIndex(): void {
         this.productionIndex = new Map<string, Array<any>>();
 
+        let cfgCache = new Map<string, Array<string>>();
+
         let units = enumerate(this.settlementController.Settlement.Units);
         let unit;
         
         while ((unit = eNext(units)) !== undefined) {
-            let producerParams = unit.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer, true);
+            let unitCfgId = unit.Cfg.Uid;
             
-            if (producerParams) {
-                if (!unit.IsAlive || unit.EffectsMind.BuildingInProgress) {
-                    continue;
-                }
-                
-                let produceList = enumerate(producerParams.CanProduceList);
-                let produceListItem;
-
-                while ((produceListItem = eNext(produceList)) !== undefined) {
-                    if (!this.configProductionRequirementsMet(produceListItem)) {
+            if (!cfgCache.has(unitCfgId)) {
+                let producerParams = unit.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer, true);
+                let producedCfgIds:Array<string> = [];
+            
+                if (producerParams) {
+                    if (!unit.IsAlive || unit.EffectsMind.BuildingInProgress) {
                         continue;
                     }
                     
-                    if (this.productionIndex.has(produceListItem.Uid)) {
-                        let producers = this.productionIndex.get(produceListItem.Uid);
-                        producers!.push(unit);
+                    let produceList = enumerate(producerParams.CanProduceList);
+                    let produceListItem;
+
+                    while ((produceListItem = eNext(produceList)) !== undefined) {
+                        if (!this.configProductionRequirementsMet(produceListItem)) {
+                            continue;
+                        }
+                        
+                        producedCfgIds.push(produceListItem.Uid);
                     }
-                    else {
-                        this.productionIndex.set(produceListItem.Uid, [unit]);
-                    }
+                }
+
+                cfgCache.set(unitCfgId, producedCfgIds);
+            }
+
+            let produceableCfgIds = cfgCache.get(unitCfgId);
+
+            for (let cfgId of produceableCfgIds!) {
+                if (this.productionIndex.has(cfgId)) {
+                    let producers = this.productionIndex.get(cfgId);
+                    producers!.push(unit);
+                }
+                else {
+                    this.productionIndex.set(cfgId, [unit]);
                 }
             }
         }
     }
 
     private configProductionRequirementsMet(config: any): boolean {
-        return this.settlementController.Settlement.TechTree.AreRequirementsSatisfied(config);    
+        return this.settlementController.Settlement.TechTree.AreRequirementsSatisfied(config);
     }
 }

@@ -10,19 +10,20 @@ export class MaraSettlementControllerSettings {
 
 class UnitSearchSettings {
     public BuildingSearchRadius: number = 5;
-    public ExpandEnemySearchRadius: number = 10;
+    public ExpandEnemySearchRadius: number = 12;
 }
 
 class TimeoutsSettings {
     public RebuildEstimationThreshold: number = 2 * 60 * 50;
     
-    public MaxBuildUpProductionTimeout: number = 3 * 60 * 50;
-    public MinBuildUpProductionTimeout: number = 1 * 60 * 50;
+    public MaxBuildUpProduction: number = 3 * 60 * 50;
+    public MinBuildUpProduction: number = 1 * 60 * 50;
 
     public UnitProductionEstimationThreshold: number = 2 * 60 * 50;
-    public ExterminatingTimeout: number = 5 * 60 * 50;
+    public Exterminate: number = 5 * 60 * 50;
     
-    public ExpandBuildTimeout: number = 3 * 60 * 50;
+    public ExpandBuild: number = 3 * 60 * 50;
+    public ExpandPrepare: number = 2 * 60 * 50;
 }
 
 class SquadsSettings {
@@ -33,10 +34,13 @@ class SquadsSettings {
     public MinStrength: number = 100;
     public DefaultMovementPrecision: number = 3;
     public KiteTimeout: number = 8 * 50; // 8 sec
+    public KiteThresholdPositionChangeDistance: number = 5;
 }
 
 class ControllerStatesSettings {
-    public ProducerProductionProbability: number = 66;
+    public BuildUpProbabilityWhenOffensePossible = 0.70;
+    public BuildUpProbabilityWhenDefensePossible = 0.35;
+    
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;
     public AttackStrengthToEnemyStrengthRatio: number = 1.5;
@@ -55,4 +59,7 @@ class ResourceMiningSettings {
 
 class CombatSettings {
     public ExpandDefenseStrength: number = 100;
+    public MaxCompositionUnitCount: number = 20;
+    public MaxUsedOffensiveCfgIdCount: number = 4;
+    public MaxUsedDefensiveCfgIdCount: number = 1;
 }

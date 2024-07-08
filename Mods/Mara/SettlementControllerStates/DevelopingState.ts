@@ -6,7 +6,11 @@ import { MaraProductionRequest, MaraResources } from "../Utils/Common";
 export class DevelopingState extends ProductionState {
     protected getProductionRequests(): Array<MaraProductionRequest> {
         let economyComposition = this.settlementController.GetCurrentEconomyComposition();
+        let requiredProductionChain = this.settlementController.StrategyController.GetRequiredProductionChainCfgIds();
+        
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
+        produceableCfgIds = produceableCfgIds.filter((value) => requiredProductionChain.has(value));
+        
         let absentProducers: string[] = [];
         let absentTech: string[] = [];
 
@@ -28,54 +32,66 @@ export class DevelopingState extends ProductionState {
             }
         }
 
+        this.settlementController.Debug(`Absent producers: ${absentProducers.join(", ")}`);
+        this.settlementController.Debug(`Absent tech: ${absentTech.join(", ")}`);
+
         let result = new Array<MaraProductionRequest>();
 
-        if (absentProducers.length > 0 || absentTech.length > 0) {
-            let selectedCfgIds: Array<string>;
+        let harvesterCount = 0;
 
-            if (absentProducers.length > 0 && absentTech.length > 0) {
-                let pick = MaraUtils.Random(this.settlementController.MasterMind, 100, 1);
-                
-                if (pick > this.settlementController.Settings.ControllerStates.ProducerProductionProbability) {
-                    selectedCfgIds = absentTech;
-                }
-                else {
-                    selectedCfgIds = absentProducers;
-                }
+        economyComposition.forEach((value, key) => {
+            if (MaraUtils.IsHarvesterConfigId(key)) {
+                harvesterCount += value;
             }
-            else if (absentProducers.length > 0) {
-                selectedCfgIds = absentProducers;
-            }
-            else {
-                selectedCfgIds = absentTech;
-            }
-            
-            let index = MaraUtils.Random(this.settlementController.MasterMind, selectedCfgIds.length - 1);
+        });
 
-            result.push(this.makeProductionRequest(selectedCfgIds[index], null, null));
+        let maxHarvesterCount = this.settlementController.MiningController.GetOptimalHarvesterCount();
+
+        if (harvesterCount < maxHarvesterCount) {
+            let harvesterConfigIds = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
+            let cfgId = MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, harvesterConfigIds);
+
+            if (cfgId != null) {
+                for (let i = 0; i < maxHarvesterCount - harvesterCount; i++) {
+                    result.push(this.makeProductionRequest(cfgId, null, null));
+                }
+            }
         }
 
         let combatComposition = this.settlementController.StrategyController.GetSettlementAttackArmyComposition();
         let estimation = this.settlementController.ProductionController.EstimateProductionTime(combatComposition);
+        let reinforcementProducers:Array<string> = [];
 
         estimation.forEach((value, key) => {
             if (value > this.settlementController.Settings.Timeouts.UnitProductionEstimationThreshold / 2) {
                 let producingCfgIds = this.settlementController.ProductionController.GetProducingCfgIds(key);
+                producingCfgIds = producingCfgIds.filter((value) => requiredProductionChain.has(value));
 
                 if (producingCfgIds.length > 0) {
-                    let index = MaraUtils.Random(this.settlementController.MasterMind, producingCfgIds.length - 1);
-                    let producerCfgId = producingCfgIds[index];
-
-                    if (
-                        !result.find(
-                            (value) => {return value.ConfigId == producerCfgId}
-                        )
-                    ) {
-                        result.push(this.makeProductionRequest(producerCfgId, null, null));
-                    }
+                    let producerCfgId = MaraUtils.RandomSelect(this.settlementController.MasterMind, producingCfgIds);
+                    reinforcementProducers.push(producerCfgId!);
                 }
             }
         });
+
+        this.settlementController.Debug(`Reinforcements producers: ${reinforcementProducers.join(", ")}`)
+
+        let selectedCfgIds: Array<string> | null = null;
+ 
+        if (absentProducers.length > 0) {
+            selectedCfgIds = absentProducers;
+        }
+        else if (absentTech.length > 0) {
+            selectedCfgIds = absentTech;
+        }
+        else if (reinforcementProducers.length > 0) {
+            selectedCfgIds = reinforcementProducers;
+        }
+
+        if (selectedCfgIds) {
+            let cfgId =  MaraUtils.RandomSelect(this.settlementController.MasterMind, selectedCfgIds);
+            result.push(this.makeProductionRequest(cfgId!, null, null));
+        }
 
         return result;
     }

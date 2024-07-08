@@ -2,6 +2,7 @@ import { log } from "library/common/logging";
 import { MaraSettlementController } from "./MaraSettlementController";
 import { MaraUtils } from "./Utils/MaraUtils";
 import { MaraResourceMap } from "./MaraResourceMap";
+import { PathFinder } from "library/game-logic/path-find";
 
 export enum MaraLogLevel {
     Debug = 0,
@@ -23,14 +24,27 @@ export class Mara {
     static IsNetworkMode = true;
     
     private static controllers: Array<MaraSettlementController> = [];
+    private static pathfinder: any;
     
     public static get Controllers(): Array<MaraSettlementController> {
         return Mara.controllers;
+    }
+
+    public static get Pathfinder(): any {
+        if (!Mara.pathfinder) {
+            Mara.pathfinder = new PathFinder(MaraUtils.GetScena());
+        }
+
+        return Mara.pathfinder;
     }
     
     static Tick(tickNumber: number): void {
         try {
             if (Mara.CanRun) {
+                if (tickNumber < 10) { //doing nothing for first 10 ticks since not all core objects could be properly inited
+                    return;
+                }
+                
                 for (let controller of Mara.controllers) {
                     if (!controller.Settlement.Existence.IsTotalDefeat) {
                         controller.Tick(tickNumber - controller.TickOffset);

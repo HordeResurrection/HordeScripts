@@ -7,8 +7,8 @@ export class BuildingUpState extends ProductionState {
     protected getProductionTimeout(): number | null {
         return MaraUtils.Random(
             this.settlementController.MasterMind,
-            this.settlementController.Settings.Timeouts.MaxBuildUpProductionTimeout,
-            this.settlementController.Settings.Timeouts.MinBuildUpProductionTimeout
+            this.settlementController.Settings.Timeouts.MaxBuildUpProduction,
+            this.settlementController.Settings.Timeouts.MinBuildUpProduction
         );
     }
     

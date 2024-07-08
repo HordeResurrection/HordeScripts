@@ -53,22 +53,16 @@ export abstract class MaraSettlementControllerState extends FsmState {
     }
 
     private isFreeWoodcuttingCluster(cluster: MaraResourceCluster): boolean {
-        let atLeastOneSawmillPresent = false;
-        
         for (let sawmillData of this.settlementController.MiningController.Sawmills) {
             if (
                 MaraUtils.ChebyshevDistance(cluster.Center, sawmillData.Sawmill.CellCenter) < 
                     this.settlementController.Settings.ResourceMining.WoodcuttingRadius
             ) {
-                atLeastOneSawmillPresent = true;
-                
-                if (sawmillData.Woodcutters.length < this.settlementController.Settings.ResourceMining.MaxWoodcuttersPerSawmill) {
-                    return true;
-                }
+                return false;
             }
         }
         
-        return !atLeastOneSawmillPresent;
+        return true;
     }
 
     private canPlaceMine(cluster: MaraResourceCluster, resourceType: MaraResourceType): boolean {
@@ -101,18 +95,23 @@ export abstract class MaraSettlementControllerState extends FsmState {
                 
                 if (freeGold > requiredGold && this.canPlaceMine(value, MaraResourceType.Gold)) {
                     candidates.push(value);
+                    return;
                 }
             }
-            else if (requiredMetal > 0 && this.canPlaceMine(value, MaraResourceType.Metal)) {
+            
+            if (requiredMetal > 0) {
                 let freeMetal = this.getUnoccupiedMinerals(value.MetalCells);
                 
-                if (freeMetal > requiredMetal) {
+                if (freeMetal > requiredMetal && this.canPlaceMine(value, MaraResourceType.Metal)) {
                     candidates.push(value);
+                    return;
                 }
             }
-            else if (requiredWood > 0 && value.WoodAmount >= requiredWood) {
+            
+            if (requiredWood > 0 && value.WoodAmount >= requiredWood) {
                 if (this.isFreeWoodcuttingCluster(value)) {
                     candidates.push(value);
+                    return;
                 }
             }
         });
@@ -140,7 +139,7 @@ export abstract class MaraSettlementControllerState extends FsmState {
                 continue;
             }
             else {
-                freeMinerals += MaraUtils.GetCellMineralsAmount(cell.X, cell.Y);
+                freeMinerals += MaraResourceMap.GetCellMineralsAmount(cell.X, cell.Y);
             }
         }
 

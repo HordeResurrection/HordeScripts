@@ -1,8 +1,6 @@
 import { MaraPoint } from "./Utils/Common";
 import { MaraUtils, ResourceType } from "./Utils/MaraUtils";
 
-const CLUSTER_SIZE = 8;
-
 export enum MaraResourceType {
     Wood,
     Metal,
@@ -13,10 +11,48 @@ export enum MaraResourceType {
 export class MaraResourceMap {
     public static ResourceClusters: Map<string, MaraResourceCluster>;
     public static ProcessedCells: Set<string> = new Set<string>();
+
+    public static ResourceData: Array<Array<any>> = [];
+    public static readonly CLUSTER_SIZE = 8;
     
-    public static Init() {
-        let maxRowIndex = Math.floor(MaraUtils.GetScenaHeigth() / CLUSTER_SIZE);
-        let maxColIndex = Math.floor(MaraUtils.GetScenaWidth() / CLUSTER_SIZE);
+    public static Init(): void {
+        MaraResourceMap.initCellResources();
+        MaraResourceMap.initClusters();
+    }
+
+    static GetCellMineralType(x: number, y: number): any {
+        let res = MaraResourceMap.ResourceData[x][y];
+        return res.ResourceType;
+    }
+
+    static GetCellMineralsAmount(x: number, y: number): number {
+        let res = MaraResourceMap.ResourceData[x][y];
+        return res.ResourceAmount;
+    }
+
+    static GetCellTreesCount(x: number, y: number): number {
+        let res = MaraResourceMap.ResourceData[x][y];
+        return res.TreesCount;
+    }
+
+    private static initCellResources(): void {
+        let scenaWidth = MaraUtils.GetScenaWidth();
+        let scenaHeigth = MaraUtils.GetScenaHeigth();
+        
+        for (let x = 0; x < scenaWidth; x++) {
+            let columnData: Array<any> = [];
+            MaraResourceMap.ResourceData.push(columnData);
+            
+            for (let y = 0; y < scenaHeigth; y++) {
+                let resourceData = MaraUtils.GetCellResourceData(x, y);
+                columnData.push(resourceData);
+            }
+        }
+    }
+
+    private static initClusters(): void {
+        let maxRowIndex = Math.floor(MaraUtils.GetScenaHeigth() / MaraResourceMap.CLUSTER_SIZE);
+        let maxColIndex = Math.floor(MaraUtils.GetScenaWidth() / MaraResourceMap.CLUSTER_SIZE);
 
         MaraResourceMap.ResourceClusters = new Map<string, MaraResourceCluster>();
         
@@ -35,7 +71,7 @@ export class MaraResourceMap {
 export class MaraResourceCluster {
     public readonly Index: MaraPoint;
     public readonly Coordinates: MaraPoint;
-    public readonly Size: number = CLUSTER_SIZE;
+    public readonly Size: number = MaraResourceMap.CLUSTER_SIZE;
 
     public WoodCells: Array<MaraPoint> = [];
     public MetalCells: Array<MaraPoint> = [];
@@ -43,10 +79,10 @@ export class MaraResourceCluster {
 
     constructor(x: number, y: number) {
         this.Index = new MaraPoint(x, y);
-        this.Coordinates = new MaraPoint(x * CLUSTER_SIZE, y * CLUSTER_SIZE);
+        this.Coordinates = new MaraPoint(x * MaraResourceMap.CLUSTER_SIZE, y * MaraResourceMap.CLUSTER_SIZE);
 
-        let maxRow = Math.min(this.Coordinates.Y + CLUSTER_SIZE, MaraUtils.GetScenaHeigth());
-        let maxCol = Math.min(this.Coordinates.X + CLUSTER_SIZE, MaraUtils.GetScenaWidth());
+        let maxRow = Math.min(this.Coordinates.Y + MaraResourceMap.CLUSTER_SIZE, MaraUtils.GetScenaHeigth());
+        let maxCol = Math.min(this.Coordinates.X + MaraResourceMap.CLUSTER_SIZE, MaraUtils.GetScenaWidth());
 
         let nextCells: Array<MaraPoint> = [];
         
@@ -68,7 +104,7 @@ export class MaraResourceCluster {
 
                 MaraResourceMap.ProcessedCells.add(cell.ToString());
                 
-                let resourceType = MaraUtils.GetCellMineralType(cell.X, cell.Y);
+                let resourceType = MaraResourceMap.GetCellMineralType(cell.X, cell.Y);
                 let isMineralCell = false;
 
                 switch (resourceType) {
@@ -81,7 +117,7 @@ export class MaraResourceCluster {
                         isMineralCell = true;
                         break;
                     default:
-                        let treesCount = MaraUtils.GetCellTreesCount(cell.X, cell.Y);
+                        let treesCount = MaraResourceMap.GetCellTreesCount(cell.X, cell.Y);
                         
                         if (treesCount > 0) {
                             this.WoodCells.push(cell);
@@ -108,20 +144,20 @@ export class MaraResourceCluster {
     }
 
     public get WoodAmount() {
-        let amount = 0;
+        let totalTreesCount = 0;
         
         for (let cell of this.WoodCells) {
-            amount += MaraUtils.GetCellTreesCount(cell.X, cell.Y);
+            totalTreesCount += MaraResourceMap.GetCellTreesCount(cell.X, cell.Y);
         }
 
-        return amount * 10;
+        return totalTreesCount * 10;
     }
 
     public get GoldAmount() {
         let amount = 0;
         
         for (let cell of this.GoldCells) {
-            amount += MaraUtils.GetCellMineralsAmount(cell.X, cell.Y);
+            amount += MaraResourceMap.GetCellMineralsAmount(cell.X, cell.Y);
         }
 
         return amount;
@@ -131,14 +167,14 @@ export class MaraResourceCluster {
         let amount = 0;
         
         for (let cell of this.MetalCells) {
-            amount += MaraUtils.GetCellMineralsAmount(cell.X, cell.Y);
+            amount += MaraResourceMap.GetCellMineralsAmount(cell.X, cell.Y);
         }
 
         return amount;
     }
 
     public get Center(): MaraPoint {
-        return new MaraPoint(this.Coordinates.X + CLUSTER_SIZE / 2, this.Coordinates.Y + CLUSTER_SIZE / 2);
+        return new MaraPoint(this.Coordinates.X + MaraResourceMap.CLUSTER_SIZE / 2, this.Coordinates.Y + MaraResourceMap.CLUSTER_SIZE / 2);
     }
 
     public ToString(): string {

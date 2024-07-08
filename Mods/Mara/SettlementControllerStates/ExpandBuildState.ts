@@ -82,7 +82,7 @@ export class ExpandBuildState extends ProductionState {
     }
 
     protected getProductionTimeout(): number | null {
-        return this.settlementController.Settings.Timeouts.ExpandBuildTimeout;
+        return this.settlementController.Settings.Timeouts.ExpandBuild;
     }
 
     private calculateExpandCenter(): MaraPoint | null {
@@ -126,7 +126,18 @@ export class ExpandBuildState extends ProductionState {
     }
 
     private selectConfigId(configIds: Array<string>): string | null {
-        return MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, configIds);
+        let economy = this.settlementController.GetCurrentDevelopedEconomyComposition();
+        let allowedItems = MaraUtils.MakeAllowedCfgItems(configIds, economy, this.settlementController.Settlement);
+        
+        let allowedCfgIds: Array<string> = [];
+
+        for (let item of allowedItems) {
+            if (item.MaxCount > 0) {
+                allowedCfgIds.push(item.UnitConfig.Uid);
+            }
+        }
+        
+        return MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, allowedCfgIds);
     }
 
     private orderMineProduction(cluster: MaraResourceCluster, resourceType: MaraResourceType): Array<MaraProductionRequest> {
@@ -222,16 +233,20 @@ export class ExpandBuildState extends ProductionState {
     private orderWoodcuttingProduction(): Array<MaraProductionRequest> {
         let result = new Array<MaraProductionRequest>();
         
-        let sawmills = MaraUtils.GetSettlementUnitsInArea(
-            this.expandCenter, 
-            this.settlementController.Settings.ResourceMining.WoodcuttingRadius,
-            [this.settlementController.Settlement],
-            (unit) => {return MaraUtils.IsSawmillConfig(unit.Cfg) && unit.IsAlive}
-        );
-        
+        let isSawmillPresent = false;
+
+        for (let sawmillData of this.settlementController.MiningController.Sawmills) {
+            let distance = MaraUtils.ChebyshevDistance(sawmillData.Sawmill.CellCenter, this.expandCenter);
+            
+            if (distance < this.settlementController.Settings.ResourceMining.WoodcuttingRadius) {
+                isSawmillPresent = true;
+                break;
+            }
+        }
+
         let targetResourceCluster = this.settlementController.TargetExpand!.Cluster!;
 
-        if (sawmills.length == 0) {
+        if (!isSawmillPresent) {
             let sawmillConfigs = MaraUtils.GetAllSawmillConfigIds(this.settlementController.Settlement);
             let cfgId = this.selectConfigId(sawmillConfigs);
 

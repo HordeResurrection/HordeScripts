@@ -2,7 +2,7 @@ import { ProductionState } from "./ProductionState";
 import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
 import { MaraUtils, UnitComposition } from "../Utils/MaraUtils";
 import { EconomySnapshotItem } from "../MaraSettlementController";
-import { MaraProductionRequest } from "../Utils/Common";
+import { MaraPoint, MaraProductionRequest } from "../Utils/Common";
 
 export class RebuildState extends ProductionState {
     protected getProductionRequests(): Array<MaraProductionRequest> {
@@ -16,6 +16,8 @@ export class RebuildState extends ProductionState {
 
         let requiredBuildings: Array<EconomySnapshotItem> = [];
         let requiredHarvesters: UnitComposition = new Map<string, number>();
+        let maxHarvesterCount = this.settlementController.MiningController.GetOptimalHarvesterCount();
+        let initialHarvesterCount = 0;
 
         for (let item of requiredEconomy) {
             if (MaraUtils.IsBuildingConfigId(item.ConfigId)) {
@@ -42,7 +44,10 @@ export class RebuildState extends ProductionState {
                 }
             }
             else if (MaraUtils.IsHarvesterConfigId(item.ConfigId)) {
-                MaraUtils.IncrementMapItem(requiredHarvesters, item.ConfigId);
+                if (initialHarvesterCount < maxHarvesterCount) {
+                    MaraUtils.IncrementMapItem(requiredHarvesters, item.ConfigId);
+                    initialHarvesterCount++;
+                }
             }
         }
 
@@ -72,26 +77,44 @@ export class RebuildState extends ProductionState {
                     }
                 )
             ) {
+                if (MaraUtils.IsMineConfigId(building.ConfigId)) {
+                    let config = MaraUtils.GetUnitConfig(building.ConfigId);
+                    let bottomRight = new MaraPoint(
+                        building.Position!.X + config.Size.Width - 1, 
+                        building.Position!.Y + config.Size.Height - 1
+                    );
+
+                    let minerals = this.settlementController.MiningController.GetRectResources(building.Position!, bottomRight);
+
+                    if (minerals.Gold == 0 && minerals.Metal == 0) {
+                        continue;
+                    }
+                }
+                
                 result.push(this.makeProductionRequest(building.ConfigId, building.Position!, 0));
             }
         }
 
         let harvestersToProduce = MaraUtils.SubstractCompositionLists(requiredHarvesters, existingHarvesters);
-        let maxHarvesters = this.settlementController.MiningController.GetMaxHarvesterCount();
-        let harvestersCout = 0;
 
         harvestersToProduce.forEach(
             (value, key) => {
-                if (harvestersCout >= maxHarvesters) {
-                    return;
-                }
-                
                 for (let i = 0; i < value; i++) {
                     result.push(this.makeProductionRequest(key, null, null));
-                    harvestersCout ++;
                 }
             }
         );
+
+        if (initialHarvesterCount < maxHarvesterCount) {
+            let harvesterConfigIds = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
+            let cfgId = MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, harvesterConfigIds);
+
+            if (cfgId != null) {
+                for (let i = 0; i < maxHarvesterCount - initialHarvesterCount; i++) {
+                    result.push(this.makeProductionRequest(cfgId, null, null));
+                }
+            }
+        }
 
         return result;
     }

@@ -1,9 +1,10 @@
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
 import { MaraResourceCluster, MaraResourceMap, MaraResourceType } from "../MaraResourceMap";
-import { MaraPoint, MaraResources, eNext, enumerate } from "../Utils/Common";
+import { MaraPoint, MaraResources } from "../Utils/Common";
 import { MaraUtils, ResourceType } from "../Utils/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSettlementController } from "Mara/MaraSettlementController";
+import { eNext, enumerate } from "library/dotnet/dotnet-utils";
 
 class MineData {
     public Mine: any = null;
@@ -76,7 +77,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
             MaraResourceMap.ResourceClusters.forEach(
                 (value) => {
                     if (
-                        MaraUtils.ChebyshevDistance(value.Center, sawmillData.Sawmill.CellCenter) <= 
+                        MaraUtils.ChebyshevDistance(value.Center, sawmillData.Sawmill.CellCenter) < 
                             this.settlementController.Settings.ResourceMining.WoodcuttingRadius
                     ) {
                         totalResources.Wood += value.WoodAmount;
@@ -105,8 +106,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
         for (let row = topLeft.Y; row <= bottomRight.Y; row++) {
             for (let col = topLeft.X; col <= bottomRight.X; col++) {
-                let mineralType = MaraUtils.GetCellMineralType(col, row);
-                let mineralAmount = MaraUtils.GetCellMineralsAmount(col, row);
+                let mineralType = MaraResourceMap.GetCellMineralType(col, row);
+                let mineralAmount = MaraResourceMap.GetCellMineralsAmount(col, row);
 
                 if (mineralType == ResourceType.Metal) {
                     result.Metal += mineralAmount;
@@ -180,7 +181,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
         return optimalPosition;
     }
 
-    public GetMaxHarvesterCount(): number {
+    public GetOptimalHarvesterCount(): number {
+        this.checkForUnaccountedBuildings();
         let maxMiners = 0;
 
         for (let mineData of this.Mines) {
@@ -188,7 +190,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
         
         return maxMiners +
-            this.Sawmills.length * this.settlementController.Settings.ResourceMining.MaxWoodcuttersPerSawmill;
+            this.Sawmills.length * this.settlementController.Settings.ResourceMining.WoodcutterBatchSize;
     }
 
     private getClosestMetalStock(point: MaraPoint): any | null {
@@ -319,8 +321,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
     private findWoodCell(sawmill: any): MaraPoint | null {
         let cell = MaraUtils.FindClosestCell(
             sawmill.CellCenter,
-            this.settlementController.Settings.ResourceMining.WoodcuttingRadius,
-            (cell) => {return MaraUtils.GetCellTreesCount(cell.X, cell.Y) > 0;}
+            this.settlementController.Settings.ResourceMining.WoodcuttingRadius + MaraResourceMap.CLUSTER_SIZE / 2,
+            (cell) => {return MaraResourceMap.GetCellTreesCount(cell.X, cell.Y) > 0;}
         )
         
         return cell;

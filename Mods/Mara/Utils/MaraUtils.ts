@@ -4,9 +4,10 @@ import { createBox, createPoint } from "library/common/primitives";
 import { UnitFlags, UnitCommand, AllContent, UnitConfig } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
-import { enumerate, eNext, MaraProductionRequest, MaraPoint } from "./Common";
+import { MaraProductionRequest, MaraPoint } from "./Common";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { ProduceRequest, ProduceRequestParameters } from "library/mastermind/matermind-types";
+import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 
 export class MaraSettlementData {
     public Settlement: any;
@@ -70,14 +71,18 @@ export class MaraProfiler {
     private executionTime: number;
     private startTime: number;
 
-    constructor(message: string) {
+    constructor(message: string, start: boolean = false) {
         this.message = message;
         this.callCount = 0;
         this.executionTime = 0;
+
+        if (start) {
+            this.Start();
+        }
     }
 
     public Print(): void {
-        Mara.Debug(this.message + ` took ${this.executionTime} ms, call count: ${this.callCount}`);
+        Mara.Debug(`${this.message} took ${this.executionTime} ms, call count: ${this.callCount}`);
     }
 
     public Profile(call: () => void): void {
@@ -94,9 +99,13 @@ export class MaraProfiler {
         this.startTime = Date.now();
     }
 
-    public Stop() {
+    public Stop(print: boolean = false) {
         this.executionTime += Date.now() - this.startTime;
         this.callCount++;
+
+        if (print) {
+            this.Print();
+        }
     }
 }
 
@@ -153,20 +162,9 @@ export class MaraUtils {
     static GetScenaHeigth(): number {
         return DotnetHolder.RealScena.Size.Height;
     }
-    
-    static GetCellMineralType(x: number, y: number): any {
-        let res = DotnetHolder.ResourceMap.Item.get(x, y);
-        return res.ResourceType;
-    }
 
-    static GetCellMineralsAmount(x: number, y: number): number {
-        let res = DotnetHolder.ResourceMap.Item.get(x, y);
-        return res.ResourceAmount;
-    }
-
-    static GetCellTreesCount(x: number, y: number): number {
-        let res = DotnetHolder.ResourceMap.Item.get(x, y);
-        return res.TreesCount;
+    static GetCellResourceData(x: number, y: number): any {
+        return DotnetHolder.ResourceMap.Item.get(x, y);
     }
     
     static MakeAllowedCfgItems(cfgIds: string[], currentComposition: UnitComposition, settlement: any): AllowedCompositionItem[] {
@@ -216,44 +214,39 @@ export class MaraUtils {
         unitFilter?: (unit: any) => boolean
     ): MaraSquad {
         let unitSettlement = unit.Owner;
+
+        let newUnitsPresent = true;
+        let currentSquad = new MaraSquad([unit]);
         
-        let newUnits: any[] = [unit];
-        let currentUnits: any[] = [];
-        let units: any[] = [];
+        while (newUnitsPresent) {
+            let squadLocation = currentSquad.GetLocation();
+            let newRadius = radius + squadLocation.Spread / 2;
 
-        do {
-            units.push(...newUnits);
-            currentUnits = [...newUnits];
-            
-            newUnits = [];
-            let newUnitIds = new Set<number>();
+            let newUnits = MaraUtils.GetSettlementUnitsInArea(
+                squadLocation.SpreadCenter, 
+                newRadius,
+                settlements,
+                unitFilter
+            );
 
-            for (let curUnit of currentUnits) {
-                if (processedUnitIds.has(curUnit.Id)) {
-                    continue;
-                }
+            newUnits = newUnits.filter((unit) => {
+                return unit.Owner === unitSettlement && 
+                    !processedUnitIds.has(unit.Id)
+            });
 
-                processedUnitIds.add(curUnit.Id);
-
-                let friends = MaraUtils.GetSettlementUnitsInArea(curUnit.CellCenter, radius, settlements, unitFilter);
-
-                friends = friends.filter((unit) => {
-                    return  unit.Owner === unitSettlement && 
-                        !processedUnitIds.has(unit.Id) &&
-                        currentUnits.indexOf(unit) == -1
-                });
-
-                for (let friend of friends) {
-                    if (!newUnitIds.has(friend.Id)) {
-                        newUnits.push(friend);
-                        newUnitIds.add(friend.Id);
-                    }
-                }
+            if (newUnits.length == currentSquad.Units.length) {
+                newUnitsPresent = false;
+            }
+            else {
+                currentSquad = new MaraSquad(newUnits);
             }
         }
-        while (newUnits.length > 0);
 
-        return new MaraSquad(units);
+        for (let unit of currentSquad.Units) {
+            processedUnitIds.add(unit.Id);
+        }
+
+        return currentSquad;
     }
     
     static GetSettlementUnitsInArea(
@@ -886,31 +879,45 @@ export class MaraUtils {
         return unitConfig.ProducedPeople > 0 && !MaraUtils.IsProducerConfig(unitConfig);
     }
 
+    static IsHousingConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId)
+        return MaraUtils.IsHousingConfig(cfg);
+    }
+
     static IsMetalStockConfig(unitConfig: any): boolean {
         return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.MetalStock);
     }
 
+    static IsMetalStockConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId);
+        return MaraUtils.IsMetalStockConfig(cfg);
+    }
+
     static GetAllSawmillConfigIds(settlement: any): Array<string> {
-        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsSawmillConfig);
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsSawmillConfig);
     }
 
     static GetAllMineConfigIds(settlement: any): Array<string> {
-        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsMineConfig);
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsMineConfig);
     }
 
     static GetAllHarvesterConfigIds(settlement: any): Array<string> {
-        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsHarvesterConfig);
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsHarvesterConfig);
     }
 
     static GetAllHousingConfigIds(settlement: any): Array<string> {
-        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsHousingConfig);
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsHousingConfig);
     }
 
     static GetAllMetalStockConfigIds(settlement: any): Array<string> {
-        return MaraUtils.getAllConfigs(settlement, MaraUtils.IsMetalStockConfig);
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsMetalStockConfig);
     }
 
-    private static getAllConfigs(settlement: any, configFilter: (config: any) => boolean) {
+    static GetAllProducerConfigIds(settlement: any): Array<string> {
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsProducerConfig);
+    }
+
+    static GetAllConfigIds(settlement: any, configFilter: (config: any) => boolean): Array<string> {
         let result: Array<string> = [];
 
         ForEach(AllContent.UnitConfigs.Configs, kv => {
@@ -929,8 +936,12 @@ export class MaraUtils {
     }
 
     static GetUnitStrength(unit: any): number {
-        if (this.IsCombatConfig(unit.Cfg) && unit.IsAlive) {
-            return Math.max(unit.Health, 0);
+        let unitCfg = unit.Cfg;
+
+        if (this.IsCombatConfig(unitCfg) && unit.IsAlive) {
+            let maxStrength = MaraUtils.GetConfigStrength(unitCfg);
+
+            return maxStrength * (unit.Health / unitCfg.MaxHealth);
         }
         else {
             return 0;
@@ -939,7 +950,7 @@ export class MaraUtils {
 
     static GetConfigStrength(unitConfig: any): number {
         if (MaraUtils.IsCombatConfig(unitConfig)) {
-            return unitConfig.MaxHealth;
+            return unitConfig.MaxHealth * (unitConfig.Shield + 1);
         }
         else {
             return 0;
