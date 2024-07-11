@@ -40,8 +40,9 @@ export class Example_UnitWorks extends HordeExampleBase {
         // Боевой отдел:
         let battleMind = unit.BattleMind;
 
-        this.log.info(`Нанесем 1 ед. урона юниту с типом повреждения "ближний бой"`)
-        battleMind.TakeDamage(null, 1, UnitDeathType.Mele);
+        this.log.info(`${battleMind}`);
+        this.log.info(`Нанесем 1 ед. урона юниту с типом повреждения "ближний бой"`);
+        battleMind.TakeDamage(1, UnitDeathType.Mele);
 
         // Другие методы в BattleMind:
         //   TakeEffectiveDamage(attacker, dmg, type) - нанесение урона без учета брони
