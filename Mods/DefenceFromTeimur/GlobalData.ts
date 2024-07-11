@@ -17,7 +17,7 @@ export class GlobalVars {
     public static attackPlan: IAttackPlan;
     /** план инкома */
     public static incomePlan: IIncomePlan;
-    /** все юниты в игре */
+    /** все заскриптованные юниты в игре */
     public static units: Array<IUnit>;
     /** время старта игры */
     public static startGameTickNum: number;
@@ -35,6 +35,6 @@ export class GlobalVars {
     public static Players: any;
     public static scenaWidth : number;
     public static scenaHeight : number;
-    /** скриптованные юниты на карте */
+    /** юниты на карте */
     public static unitsMap : any;
 }

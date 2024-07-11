@@ -267,7 +267,7 @@ export class AttackPlan_4 extends IAttackPlan {
 
         // 1 - 5 волны, 2, 4, 6, 8, 10 минут
         for (var waveNum = 0; waveNum < 5; waveNum++) {
-            var unitType = GlobalVars.rnd.RandomNumber(0, waveNum < 2 ? 2 : 3);
+            var unitType = GlobalVars.rnd.RandomNumber(0, waveNum <= 1 ? 1 : 3);
             var waveStr  = "";
             var unitClass : any;
             var unitCount = 0;
@@ -276,13 +276,13 @@ export class AttackPlan_4 extends IAttackPlan {
                 unitClass = Teimur_Swordmen;
                 unitCount = 10*GlobalVars.difficult;
             } else if (unitType == 1) {
-                waveStr   = "Тяжелые рыцари";
-                unitClass = Teimur_Heavymen;
-                unitCount = 7*GlobalVars.difficult;
-            } else if (unitType == 2) {
                 waveStr   = "Лучники";
                 unitClass = Teimur_Archer;
                 unitCount = 10*GlobalVars.difficult;
+            } else if (unitType == 2) {
+                waveStr   = "Тяжелые рыцари";
+                unitClass = Teimur_Heavymen;
+                unitCount = 7*GlobalVars.difficult;
             } else if (unitType == 3) {
                 waveStr   = "Поджигатели";
                 unitClass = Teimur_Archer_2;
@@ -345,7 +345,8 @@ export class AttackPlan_4 extends IAttackPlan {
                         Teimur_Legendary_RAIDER,
                         Teimur_Legendary_HORSE,
                         Teimur_Legendary_DARK_DRAIDER,
-                        Teimur_Legendary_FIRE_MAGE
+                        Teimur_Legendary_FIRE_MAGE,
+                        Teimur_Legendary_GREED_HORSE
                     ]),
                     Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
             ])
@@ -379,8 +380,22 @@ export class AttackPlan_4 extends IAttackPlan {
             );
         }
 
+        // 18 - босс волна
         this.waves.push(
-            new Wave("БОСС ВОЛНА 18", 37 * 60 * 50, [
+            new Wave("ВОЛНА 18", 37 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE,
+                        Teimur_Legendary_GREED_HORSE
+                    ]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        this.waves.push(
+            new Wave("ВОЛНА 19", 38.5 * 60 * 50, [
                 new WaveUnit(RandomUnit<typeof ITeimurUnit>([
                         Teimur_Legendary_ARCHER_2,
                         Teimur_Legendary_HEAVYMAN,
@@ -388,8 +403,139 @@ export class AttackPlan_4 extends IAttackPlan {
                         Teimur_Legendary_HORSE,
                         Teimur_Legendary_DARK_DRAIDER,
                         Teimur_Legendary_FIRE_MAGE
-                    ]),
-                    7*Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+                    ]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        this.waves.push(
+            new Wave("ВОЛНА 20", 40 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        this.waves.push(
+            new Wave("ВОЛНА 21", 41.5 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        this.waves.push(
+            new Wave("ВОЛНА 22", 43 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        this.waves.push(
+            new Wave("ВОЛНА 23", 44.5 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        this.waves.push(
+            new Wave("ВОЛНА 24", 46 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        this.waves.push(
+            new Wave("ВОЛНА 25", 47 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        this.waves.push(
+            new Wave("ВОЛНА 26", 48 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        this.waves.push(
+            new Wave("ВОЛНА 27", 49 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        this.waves.push(
+            new Wave("ВОЛНА 28", 50 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        this.waves.push(
+            new Wave("ВОЛНА 29", 50.5 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]), Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1))
+            ])
+        );
+        this.waves.push(
+            new Wave("ФИНАЛЬНАЯ ВОЛНА 30", 52 * 60 * 50, [
+                new WaveUnit(RandomUnit<typeof ITeimurUnit>([
+                        Teimur_Legendary_ARCHER_2,
+                        Teimur_Legendary_HEAVYMAN,
+                        Teimur_Legendary_RAIDER,
+                        Teimur_Legendary_HORSE,
+                        Teimur_Legendary_DARK_DRAIDER,
+                        Teimur_Legendary_FIRE_MAGE
+                    ]), 3*GlobalVars.difficult)
             ])
         );
 
@@ -397,7 +543,7 @@ export class AttackPlan_4 extends IAttackPlan {
         this.AutoGenerateWaveNames();
 
         this.waves.push(
-            new Wave("Конец", 42 * 60 * 50, [ ])
+            new Wave("Конец", 55 * 60 * 50, [ ])
         );
     }
 }
@@ -409,7 +555,7 @@ export class AttackPlan_test extends IAttackPlan {
         super();
 
         var waveUnits = new Array<WaveUnit>();
-        waveUnits.push(new WaveUnit(Teimur_Legendary_GREED_HORSE, 1));
+        waveUnits.push(new WaveUnit(Teimur_Legendary_HEAVYMAN, 2));
 
         this.waves = [];
         this.waves.push(

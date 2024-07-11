@@ -102,7 +102,7 @@ export class ITeimurUnit extends IUnit {
 
     public static InitConfig() {
         IUnit.InitConfig.call(this);
-
+        
         if (GlobalVars.configs[this.CfgUid].AllowedCommands.ContainsKey(UnitCommand.Capture)) {
             GlobalVars.configs[this.CfgUid].AllowedCommands.Remove(UnitCommand.Capture);
         }

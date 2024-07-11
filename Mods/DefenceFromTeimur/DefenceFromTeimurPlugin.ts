@@ -7,12 +7,15 @@ import { createHordeColor, createPoint } from "library/common/primitives";
 import { UnitDirection } from "library/game-logic/horde-types";
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_GOALCASTLE } from "./Realizations/Player_units";
-import { TeimurUnitsClass, TeimurLegendaryUnitsClass } from "./Realizations/Teimur_units";
+import { TeimurUnitsClass, TeimurLegendaryUnitsClass, TeimurUnitsAllClass } from "./Realizations/Teimur_units";
 import { broadcastMessage, createGameMessageWithNoSound, createGameMessageWithSound } from "library/common/messages";
 import { GameState, GlobalVars } from "./GlobalData";
 import { IUnit } from "./Types/IUnit";
 import { IncomePlansClass } from "./Realizations/IncomePlans";
 import { RandomSpawner, RectangleSpawner, RingSpawner } from "./Realizations/Spawners";
+import { printObjectItems } from "library/common/introspection";
+import { log } from "library/common/logging";
+import { ITeimurUnit } from "./Types/ITeimurUnit";
 
 const DeleteUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
 const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
@@ -20,6 +23,7 @@ const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.
 
 // \TODO
 // DefenceFromTeimurPlugin.GlobalStorage - сохранение
+// ChangeOwner прокаченного юнита создает событие добавление в список??? И поэтому данный юнит считается апнутым и апается еще раз.
 
 export class DefenceFromTeimurPlugin extends HordePluginBase {
     hostPlayerTeamNum : number;
@@ -95,6 +99,9 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             GlobalVars.teams[1].castleCell        = new Cell(155, 156);
             GlobalVars.teams[1].allSettlementsIdx = [3, 4, 5];
             GlobalVars.teams[1].spawner           = new RectangleSpawner(new Rectangle(0, 0, 32, 32), 1);
+        } else {
+            GlobalVars.gameState = GameState.End;
+            return;
         }
 
         GlobalVars.gameState = GameState.PreInit;
@@ -124,7 +131,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
     }
 
     private PreInit(gameTickNum: number) {
-        GlobalVars.configs = new Array<any>();
+        GlobalVars.configs   = new Array<any>();
         GlobalVars.gameState = GameState.Init;
     }
 
@@ -407,6 +414,36 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         // даем стартовый капитал
         GlobalVars.incomePlan.OnStart();
 
+        // подписываемся на событие о замене юнита (поддержка LevelSystem)
+
+        let scenaSettlements = GlobalVars.ActiveScena.GetRealScena().Settlements;
+        for (var settlementNum = 0; settlementNum < scenaSettlements.Count; settlementNum++) {
+            var settlementUnits = scenaSettlements.Item.get(settlementNum + '').Units;
+
+            settlementUnits.UnitReplaced.connect(
+                function (sender, args) {
+                    // если производится заменя юнита, который в списке юнитов, то нужно переинициализировать его
+                    for (var unitNum = 0; unitNum < GlobalVars.units.length; unitNum++) {
+                        if (args.OldUnit.Id == GlobalVars.units[unitNum].unit.Id) {
+                            GlobalVars.units[unitNum].needDeleted = true;
+                            GlobalVars.units.push(GlobalVars.units[unitNum].constructor(args.NewUnit, GlobalVars.units[unitNum].teamNum));
+
+                            // если конфига нету в системе, то инициализируем его
+                            if (!GlobalVars.configs[args.NewUnit.Cfg.Uid]) {
+                                var prev_BaseCfgUid     = ITeimurUnit.BaseCfgUid;
+                                var prev_CfgUid         = ITeimurUnit.CfgUid;
+                                ITeimurUnit.BaseCfgUid  = args.NewUnit.Cfg.Uid;
+                                ITeimurUnit.CfgUid      = args.NewUnit.Cfg.Uid;
+                                ITeimurUnit.InitConfig();
+                                ITeimurUnit.BaseCfgUid  = prev_BaseCfgUid;
+                                ITeimurUnit.CfgUid      = prev_CfgUid;
+                            }
+                            break;
+                        }
+                    }
+            });
+        }
+
         GlobalVars.startGameTickNum = gameTickNum;
         GlobalVars.gameState        = GameState.Run;
     }
@@ -531,14 +568,13 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             if (GlobalVars.units[unitNum].unit.IsDead) {
                 GlobalVars.units[unitNum].OnDead(gameTickNum);
                 GlobalVars.units.splice(unitNum--, 1);
-                continue;
             }
             // юнит сам запросил, что его нужно удалить из списка
             else if (GlobalVars.units[unitNum].needDeleted) {
                 GlobalVars.units.splice(unitNum--, 1);
-                continue;
             }
-            if (gameTickNum % GlobalVars.units[unitNum].processingTickModule == GlobalVars.units[unitNum].processingTick) {
+            // настало время для обработки юнита
+            else if (gameTickNum % GlobalVars.units[unitNum].processingTickModule == GlobalVars.units[unitNum].processingTick) {
                 GlobalVars.units[unitNum].OnEveryTick(gameTickNum);
             }
         }

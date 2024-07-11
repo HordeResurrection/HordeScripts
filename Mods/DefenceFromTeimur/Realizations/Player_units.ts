@@ -218,27 +218,9 @@ export class Player_Teimur_Dovehouse extends IUnit {
                             if (UnitProducedEventArgs.ProducerUnit.Cfg.Uid != Player_Teimur_Dovehouse.CfgUid) {
                                 return;
                             }
-
-                            // ищем текущую ид тиму
-                            //var settlementId = UnitProducedEventArgs.ProducerUnit.Owner.Uid;
-                            // var teamNum = -1;
-                            // for (var _teamNum = 0; _teamNum < GlobalVars.teams.length; _teamNum++) {
-                            //     for (var _settlementId of GlobalVars.teams[_teamNum].allSettlementsIdx) {
-                            //         if (_settlementId == settlementId) {
-                            //             teamNum = _teamNum;
-                            //             break;
-                            //         }
-                            //     }
-                            //     if (teamNum != -1) {
-                            //         break;
-                            //     }
-                            // }
-
-                            // добавляем чужим спавнерам нужную UnitWave
+                            
+                            // отправляем легендарных юнитов всем
                             for (var _teamNum = 0; _teamNum < GlobalVars.teams.length; _teamNum++) {
-                                //if (_teamNum == teamNum) {
-                                //    continue;
-                                //}
                                 GlobalVars.teams[_teamNum].spawner.SpawnUnit(Player_Teimur_Dovehouse.WaveUnits[UnitProducedEventArgs.Unit.Cfg.Shield]);
                             }
 

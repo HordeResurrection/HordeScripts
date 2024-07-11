@@ -437,7 +437,7 @@ export class Teimur_CapturedUnit extends ITeimurUnit {
     static CfgUid      : string = "";
     static BaseCfgUid  : string = "";
 
-    ownerSettlement: any;
+    ownerSettlementUid: any;
 
     constructor (unit: any, teamNum: number) {
         super(unit, teamNum);
@@ -445,7 +445,7 @@ export class Teimur_CapturedUnit extends ITeimurUnit {
 
     RegainControlOwner() {
         this.unit_ordersMind.CancelOrders();
-        this.unit.ChangeOwner(this.ownerSettlement);
+        this.unit.ChangeOwner(GlobalVars.ActiveScena.GetRealScena().Settlements.GetByUid(this.ownerSettlementUid));
         this.needDeleted = true;
     }
 }
@@ -515,13 +515,13 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
                     break;
                 }
 
-                captureUnitsLimit--;
+                var prevOwnerUid = _unit.Owner.Uid;
 
                 _unit.OrdersMind.CancelOrders();
                 _unit.ChangeOwner(GlobalVars.teams[this.teamNum].teimurSettlement);
 
                 var unitInfo = new Teimur_CapturedUnit(_unit, this.teamNum);
-                unitInfo.ownerSettlement = _unit.Owner;
+                unitInfo.ownerSettlementUid = prevOwnerUid;
 
                 GlobalVars.units.push(unitInfo);
                 this.captureUnits.push(unitInfo);
@@ -745,7 +745,7 @@ export class Teimur_Legendary_FIRE_MAGE extends ILegendaryUnit {
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(120 * Math.sqrt(GlobalVars.difficult)));
         // задаем кастомный снаряд
         GlobalVars.ScriptUtils.GetValue(GlobalVars.configs[this.CfgUid].MainArmament, "BulletConfigRef").SetConfig(this.FireballCfg);
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "ReloadTime", 150);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "ReloadTime", 300);
     }
 
     public OnEveryTick(gameTickNum: number): void {
@@ -1015,3 +1015,5 @@ export const TeimurUnitsClass : Array<typeof IUnit> = [
     Teimur_Villur,
     Teimur_Olga
 ];
+
+export const TeimurUnitsAllClass : Array<typeof IUnit> = TeimurLegendaryUnitsClass.concat(TeimurUnitsClass);
