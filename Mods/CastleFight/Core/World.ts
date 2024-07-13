@@ -251,7 +251,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["castle"], "Shield", 200);
         // увеличиваем видимость
-        ScriptUtils.SetValue(this.configs["castle"], "Sight", 1);
+        ScriptUtils.SetValue(this.configs["castle"], "Sight", 12);
 
         ////////////////////
         // Стрельбище (лучник)
