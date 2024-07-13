@@ -1,27 +1,40 @@
-import { CreateConfig } from "../Utils";
+import { CreateUnitConfig } from "../Utils";
 import { Cell } from "./Geometry";
 import { PointCommandArgs, ProduceAtCommandArgs } from "library/game-logic/horde-types";
 import { createPoint } from "library/common/primitives";
 import { GlobalVars } from "../GlobalData";
 
 export class IUnit {
+    /** ссылка на юнита */
     unit: any;
+    /** ссылка на отдел приказов юнита */
     unit_ordersMind: any;
+    /** номер команды к которому принадлежит юнит */
     teamNum: number;
+    /** тик на котором нужно обрабатывать юнита */
     processingTick: number;
+    /** модуль на который делится игровой тик, если остаток деления равен processingTick, то юнит обрабатывается */
+    processingTickModule: number;
+
+    /** флаг, что юнита нужно удалить из списка юнитов, чтобы отключить обработку */
+    needDeleted: boolean;
 
     static CfgUid      : string = "";
     static BaseCfgUid  : string = "";
 
     constructor (unit: any, teamNum: number) {
-        this.unit            = unit;
-        this.teamNum         = teamNum;
-        this.unit_ordersMind = this.unit.OrdersMind;
-        this.processingTick  = this.unit.PseudoTickCounter % 50;
+        this.unit                   = unit;
+        this.teamNum                = teamNum;
+        this.unit_ordersMind        = this.unit.OrdersMind;
+        this.processingTickModule   = 50;
+        this.processingTick         = this.unit.PseudoTickCounter % this.processingTickModule;
+        this.needDeleted            = true;
     }
 
     public static InitConfig() {
-        GlobalVars.configs[this.CfgUid] = CreateConfig(this.BaseCfgUid, this.CfgUid);
+        if (this.BaseCfgUid != "" && this.CfgUid != "") {
+            GlobalVars.configs[this.CfgUid] = CreateUnitConfig(this.BaseCfgUid, this.CfgUid);
+        }
     }
 
     public OnEveryTick(gameTickNum: number) {}

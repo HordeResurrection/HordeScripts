@@ -7,25 +7,23 @@ import { createHordeColor, createPoint } from "library/common/primitives";
 import { UnitDirection } from "library/game-logic/horde-types";
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_GOALCASTLE } from "./Realizations/Player_units";
-import { TeimurUnitsClass, TeimurLegendaryUnitsClass } from "./Realizations/Teimur_units";
-import { broadcastMessage } from "library/common/messages";
+import { TeimurUnitsClass, TeimurLegendaryUnitsClass, TeimurUnitsAllClass } from "./Realizations/Teimur_units";
+import { broadcastMessage, createGameMessageWithNoSound, createGameMessageWithSound } from "library/common/messages";
 import { GameState, GlobalVars } from "./GlobalData";
 import { IUnit } from "./Types/IUnit";
 import { IncomePlansClass } from "./Realizations/IncomePlans";
-import { RectangleSpawner, RingSpawner } from "./Realizations/Spawners";
+import { RandomSpawner, RectangleSpawner, RingSpawner } from "./Realizations/Spawners";
+import { printObjectItems } from "library/common/introspection";
+import { log } from "library/common/logging";
+import { ITeimurUnit } from "./Types/ITeimurUnit";
 
 const DeleteUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
 const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 
 // \TODO
-// + легендарные юниты могли захватывать здания
-// - сделать голубятню дороже
-// - 2 раза поражение защитал, один раз при уничтожении замка, а второй при
-// - сделать однородные волны, и их можно рандомить, чтобы волна контрилась
-// на полукруге чуть выше
-// - легендарный инж чет плохо строит башни
-// + легендарный всадник бъет!, а не должен
+// DefenceFromTeimurPlugin.GlobalStorage - сохранение
+// ChangeOwner прокаченного юнита создает событие добавление в список??? И поэтому данный юнит считается апнутым и апается еще раз.
 
 export class DefenceFromTeimurPlugin extends HordePluginBase {
     hostPlayerTeamNum : number;
@@ -64,19 +62,46 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             GlobalVars.teams[0].castleCell        = new Cell(98, 95);
             GlobalVars.teams[0].allSettlementsIdx = [0, 1, 2, 3, 5];
             GlobalVars.teams[0].spawner           = new RingSpawner(new Cell(99, 99), 80, 100, 0, Math.PI, 0);
+        } else if (scenaName == "Оборона от Теймура - стороны света (1-6)") {
+            GlobalVars.teams = new Array<Team>(1);
+            GlobalVars.teams[0] = new Team();
+            GlobalVars.teams[0].teimurSettlementId = 6;
+            GlobalVars.teams[0].castleCell        = new Cell(94, 94);
+            GlobalVars.teams[0].allSettlementsIdx = [0, 1, 2, 3, 4, 5];
+            GlobalVars.teams[0].spawner           = new RandomSpawner([
+                new RectangleSpawner(new Rectangle(0,     0, 32, 32), 0),
+                new RectangleSpawner(new Rectangle(160,   0, 32, 32), 0),
+                new RectangleSpawner(new Rectangle(160, 160, 32, 32), 0),
+                new RectangleSpawner(new Rectangle(0,   160, 32, 32), 0)], 0);
         } else if (scenaName == "Оборона от Теймура - легион (2x2)") {
             GlobalVars.teams = new Array<Team>(2);
             GlobalVars.teams[0] = new Team();
             GlobalVars.teams[0].teimurSettlementId = 6;
-            GlobalVars.teams[0].castleCell        = new Cell(138, 18);
+            GlobalVars.teams[0].castleCell        = new Cell(170, 18);
             GlobalVars.teams[0].allSettlementsIdx = [0, 1, 2];
             GlobalVars.teams[0].spawner           = new RectangleSpawner(new Rectangle(0, 0, 38, 42), 0);
 
             GlobalVars.teams[1] = new Team();
             GlobalVars.teams[1].teimurSettlementId = 7;
-            GlobalVars.teams[1].castleCell        = new Cell(138, 82);
+            GlobalVars.teams[1].castleCell        = new Cell(170, 82);
             GlobalVars.teams[1].allSettlementsIdx = [3, 4, 5];
             GlobalVars.teams[1].spawner           = new RectangleSpawner(new Rectangle(0, 61, 38, 42), 1);
+        } else if (scenaName == "Оборона от Теймура - крестный легион (2x2)") {
+            GlobalVars.teams = new Array<Team>(2);
+            GlobalVars.teams[0] = new Team();
+            GlobalVars.teams[0].teimurSettlementId = 6;
+            GlobalVars.teams[0].castleCell        = new Cell(32, 156);
+            GlobalVars.teams[0].allSettlementsIdx = [0, 1, 2];
+            GlobalVars.teams[0].spawner           = new RectangleSpawner(new Rectangle(160, 0, 32, 32), 0);
+
+            GlobalVars.teams[1] = new Team();
+            GlobalVars.teams[1].teimurSettlementId = 7;
+            GlobalVars.teams[1].castleCell        = new Cell(155, 156);
+            GlobalVars.teams[1].allSettlementsIdx = [3, 4, 5];
+            GlobalVars.teams[1].spawner           = new RectangleSpawner(new Rectangle(0, 0, 32, 32), 1);
+        } else {
+            GlobalVars.gameState = GameState.End;
+            return;
         }
 
         GlobalVars.gameState = GameState.PreInit;
@@ -106,7 +131,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
     }
 
     private PreInit(gameTickNum: number) {
-        GlobalVars.configs = new Array<any>();
+        GlobalVars.configs   = new Array<any>();
         GlobalVars.gameState = GameState.Init;
     }
 
@@ -389,6 +414,36 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         // даем стартовый капитал
         GlobalVars.incomePlan.OnStart();
 
+        // подписываемся на событие о замене юнита (поддержка LevelSystem)
+
+        let scenaSettlements = GlobalVars.ActiveScena.GetRealScena().Settlements;
+        for (var settlementNum = 0; settlementNum < scenaSettlements.Count; settlementNum++) {
+            var settlementUnits = scenaSettlements.Item.get(settlementNum + '').Units;
+
+            settlementUnits.UnitReplaced.connect(
+                function (sender, args) {
+                    // если производится заменя юнита, который в списке юнитов, то нужно переинициализировать его
+                    for (var unitNum = 0; unitNum < GlobalVars.units.length; unitNum++) {
+                        if (args.OldUnit.Id == GlobalVars.units[unitNum].unit.Id) {
+                            GlobalVars.units[unitNum].needDeleted = true;
+                            GlobalVars.units.push(GlobalVars.units[unitNum].constructor(args.NewUnit, GlobalVars.units[unitNum].teamNum));
+
+                            // если конфига нету в системе, то инициализируем его
+                            if (!GlobalVars.configs[args.NewUnit.Cfg.Uid]) {
+                                var prev_BaseCfgUid     = ITeimurUnit.BaseCfgUid;
+                                var prev_CfgUid         = ITeimurUnit.CfgUid;
+                                ITeimurUnit.BaseCfgUid  = args.NewUnit.Cfg.Uid;
+                                ITeimurUnit.CfgUid      = args.NewUnit.Cfg.Uid;
+                                ITeimurUnit.InitConfig();
+                                ITeimurUnit.BaseCfgUid  = prev_BaseCfgUid;
+                                ITeimurUnit.CfgUid      = prev_CfgUid;
+                            }
+                            break;
+                        }
+                    }
+            });
+        }
+
         GlobalVars.startGameTickNum = gameTickNum;
         GlobalVars.gameState        = GameState.Run;
     }
@@ -469,7 +524,17 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             var minutesLeft = Math.floor(secondsLeft / 60);
             secondsLeft    -= minutesLeft * 60;
             secondsLeft     = Math.round(secondsLeft);
-            broadcastMessage("Осталось продержаться " + (minutesLeft > 0 ? minutesLeft + " минут " : "") + secondsLeft + " секунд", createHordeColor(255, 100, 100, 100));
+            let msg         = createGameMessageWithNoSound("Осталось продержаться " + (minutesLeft > 0 ? minutesLeft + " минут " : "") + secondsLeft + " секунд", createHordeColor(255, 100, 100, 100));
+            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0 ||
+                    GlobalVars.teams[teamNum].castle.unit.IsDead) {
+                    continue;
+                }
+
+                for (var settlement of GlobalVars.teams[teamNum].settlements) {
+                    settlement.Messages.AddMessage(msg);
+                }
+            }
         }
 
         // спавним врагов
@@ -499,12 +564,17 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         // обработка юнитов
 
         for (var unitNum = 0; unitNum < GlobalVars.units.length; unitNum++) {
+            // юнит умер, удаляем из списка
             if (GlobalVars.units[unitNum].unit.IsDead) {
                 GlobalVars.units[unitNum].OnDead(gameTickNum);
                 GlobalVars.units.splice(unitNum--, 1);
-                continue;
             }
-            if (gameTickNum % 50 == GlobalVars.units[unitNum].processingTick) {
+            // юнит сам запросил, что его нужно удалить из списка
+            else if (GlobalVars.units[unitNum].needDeleted) {
+                GlobalVars.units.splice(unitNum--, 1);
+            }
+            // настало время для обработки юнита
+            else if (gameTickNum % GlobalVars.units[unitNum].processingTickModule == GlobalVars.units[unitNum].processingTick) {
                 GlobalVars.units[unitNum].OnEveryTick(gameTickNum);
             }
         }

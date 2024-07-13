@@ -1,5 +1,5 @@
 import { GlobalVars } from "../GlobalData";
-import { CreateConfig } from "../Utils";
+import { CreateUnitConfig } from "../Utils";
 import { Cell } from "./Geometry";
 import { ITeimurUnit } from "./ITeimurUnit";
 
@@ -12,5 +12,9 @@ export abstract class ILegendaryUnit extends ITeimurUnit {
 
     public static InitConfig() {
         ITeimurUnit.InitConfig.call(this);
+
+        if (this.Description != "") {
+            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", this.Description);
+        }
     }
 }

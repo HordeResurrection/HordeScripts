@@ -12,7 +12,7 @@ export class RectangleSpawner extends ISpawner {
         this.rect = rect;
     }
 
-    protected Generator() : any {
+    public Generator() : any {
         return generateRandomCellInRect(this.rect.X, this.rect.Y, this.rect.W, this.rect.H);
     }
 }
@@ -65,7 +65,7 @@ export class RingSpawner extends ISpawner {
         }
     }
 
-    protected Generator() : any {
+    public Generator() : any {
         let rnd = GlobalVars.ActiveScena.GetRealScena().Context.Randomizer;
         var set = new Array<number>(this.cells.length);
         for (var i = 0; i < this.cells.length; i++) {
@@ -85,5 +85,20 @@ export class RingSpawner extends ISpawner {
                 return { value: _this.cells[cellNum], done: false };
             }
         };
+    }
+}
+
+export class RandomSpawner extends ISpawner {
+    spawners: Array<ISpawner>;
+
+    constructor (spawners: Array<ISpawner>, teamNum: number) {
+        super("RandomSpawner", teamNum);
+
+        this.spawners = spawners;
+    }
+
+    public Generator() : any {
+        var spawnerNum = GlobalVars.rnd.RandomNumber(0, this.spawners.length - 1);
+        return this.spawners[spawnerNum].Generator();
     }
 }

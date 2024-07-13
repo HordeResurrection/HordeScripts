@@ -19,7 +19,7 @@ export abstract class ISpawner {
         this.queue = new Array<WaveUnit>();
     }
 
-    protected Generator() : any {
+    public Generator() : any {
         return {
             next: function() {
               return { value: new Cell(), done: true };

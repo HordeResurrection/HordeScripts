@@ -4,7 +4,7 @@ import { createPoint } from "library/common/primitives";
 import { PointCommandArgs } from "library/game-logic/horde-types";
 import { Cell } from "./Types/Geometry";
 
-export function CreateConfig(baseConfigUid: string, newConfigUid: string) {
+export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
     if (HordeContentApi.HasUnitConfig(newConfigUid)) {
         log.info("GET baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
         return HordeContentApi.GetUnitConfig(newConfigUid);
@@ -14,8 +14,30 @@ export function CreateConfig(baseConfigUid: string, newConfigUid: string) {
     }
 }
 
+export function CreateBulletConfig(baseConfigUid: string, newConfigUid: string) {
+    if (HordeContentApi.HasBulletConfig(newConfigUid)) {
+        log.info("GET baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
+        return HordeContentApi.GetBulletConfig(newConfigUid);
+    } else {
+        log.info("CREATE baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
+        return HordeContentApi.CloneConfig(HordeContentApi.GetBulletConfig(baseConfigUid), newConfigUid);
+    }
+}
+
 export function unitCanBePlacedByRealMap(uCfg, x, y) {
     return uCfg.CanBePlacedByRealMap(ActiveScena.GetRealScena(), x, y);
+}
+
+export function ChebyshevDistance(x1: number, y1: number, x2: number, y2: number) {
+    return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
+}
+
+export function EuclidDistance(x1: number, y1: number, x2: number, y2: number) {
+    return Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
+}
+
+export function L1Distance(x1: number, y1: number, x2: number, y2: number) {
+    return Math.abs(x1 - x2) + Math.abs(y1 - y2);
 }
 
 const SpawnUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
@@ -33,6 +55,17 @@ export function spawnUnits(settlement, uCfg, uCount, direction, generator) {
     }
 
     return outSpawnedUnits;
+}
+export function spawnUnit(settlement, uCfg, direction, position) {
+    if (unitCanBePlacedByRealMap(uCfg, position.X, position.Y)) {
+        let spawnParams = new SpawnUnitParameters();
+        spawnParams.ProductUnitConfig = uCfg;
+        spawnParams.Direction = direction;
+        spawnParams.Cell = createPoint(position.X, position.Y);
+        return settlement.Units.SpawnUnit(spawnParams);
+    } else {
+        return null;
+    }
 }
 
 export function* generateRandomCellInRect(rectX, rectY, rectW, rectH) {

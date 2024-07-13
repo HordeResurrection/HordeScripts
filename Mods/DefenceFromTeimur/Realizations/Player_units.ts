@@ -1,10 +1,10 @@
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 import { IUnit } from "../Types/IUnit";
-import { CreateConfig } from "../Utils";
+import { CreateUnitConfig } from "../Utils";
 import { AttackPlansClass } from "./AttackPlans";
 import { GlobalVars } from "../GlobalData";
 import { UnitCommand, UnitDeathType } from "library/game-logic/horde-types";
-import { TeimurLegendaryUnitsClass } from "./Teimur_units";
+import { TeimurLegendaryUnitsClass, Teimur_Legendary_GREED_HORSE } from "./Teimur_units";
 import { log } from "library/common/logging";
 import { WaveUnit } from "../Types/IAttackPlan";
 import { IncomePlanClass, IncomePlansClass } from "./IncomePlans";
@@ -64,7 +64,7 @@ export class Player_CASTLE_CHOISE_DIFFICULT extends IUnit {
             var choise_CfgUid     = this.CfgUid + "_";
             for (var difficultIdx = 1; difficultIdx <= GlobalVars.difficult + 2; difficultIdx++) {
                 var unitChoise_CfgUid = choise_CfgUid + difficultIdx;
-                GlobalVars.configs[unitChoise_CfgUid] = CreateConfig(choise_BaseCfgUid, unitChoise_CfgUid);
+                GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(choise_BaseCfgUid, unitChoise_CfgUid);
 
                 // назначаем имя
                 GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Name", "Выбрать сложность " + difficultIdx);
@@ -123,7 +123,7 @@ export class Player_CASTLE_CHOISE_ATTACKPLAN extends IUnit {
             var choise_CfgUid     = this.CfgUid + "_";
             for (var planIdx = 0; planIdx < AttackPlansClass.length; planIdx++) {
                 var unitChoise_CfgUid = choise_CfgUid + planIdx;
-                GlobalVars.configs[unitChoise_CfgUid] = CreateConfig(choise_BaseCfgUid, unitChoise_CfgUid);
+                GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(choise_BaseCfgUid, unitChoise_CfgUid);
 
                 // назначаем имя
                 GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Name", "Выбрать волну " + planIdx);
@@ -179,8 +179,13 @@ export class Player_Teimur_Dovehouse extends IUnit {
             produceList.Clear();
 
             for (var unitNum = 0; unitNum < TeimurLegendaryUnitsClass.length; unitNum++) {
+                // некоторых юнитов спавнить нельзя
+                if (TeimurLegendaryUnitsClass[unitNum].CfgUid == Teimur_Legendary_GREED_HORSE.CfgUid) {
+                    continue;
+                }
+
                 var unitCfgUid = this.CfgUid + "_" + unitNum;
-                GlobalVars.configs[unitCfgUid] = CreateConfig(TeimurLegendaryUnitsClass[unitNum].CfgUid, unitCfgUid);
+                GlobalVars.configs[unitCfgUid] = CreateUnitConfig(TeimurLegendaryUnitsClass[unitNum].CfgUid, unitCfgUid);
 
                 // стоимость легендарного юнита в здании для отправки врагам
                 GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid].CostResources, "Gold",   500);
@@ -213,27 +218,9 @@ export class Player_Teimur_Dovehouse extends IUnit {
                             if (UnitProducedEventArgs.ProducerUnit.Cfg.Uid != Player_Teimur_Dovehouse.CfgUid) {
                                 return;
                             }
-
-                            // ищем текущую ид тиму
-                            //var settlementId = UnitProducedEventArgs.ProducerUnit.Owner.Uid;
-                            // var teamNum = -1;
-                            // for (var _teamNum = 0; _teamNum < GlobalVars.teams.length; _teamNum++) {
-                            //     for (var _settlementId of GlobalVars.teams[_teamNum].allSettlementsIdx) {
-                            //         if (_settlementId == settlementId) {
-                            //             teamNum = _teamNum;
-                            //             break;
-                            //         }
-                            //     }
-                            //     if (teamNum != -1) {
-                            //         break;
-                            //     }
-                            // }
-
-                            // добавляем чужим спавнерам нужную UnitWave
+                            
+                            // отправляем легендарных юнитов всем
                             for (var _teamNum = 0; _teamNum < GlobalVars.teams.length; _teamNum++) {
-                                //if (_teamNum == teamNum) {
-                                //    continue;
-                                //}
                                 GlobalVars.teams[_teamNum].spawner.SpawnUnit(Player_Teimur_Dovehouse.WaveUnits[UnitProducedEventArgs.Unit.Cfg.Shield]);
                             }
 
