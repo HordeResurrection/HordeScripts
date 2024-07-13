@@ -7,6 +7,11 @@ class SelectionResult {
     LowestTechCfgId: string = "";
 }
 
+class CfgIdSelectionItem {
+    CfgId: string;
+    ProductionChain: Array<string>;
+}
+
 export class SettlementGlobalStrategy {
     OffensiveCfgIds: Set<string>;
     DefensiveBuildingsCfgIds: Set<string>;
@@ -68,44 +73,78 @@ export class SettlementGlobalStrategy {
         availableCfgIds: Array<string>,
         maxCfgIdCount: number
     ): SelectionResult {
-        let result = new SelectionResult();
+        let allSelectionItems: Array<CfgIdSelectionItem> = [];
+
+        for (let cfgId of availableCfgIds) {
+            let productionChain = MaraUtils.GetCfgIdProductionChain(cfgId, settlementController.Settlement);
+            let selectionItem = new CfgIdSelectionItem();
+            
+            selectionItem.CfgId = cfgId;
+            selectionItem.ProductionChain = productionChain.map((item) => item.Uid);
+            allSelectionItems.push(selectionItem);
+        }
+        
+        let resultSelectionItems: Array<CfgIdSelectionItem> = [];
         let cfgIdCount = 0;
         
-        if (availableCfgIds.length <= cfgIdCount) {
-            result.CfgIds = new Set(availableCfgIds);
+        if (allSelectionItems.length <= cfgIdCount) {
+            resultSelectionItems = allSelectionItems;
         }
         else {
-            result.CfgIds = new Set<string>();
+            let buildingDamagerItems = allSelectionItems.filter((value) => {
+                return MaraUtils.IsAllDamagerConfigId(value.CfgId);
+            });
+
+            let lowestTechBuildingDamager = this.selectLowestTechSelectionItem(buildingDamagerItems);
+
+            if (lowestTechBuildingDamager) {
+                resultSelectionItems.push(lowestTechBuildingDamager);
+                cfgIdCount ++;
+                allSelectionItems = allSelectionItems.filter((value) => {return value.CfgId != lowestTechBuildingDamager.CfgId});
+            }
             
             while (cfgIdCount < maxCfgIdCount) {
-                let cfgId = MaraUtils.RandomSelect<string>(settlementController.MasterMind, availableCfgIds);
+                let choise = MaraUtils.RandomSelect<CfgIdSelectionItem>(settlementController.MasterMind, allSelectionItems);
 
-                if (!cfgId) {
+                if (!choise) {
                     break;
                 }
 
-                result.CfgIds.add(cfgId);
+                resultSelectionItems.push(choise);
                 cfgIdCount ++;
-                availableCfgIds = availableCfgIds.filter((value) => {return value != cfgId});
+                allSelectionItems = allSelectionItems.filter((value) => {return value.CfgId != choise.CfgId});
             }
         }
 
+        let lowestTechItem = this.selectLowestTechSelectionItem(resultSelectionItems);
+
+        let result = new SelectionResult();
+        result.CfgIds = new Set<string>(resultSelectionItems.map((value) => value.CfgId));
+        result.LowestTechCfgId = lowestTechItem!.CfgId;
         result.ProductionChainCfgIds = new Set<string>();
-        let shortestProductionChainLen = Infinity;
 
-        result.CfgIds.forEach((value) => {
-            let productionChain = MaraUtils.GetCfgIdProductionChain(value, settlementController.Settlement);
-            
-            for (let item of productionChain) {
-                result.ProductionChainCfgIds.add(item.Uid);
+        for (let item of resultSelectionItems) {
+            for (let cfgId of item.ProductionChain) {
+                result.ProductionChainCfgIds.add(cfgId);
             }
-
-            if (productionChain.length < shortestProductionChainLen) {
-                shortestProductionChainLen = productionChain.length;
-                result.LowestTechCfgId = value;
-            }
-        });
+        }
 
         return result;
+    }
+
+    private selectLowestTechSelectionItem(items: Array<CfgIdSelectionItem>): CfgIdSelectionItem | null {
+        let shortestChainItem: CfgIdSelectionItem | null = null;
+        
+        for (let item of items) {
+            if (!shortestChainItem) {
+                shortestChainItem = item;
+            }
+
+            if (item.ProductionChain.length < shortestChainItem.ProductionChain.length) {
+                shortestChainItem = item;
+            }
+        }
+
+        return shortestChainItem;
     }
 }

@@ -1,7 +1,7 @@
 import { Mara, MaraLogLevel } from "Mara/Mara";
 import { MaraSquad } from "Mara/Subcontrollers/Squads/MaraSquad";
 import { createBox, createPoint } from "library/common/primitives";
-import { UnitFlags, UnitCommand, AllContent, UnitConfig } from "library/game-logic/horde-types";
+import { UnitFlags, UnitCommand, AllContent, UnitConfig, UnitQueryFlag } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
 import { MaraProductionRequest, MaraPoint } from "./Common";
@@ -801,6 +801,22 @@ export class MaraUtils {
 
     static IsSettlementDefeated(settlement: any): boolean {
         return settlement.Existence.IsTotalDefeat || settlement.Existence.IsAlmostDefeat;
+    }
+
+    static IsAllDamagerConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId);
+        return MaraUtils.IsAllDamagerConfig(cfg);
+    }
+
+    static IsAllDamagerConfig(unitConfig: any): boolean {
+        let mainArmament = unitConfig.MainArmament;
+
+        if (mainArmament) {
+            return mainArmament.BulletConfig.DisallowedTargets == UnitQueryFlag.None;
+        }
+        else {
+            return false;
+        }
     }
 
     static IsCombatConfig(unitConfig: any): boolean {
