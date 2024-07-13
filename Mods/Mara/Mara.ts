@@ -41,6 +41,8 @@ export class Mara {
     static Tick(tickNumber: number): void {
         try {
             if (Mara.CanRun) {
+                MaraResourceMap.Tick();
+                
                 if (tickNumber < 10) { //doing nothing for first 10 ticks since not all core objects could be properly inited
                     return;
                 }

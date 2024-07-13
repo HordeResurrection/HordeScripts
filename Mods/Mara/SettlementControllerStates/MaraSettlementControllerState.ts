@@ -122,7 +122,26 @@ export abstract class MaraSettlementControllerState extends FsmState {
         }
 
         if (candidates.length > 0) {
-            return this.settlementController.StrategyController.SelectOptimalResourceCluster(candidates);
+            let settlementLocation = this.settlementController.GetSettlementLocation();
+
+            if (settlementLocation) {
+                let sortData = candidates.map((value) => {
+                    return {
+                        Distance: MaraUtils.ChebyshevDistance(settlementLocation.Center, value.Center),
+                        Cluster: value
+                    }
+                });
+
+                sortData.sort((a, b) => a.Distance - b.Distance);
+
+                let closestSortData = sortData.slice(0, 10);
+                let closestCandidates = closestSortData.map((value) => value.Cluster);
+
+                return this.settlementController.StrategyController.SelectOptimalResourceCluster(closestCandidates);
+            }
+            else {
+                return null;
+            }
         }
         else {
             return null;
