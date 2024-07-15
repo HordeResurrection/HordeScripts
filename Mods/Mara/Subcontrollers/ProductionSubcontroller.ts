@@ -296,6 +296,6 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     private configProductionRequirementsMet(config: any): boolean {
-        return this.settlementController.Settlement.TechTree.AreRequirementsSatisfied(config);
+        return this.settlementController.Settlement.TechTree.HasUnmetRequirements(config);
     }
 }

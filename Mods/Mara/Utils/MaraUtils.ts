@@ -566,7 +566,7 @@ export class MaraUtils {
     }
 
     private static techGetter(cfg: any, settlement: any): any {
-        return settlement.TechTree.AreRequirementsSatisfiedExt(cfg);
+        return settlement.TechTree.GetUnmetRequirements(cfg);
     }
     
     private static productionGetter(cfg: any, settlement: any): any {
