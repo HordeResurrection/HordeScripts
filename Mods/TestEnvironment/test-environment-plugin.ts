@@ -28,5 +28,24 @@ export class TestEnvironmentPlugin extends HordePluginBase {
     public onEveryTick(gameTickNum: number) {
         // Empty
     }
+
+    // -------------------
+
+    /**
+     * Метод для работы с выделенным юнитом.
+     */
+    public handleSelectedUnit(callback) {
+        //let player = HordeEngine.HordeResurrection.Engine.Logic.Main.PlayersController.ActivePlayer;  // ActivePlayer не будет работать по сети
+        let player = Players["0"].GetRealPlayer();
+        
+        let selectedUnit = player.SelectedSquadVirtual.GetFirstUnit();
+        if (!selectedUnit)
+        if (!selectedUnit) {
+            this.log.info('Юнит не выбран!');
+            return;
+        }
+
+        callback(selectedUnit);
+    }
 }
 
