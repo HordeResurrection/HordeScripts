@@ -81,6 +81,11 @@ export class MaraControllableSquad extends MaraSquad {
         return enemies.length > 0;
     }
 
+    ToString(): string {
+        let unitNames = this.Units.map((value) => value.ToString());
+        return unitNames.join("\n");
+    }
+
     private recalcMinSpread(): void {
         this.minSpread = Math.round(Math.sqrt(this.Units.length));
     }

@@ -420,7 +420,7 @@ export class AttackPlan_test extends IAttackPlan {
         super();
 
         var waveUnits = new Array<WaveUnit>();
-        waveUnits.push(new WaveUnit(Teimur_Legendary_HEAVYMAN, 2));
+        waveUnits.push(new WaveUnit(Teimur_Legendary_WORKER, 1));
 
         this.waves = [];
         this.waves.push(

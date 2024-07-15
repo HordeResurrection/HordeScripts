@@ -1,16 +1,15 @@
 import { MaraUtils } from "Mara/Utils/MaraUtils";
+import { MaraPoint } from "../../Utils/Common";
 
 export class MaraSquadLocation {
-    Point: {
-        X: number;
-        Y: number;
-    };
-    
+    Point: MaraPoint;
     Spread: number;
+    SpreadCenter: MaraPoint;
 
-    constructor(x: number, y: number, spread: number) {
-        this.Point = {X: x, Y: y};
+    constructor(point: MaraPoint, spread: number, spreadCenter: MaraPoint) {
+        this.Point = point;
         this.Spread = spread;
+        this.SpreadCenter = spreadCenter;
     }
 }
 
@@ -100,14 +99,20 @@ export class MaraSquad {
                 let horizontalSpread = rightmostUnit.Cell.X - leftmostUnit.Cell.X;
                 let spread = Math.max(verticalSpread, horizontalSpread);
 
-                this.location = new MaraSquadLocation(
+                let spreadCenter = new MaraPoint(
+                    leftmostUnit.Cell.X + spread / 2,
+                    uppermostUnit.Cell.Y + spread / 2
+                )
+
+                let point = new MaraPoint(
                     Math.round(avgPosition.X / this.Units.length),
-                    Math.round(avgPosition.Y / this.Units.length),
-                    spread
+                    Math.round(avgPosition.Y / this.Units.length)
                 );
+
+                this.location = new MaraSquadLocation(point, spread, spreadCenter);
             }
             else {
-                this.location = new MaraSquadLocation(0, 0, 0);
+                this.location = new MaraSquadLocation(new MaraPoint(0, 0), 0, new MaraPoint(0, 0));
             }
         }
 

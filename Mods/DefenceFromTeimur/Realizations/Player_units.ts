@@ -62,7 +62,7 @@ export class Player_CASTLE_CHOISE_DIFFICULT extends IUnit {
 
             var choise_BaseCfgUid = "#UnitConfig_Barbarian_Swordmen";
             var choise_CfgUid     = this.CfgUid + "_";
-            for (var difficultIdx = 1; difficultIdx <= GlobalVars.difficult + 2; difficultIdx++) {
+            for (var difficultIdx = 1; difficultIdx <= GlobalVars.difficult + 4; difficultIdx++) {
                 var unitChoise_CfgUid = choise_CfgUid + difficultIdx;
                 GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(choise_BaseCfgUid, unitChoise_CfgUid);
 

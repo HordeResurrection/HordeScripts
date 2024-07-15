@@ -23,7 +23,8 @@ const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.
 
 // \TODO
 // DefenceFromTeimurPlugin.GlobalStorage - сохранение
-// ChangeOwner прокаченного юнита создает событие добавление в список??? И поэтому данный юнит считается апнутым и апается еще раз.
+// забалансить голубятню, например добавить грабеж
+// инженера прокачать, чтобы он запоминал башню которую строит сейчас и достраивал её до конца, а после башни можно построить казарму и строить там рыцарей
 
 export class DefenceFromTeimurPlugin extends HordePluginBase {
     hostPlayerTeamNum : number;

@@ -5,25 +5,7 @@ import { MaraSquadMoveState } from "./MaraSquadMoveState";
 import { MaraSquadState } from "./MaraSquadState";
 import { TileType } from "library/game-logic/horde-types";
 import { MaraSquadPullbackState } from "./MaraSquadPullbackState";
-
-abstract class MaraCellDataHolder {
-    protected data: any;
-    
-    constructor () {
-        this.Clear();
-    }
-
-    abstract Get(cell: any): any;
-    abstract Set(cell: any, value: any): void;
-
-    Clear(): void {
-        this.data = {};
-    }
-
-    protected makeIndex(cell: any): string {
-        return `(${cell.X},${cell.Y})`;
-    }
-}
+import { MaraCellDataHolder, MaraPoint } from "../../../Utils/Common";
 
 class MaraThreatMap extends MaraCellDataHolder {
     constructor () {
@@ -88,10 +70,19 @@ export class MaraSquadBattleState extends MaraSquadState {
 
     private initialLocation: MaraSquadLocation;
     private lastNonKitedTick: number;
+    private initialEnemyLocation: MaraPoint;
     
     OnEntry(): void {
         this.updateThreats();
+
+        if (this.enemyUnits.length == 0) {
+            this.squad.Attack(this.squad.CurrentTargetCell);
+            this.squad.SetState(new MaraSquadAttackState(this.squad));
+            return;
+        }
+
         this.initialLocation = this.squad.GetLocation();
+        this.initialEnemyLocation = this.enemySquads[0].GetLocation().Point;
     }
     
     OnExit(): void {}
@@ -106,10 +97,6 @@ export class MaraSquadBattleState extends MaraSquadState {
             if (this.isAtLeastOneUnitAttacking()) {
                 this.lastNonKitedTick = tickNumber;
             }
-            else if (tickNumber - this.lastNonKitedTick >= this.squad.Controller.SquadsSettings.KiteTimeout) {
-                this.squad.SetState(new MaraSquadPullbackState(this.squad, this.initialLocation.Point));
-                return;
-            }
         }
 
         if (tickNumber % 50 == 0) {
@@ -118,6 +105,11 @@ export class MaraSquadBattleState extends MaraSquadState {
             if (this.enemyUnits.length == 0) {
                 this.squad.Attack(this.squad.CurrentTargetCell);
                 this.squad.SetState(new MaraSquadAttackState(this.squad));
+                return;
+            }
+
+            if (this.isKitingDetected(tickNumber)) {
+                this.squad.SetState(new MaraSquadPullbackState(this.squad, this.initialLocation.Point));
                 return;
             }
 
@@ -136,6 +128,17 @@ export class MaraSquadBattleState extends MaraSquadState {
         }
 
         return false;
+    }
+
+    private isKitingDetected(tickNumber: number): boolean {
+        let currentEnemyLocation = this.enemySquads[0].GetLocation().Point;
+
+        let isNoAttackForTooLong = tickNumber - this.lastNonKitedTick >= this.squad.Controller.SquadsSettings.KiteTimeout;
+        
+        let isEnemyMovedTooFar = 
+            MaraUtils.ChebyshevDistance(this.initialEnemyLocation, currentEnemyLocation) > this.squad.Controller.SquadsSettings.KiteThresholdPositionChangeDistance;
+
+        return isNoAttackForTooLong && isEnemyMovedTooFar;
     }
 
     private updateThreats(): void {

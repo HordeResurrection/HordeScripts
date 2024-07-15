@@ -145,7 +145,7 @@ export class Example_SettlementUnitsInfo extends HordeExampleBase {
         logUnit('- Первый в ActiveBuildings', professionCenter.ActiveBuildings.First());
         logUnit('- Первый в DevelopmentBoosterBuildings', professionCenter.DevelopmentBoosterBuildings.First());
         logUnit('- Первый в MaxGrowthSpeedIncreaseBuildings', professionCenter.MaxGrowthSpeedIncreaseBuildings.First());
-        logUnit('- Первый в Harmless', professionCenter.Harmless.First());
+        logUnit('- Первый в Unarmed', professionCenter.Unarmed.First());
 
         // Информация о производстве
         let settlementProduction = realSettlement.Production;

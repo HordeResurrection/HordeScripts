@@ -1,11 +1,13 @@
 import { Mara, MaraLogLevel } from "Mara/Mara";
 import { MaraSquad } from "Mara/Subcontrollers/Squads/MaraSquad";
 import { createBox, createPoint } from "library/common/primitives";
-import { UnitFlags, UnitCommand, AllContent } from "library/game-logic/horde-types";
+import { UnitFlags, UnitCommand, AllContent, UnitConfig, UnitQueryFlag } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
-import { enumerate, eNext } from "./Common";
+import { MaraProductionRequest, MaraPoint } from "./Common";
 import { generateCellInSpiral } from "library/common/position-tools";
+import { ProduceRequest, ProduceRequestParameters } from "library/mastermind/matermind-types";
+import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 
 export class MaraSettlementData {
     public Settlement: any;
@@ -36,7 +38,7 @@ class DotnetHolder {
     
     public static get UnitsMap() {
         if (!DotnetHolder.unitsMap) {
-            DotnetHolder.unitsMap = ActiveScena.GetRealScena().UnitsMap;
+            DotnetHolder.unitsMap = DotnetHolder.RealScena.UnitsMap;
         }
         
         return DotnetHolder.unitsMap;
@@ -46,10 +48,20 @@ class DotnetHolder {
     
     public static get LandscapeMap() {
         if (!DotnetHolder.landscapeMap) {
-            DotnetHolder.landscapeMap = ActiveScena.GetRealScena().LandscapeMap;
+            DotnetHolder.landscapeMap = DotnetHolder.RealScena.LandscapeMap;
         }
         
         return DotnetHolder.landscapeMap;
+    }
+
+    private static resourceMap;
+
+    public static get ResourceMap() {
+        if (!DotnetHolder.resourceMap) {
+            DotnetHolder.resourceMap = DotnetHolder.RealScena.ResourcesMap;
+        }
+        
+        return DotnetHolder.resourceMap;
     }
 }
 
@@ -59,14 +71,18 @@ export class MaraProfiler {
     private executionTime: number;
     private startTime: number;
 
-    constructor(message: string) {
+    constructor(message: string, start: boolean = false) {
         this.message = message;
         this.callCount = 0;
         this.executionTime = 0;
+
+        if (start) {
+            this.Start();
+        }
     }
 
     public Print(): void {
-        Mara.Debug(this.message + ` took ${this.executionTime} ms, call count: ${this.callCount}`);
+        Mara.Debug(`${this.message} took ${this.executionTime} ms, call count: ${this.callCount}`);
     }
 
     public Profile(call: () => void): void {
@@ -83,9 +99,13 @@ export class MaraProfiler {
         this.startTime = Date.now();
     }
 
-    public Stop() {
+    public Stop(print: boolean = false) {
         this.executionTime += Date.now() - this.startTime;
         this.callCount++;
+
+        if (print) {
+            this.Print();
+        }
     }
 }
 
@@ -99,13 +119,54 @@ export class AllowedCompositionItem {
     }
 }
 
+export interface NonUniformRandomSelectItem {
+    Weight: number;
+}
+
 const TileType = HCL.HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType;
 const AlmostDefeatCondition = HCL.HordeClassLibrary.World.Settlements.Existence.AlmostDefeatCondition;
+const ResourceType = HCL.HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
+
+export const BuildTrackerType = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Intellect.Requests.Trackers.UnitProducing.BuildTracker", "HordeResurrection.Intellect"));
 
 export type UnitComposition = Map<string, number>;
 export { AlmostDefeatCondition }
+export { ResourceType }
 
 export class MaraUtils {
+    static GetPropertyValue(object: any, propertyName: string): any {
+        return ScriptUtils.GetValue(object, propertyName);
+    }
+
+    static SetValue(object: any, propertyName: string, newValue: any): void {
+        ScriptUtils.SetValue(object, propertyName, newValue);
+    }
+
+    static CastToType(object: any, type: any): any {
+        try {
+            return host.cast(type, object);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
+    static GetScena(): any {
+        return DotnetHolder.RealScena;
+    }
+
+    static GetScenaWidth(): number {
+        return DotnetHolder.RealScena.Size.Width;
+    }
+
+    static GetScenaHeigth(): number {
+        return DotnetHolder.RealScena.Size.Height;
+    }
+
+    static GetCellResourceData(x: number, y: number): any {
+        return DotnetHolder.ResourceMap.Item.get(x, y);
+    }
+    
     static MakeAllowedCfgItems(cfgIds: string[], currentComposition: UnitComposition, settlement: any): AllowedCompositionItem[] {
         let allowedCfgItems = new Array<AllowedCompositionItem>();
         
@@ -153,58 +214,65 @@ export class MaraUtils {
         unitFilter?: (unit: any) => boolean
     ): MaraSquad {
         let unitSettlement = unit.Owner;
+
+        let newUnitsPresent = true;
+        let currentSquad = new MaraSquad([unit]);
         
-        let newUnits: any[] = [unit];
-        let currentUnits: any[] = [];
-        let units: any[] = [];
+        while (newUnitsPresent) {
+            let squadLocation = currentSquad.GetLocation();
+            let newRadius = radius + squadLocation.Spread / 2;
 
-        do {
-            units.push(...newUnits);
-            currentUnits = [...newUnits];
-            
-            newUnits = [];
-            let newUnitIds = new Set<number>();
+            let newUnits = MaraUtils.GetSettlementUnitsInArea(
+                squadLocation.SpreadCenter, 
+                newRadius,
+                settlements,
+                unitFilter
+            );
 
-            for (let curUnit of currentUnits) {
-                if (processedUnitIds.has(curUnit.Id)) {
-                    continue;
-                }
+            newUnits = newUnits.filter((unit) => {
+                return unit.Owner === unitSettlement && 
+                    !processedUnitIds.has(unit.Id)
+            });
 
-                processedUnitIds.add(curUnit.Id);
-
-                let friends = MaraUtils.GetSettlementUnitsInArea(curUnit.CellCenter, radius, settlements, unitFilter);
-
-                friends = friends.filter((unit) => {
-                    return  unit.Owner === unitSettlement && 
-                        !processedUnitIds.has(unit.Id) &&
-                        currentUnits.indexOf(unit) == -1
-                });
-
-                for (let friend of friends) {
-                    if (!newUnitIds.has(friend.Id)) {
-                        newUnits.push(friend);
-                        newUnitIds.add(friend.Id);
-                    }
-                }
+            if (newUnits.length == currentSquad.Units.length) {
+                newUnitsPresent = false;
+            }
+            else {
+                currentSquad = new MaraSquad(newUnits);
             }
         }
-        while (newUnits.length > 0);
 
-        return new MaraSquad(units);
+        for (let unit of currentSquad.Units) {
+            processedUnitIds.add(unit.Id);
+        }
+
+        return currentSquad;
     }
     
     static GetSettlementUnitsInArea(
         cell: any, 
         radius: number, 
-        enemySettelements: Array<any>,
+        settelements: Array<any>,
         unitFilter?: (unit: any) => boolean
     ): Array<any> {
         let units = MaraUtils.GetUnitsInArea(cell, radius, unitFilter);
-        let enemies = units.filter((unit) => {
-            return enemySettelements.indexOf(unit.Owner) > -1 && unit.IsAlive && unit.Cfg.HasNotFlags(UnitFlags.Passive)
+        units = units.filter((unit) => {
+            return settelements.indexOf(unit.Owner) > -1 && unit.IsAlive && unit.Cfg.HasNotFlags(UnitFlags.Passive)
         });
 
-        return enemies;
+        return units;
+    }
+
+    static GetAllSettlementUnits(settlement: any): Array<any> {
+        let units = enumerate(settlement.Units);
+        let unit;
+        let result: Array<any> = [];
+        
+        while ((unit = eNext(units)) !== undefined) {
+            result.push(unit);
+        }
+
+        return result;
     }
 
     // This has neat side effect that resulting cells are ordered from closest to farthest from center
@@ -228,6 +296,56 @@ export class MaraUtils {
         }
 
         return result;
+    }
+
+    static GetCircumscribingRect(points: Array<MaraPoint>): {topLeft: MaraPoint; bottomRight: MaraPoint;} {
+        let topPoint: MaraPoint = new MaraPoint(Infinity, Infinity);
+        let bottomPoint: MaraPoint = new MaraPoint(0, 0);
+        let leftPoint: MaraPoint = new MaraPoint(Infinity, Infinity);
+        let rightPoint: MaraPoint = new MaraPoint(0, 0);
+
+        for (let point of points) {
+            if (point.Y < topPoint.Y) {
+                topPoint = point;
+            }
+
+            if (point.X < leftPoint.X) {
+                leftPoint = point;
+            }
+
+            if (point.Y > bottomPoint.Y) {
+                bottomPoint = point;
+            }
+
+            if (point.X > rightPoint.X) {
+                rightPoint = point;
+            }
+        }
+
+        return {
+            topLeft: new MaraPoint(leftPoint.X, topPoint.Y), 
+            bottomRight: new MaraPoint(rightPoint.X, bottomPoint.Y)
+        };
+    }
+
+    static FindClosestCell(
+        center: {X: number; Y: number;}, 
+        radius: number, 
+        predicate: (cell: any) => boolean
+    ): MaraPoint | null {
+        let generator = generateCellInSpiral(center.X, center.Y);
+        let cell: any;
+        for (cell = generator.next(); !cell.done; cell = generator.next()) {
+            if (MaraUtils.ChebyshevDistance(cell.value, center) > radius) {
+                return null;
+            }
+
+            if ( predicate(cell.value) ) {
+                return new MaraPoint(cell.value.X, cell.value.Y);
+            }
+        }
+
+        return null;
     }
     
     static GetTileType(point: {X: number; Y: number;}): any {
@@ -275,16 +393,64 @@ export class MaraUtils {
         return result;
     }
     
-    static PrintMap(map: UnitComposition) {
+    static PrintMap(map: UnitComposition): void {
         map.forEach(
             (value, key, m) => {
                 Mara.Log(MaraLogLevel.Debug, `${key}: ${value}`);
             }
         )
     }
+
+    static RandomSelect<Type>(masterMind: any, items: Array<Type>): Type | null {
+        let index = 0; 
+        
+        if (items.length == 0) {
+            return null;
+        } 
+        else if (items.length > 1) {
+            index = MaraUtils.Random(masterMind, items.length - 1);
+        }
+
+        return items[index];
+    }
+
+    static NonUniformRandomSelect<Type extends NonUniformRandomSelectItem>(
+        masterMind: any, 
+        items:Array<Type>
+    ): Type | null {
+        if (items.length == 0) {
+            return null;
+        }
+        
+        let upperBound = 0;
+
+        for (let item of items) {
+            upperBound += item.Weight;
+        }
+
+        let pick = MaraUtils.Random(masterMind, upperBound);
+
+        let accumulatedBound = 0;
+
+        for (let item of items) {
+            accumulatedBound += item.Weight;
+
+            if (accumulatedBound <= pick) {
+                return item;
+            }
+        }
+
+        return items[0];
+    }
     
     static IncrementMapItem(map: UnitComposition, key: string): void {
         MaraUtils.AddToMapItem(map, key, 1);
+    }
+
+    static DecrementMapItem(map: UnitComposition, key: string): void {
+        if (map.has(key)) {
+            map.set(key, Math.max(map.get(key)! - 1, 0));
+        }
     }
 
     static AddToMapItem(map: UnitComposition, key: string, value: number): void {
@@ -399,6 +565,47 @@ export class MaraUtils {
         return unitsMap.GetUpperUnit(cell.X, cell.Y);
     }
 
+    private static techGetter(cfg: any, settlement: any): any {
+        return settlement.TechTree.AreRequirementsSatisfiedExt(cfg);
+    }
+    
+    private static productionGetter(cfg: any, settlement: any): any {
+        let listType = xHost.type('System.Collections.Generic.List');
+        let configType = UnitConfig;
+        let list = host.newObj(listType(configType), 0);
+    
+        settlement.TechTree.HypotheticalProducts.WhoCanProduce(cfg, list);
+    
+        return list;
+    }
+    
+    private static getChain(cfg: any, settlement: any, chain: Map<string, any>, nextLevelGetter: (cfg: any, settlement: any) => Array<any>): void {
+        let nextLevel = nextLevelGetter(cfg, settlement);
+    
+        ForEach(nextLevel, (item) => {
+                if (!chain.has(item.Uid)) {
+                    chain.set(item.Uid, item);
+                    MaraUtils.getChain(item, settlement, chain, nextLevelGetter);
+                }
+            }
+        );
+    }
+    
+    public static GetCfgIdProductionChain(cfgId: string, settlement: any): Array<any> {
+        let chain = new Map<string, any>();
+        let config = MaraUtils.GetUnitConfig(cfgId);
+    
+        MaraUtils.getChain(config, settlement, chain, MaraUtils.productionGetter);
+    
+        if (chain.size == 0) {
+            return [];
+        }
+    
+        MaraUtils.getChain(config, settlement, chain, MaraUtils.techGetter);
+    
+        return Array.from(chain.values());
+    }
+
     // finds a free cell nearest to given
     static FindFreeCell(point): any {
         let unitsMap = DotnetHolder.UnitsMap;
@@ -415,15 +622,40 @@ export class MaraUtils {
         return null;
     }
 
-    static IssueAttackCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true) {
-        MaraUtils.issueCommand(units, player, location, UnitCommand.Attack, isReplaceMode);
+    static IssueAttackCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
+        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.Attack, isReplaceMode);
     }
 
-    static IssueMoveCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true) {
-        MaraUtils.issueCommand(units, player, location, UnitCommand.MoveToPoint, isReplaceMode);
+    static IssueMoveCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
+        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.MoveToPoint, isReplaceMode);
     }
 
-    private static issueCommand(units: Array<any>, player: any, location: any, command: any, isReplaceMode: boolean = true) {
+    static IssueHarvestLumberCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
+        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.HarvestLumber, isReplaceMode);
+    }
+
+    static IssueMineCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
+        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.Mine, isReplaceMode);
+    }
+
+    static IssueSelfDestructCommand(units: Array<any>, player: any) {
+        MaraUtils.issueOneClickCommand(units, player, UnitCommand.DestroySelf);
+    }
+
+    private static issueOneClickCommand(units: Array<any>, player: any, command: any): void {
+        let virtualInput = MaraUtils.playersInput[player];
+        
+        if (!virtualInput) {
+            virtualInput = new PlayerVirtualInput(player);
+            MaraUtils.playersInput[player] = virtualInput;
+        }
+
+        let unitIds = units.map((unit) => unit.Id);
+        virtualInput.selectUnitsById(unitIds, VirtualSelectUnitsMode.Select);
+        virtualInput.oneClickCommand(command);
+    }
+
+    private static issuePointBasedCommand(units: Array<any>, player: any, location: any, command: any, isReplaceMode: boolean = true): void {
         let virtualInput = MaraUtils.playersInput[player];
         
         if (!virtualInput) {
@@ -432,15 +664,9 @@ export class MaraUtils {
         }
 
         let mode = isReplaceMode ? AssignOrderMode.Replace : AssignOrderMode.Queue;
-
         let unitIds = units.map((unit) => unit.Id);
-        let chunkSize = 10;
-
-        for (let i = 0; i < unitIds.length; i += chunkSize) {
-            let chunk = unitIds.slice(i, i + chunkSize);
-            virtualInput.selectUnitsById(chunk, VirtualSelectUnitsMode.Select);
-        }
-
+        
+        virtualInput.selectUnitsById(unitIds, VirtualSelectUnitsMode.Select);
         virtualInput.pointBasedCommand(createPoint(location.X, location.Y), command, mode);
         virtualInput.commit();
     }
@@ -456,10 +682,30 @@ export class MaraUtils {
         return HordeContentApi.GetUnitConfig(configId);
     }
 
-    static RequestMasterMindProduction(configId: string, productionDepartment: any, checkDuplicate: boolean = false) {
-        let cfg = MaraUtils.GetUnitConfig(configId);
+    static RequestMasterMindProduction(productionRequest: MaraProductionRequest, masterMind: any, checkDuplicate: boolean = false): boolean {
+        let cfg = MaraUtils.GetUnitConfig(productionRequest.ConfigId);
+
+        let produceRequestParameters = new ProduceRequestParameters(cfg, 1);
+        produceRequestParameters.CheckExistsRequest = checkDuplicate;
+        produceRequestParameters.AllowAuxiliaryProduceRequests = false;
+        produceRequestParameters.Producer = productionRequest.Executor;
         
-        return productionDepartment.AddRequestToProduce(cfg, 1, null, checkDuplicate);
+        if (productionRequest.Point) {
+            produceRequestParameters.TargetCell = createPoint(productionRequest.Point.X, productionRequest.Point.Y);
+        }
+
+        produceRequestParameters.MaxRetargetAttempts = productionRequest.Precision;
+        produceRequestParameters.DisableBuildPlaceChecking = productionRequest.Precision == 0;
+
+        let addedRequest = host.newVar(ProduceRequest);
+        
+        if (masterMind.ProductionDepartment.AddRequestToProduce(produceRequestParameters, addedRequest.out)) {
+            productionRequest.MasterMindRequest = addedRequest;
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     static ConfigHasProfession(unitConfig: any, profession: any): boolean {
@@ -489,16 +735,16 @@ export class MaraUtils {
 
     static ForEachCell(center: any, radius: any, action: (cell: any) => void): void {
         let endRow = Math.min(center.Y + radius, DotnetHolder.RealScena.Size.Height);
-        let endCol = Math.min(center.X + radius, DotnetHolder.RealScena.Size.Width)
+        let endCol = Math.min(center.X + radius, DotnetHolder.RealScena.Size.Width);
         
         for (
             let row = Math.max(center.Y - radius, 0);
-            row <= endRow;
+            row < endRow;
             row++
         ) {
             for (
                 let col = Math.max(center.X - radius, 0);
-                col <= endCol;
+                col < endCol;
                 col++
             ) {
                 action({X: col, Y: row});
@@ -508,6 +754,13 @@ export class MaraUtils {
 
     static IsCellReachable(cell: any, unit: any): boolean {
         return unit.MapMind.CheckPathTo(createPoint(cell.X, cell.Y), false).Found;
+    }
+
+    static IsPathExists(fromCell: MaraPoint, toCell: MaraPoint, unitCfg: any, pathFinder: any): boolean {
+        let from = createPoint(fromCell.X, fromCell.Y);
+        let to = createPoint(toCell.X, toCell.Y);
+        
+        return pathFinder.checkPath(unitCfg, from, to);
     }
 
     static GetUnitTarget(unit: any): any {
@@ -550,11 +803,32 @@ export class MaraUtils {
         return settlement.Existence.IsTotalDefeat || settlement.Existence.IsAlmostDefeat;
     }
 
+    static IsAllDamagerConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId);
+        return MaraUtils.IsAllDamagerConfig(cfg);
+    }
+
+    static IsAllDamagerConfig(unitConfig: any): boolean {
+        let mainArmament = unitConfig.MainArmament;
+
+        if (mainArmament) {
+            return mainArmament.BulletConfig.DisallowedTargets == UnitQueryFlag.None;
+        }
+        else {
+            return false;
+        }
+    }
+
     static IsCombatConfig(unitConfig: any): boolean {
         let mainArmament = unitConfig.MainArmament;
         let isHarvester = MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Harvester);
 
         return mainArmament != null && !isHarvester;
+    }
+
+    static IsCombatConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId);
+        return MaraUtils.IsCombatConfig(cfg);
     }
 
     static IsProducerConfig(cfg: any): boolean {
@@ -581,19 +855,109 @@ export class MaraUtils {
         return false;
     }
 
-    static IsBuildingConfig(cfgId: string): boolean {
+    static IsBuildingConfigId(cfgId: string): boolean {
         let cfg = MaraUtils.GetUnitConfig(cfgId);
+        return MaraUtils.IsBuildingConfig(cfg);
+    }
 
+    static IsBuildingConfig(cfg: any): boolean {
         return cfg.BuildingConfig != null && cfg.HasNotFlags(UnitFlags.Passive);
     }
 
-    static IsMineConfig(unitConfig: any):boolean {
+    static IsMineConfig(unitConfig: any): boolean {
         return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Mine);
     }
 
+    static IsMineConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId)
+        return MaraUtils.IsMineConfig(cfg);
+    }
+
+    static IsSawmillConfig(unitConfig: any): boolean {
+        return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Sawmill);
+    }
+
+    static IsSawmillConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId)
+        return MaraUtils.IsSawmillConfig(cfg);
+    }
+
+    static IsHarvesterConfig(unitConfig: any): boolean {
+        return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Harvester);
+    }
+
+    static IsHarvesterConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId)
+        return MaraUtils.IsHarvesterConfig(cfg);
+    }
+
+    static IsHousingConfig(unitConfig: any): boolean {
+        return unitConfig.ProducedPeople > 0 && !MaraUtils.IsProducerConfig(unitConfig);
+    }
+
+    static IsHousingConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId)
+        return MaraUtils.IsHousingConfig(cfg);
+    }
+
+    static IsMetalStockConfig(unitConfig: any): boolean {
+        return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.MetalStock);
+    }
+
+    static IsMetalStockConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId);
+        return MaraUtils.IsMetalStockConfig(cfg);
+    }
+
+    static GetAllSawmillConfigIds(settlement: any): Array<string> {
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsSawmillConfig);
+    }
+
+    static GetAllMineConfigIds(settlement: any): Array<string> {
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsMineConfig);
+    }
+
+    static GetAllHarvesterConfigIds(settlement: any): Array<string> {
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsHarvesterConfig);
+    }
+
+    static GetAllHousingConfigIds(settlement: any): Array<string> {
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsHousingConfig);
+    }
+
+    static GetAllMetalStockConfigIds(settlement: any): Array<string> {
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsMetalStockConfig);
+    }
+
+    static GetAllProducerConfigIds(settlement: any): Array<string> {
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsProducerConfig);
+    }
+
+    static GetAllConfigIds(settlement: any, configFilter: (config: any) => boolean): Array<string> {
+        let result: Array<string> = [];
+
+        ForEach(AllContent.UnitConfigs.Configs, kv => {
+            let cfgId = kv.Key;
+            let uCfg = kv.Value;
+            
+            if (
+                configFilter(uCfg) &&
+                settlement.TechTree.HypotheticalProducts.CanProduce(uCfg)
+            ) {
+                result.push(cfgId);
+            }
+        });
+
+        return result;
+    }
+
     static GetUnitStrength(unit: any): number {
-        if (this.IsCombatConfig(unit.Cfg) && unit.IsAlive) {
-            return Math.max(unit.Health, 0);
+        let unitCfg = unit.Cfg;
+
+        if (this.IsCombatConfig(unitCfg) && unit.IsAlive) {
+            let maxStrength = MaraUtils.GetConfigStrength(unitCfg);
+
+            return maxStrength * (unit.Health / unitCfg.MaxHealth);
         }
         else {
             return 0;
@@ -602,7 +966,7 @@ export class MaraUtils {
 
     static GetConfigStrength(unitConfig: any): number {
         if (MaraUtils.IsCombatConfig(unitConfig)) {
-            return unitConfig.MaxHealth;
+            return unitConfig.MaxHealth * (unitConfig.Shield + 1);
         }
         else {
             return 0;
@@ -617,9 +981,5 @@ export class MaraUtils {
         let NetworkController = HordeEngine.HordeResurrection.Engine.Logic.Main.NetworkController;
         
         return NetworkController.NetWorker != null;
-    }
-
-    static SetValue(object: any, propertyName: string, newValue: any): void {
-        ScriptUtils.SetValue(object, propertyName, newValue);
     }
 }

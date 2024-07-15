@@ -1,14 +1,14 @@
 
-//TODO: probably reorganize build list to a queue
-
 import { MaraSettlementController } from "Mara/MaraSettlementController";
-import { eNext, enumerate } from "Mara/Utils/Common";
+import { MaraProductionRequest } from "Mara/Utils/Common";
 import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { MaraSubcontroller } from "./MaraSubcontroller";
+import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
-    private productionList: Array<string> = [];
+    private productionList: Array<MaraProductionRequest> = [];
+    private executingRequests: Array<MaraProductionRequest> = [];
     private productionIndex: Map<string, Array<any>> | null = null;
 
     constructor (parent: MaraSettlementController) {
@@ -21,39 +21,68 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
 
         this.productionIndex = null;
-        
-        let mmProductionDepartament = this.parentController.MasterMind.ProductionDepartment;
-        let orderedUnits: Array<string> = [];
+        let addedRequests: Array<MaraProductionRequest> = [];
 
-        for (let unitConfigId of this.productionList) {
-            let freeProducer = this.getProducer(unitConfigId);
-            
-            //!! most probably doesn't work as expected since producer is always free on this tick
+        for (let request of this.productionList) {
+            let freeProducer = this.getProducer(request.ConfigId);
+
             if (freeProducer) {
-                if (MaraUtils.RequestMasterMindProduction(unitConfigId, mmProductionDepartament)) {
-                    this.parentController.Debug(`Added ${unitConfigId} to the production list`);
-                    orderedUnits.push(unitConfigId);
+                request.Executor = freeProducer;
+                
+                if (MaraUtils.RequestMasterMindProduction(request, this.settlementController.MasterMind)) {
+                    this.settlementController.Debug(`Added ${request.ConfigId} to the production list`);
+                    addedRequests.push(request);
+                    this.settlementController.ReservedUnitsData.ReserveUnit(freeProducer);
+                }
+            }
+            else if (request.IsForce) {
+                if (!this.productionIndex!.has(request.ConfigId)) {
+                    if (MaraUtils.RequestMasterMindProduction(request, this.settlementController.MasterMind)) {
+                        this.settlementController.Debug(`(forcibly) Added ${request.ConfigId} to the production list`);
+                        addedRequests.push(request);
+                    }
                 }
             }
         }
 
-        if (orderedUnits.length > 0) {
-            this.parentController.Debug(`Removed ${orderedUnits.length} units from target production list`);
+        if (addedRequests.length > 0) {
+            this.settlementController.Debug(`Removed ${addedRequests.length} units from target production list`);
 
-            for (let cfg of orderedUnits) {
-                let index = this.productionList.indexOf(cfg);
+            for (let request of addedRequests) {
+                let index = this.productionList.indexOf(request);
 
                 if (index > -1) {
                     this.productionList.splice(index, 1);
                 }
             }
+
+            this.executingRequests.push(...addedRequests);
+        }
+
+        if (this.executingRequests.length > 0) {
+            let filteredRequests: Array<MaraProductionRequest> = [];
+            
+            for (let request of this.executingRequests) {
+                if (request.IsCompleted) {
+                    if (request.Executor) {
+                        this.settlementController.ReservedUnitsData.FreeUnit(request.Executor);
+                    }
+
+                    request.OnProductionFinished();
+                }
+                else {
+                    filteredRequests.push(request);
+                }
+            }
+
+            this.executingRequests = filteredRequests;
         }
     }
 
     public get ProductionList(): Array<string> {
-        let list = [...this.productionList];
+        let list = [...this.productionList].map((value) => value.ConfigId);
 
-        let masterMind = this.parentController.MasterMind;
+        let masterMind = this.settlementController.MasterMind;
         let requests = enumerate(masterMind.Requests);
         let request;
 
@@ -66,37 +95,66 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         return list;
     }
 
-    RequestProduction(configId: string): void {
-        this.productionList.push(configId);
-        this.parentController.Debug(`Added ${configId} to target production list`);
-    }
+    public get ProductionRequests(): Array<MaraProductionRequest> {
+        let list = [...this.productionList];
 
-    RequestSingleProduction(configId: string): void {
-        if (this.ProductionList.indexOf(configId) < 0) {
-            this.RequestProduction(configId);
-        }
-    }
-
-    ForceRequestSingleProduction(configId: string): void {
-        let masterMind = this.parentController.MasterMind;
+        let masterMind = this.settlementController.MasterMind;
         let requests = enumerate(masterMind.Requests);
         let request;
 
         while ((request = eNext(requests)) !== undefined) {
             if (request.RequestedCfg) {
-                if (request.RequestedCfg.Uid == configId)  {
-                    return;
-                }
+                let productionRequest = new MaraProductionRequest(request.RequestedCfg.Uid, request.TargetCell, null);
+                list.push(productionRequest);
             }
         }
         
-        let mmProductionDepartament = this.parentController.MasterMind.ProductionDepartment;
-        MaraUtils.RequestMasterMindProduction(configId, mmProductionDepartament);
+        return list;
+    }
+
+    RequestCfgIdProduction(configId: string): void {
+        let request = new MaraProductionRequest(configId, null, null);
+        this.productionList.push(request);
+        this.settlementController.Debug(`Added ${configId} to target production list`);
+    }
+
+    RequestProduction(request: MaraProductionRequest): void {
+        this.productionList.push(request);
+        this.settlementController.Debug(`Added ${request.ToString()} to target production list`);
+    }
+
+    RequestSingleCfgIdProduction(configId: string): void {
+        if (this.ProductionList.indexOf(configId) < 0) {
+            this.RequestCfgIdProduction(configId);
+        }
+    }
+
+    ForceRequestSingleCfgIdProduction(configId: string): void {
+        if (this.ProductionList.indexOf(configId) >= 0) {
+            return;
+        }
+        
+        this.RequestCfgIdProduction(configId);
+
+        let requiredConfigs = MaraUtils.GetCfgIdProductionChain(configId, this.settlementController.Settlement);
+        
+        let existingUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        let existingCfgIds = new Set<string>();
+
+        for (let unit of existingUnits) {
+            existingCfgIds.add(unit.Cfg.Uid);
+        }
+
+        for (let cfg of requiredConfigs) {
+            if (!existingCfgIds.has(cfg.Uid)) {
+                this.RequestCfgIdProduction(cfg.Uid);
+            }
+        }
     }
 
     CancelAllProduction(): void {
         this.productionList = [];
-        this.parentController.Debug(`Cleared target production list`);
+        this.settlementController.Debug(`Cleared target production list`);
     }
 
     GetProduceableCfgIds(): Array<string> {
@@ -163,14 +221,24 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         if (!this.productionIndex) {
             this.updateProductionIndex();
         }
-        
-        //TODO: implement engagement of workers that are busy gathering resources
+
         let producers = this.productionIndex!.get(configId);
 
         if (producers) {
             for (let producer of producers) {
-                if (producer.OrdersMind.OrdersCount === 0) {
+                if (
+                    producer.OrdersMind.OrdersCount == 0 &&
+                    !this.settlementController.ReservedUnitsData.IsUnitReserved(producer)
+                ) {
                     return producer;
+                }
+            }
+
+            for (let i = 0; i < this.settlementController.ReservedUnitsData.ReservableUnits.length; i++) {
+                for (let producer of producers) {
+                    if (this.settlementController.ReservedUnitsData.ReservableUnits[i].has(producer.Id)) {
+                        return producer;
+                    }
                 }
             }
         }
@@ -181,38 +249,53 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     private updateProductionIndex(): void {
         this.productionIndex = new Map<string, Array<any>>();
 
-        let units = enumerate(this.parentController.Settlement.Units);
+        let cfgCache = new Map<string, Array<string>>();
+
+        let units = enumerate(this.settlementController.Settlement.Units);
         let unit;
         
         while ((unit = eNext(units)) !== undefined) {
-            let producerParams = unit.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer, true);
+            let unitCfgId = unit.Cfg.Uid;
             
-            if (producerParams) {
-                if (!unit.IsAlive || unit.EffectsMind.BuildingInProgress) {
-                    continue;
-                }
-                
-                let produceList = enumerate(producerParams.CanProduceList);
-                let produceListItem;
-
-                while ((produceListItem = eNext(produceList)) !== undefined) {
-                    if (!this.configProductionRequirementsMet(produceListItem)) {
+            if (!cfgCache.has(unitCfgId)) {
+                let producerParams = unit.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer, true);
+                let producedCfgIds:Array<string> = [];
+            
+                if (producerParams) {
+                    if (!unit.IsAlive || unit.EffectsMind.BuildingInProgress) {
                         continue;
                     }
                     
-                    if (this.productionIndex.has(produceListItem.Uid)) {
-                        let producers = this.productionIndex.get(produceListItem.Uid);
-                        producers!.push(unit);
+                    let produceList = enumerate(producerParams.CanProduceList);
+                    let produceListItem;
+
+                    while ((produceListItem = eNext(produceList)) !== undefined) {
+                        if (!this.configProductionRequirementsMet(produceListItem)) {
+                            continue;
+                        }
+                        
+                        producedCfgIds.push(produceListItem.Uid);
                     }
-                    else {
-                        this.productionIndex.set(produceListItem.Uid, [unit]);
-                    }
+                }
+
+                cfgCache.set(unitCfgId, producedCfgIds);
+            }
+
+            let produceableCfgIds = cfgCache.get(unitCfgId);
+
+            for (let cfgId of produceableCfgIds!) {
+                if (this.productionIndex.has(cfgId)) {
+                    let producers = this.productionIndex.get(cfgId);
+                    producers!.push(unit);
+                }
+                else {
+                    this.productionIndex.set(cfgId, [unit]);
                 }
             }
         }
     }
 
     private configProductionRequirementsMet(config: any): boolean {
-        return this.parentController.Settlement.TechTree.AreRequirementsSatisfied(config);    
+        return this.settlementController.Settlement.TechTree.AreRequirementsSatisfied(config);
     }
 }
