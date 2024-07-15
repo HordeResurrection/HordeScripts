@@ -623,7 +623,7 @@ export function BuffSystem(world: World, gameTickNum: number) {
                 case BUFF_TYPE.ATTACK:
                     ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {атака}");
                     ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 150, 0, 0));
-                    ScriptUtils.SetValue(cloneCFG.MainArmament.BulletCombatParams, "Damage", Math.min(1000, 5*cloneCFG.MainArmament.BulletCombatParams.Damage));
+                    ScriptUtils.SetValue(cloneCFG.MainArmament.ShotParams, "Damage", Math.min(1000, 5*cloneCFG.MainArmament.ShotParams.Damage));
                     ScriptUtils.SetValue(cloneCFG, "Sight", Math.min(13, cloneCFG.Sight + 2));
                     if (cloneCFG.MainArmament.Range > 1) {
                         ScriptUtils.SetValue(cloneCFG.MainArmament, "EmitBulletsCountMin", Math.min(5, cloneCFG.MainArmament.EmitBulletsCountMin + 2));
@@ -647,7 +647,7 @@ export function BuffSystem(world: World, gameTickNum: number) {
                         ScriptUtils.SetValue(cloneCFG.MainArmament, "ForestRange", 2*cloneCFG.MainArmament.ForestRange);
                         ScriptUtils.SetValue(cloneCFG, "OrderDistance", 2*cloneCFG.OrderDistance);
                         ScriptUtils.SetValue(cloneCFG.MainArmament, "DisableDispersion", true);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament.BulletCombatParams, "AdditiveBulletSpeed", createPF(30, 0));
+                        ScriptUtils.SetValue(cloneCFG.MainArmament.ShotParams, "AdditiveBulletSpeed", createPF(30, 0));
                     }
                     break;
                 case BUFF_TYPE.HEALTH:

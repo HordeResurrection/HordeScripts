@@ -1,5 +1,5 @@
 import HordeExampleBase from "./base-example";
-import { BulletState, BulletCombatParams, UnitMapLayer, TilePayload } from "library/game-logic/horde-types"
+import { BulletState, ShotParams, UnitMapLayer, TilePayload } from "library/game-logic/horde-types"
 import { createPF, createPoint } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
 import { spawnDecoration, spawnSound } from "library/game-logic/decoration-spawn";
@@ -21,7 +21,7 @@ export class Example_CustomBullet extends HordeExampleBase {
     private smokeDecorationCfg: any;
     private hitSoundCatalog: any;
     private customBullCfg: any;
-    private combatParams: any;
+    private shotParams: any;
     private waveNum: number = 0;
 
     public constructor() {
@@ -45,7 +45,7 @@ export class Example_CustomBullet extends HordeExampleBase {
         setBulletProcessWorker(this, this.customBullCfg, this.processWorker);
         
         // Создаём характеристики выстрела
-        this.combatParams = createCombatParams();
+        this.shotParams = createShotParams();
     }
 
     /**
@@ -70,7 +70,7 @@ export class Example_CustomBullet extends HordeExampleBase {
         let someUnit = settlement_0.Units.GetCastleOrAnyUnit();
 
         // Создание снаряда
-        let bull = spawnBullet(someUnit, null, null, this.customBullCfg, this.combatParams, createPoint(250, 250), createPoint(500, 300), UnitMapLayer.Main);
+        let bull = spawnBullet(someUnit, null, null, this.customBullCfg, this.shotParams, createPoint(250, 250), createPoint(500, 300), UnitMapLayer.Main);
         if (!bull) {
             this.log.warning(`Ошибка! Не удалось создать снаряд.`);
             return;
@@ -125,7 +125,7 @@ export class Example_CustomBullet extends HordeExampleBase {
 
             // Снаряд успел долететь?
             if (bull.IsTargetReached) {
-                bull.DamageArea(2);  // тут задаётся радиус, а урон был задан в BulletCombatParams
+                bull.DamageArea(2);  // тут задаётся радиус, а урон был задан в ShotParams
                 bull.UtterSound("Hit", bull.Position);
 
                 // Примечание: Для нанесения урона по единственной клетке можно использовать метод "bull.DamageCell(bool magicDamage)".
@@ -165,10 +165,10 @@ function createBulletConfig() {
 /**
  * Создаёт характеристики выстрела.
  */
-function createCombatParams() {
-    let combatParams = BulletCombatParams.CreateInstance();
-    ScriptUtils.SetValue(combatParams, "Damage", 4);
-    ScriptUtils.SetValue(combatParams, "AdditiveBulletSpeed", createPF(0, 0));
+function createShotParams() {
+    let shotParams = ShotParams.CreateInstance();
+    ScriptUtils.SetValue(shotParams, "Damage", 4);
+    ScriptUtils.SetValue(shotParams, "AdditiveBulletSpeed", createPF(0, 0));
 
-    return combatParams;
+    return shotParams;
 }

@@ -265,7 +265,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_1"], "Shield", 0);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_1"].MainArmament.BulletCombatParams, "Damage", 400);
+        ScriptUtils.SetValue(this.configs["unit_1"].MainArmament.ShotParams, "Damage", 400);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_1"));
@@ -308,7 +308,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_1_1"], "Shield", 0);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_1_1"].MainArmament.BulletCombatParams, "Damage", 400);
+        ScriptUtils.SetValue(this.configs["unit_1_1"].MainArmament.ShotParams, "Damage", 400);
         // увеличиваем количество выпускаемых стрел
         ScriptUtils.SetValue(this.configs["unit_1_1"].MainArmament, "EmitBulletsCountMin", 4);
         ScriptUtils.SetValue(this.configs["unit_1_1"].MainArmament, "EmitBulletsCountMax", 4);
@@ -357,7 +357,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_1_1_1"], "Shield", 100);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_1_1_1"].MainArmament.BulletCombatParams, "Damage", 1000);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1"].MainArmament.ShotParams, "Damage", 1000);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_1_1_1"));
@@ -403,7 +403,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_1_1_1_1"], "Shield", 0);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].MainArmament.BulletCombatParams, "Damage", 500);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].MainArmament.ShotParams, "Damage", 500);
         // убираем стоимость
         ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].CostResources, "Gold",   100);
         ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].CostResources, "Metal",  0);
@@ -454,7 +454,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "Shield", 200);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"].MainArmament.BulletCombatParams, "Damage", 1000);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"].MainArmament.ShotParams, "Damage", 1000);
         // параметры атаки
         ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "Sight", 3);
         ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "OrderDistance", 6);
@@ -500,7 +500,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_1_1_2"], "Shield", 200);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_1_1_2"].MainArmament.BulletCombatParams, "Damage", 1000);
+        ScriptUtils.SetValue(this.configs["unit_1_1_2"].MainArmament.ShotParams, "Damage", 1000);
         // параметры атаки
         ScriptUtils.SetValue(this.configs["unit_1_1_2"], "Sight", 3);
         ScriptUtils.SetValue(this.configs["unit_1_1_2"], "OrderDistance", 9);
@@ -547,7 +547,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_1_2"], "Shield", 100);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_1_2"].MainArmament.BulletCombatParams, "Damage", 800);
+        ScriptUtils.SetValue(this.configs["unit_1_2"].MainArmament.ShotParams, "Damage", 800);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_1_2"));
@@ -593,7 +593,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_1_2_1"], "Shield", 200);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_1_2_1"].MainArmament.BulletCombatParams, "Damage", 500);
+        ScriptUtils.SetValue(this.configs["unit_1_2_1"].MainArmament.ShotParams, "Damage", 500);
         // параметры атаки
         ScriptUtils.SetValue(this.configs["unit_1_2_1"], "Sight", 3);
         ScriptUtils.SetValue(this.configs["unit_1_2_1"], "OrderDistance", 10);
@@ -640,7 +640,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_2"], "Shield", 0);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_2"].MainArmament.BulletCombatParams, "Damage", 500);
+        ScriptUtils.SetValue(this.configs["unit_2"].MainArmament.ShotParams, "Damage", 500);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_2"));
@@ -684,7 +684,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_2_1"], "Shield", 200);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_2_1"].MainArmament.BulletCombatParams, "Damage", 500);
+        ScriptUtils.SetValue(this.configs["unit_2_1"].MainArmament.ShotParams, "Damage", 500);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_2_1"));
@@ -728,7 +728,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_2_1_1"], "Shield", 300);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_2_1_1"].MainArmament.BulletCombatParams, "Damage", 350);
+        ScriptUtils.SetValue(this.configs["unit_2_1_1"].MainArmament.ShotParams, "Damage", 350);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_2_1_1"));
@@ -768,7 +768,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_2_1_2"], "Shield", 0);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_2_1_2"].MainArmament.BulletCombatParams, "Damage", 600);
+        ScriptUtils.SetValue(this.configs["unit_2_1_2"].MainArmament.ShotParams, "Damage", 600);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_2_1_2"));
@@ -810,7 +810,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_2_2"], "Shield", 0);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_2_2"].MainArmament.BulletCombatParams, "Damage", 500);
+        ScriptUtils.SetValue(this.configs["unit_2_2"].MainArmament.ShotParams, "Damage", 500);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_2_2"));
@@ -854,7 +854,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_2_2_1"], "Shield", 0);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_2_2_1"].MainArmament.BulletCombatParams, "Damage", 700);
+        ScriptUtils.SetValue(this.configs["unit_2_2_1"].MainArmament.ShotParams, "Damage", 700);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_2_2_1"));
@@ -896,7 +896,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_2_3"], "Shield", 0);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_2_3"].MainArmament.BulletCombatParams, "Damage", 500);
+        ScriptUtils.SetValue(this.configs["unit_2_3"].MainArmament.ShotParams, "Damage", 500);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_2_3"));
@@ -942,7 +942,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["unit_2_3_1"], "Shield", 0);
         // урон
-        ScriptUtils.SetValue(this.configs["unit_2_3_1"].MainArmament.BulletCombatParams, "Damage", 500);
+        ScriptUtils.SetValue(this.configs["unit_2_3_1"].MainArmament.ShotParams, "Damage", 500);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_2_3_1"));
@@ -986,7 +986,7 @@ export class World {
         // броня
         ScriptUtils.SetValue(this.configs["tower_1"], "Shield", 300);
         // делаем урон = 0
-        ScriptUtils.SetValue(this.configs["tower_1"].MainArmament.BulletCombatParams, "Damage", 600);
+        ScriptUtils.SetValue(this.configs["tower_1"].MainArmament.ShotParams, "Damage", 600);
         // стоимость
         ScriptUtils.SetValue(this.configs["tower_1"].CostResources, "Gold",   200);
         ScriptUtils.SetValue(this.configs["tower_1"].CostResources, "Metal",  0);
@@ -1044,7 +1044,7 @@ export class World {
         // здоровье
         ScriptUtils.SetValue(this.configs["holy_spirit_attack"], "MaxHealth", 1);
         // делаем урон = 0
-        ScriptUtils.SetValue(this.configs["holy_spirit_attack"].MainArmament.BulletCombatParams, "Damage", 0);
+        ScriptUtils.SetValue(this.configs["holy_spirit_attack"].MainArmament.ShotParams, "Damage", 0);
         // меняем цвет
         ScriptUtils.SetValue(this.configs["holy_spirit_attack"], "TintColor", createHordeColor(150, 150, 0, 0));
         // время постройки
@@ -1072,7 +1072,7 @@ export class World {
         // здоровье
         ScriptUtils.SetValue(this.configs["holy_spirit_accuracy"], "MaxHealth", 1);
         // делаем урон = 0
-        ScriptUtils.SetValue(this.configs["holy_spirit_accuracy"].MainArmament.BulletCombatParams, "Damage", 0);
+        ScriptUtils.SetValue(this.configs["holy_spirit_accuracy"].MainArmament.ShotParams, "Damage", 0);
         // меняем цвет
         ScriptUtils.SetValue(this.configs["holy_spirit_accuracy"], "TintColor", createHordeColor(150, 148, 0, 211));
         // время постройки
@@ -1096,7 +1096,7 @@ export class World {
         // здоровье
         ScriptUtils.SetValue(this.configs["holy_spirit_health"], "MaxHealth", 1);
         // делаем урон = 0
-        ScriptUtils.SetValue(this.configs["holy_spirit_health"].MainArmament.BulletCombatParams, "Damage", 0);
+        ScriptUtils.SetValue(this.configs["holy_spirit_health"].MainArmament.ShotParams, "Damage", 0);
         // меняем цвет
         ScriptUtils.SetValue(this.configs["holy_spirit_health"], "TintColor", createHordeColor(150, 0, 150, 0));
         // время постройки
@@ -1122,7 +1122,7 @@ export class World {
         // здоровье
         ScriptUtils.SetValue(this.configs["holy_spirit_defense"], "MaxHealth", 1);
         // делаем урон = 0
-        ScriptUtils.SetValue(this.configs["holy_spirit_defense"].MainArmament.BulletCombatParams, "Damage", 0);
+        ScriptUtils.SetValue(this.configs["holy_spirit_defense"].MainArmament.ShotParams, "Damage", 0);
         // меняем цвет
         ScriptUtils.SetValue(this.configs["holy_spirit_defense"], "TintColor", createHordeColor(150, 255, 215, 0));
         // время постройки
@@ -1146,7 +1146,7 @@ export class World {
         // здоровье
         ScriptUtils.SetValue(this.configs["holy_spirit_cloning"], "MaxHealth", 1);
         // делаем урон = 0
-        ScriptUtils.SetValue(this.configs["holy_spirit_cloning"].MainArmament.BulletCombatParams, "Damage", 0);
+        ScriptUtils.SetValue(this.configs["holy_spirit_cloning"].MainArmament.ShotParams, "Damage", 0);
         // меняем цвет
         ScriptUtils.SetValue(this.configs["holy_spirit_cloning"], "TintColor", createHordeColor(150, 255, 255, 255));
         // время постройки
@@ -1424,7 +1424,7 @@ export class World {
                         spawnUnitCfg.Name + "\n" +
                         "  здоровье " + spawnUnitCfg.MaxHealth + "\n" +
                         "  броня " + spawnUnitCfg.Shield + "\n" +
-                        "  атака " + spawnUnitCfg.MainArmament.BulletCombatParams.Damage + "\n" +
+                        "  атака " + spawnUnitCfg.MainArmament.ShotParams.Damage + "\n" +
                         "  радиус атаки " + spawnUnitCfg.MainArmament.Range + "\n" +
                         "  скорость бега " + spawnUnitCfg.Speeds.Item(TileType.Grass) + "\n"
                         + (spawnUnitCfg.Flags.HasFlag(UnitFlags.FireResistant) || spawnUnitCfg.Flags.HasFlag(UnitFlags.MagicResistant)

@@ -49,7 +49,7 @@ export const UnitTechConfig = HCL.HordeClassLibrary.HordeContent.Configs.Units.U
 export const Unit = HCL.HordeClassLibrary.World.Objects.Units.Unit;
 export const KnownUnit = HCL.HordeClassLibrary.World.Objects.Units.KnownUnit;
 export const UnitArmament = HCL.HordeClassLibrary.UnitComponents.BattleSystem.UnitArmament;
-export const BulletCombatParams = HCL.HordeClassLibrary.World.Objects.Bullets.BulletCombatParams;
+export const ShotParams = HCL.HordeClassLibrary.World.Objects.Bullets.ShotParams;
 
 
 // ===================================================

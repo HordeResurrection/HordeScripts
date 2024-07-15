@@ -290,7 +290,7 @@ export class Teimur_Legendary_RAIDER extends ILegendaryUnit {
         // задаем количество здоровья от числа игроков
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
         // делаем урон = 0
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.BulletCombatParams, "Damage", 0);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", 0);
     }
 
     public OnEveryTick(gameTickNum: number): void {
@@ -479,7 +479,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
         // задаем количество здоровья от числа игроков
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(120 * Math.sqrt(GlobalVars.difficult)));
         // делаем урон = 0
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.BulletCombatParams, "Damage", 0);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", 0);
 
         this.CaptureUnitsLimit = Math.floor(this.CaptureUnitsLimit * Math.sqrt(GlobalVars.difficult));
     }
@@ -788,7 +788,7 @@ export class Teimur_Legendary_FIRE_MAGE extends ILegendaryUnit {
         // траектория полета снаряда
 
         const nPoints : number = 8;
-        bull.ScriptData.Speed               = bull.Cfg.BaseBulletSpeed;// + bull.CombatParams.AdditiveBulletSpeed;
+        bull.ScriptData.Speed               = bull.Cfg.BaseBulletSpeed;// + bull.ShotParams.AdditiveBulletSpeed;
         bull.ScriptData.Trajectories        = {};
         bull.ScriptData.Trajectories.points = new Array<any>(nPoints);
         bull.ScriptData.Trajectories.times  = new Array<number>(nPoints);

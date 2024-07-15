@@ -116,7 +116,7 @@ export class Example_CustomUnit extends HordeExampleBase {
         u.BattleMind.SelectedArmament.Shot(u, nearestEnemy, nearestEnemy.Position, nearestEnemy.MapLayer);
 
         // В некоторых требуется более детальный контроль при создании снаряда, тогда следует использовать следующую функцию:
-        //spawnBullet(u, nearestEnemy, araiderArmament, araiderArmament.BulletConfig, araiderArmament.BulletCombatParams, launchPos, targetPos, nearestEnemy.MapLayer);
+        //spawnBullet(u, nearestEnemy, araiderArmament, araiderArmament.BulletConfig, araiderArmament.ShotParams, launchPos, targetPos, nearestEnemy.MapLayer);
 
         // Возвращаем вооружение юнита
         ScriptUtils.SetValue(u.BattleMind, "SelectedArmament", prevArmament);
@@ -156,8 +156,8 @@ function createArmamament() {
 
     // Вооружение
     let armament = UnitArmament.CreateArmament(arrowCfg);
-    ScriptUtils.SetValue(armament.BulletCombatParams, "Damage", 4);
-    ScriptUtils.SetValue(armament.BulletCombatParams, "AdditiveBulletSpeed", createPF(0, 0));
+    ScriptUtils.SetValue(armament.ShotParams, "Damage", 4);
+    ScriptUtils.SetValue(armament.ShotParams, "AdditiveBulletSpeed", createPF(0, 0));
     ScriptUtils.SetValue(armament, "Range", 7);
     ScriptUtils.SetValue(armament, "ForestRange", 1);
     ScriptUtils.SetValue(armament, "RangeMin", 0);
