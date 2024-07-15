@@ -3,7 +3,7 @@ import { IUnit } from "../Types/IUnit";
 import { CreateUnitConfig } from "../Utils";
 import { AttackPlansClass } from "./AttackPlans";
 import { GlobalVars } from "../GlobalData";
-import { UnitCommand, UnitDeathType } from "library/game-logic/horde-types";
+import { UnitCommand, UnitHurtType } from "library/game-logic/horde-types";
 import { TeimurLegendaryUnitsClass, Teimur_Legendary_GREED_HORSE } from "./Teimur_units";
 import { log } from "library/common/logging";
 import { WaveUnit } from "../Types/IAttackPlan";
@@ -225,7 +225,7 @@ export class Player_Teimur_Dovehouse extends IUnit {
                             }
 
                             // убиваем юнита
-                            UnitProducedEventArgs.Unit.BattleMind.InstantDeath(null, UnitDeathType.Mele);
+                            UnitProducedEventArgs.Unit.BattleMind.InstantDeath(null, UnitHurtType.Mele);
                         } catch (ex) {
                             log.exception(ex);
                         }

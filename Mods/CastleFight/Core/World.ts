@@ -1,7 +1,7 @@
 import { log } from "library/common/logging";
 import { createHordeColor, createPoint } from "library/common/primitives";
 import { isReplayMode } from "library/game-logic/game-tools";
-import { UnitCommand, TileType, UnitFlags, UnitSpecification, UnitDeathType, UnitDirection } from "library/game-logic/horde-types";
+import { UnitCommand, TileType, UnitFlags, UnitSpecification, UnitHurtType, UnitDirection } from "library/game-logic/horde-types";
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { world } from "./CastleFightPlugin";
@@ -1610,7 +1610,7 @@ export class World {
             var enumerator = units.GetEnumerator();
             while(enumerator.MoveNext()) {
                 var battleMind = enumerator.Current.BattleMind;
-                battleMind.InstantDeath(null, UnitDeathType.Mele);
+                battleMind.InstantDeath(null, UnitHurtType.Mele);
             }
             enumerator.Dispose();
 

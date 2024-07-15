@@ -3,7 +3,7 @@ import { generateCellInSpiral } from "library/common/position-tools";
 import { createHordeColor, createResourcesAmount } from "library/common/primitives";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
-import { UnitDeathType, UnitCommand, UnitDirection, UnitFlags, DiplomacyStatus } from "library/game-logic/horde-types";
+import { UnitHurtType, UnitCommand, UnitDirection, UnitFlags, DiplomacyStatus } from "library/game-logic/horde-types";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { COMPONENT_TYPE, UnitComponent, BuffableComponent, BUFF_TYPE, SettlementComponent, IncomeIncreaseEvent, IncomeIncreaseComponent, IncomeEvent, IncomeLimitedPeriodicalComponent, Entity, AttackingAlongPathComponent, SpawnBuildingComponent, ReviveComponent, UpgradableBuildingComponent, UpgradableBuildingEvent, BuffEvent, BuffComponent, UnitProducedEvent } from "../Components/ESC_components";
 import { Cell, distance_Chebyshev, UnitGiveOrderToNearEmptyCell, UnitDisallowCommands, spawnUnits } from "../Utils";
@@ -194,7 +194,7 @@ export function WordClearSystem(world: World, gameTickNum: number) {
             // уничтожаем замок если жив
 
             if (!world.settlements_castleUnit[settlementId].IsDead) {
-                world.settlements_castleUnit[settlementId].BattleMind.InstantDeath(null, UnitDeathType.Mele);
+                world.settlements_castleUnit[settlementId].BattleMind.InstantDeath(null, UnitHurtType.Mele);
                 killUnitsCount++;
             }
 
@@ -208,7 +208,7 @@ export function WordClearSystem(world: World, gameTickNum: number) {
                     continue;
                 }
 
-                unit.BattleMind.InstantDeath(null, UnitDeathType.Mele);
+                unit.BattleMind.InstantDeath(null, UnitHurtType.Mele);
                 killUnitsCount++;
             }
             unitsEnumerator.Dispose();
@@ -224,7 +224,7 @@ export function WordClearSystem(world: World, gameTickNum: number) {
             //         continue;
             //     }
 
-            //     unitComponent.unit.BattleMind.InstantDeath(null, UnitDeathType.Mele);
+            //     unitComponent.unit.BattleMind.InstantDeath(null, UnitHurtType.Mele);
             //     killUnitsCount++;
             // }
         }
@@ -607,7 +607,7 @@ export function BuffSystem(world: World, gameTickNum: number) {
             // убиваем духа
             {
                 var battleMind = unitComponent.unit.BattleMind;
-                battleMind.InstantDeath(null, UnitDeathType.Mele);
+                battleMind.InstantDeath(null, UnitHurtType.Mele);
             }
 
             var target_entity = world.settlements_entities[target_settlementId][target_entityId] as Entity;

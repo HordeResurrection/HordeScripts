@@ -1,6 +1,6 @@
 import { createPoint } from "library/common/primitives";
 import { inspect } from "library/common/introspection";
-import { BattleController, OneClickCommandArgs, PointCommandArgs, ProduceAtCommandArgs, ProduceCommandArgs, UnitCommand, UnitDeathType, UnitDirection } from "library/game-logic/horde-types";
+import { BattleController, OneClickCommandArgs, PointCommandArgs, ProduceAtCommandArgs, ProduceCommandArgs, UnitCommand, UnitHurtType, UnitDirection } from "library/game-logic/horde-types";
 import { unitCanBePlacedByKnownMap, unitCanBePlacedByRealMap, unitCheckPathTo, unitSpeedAtCellByKnownMap, unitSpeedAtCellByRealMap, unitTeleport } from "library/game-logic/unit-and-map";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import HordeExampleBase from "./base-example";
@@ -42,7 +42,7 @@ export class Example_UnitWorks extends HordeExampleBase {
 
         this.log.info(`${battleMind}`);
         this.log.info(`Нанесем 1 ед. урона юниту с типом повреждения "ближний бой"`);
-        battleMind.TakeDamage(1, UnitDeathType.Mele);
+        battleMind.TakeDamage(1, UnitHurtType.Mele);
 
         // Другие методы в BattleMind:
         //   TakeEffectiveDamage(attacker, dmg, type) - нанесение урона без учета брони
