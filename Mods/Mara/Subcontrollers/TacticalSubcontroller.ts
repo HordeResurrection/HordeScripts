@@ -211,7 +211,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         }
 
         if (weakestSquad == null && checkReinforcements) {
-            weakestSquad = this.findWeakestReinforceableSquad(this.reinforcementSquads, squadMovementType);
+            weakestSquad = this.findWeakestReinforceableSquad(this.reinforcementSquads, squadMovementType, (s) => s.IsIdle());
         }
 
         return weakestSquad;
@@ -490,6 +490,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         let attackerLocation = attackers[attackerIndex].GetLocation();
         let attackerStrength = attackers[attackerIndex].Strength;
         let accumulatedStrength = 0;
+        let defendingSquadGroup: Array<MaraControllableSquad> = [];
 
         let settlementLocation = this.settlementController.GetSettlementLocation();
 
@@ -509,10 +510,15 @@ export class TacticalSubcontroller extends MaraSubcontroller {
                 continue;
             }
             
-            squad.Attack(attackerLocation.Point);
+            defendingSquadGroup.push(squad);
             accumulatedStrength += squad.Strength;
 
             if (accumulatedStrength > attackerStrength) {
+                // if accumulated strength is less than attacker's, this won't fire and squads of the last batch shall do nothing
+                for (let squad of defendingSquadGroup) {
+                    squad.Attack(attackerLocation.Point);
+                }
+                
                 attackerIndex++;
 
                 if (attackerIndex == attackers.length) {
@@ -522,6 +528,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
                 attackerLocation = attackers[attackerIndex].GetLocation();
                 attackerStrength = attackers[attackerIndex].Strength;
                 accumulatedStrength = 0;
+                defendingSquadGroup = [];
             }
         }
     }
