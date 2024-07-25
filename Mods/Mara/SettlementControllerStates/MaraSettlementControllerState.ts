@@ -11,7 +11,7 @@ export abstract class MaraSettlementControllerState extends FsmState {
         this.settlementController = settlementController;
     }
 
-    TacticalControllerTick() {
+    TacticalControllerTick(): void {
         this.settlementController.TacticalController.IdleTick();
     }
 
