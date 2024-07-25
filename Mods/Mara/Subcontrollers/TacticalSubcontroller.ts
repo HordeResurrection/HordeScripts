@@ -85,6 +85,11 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
     DefendTick(): void {
         this.reinforceSquads();
+
+        if (this.needRetreat()) {
+            this.Retreat();
+        }
+
         this.updateDefenseTargets();
     }
 
@@ -116,14 +121,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             this.ComposeSquads();
         }
         
-        let defensiveStrength = 0;
-        this.defensiveSquads.forEach((squad) => {defensiveStrength += squad.Strength});
-
-        let enemyStrength = 0;
-        this.settlementController.HostileAttackingSquads.forEach((squad) => {enemyStrength += squad.Strength});
-
-        if (defensiveStrength < enemyStrength) {
-            this.settlementController.Debug(`Current defense strength ${defensiveStrength} is not enough to counter attack srength ${enemyStrength}`);
+        if (this.needRetreat()) {
             this.Retreat();
         }
 
@@ -196,6 +194,22 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.initialOffensiveSquadCount = this.offensiveSquads.length;
 
         this.settlementController.Debug(`${this.initialOffensiveSquadCount} offensive squads composed`);
+    }
+
+    private needRetreat(): boolean {
+        let defensiveStrength = 0;
+        this.defensiveSquads.forEach((squad) => {defensiveStrength += squad.Strength});
+
+        let enemyStrength = 0;
+        this.settlementController.HostileAttackingSquads.forEach((squad) => {enemyStrength += squad.Strength});
+
+        let needRetreat = defensiveStrength < enemyStrength;
+
+        if (needRetreat) {
+            this.settlementController.Debug(`Current defense strength ${defensiveStrength} is not enough to counter attack srength ${enemyStrength}`);
+        }
+
+        return needRetreat;
     }
 
     private reinforceSquads(): void {
