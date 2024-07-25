@@ -116,11 +116,14 @@ export class SettlementGlobalStrategy {
             }
         }
 
-        let lowestTechItem = this.selectLowestTechSelectionItem(resultSelectionItems);
-
         let result = new SelectionResult();
+        let lowestTechItem = this.selectLowestTechSelectionItem(resultSelectionItems);
+        
+        if (lowestTechItem) {
+            result.LowestTechCfgId = lowestTechItem.CfgId;
+        }
+
         result.CfgIds = new Set<string>(resultSelectionItems.map((value) => value.CfgId));
-        result.LowestTechCfgId = lowestTechItem!.CfgId;
         result.ProductionChainCfgIds = new Set<string>();
 
         for (let item of resultSelectionItems) {
