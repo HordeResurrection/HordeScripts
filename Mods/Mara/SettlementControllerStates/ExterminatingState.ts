@@ -43,7 +43,6 @@ export class ExterminatingState extends MaraSettlementControllerState {
             }
 
             this.requestReinforcementsProduction();
-            this.settlementController.TacticalController.ReinforceSquads();
         }
 
         let combativityIndex = this.settlementController.TacticalController.OffenseCombativityIndex;
@@ -69,6 +68,10 @@ export class ExterminatingState extends MaraSettlementControllerState {
             this.settlementController.State = SettlementControllerStateFactory.MakeRoutingState(this.settlementController);
             return;
         }
+    }
+
+    TacticalControllerTick(): void {
+        this.settlementController.TacticalController.AttackTick();
     }
 
     private celebrateVictory(): void {

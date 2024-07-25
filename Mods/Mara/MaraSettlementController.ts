@@ -178,7 +178,7 @@ export class MaraSettlementController {
     }
 
     public get State(): MaraSettlementControllerState {
-        return this.State;
+        return this.state;
     }
     
     public set State(value: MaraSettlementControllerState) {

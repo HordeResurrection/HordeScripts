@@ -59,36 +59,42 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         
         if (tickNumber % 10 == 0) {
             this.updateSquads();
+            this.settlementController.State.TacticalControllerTick();
+        }
+    }
 
-            if (this.currentTarget) { //we are attacking
-                if (this.currentTarget.IsAlive) {
-                    let pullbackLocation = this.getPullbackLocation();
+    AttackTick(): void {
+        this.reinforceSquads();
+        
+        if (this.currentTarget.IsAlive) {
+            let pullbackLocation = this.getPullbackLocation();
 
-                    for (let squad of this.offensiveSquads) {
-                        if (pullbackLocation) {
-                            if (squad.CombativityIndex < this.settlementController.Settings.Squads.MinCombativityIndex) {
-                                this.sendSquadToLocation(squad, pullbackLocation);
-                            }
-                        }
-
-                        if (squad.IsIdle() && squad.CombativityIndex >= 1) {
-                            squad.Attack(this.currentTarget.Cell);
-                        }
+            for (let squad of this.offensiveSquads) {
+                if (pullbackLocation) {
+                    if (squad.CombativityIndex < this.settlementController.Settings.Squads.MinCombativityIndex) {
+                        this.sendSquadToLocation(squad, pullbackLocation);
                     }
                 }
-            }
-            else if (this.settlementController.HostileAttackingSquads.length > 0) { //we are under attack
-                this.updateDefenseTargets();
-            }
-            else { //building up or something
-                let retreatLocation = this.getRetreatLocation();
 
-                if (retreatLocation) {
-                    for (let squad of this.AllSquads) {
-                        if (squad.IsIdle()) {
-                            this.sendSquadToLocation(squad, retreatLocation);
-                        }
-                    }
+                if (squad.IsIdle() && squad.CombativityIndex >= 1) {
+                    squad.Attack(this.currentTarget.Cell);
+                }
+            }
+        }
+    }
+
+    DefendTick(): void {
+        this.reinforceSquads();
+        this.updateDefenseTargets();
+    }
+
+    IdleTick(): void {
+        let retreatLocation = this.getRetreatLocation();
+
+        if (retreatLocation) {
+            for (let squad of this.AllSquads) {
+                if (squad.IsIdle()) {
+                    this.sendSquadToLocation(squad, retreatLocation);
                 }
             }
         }
@@ -192,7 +198,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.settlementController.Debug(`${this.initialOffensiveSquadCount} offensive squads composed`);
     }
 
-    ReinforceSquads(): void {
+    private reinforceSquads(): void {
         this.reinforceSquadsByFreeUnits();
 
         this.reinforceSquadsByReinforcementSquads();

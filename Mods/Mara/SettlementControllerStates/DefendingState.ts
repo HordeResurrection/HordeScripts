@@ -38,9 +38,12 @@ export class DefendingState extends MaraSettlementControllerState {
             else {
                 this.refreshAttackersList();
                 this.requestReinforcementsProduction();
-                this.settlementController.TacticalController.ReinforceSquads();
             }
         }
+    }
+
+    TacticalControllerTick(): void {
+        this.settlementController.TacticalController.DefendTick();
     }
 
     private requestReinforcementsProduction() {

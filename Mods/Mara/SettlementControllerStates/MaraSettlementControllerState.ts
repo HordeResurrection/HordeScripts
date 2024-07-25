@@ -11,6 +11,10 @@ export abstract class MaraSettlementControllerState extends FsmState {
         this.settlementController = settlementController;
     }
 
+    TacticalControllerTick() {
+        this.settlementController.TacticalController.IdleTick();
+    }
+
     protected fillExpandData(requiredResources: MaraResources): void {
         let optimalCluster = this.selectOptimalResourceCluster(requiredResources);
 
