@@ -269,7 +269,9 @@ export class MaraUtils {
         let result: Array<any> = [];
         
         while ((unit = eNext(units)) !== undefined) {
-            result.push(unit);
+            if (unit.IsAlive) {
+                result.push(unit);
+            }
         }
 
         return result;

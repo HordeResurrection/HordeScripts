@@ -8,6 +8,7 @@ import { MaraResourceCluster } from "../MaraResourceMap";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { Mara } from "../Mara";
 import { SettlementGlobalStrategy } from "../Utils/SettlementControllerGlobalStrategy";
+import { UnitFlags } from "library/game-logic/horde-types";
 
 export class StrategySubcontroller extends MaraSubcontroller {
     EnemySettlements: Array<any> = []; //but actually Settlement
@@ -209,48 +210,83 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
     GetOffensiveTarget(
         enemySettlement: any //but actually Settlement
-    ): any { //but actually Point2D
-        if (!MaraUtils.IsSettlementDefeated(enemySettlement)) {
-            let defeatCondition = enemySettlement.RulesOverseer.GetExistenceRule().AlmostDefeatCondition;
+    ): any { //but actually Unit
+        if (MaraUtils.IsSettlementDefeated(enemySettlement)) {
+            return null;
+        }
 
-            if (defeatCondition == AlmostDefeatCondition.LossProducingBuildings) {
-                let professionCenter = enemySettlement.Units.Professions;
-                let productionBuilding = professionCenter.ProducingBuildings.First();
-                
-                return productionBuilding;
-            }
-            else if (defeatCondition == AlmostDefeatCondition.LossProducingUnits) {
-                let professionCenter = enemySettlement.Units.Professions;
-                let productionBuilding = professionCenter.ProducingBuildings.First();
+        let defeatCondition = enemySettlement.RulesOverseer.GetExistenceRule().AlmostDefeatCondition;
+        let allUnits = MaraUtils.GetAllSettlementUnits(enemySettlement);
+        let candidates: Array<any> = [];
 
-                if (productionBuilding) {
-                    return productionBuilding;
+        if (defeatCondition == AlmostDefeatCondition.LossProducingBuildings) {
+            candidates = allUnits.filter(
+                (unit) => {
+                    return (
+                        MaraUtils.IsProducerConfig(unit.Cfg) && 
+                        MaraUtils.IsBuildingConfig(unit.Cfg) ||
+                        MaraUtils.IsMineConfig(unit.Cfg)
+                    );
                 }
-                else {
-                    return professionCenter.ProducingUnits.First();
+            );
+        }
+        else if (defeatCondition == AlmostDefeatCondition.LossProducingUnits) {
+            candidates = allUnits.filter(
+                (unit) => {
+                    return (
+                        MaraUtils.IsProducerConfig(unit.Cfg) ||
+                        MaraUtils.IsMineConfig(unit.Cfg)
+                    );
                 }
-            }
-            else { //loss of all units or custom conditions
-                let professionCenter = enemySettlement.Units.Professions;
-                let productionBuilding = professionCenter.ProducingBuildings.First();
+            );
+        }
+        else { //loss of all units or custom conditions
+            candidates = allUnits.filter(
+                (unit) => {
+                    return (
+                        MaraUtils.IsProducerConfig(unit.Cfg) && 
+                        MaraUtils.IsBuildingConfig(unit.Cfg) ||
+                        MaraUtils.IsMineConfig(unit.Cfg)
+                    );
+                }
+            );
 
-                if (productionBuilding) {
-                    return productionBuilding;
-                }
-                else {
-                    let producingUnit = professionCenter.ProducingUnits.First();
-                    
-                    if (producingUnit) {
-                        return producingUnit;
+            if (candidates.length == 0) {
+                candidates = allUnits.filter(
+                    (unit) => {
+                        return (
+                            MaraUtils.IsProducerConfig(unit.Cfg) ||
+                            MaraUtils.IsMineConfig(unit.Cfg)
+                        );
                     }
-                    else {
-                        return professionCenter.AllUnitsExceptPassive.First();
-                    }
+                );
+
+                if (candidates.length == 0) {
+                    candidates = allUnits.filter(
+                        (unit) => {return unit.Cfg.HasNotFlags(UnitFlags.Passive);}
+                    );
                 }
             }
         }
 
-        return null;
+        let mostVulnerableUnit: any = null;
+        let minDefenceStrength = Infinity;
+
+        for (let unit of candidates) {
+            let enemies = this.GetEnemiesInArea(unit.Cell, this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius);
+            let strength = 0;
+
+            for (let enemy of enemies) {
+                strength += MaraUtils.GetUnitStrength(enemy);
+            }
+
+            if (strength < minDefenceStrength) {
+                minDefenceStrength = strength;
+                mostVulnerableUnit = unit;
+            }
+        }
+
+        return mostVulnerableUnit;
     }
 
     GetExpandOffenseTarget(expandLocation: MaraPoint): any {
