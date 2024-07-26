@@ -8,6 +8,7 @@ import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 export class TacticalSubcontroller extends MaraSubcontroller {
     private offensiveSquads: Array<MaraControllableSquad> = [];
     private defensiveSquads: Array<MaraControllableSquad> = [];
+    private militiaSquads: Array<MaraControllableSquad> = [];
     private reinforcementSquads: Array<MaraControllableSquad> = [];
     private initialOffensiveSquadCount: number;
     private unitsInSquads: Map<string, any> = new Map<string, any>();
@@ -41,7 +42,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     public get AllSquads(): Array<MaraControllableSquad> {
-        return [...this.offensiveSquads, ...this.defensiveSquads, ...this.reinforcementSquads];
+        return [...this.offensiveSquads, ...this.defensiveSquads, ...this.reinforcementSquads, ...this.militiaSquads];
     }
 
     public get SquadsSettings(): any {
@@ -88,6 +89,10 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
         if (this.needRetreat()) {
             this.Retreat();
+        }
+
+        if (!this.canDefend()) {
+            this.makeMilitia();
         }
 
         this.updateDefenseTargets();
@@ -148,6 +153,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.offensiveSquads = [];
         this.defensiveSquads = [];
         this.reinforcementSquads = [];
+        this.DismissMilitia();
         this.unitsInSquads = new Map<string, any>();
 
         let units = enumerate(this.settlementController.Settlement.Units);
@@ -199,6 +205,15 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.settlementController.Debug(`${this.initialOffensiveSquadCount} offensive squads composed`);
     }
 
+    DismissMilitia(): void {
+        for (let squad of this.militiaSquads) {
+            for (let unit of squad.Units) {
+                this.settlementController.ReservedUnitsData.FreeUnit(unit);
+            }
+        }
+        this.militiaSquads = [];
+    }
+
     private needRetreat(): boolean {
         let defensiveStrength = 0;
         this.defensiveSquads.forEach((squad) => {defensiveStrength += squad.Strength});
@@ -207,6 +222,25 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.settlementController.HostileAttackingSquads.forEach((squad) => {enemyStrength += squad.Strength});
 
         return defensiveStrength < enemyStrength;
+    }
+
+    private canDefend(): boolean {
+        return this.AllSquads.length > 0;
+    }
+
+    private makeMilitia(): void {
+        let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        let militiaUnits = allUnits.filter((value) => {
+            return MaraUtils.IsArmedConfig(value.Cfg) && 
+            !this.isBuilding(value) &&
+            !this.settlementController.ReservedUnitsData.IsUnitReserved(value)
+        });
+
+        this.militiaSquads.push(...this.createSquadsFromUnits(militiaUnits));
+        
+        for (let unit of militiaUnits) {
+            this.settlementController.ReservedUnitsData.ReserveUnit(unit);
+        }
     }
 
     private reinforceSquads(): void {
@@ -476,6 +510,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.offensiveSquads = this.offensiveSquads.filter((squad) => {return squad.Units.length > 0});
         this.defensiveSquads = this.defensiveSquads.filter((squad) => {return squad.Units.length > 0});
         this.reinforcementSquads = this.reinforcementSquads.filter((squad) => {return squad.Units.length > 0});
+        this.militiaSquads = this.militiaSquads.filter((squad) => {return squad.Units.length > 0});
         this.settlementController.HostileAttackingSquads = this.settlementController.HostileAttackingSquads.filter((squad) => {return squad.Units.length > 0});
 
         if (this.unitsInSquads != null) {

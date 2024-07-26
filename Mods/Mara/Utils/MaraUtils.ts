@@ -821,6 +821,16 @@ export class MaraUtils {
         }
     }
 
+    static IsArmedConfig(unitConfig: any): boolean {
+        let mainArmament = unitConfig.MainArmament;
+        return mainArmament != null;
+    }
+
+    static IsArmedConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId);
+        return MaraUtils.IsArmedConfig(cfg);
+    }
+
     static IsCombatConfig(unitConfig: any): boolean {
         let mainArmament = unitConfig.MainArmament;
         let isHarvester = MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Harvester);
@@ -956,7 +966,7 @@ export class MaraUtils {
     static GetUnitStrength(unit: any): number {
         let unitCfg = unit.Cfg;
 
-        if (this.IsCombatConfig(unitCfg) && unit.IsAlive) {
+        if (this.IsArmedConfig(unitCfg) && unit.IsAlive) {
             let maxStrength = MaraUtils.GetConfigStrength(unitCfg);
 
             return maxStrength * (unit.Health / unitCfg.MaxHealth);
@@ -967,7 +977,7 @@ export class MaraUtils {
     }
 
     static GetConfigStrength(unitConfig: any): number {
-        if (MaraUtils.IsCombatConfig(unitConfig)) {
+        if (MaraUtils.IsArmedConfig(unitConfig)) {
             return unitConfig.MaxHealth * (unitConfig.Shield + 1);
         }
         else {
