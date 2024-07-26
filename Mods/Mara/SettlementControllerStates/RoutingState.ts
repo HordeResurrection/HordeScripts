@@ -92,8 +92,14 @@ export class RoutingState extends MaraSettlementControllerState {
             this.pickBuildUpOrDevelopment(this.settlementController.Settings.ControllerStates.BuildUpProbabilityWhenDefensePossible * 100);
         }
         else {
-            this.settlementController.Debug(`No produceable combat units, developing...`);
-            this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
+            if (this.canBuildUp()) {
+                this.settlementController.Debug(`No produceable combat units, developing...`);
+                this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
+            }
+            else {
+                this.settlementController.Debug(`Unable to produce any combat unit, taking forced defeat...`);
+                this.settlementController.State = SettlementControllerStateFactory.MakeIdleState(this.settlementController);
+            }
         }
     }
 
@@ -113,33 +119,33 @@ export class RoutingState extends MaraSettlementControllerState {
         });
 
         if (!atLeastOneHarvesterPresent) {
-            if (!this.checkConfigIds(MaraUtils.GetAllHarvesterConfigIds)) {
+            if (!this.checkConfigIdsLimits(MaraUtils.GetAllHarvesterConfigIds)) {
                 return false;
             }
         }
 
         if (!atLeastOneMetalStockPresent) {
-            if (!this.checkConfigIds(MaraUtils.GetAllMetalStockConfigIds)) {
+            if (!this.checkConfigIdsLimits(MaraUtils.GetAllMetalStockConfigIds)) {
                 return false;
             }
         }
 
-        if (!this.checkConfigIds(MaraUtils.GetAllSawmillConfigIds)) {
+        if (!this.checkConfigIdsLimits(MaraUtils.GetAllSawmillConfigIds)) {
             return false;
         }
 
-        if (!this.checkConfigIds(MaraUtils.GetAllMineConfigIds)) {
+        if (!this.checkConfigIdsLimits(MaraUtils.GetAllMineConfigIds)) {
             return false;
         }
 
-        if (!this.checkConfigIds(MaraUtils.GetAllHousingConfigIds)) {
+        if (!this.checkConfigIdsLimits(MaraUtils.GetAllHousingConfigIds)) {
             return false;
         }
 
         return true;
     }
 
-    private checkConfigIds(configIdsGetter: (any) => Array<string>): boolean {
+    private checkConfigIdsLimits(configIdsGetter: (any) => Array<string>): boolean {
         let availableCfgIds = configIdsGetter(this.settlementController.Settlement);
 
         if (availableCfgIds.length == 0) {
@@ -156,6 +162,39 @@ export class RoutingState extends MaraSettlementControllerState {
         }
         
         return false;
+    }
+
+    private canBuildUp(): boolean {
+        let offensiveComposition = this.settlementController.StrategyController.GetSettlementAttackArmyComposition();
+        
+        if (offensiveComposition.size > 0) {
+            return true;
+        }
+        else {
+            let currentEconomy = this.settlementController.GetCurrentDevelopedEconomyComposition();
+            let requiredTechChain = this.settlementController.StrategyController.GetRequiredProductionChainCfgIds();
+
+            let absentTech: Array<string> = [];
+
+            requiredTechChain.forEach((v) => {
+                if (!currentEconomy.has(v)) {
+                    absentTech.push(v);
+                }
+            });
+
+            let atLeastOneTechIsProduceable = false;
+
+            for (let cfgId of absentTech) {
+                let producers = this.settlementController.ProductionController.GetProducingCfgIds(cfgId);
+                
+                if (producers.length > 0) {
+                    atLeastOneTechIsProduceable = true;
+                    break;
+                }
+            }
+
+            return atLeastOneTechIsProduceable;
+        }
     }
 
     private isExpandNeeded(): NeedExpandResult {
