@@ -327,21 +327,11 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return false;
     }
 
-    public IsSafeExpand(point: any): boolean {
+    IsSafeExpand(point: any): boolean {
         return this.isSafeLocation(
             point, 
             this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
         );
-    }
-
-    private isSafeLocation(point: any, radius: number): boolean {
-        let enemies = MaraUtils.GetSettlementUnitsInArea(
-            point, 
-            radius, 
-            this.EnemySettlements
-        );
-
-        return enemies.length == 0;
     }
 
     GetEnemiesInArea(cell: any, radius: number): Array<any> {
@@ -457,6 +447,16 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let result: MaraResourceCluster | null = MaraUtils.RandomSelect(this.settlementController.MasterMind, finalClusters);
 
         return result;
+    }
+
+    private isSafeLocation(point: any, radius: number): boolean {
+        let enemies = MaraUtils.GetSettlementUnitsInArea(
+            point, 
+            radius, 
+            this.EnemySettlements
+        );
+
+        return enemies.length == 0;
     }
 
     private getOffensiveUnitComposition(requiredStrength: number): UnitComposition {

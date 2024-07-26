@@ -1,4 +1,4 @@
-import { MaraSettlementController, SettlementLocation } from "Mara/MaraSettlementController";
+import { MaraSettlementController, SettlementClusterLocation } from "Mara/MaraSettlementController";
 import { MaraUtils } from "Mara/Utils/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraControllableSquad } from "./Squads/MaraControllableSquad";
@@ -67,12 +67,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.reinforceSquads();
         
         if (this.currentTarget.IsAlive) {
-            let pullbackLocation = this.getPullbackLocation();
+            let pullbackLocations = this.getPullbackLocations();
 
             for (let squad of this.offensiveSquads) {
-                if (pullbackLocation) {
+                if (pullbackLocations.length > 0) {
                     if (squad.CombativityIndex < this.settlementController.Settings.Squads.MinCombativityIndex) {
-                        this.sendSquadToLocation(squad, pullbackLocation);
+                        this.sendSquadToOneOfLocations(squad, pullbackLocations);
                     }
                 }
 
@@ -94,12 +94,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     IdleTick(): void {
-        let retreatLocation = this.getRetreatLocation();
+        let retreatLocations = this.getRetreatLocations();
 
-        if (retreatLocation) {
+        if (retreatLocations.length > 0) {
             for (let squad of this.AllSquads) {
                 if (squad.IsIdle()) {
-                    this.sendSquadToLocation(squad, retreatLocation);
+                    this.sendSquadToOneOfLocations(squad, retreatLocations);
                 }
             }
         }
@@ -129,11 +129,11 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     Retreat(): void {
-        let retreatLocation = this.getRetreatLocation();
+        let retreatLocations = this.getRetreatLocations();
 
-        if (retreatLocation) {
+        if (retreatLocations.length > 0) {
             for (let squad of this.offensiveSquads) {
-                squad.Move(retreatLocation.Center, retreatLocation.Radius);
+                this.sendSquadToOneOfLocations(squad, retreatLocations);
             }
 
             if (this.offensiveSquads.length > 0) {
@@ -234,19 +234,34 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         return weakestSquad;
     }
 
-    private sendSquadToLocation(squad: MaraControllableSquad, location: SettlementLocation): void {
-        if (!location) {
+    private sendSquadToOneOfLocations(squad: MaraControllableSquad, locations: Array<SettlementClusterLocation>): void {
+        if (locations.length == 0) {
             return;
         }
-        
-        if (!MaraUtils.IsPointsEqual(squad.CurrentTargetCell, location.Center)) {
-            let squadLocation = squad.GetLocation();
 
-            if (MaraUtils.ChebyshevDistance(squadLocation.Point, location.Center) > location.Radius) {
+        let closestLocation: SettlementClusterLocation | null = null;
+        let minDistance = Infinity;
+
+        let squadLocation = squad.GetLocation();
+
+        for (let location of locations) {
+            let distance = MaraUtils.ChebyshevDistance(squadLocation.Point, location.Center);
+
+            if (distance < minDistance) {
+                closestLocation = location;
+                minDistance = distance;
+            }
+        }
+
+        if (!MaraUtils.IsPointsEqual(squad.CurrentTargetCell, closestLocation!.Center)) {
+            if (
+                MaraUtils.ChebyshevDistance(squadLocation.Point, closestLocation!.Center) > closestLocation!.Radius || 
+                !squad.IsIdle()
+            ) {
                 let spread = squad.MinSpread * 3;
-                let precision = Math.max(location.Radius - spread, 0);
+                let precision = Math.max(closestLocation!.Radius - spread, 0);
                 
-                squad.Move(location.Center, precision);
+                squad.Move(closestLocation!.Center, precision);
             }
         }
     }
@@ -488,12 +503,31 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         return config.BuildingConfig != null;
     }
 
-    private getPullbackLocation(): SettlementLocation | null {
-        return this.settlementController.GetSettlementLocation();
+    private getPullbackLocations(): Array<SettlementClusterLocation> {
+        let result: Array<SettlementClusterLocation> = [];
+        let settlementLocation = this.settlementController.GetSettlementLocation();
+
+        if (settlementLocation) {
+            result.push(settlementLocation);
+        }
+
+        for (let expand of this.settlementController.Expands) {
+            let expandLocation = new SettlementClusterLocation(
+                expand, 
+                Math.max(
+                    this.settlementController.Settings.ResourceMining.WoodcuttingRadius, 
+                    this.settlementController.Settings.ResourceMining.MiningRadius
+                )
+            );
+
+            result.push(expandLocation);
+        }
+
+        return result;
     }
 
-    private getRetreatLocation(): SettlementLocation | null {
-        return this.getPullbackLocation();
+    private getRetreatLocations(): Array<SettlementClusterLocation> {
+        return this.getPullbackLocations();
     }
 
     private updateDefenseTargets(): void {
