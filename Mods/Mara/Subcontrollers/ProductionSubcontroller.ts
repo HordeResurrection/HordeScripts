@@ -14,7 +14,40 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     constructor (parent: MaraSettlementController) {
         super(parent);
     }
-    
+
+    public get ProductionList(): Array<string> {
+        let list = [...this.productionList].map((value) => value.ConfigId);
+
+        let masterMind = this.settlementController.MasterMind;
+        let requests = enumerate(masterMind.Requests);
+        let request;
+
+        while ((request = eNext(requests)) !== undefined) {
+            if (request.RequestedCfg) {
+                list.push(request.RequestedCfg.Uid);
+            }
+        }
+        
+        return list;
+    }
+
+    public get ProductionRequests(): Array<MaraProductionRequest> {
+        let list = [...this.productionList];
+
+        let masterMind = this.settlementController.MasterMind;
+        let requests = enumerate(masterMind.Requests);
+        let request;
+
+        while ((request = eNext(requests)) !== undefined) {
+            if (request.RequestedCfg) {
+                let productionRequest = new MaraProductionRequest(request.RequestedCfg.Uid, request.TargetCell, null);
+                list.push(productionRequest);
+            }
+        }
+        
+        return list;
+    }
+
     Tick(tickNumber: number): void {
         if (tickNumber % 10 != 0) {
             return;
@@ -77,39 +110,8 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
             this.executingRequests = filteredRequests;
         }
-    }
 
-    public get ProductionList(): Array<string> {
-        let list = [...this.productionList].map((value) => value.ConfigId);
-
-        let masterMind = this.settlementController.MasterMind;
-        let requests = enumerate(masterMind.Requests);
-        let request;
-
-        while ((request = eNext(requests)) !== undefined) {
-            if (request.RequestedCfg) {
-                list.push(request.RequestedCfg.Uid);
-            }
-        }
-        
-        return list;
-    }
-
-    public get ProductionRequests(): Array<MaraProductionRequest> {
-        let list = [...this.productionList];
-
-        let masterMind = this.settlementController.MasterMind;
-        let requests = enumerate(masterMind.Requests);
-        let request;
-
-        while ((request = eNext(requests)) !== undefined) {
-            if (request.RequestedCfg) {
-                let productionRequest = new MaraProductionRequest(request.RequestedCfg.Uid, request.TargetCell, null);
-                list.push(productionRequest);
-            }
-        }
-        
-        return list;
+        this.cleanupUnfinishedBuildings(tickNumber);
     }
 
     RequestCfgIdProduction(configId: string): void {
@@ -236,6 +238,22 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
         else {
             return [];
+        }
+    }
+
+    private cleanupUnfinishedBuildings(tickNumber: number) {
+        let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        let unfinishedBuildings = allUnits.filter((u) => MaraUtils.IsBuildingConfig(u.Cfg) && u.EffectsMind.BuildingInProgress);
+        
+        for (let building of unfinishedBuildings) {
+            // 2 is needed since units are processed every second tick in the core logic
+            let lastBuildingTick = building.OrdersMind.ActiveMotion.LastBuildTick * 2;
+
+            if (lastBuildingTick) {
+                if (tickNumber - lastBuildingTick > this.settlementController.Settings.Timeouts.UnfinishedConstructionThreshold) {
+                    MaraUtils.IssueSelfDestructCommand([building], this.settlementController.Player);
+                }
+            }
         }
     }
 

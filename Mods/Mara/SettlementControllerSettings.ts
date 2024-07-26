@@ -24,6 +24,8 @@ class TimeoutsSettings {
     
     public ExpandBuild: number = 3 * 60 * 50;
     public ExpandPrepare: number = 2 * 60 * 50;
+    
+    public UnfinishedConstructionThreshold: number = 2 * 60 * 50;
 }
 
 class SquadsSettings {
