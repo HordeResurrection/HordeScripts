@@ -129,12 +129,15 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     Retreat(): void {
-        this.settlementController.Debug(`Retreating`);
         let retreatLocation = this.getRetreatLocation();
 
         if (retreatLocation) {
             for (let squad of this.offensiveSquads) {
                 squad.Move(retreatLocation.Center, retreatLocation.Radius);
+            }
+
+            if (this.offensiveSquads.length > 0) {
+                this.settlementController.Debug(`Retreating`);
             }
         }
     }
@@ -203,13 +206,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         let enemyStrength = 0;
         this.settlementController.HostileAttackingSquads.forEach((squad) => {enemyStrength += squad.Strength});
 
-        let needRetreat = defensiveStrength < enemyStrength;
-
-        if (needRetreat) {
-            this.settlementController.Debug(`Current defense strength ${defensiveStrength} is not enough to counter attack srength ${enemyStrength}`);
-        }
-
-        return needRetreat;
+        return defensiveStrength < enemyStrength;
     }
 
     private reinforceSquads(): void {
