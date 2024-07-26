@@ -4,6 +4,8 @@ import * as primitives from "library/common/primitives";
 import * as decorations from "library/game-logic/decoration-spawn";
 
 
+const VisualEffectFogOfWarMode = HCL.HordeClassLibrary.World.Objects.VisualEffects.VisualEffectFogOfWarMode;
+
 /**
  * Плагин, который создаёт декорацию-метку в том месте на карте, где был зафиксирован Attention-клик (alt-клик)
  */
@@ -84,7 +86,7 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
         decoration.TintColor = attentionInfo.player.GetRealSettlement().SettlementColor;
         decoration.ScaleX = 2;
         decoration.ScaleY = 2;
-        decoration.IgnoreFogOfWar = true;
+        decoration.FogOfWarMode = VisualEffectFogOfWarMode.Ignore;
     }
 }
 

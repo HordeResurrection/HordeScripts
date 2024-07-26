@@ -4,14 +4,12 @@ import { createHordeColor, createResourcesAmount } from "library/common/primitiv
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
 import { UnitDeathType, UnitCommand, UnitDirection, UnitFlags, DiplomacyStatus } from "library/game-logic/horde-types";
-import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
-import { spawnUnits } from "library/game-logic/unit-spawn";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
-import { COMPONENT_TYPE, UnitComponent, BuffableComponent, BUFF_TYPE, SettlementComponent, IncomeIncreaseEvent, IncomeIncreaseComponent, IncomeEvent, IncomeLimitedPeriodicalComponent, Entity, AttackingAlongPathComponent, SpawnBuildingComponent, ReviveComponent, UpgradableBuildingComponent, UpgradableBuildingEvent, BuffEvent, BuffComponent, UnitProducedEvent } from "./ESC_components";
-import { Cell, distance_L1, UnitGiveOrder, UnitDisallowCommands, MakeBitmaskFromArray, BitmaskTestFlags } from "./Utils";
-import { GameState, World } from "./World";
+import { COMPONENT_TYPE, UnitComponent, BuffableComponent, BUFF_TYPE, SettlementComponent, IncomeIncreaseEvent, IncomeIncreaseComponent, IncomeEvent, IncomeLimitedPeriodicalComponent, Entity, AttackingAlongPathComponent, SpawnBuildingComponent, ReviveComponent, UpgradableBuildingComponent, UpgradableBuildingEvent, BuffEvent, BuffComponent, UnitProducedEvent } from "../Components/ESC_components";
+import { Cell, distance_Chebyshev, UnitGiveOrderToNearEmptyCell, UnitDisallowCommands, spawnUnits } from "../Utils";
+import { GameState, World } from "../World";
+import { createPF } from "library/common/primitives";
 import { log } from "library/common/logging";
-import { printObjectItems } from "library/common/introspection";
 
 const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 
@@ -201,21 +199,34 @@ export function WordClearSystem(world: World, gameTickNum: number) {
             }
 
             // убиваем всех юнитов, чтобы их почистила система очистки
-            
-            for (var i = 0; i < world.settlements_entities[settlementId].length; i++) {
-                var entity = world.settlements_entities[settlementId][i];
-                if (!entity.components.has(COMPONENT_TYPE.UNIT_COMPONENT)) {
-                    continue;
-                }
-                var unitComponent = entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
 
-                if (unitComponent.unit.IsDead) {
+            var unitsEnumerator = world.settlements[settlementId].Units.GetEnumerator();
+            while (unitsEnumerator.MoveNext()) {
+                var unit = unitsEnumerator.Current;
+
+                if (unit.IsDead) {
                     continue;
                 }
 
-                unitComponent.unit.BattleMind.InstantDeath(null, UnitDeathType.Mele);
+                unit.BattleMind.InstantDeath(null, UnitDeathType.Mele);
                 killUnitsCount++;
             }
+            unitsEnumerator.Dispose();
+
+            // for (var i = 0; i < world.settlements_entities[settlementId].length; i++) {
+            //     var entity = world.settlements_entities[settlementId][i];
+            //     if (!entity.components.has(COMPONENT_TYPE.UNIT_COMPONENT)) {
+            //         continue;
+            //     }
+            //     var unitComponent = entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
+
+            //     if (unitComponent.unit.IsDead) {
+            //         continue;
+            //     }
+
+            //     unitComponent.unit.BattleMind.InstantDeath(null, UnitDeathType.Mele);
+            //     killUnitsCount++;
+            // }
         }
     }
 
@@ -389,384 +400,6 @@ export function IncomeSystem(world: World, gameTickNum: number) {
         if (!emptyIncome) {
             world.settlements[settlementId].Resources.AddResources(createResourcesAmount(incomeGold + minedGold, incomeMetal + minedMetal, incomeLumber + minedLumber, incomePeople));
         }
-
-        // если у поселения есть люди отбираем их
-        //if (world.settlements[settlementId].Resources.FreePeople > 0) {
-        //    world.settlements[settlementId].Resources.TakeResources(createResourcesAmount(0, 0, 0, world.settlements[settlementId].Resources.FreePeople));
-        //}
-    }
-}
-
-export function AttackingAlongPathSystem2(world: World, gameTickNum: number) {
-    /** радиус реагирования на текущую точку пути атаки, если <= то отправляем в следующую точку */
-    const pathNodeReactionRadius = 5;
-    /** радиус реагирования на врага, который атакует наш замок */
-    const deffenceReactionRadius = 30;
-
-    var unitsMap = world.realScena.UnitsMap;
-    var settlements_enemyAttackedCastle_positions = new Array<Array<Cell>>(world.settlementsCount);
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
-        if (!world.IsSettlementInGame(settlementId)) {
-            continue;
-        }
-        settlements_enemyAttackedCastle_positions[settlementId] = new Array<Cell>();
-    }
-
-    // ищем врагов, которые атакуют наш замок
-
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
-        if (!world.IsSettlementInGame(settlementId)) {
-            continue;
-        }
-
-        for (var i = 0; i < world.settlements_entities[settlementId].length; i++) {
-            var entity = world.settlements_entities[settlementId][i] as Entity;
-            if (!entity.components.has(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT) ||
-                !entity.components.has(COMPONENT_TYPE.UNIT_COMPONENT)) {
-                continue;
-            }
-
-            var unitComponent = entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
-
-            // проверяем, что юнит кого-то бьет
-            if (!unitComponent.unit.OrdersMind.ActiveOrder.Target) {
-                continue;
-            }
-
-            var targetCastleUnit = unitComponent.unit.OrdersMind.ActiveOrder.Target;
-            // проверяем, что это чей-то замок
-            if (targetCastleUnit.Cfg.Uid != world.configs["castle"].Uid) {
-                continue;
-            }
-            // проверяем, что замок в радиусе атаки
-            if (distance_L1(
-                unitComponent.unit.Cell.X,
-                unitComponent.unit.Cell.Y,
-                targetCastleUnit.Cell.X,
-                targetCastleUnit.Cell.Y) > 2*world.configs[unitComponent.cfgId].OrderDistance) {
-                continue;
-            }
-
-            // заносим в список
-            settlements_enemyAttackedCastle_positions[targetCastleUnit.Owner.Uid].push(new Cell(unitComponent.unit.Cell.X, unitComponent.unit.Cell.Y));
-        }
-    }
-
-    // for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
-    //     if (!world.IsSettlementInGame(settlementId)) {
-    //         continue;
-    //     }
-    //     log.info(settlementId, " = ", settlements_enemyAttackedCastle_positions[settlementId].length);
-    // }
-
-    // отдаем приказы
-
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
-        if (!world.IsSettlementInGame(settlementId)) {
-            continue;
-        }
-
-        var castleUnit_settlementId = world.settlements_castleUnit[settlementId].Owner.Uid;
-
-        for (var i = 0; i < world.settlements_entities[settlementId].length; i++) {
-            var entity = world.settlements_entities[settlementId][i] as Entity;
-            if (!entity.components.has(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT) ||
-                !entity.components.has(COMPONENT_TYPE.UNIT_COMPONENT)) {
-                continue;
-            }
-
-            var unitComponent               = entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
-            var attackingAlongPathComponent = entity.components.get(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT) as AttackingAlongPathComponent;
-
-            if (!unitComponent.unit || unitComponent.unit.IsDead) {
-                continue;
-            }
-
-            var isAttackPathNull = !attackingAlongPathComponent.attackPath;
-
-            // если юнит вообще не знает куда идти, то выбираем путь атаки
-            if (isAttackPathNull) {
-                var selectedAttackPathNum                       = world.settlements_attackPathChoiser[settlementId].choiseAttackPath(unitComponent.unit, world);
-                attackingAlongPathComponent.attackPath          = world.settlements_attack_paths[settlementId][selectedAttackPathNum];
-                attackingAlongPathComponent.currentPathPointNum = 0;
-            }
-            
-            // юнит дошел то точки
-
-            if (distance_L1(unitComponent.unit.Cell.X, unitComponent.unit.Cell.Y,
-                attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].X,
-                attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].Y) <= pathNodeReactionRadius) {
-                
-                // проверка, что в ячейке нету вражеского замка
-                var unitInCell = unitsMap.GetUpperUnit(attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].X, attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].Y);
-                if (unitInCell &&
-                    unitInCell.Cfg.Uid == world.configs["castle"].Uid &&
-                    unitInCell.Owner.Uid < world.settlementsCount &&
-                    world.settlements_settlements_warFlag[settlementId][unitInCell.Owner.Uid]) {
-                    continue;
-                }
-
-                attackingAlongPathComponent.currentPathPointNum++;
-
-                // проверяем, что точка последняя
-                if (attackingAlongPathComponent.currentPathPointNum == attackingAlongPathComponent.attackPath.length) {
-                    // то зацикливаем, ставим 0-ую
-                    attackingAlongPathComponent.currentPathPointNum = 0;
-                }
-
-                UnitGiveOrder(unitComponent.unit,
-                    attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum],
-                    UnitCommand.Attack,
-                    AssignOrderMode.Replace);
-                
-                continue;
-            }
-
-            // защита замка
-
-            if (settlements_enemyAttackedCastle_positions[castleUnit_settlementId].length > 0 &&
-                distance_L1(
-                    unitComponent.unit.Cell.X,
-                    unitComponent.unit.Cell.Y,
-                    world.settlements_castleUnit[settlementId].Cell.X,
-                    world.settlements_castleUnit[settlementId].Cell.Y) < 2*deffenceReactionRadius) {
-                // который в направлении атаки
-                var attackVector     = new Cell(
-                    attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].X - unitComponent.unit.Cell.X,
-                    attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].Y - unitComponent.unit.Cell.Y);
-                // ищем ближайшего врага
-                var nearPos_num      = -1;
-                var nearPos_distance = 10000;
-                for (var posNum = 0; posNum < settlements_enemyAttackedCastle_positions[castleUnit_settlementId].length; posNum++) {
-                    var enemyX = settlements_enemyAttackedCastle_positions[castleUnit_settlementId][posNum].X;
-                    var enemyY = settlements_enemyAttackedCastle_positions[castleUnit_settlementId][posNum].Y;
-                    // проверяем, что враг на пути атаки
-                    if (attackVector.X*(enemyX - unitComponent.unit.Cell.X)
-                        + attackVector.Y*(enemyY - unitComponent.unit.Cell.Y) < 0) {
-                        continue;
-                    }
-                    // ищем расстояние до цели
-                    var posDistance = distance_L1(
-                        unitComponent.unit.Cell.X,
-                        unitComponent.unit.Cell.Y,
-                        enemyX,
-                        enemyY);
-                    if (posDistance < nearPos_distance) {
-                        nearPos_num      = posNum;
-                        nearPos_distance = posDistance;
-                    }
-                }
-                if (deffenceReactionRadius < nearPos_distance) {
-                    nearPos_num = -1;
-                }
-
-                // нашелся юнит по пути атаки идем его атаковать
-                if (nearPos_num != -1) {
-                    UnitGiveOrder(unitComponent.unit,
-                        settlements_enemyAttackedCastle_positions[castleUnit_settlementId][nearPos_num],
-                        UnitCommand.Attack,
-                        AssignOrderMode.Replace);
-                }
-                // если юнит только появился
-                else if (isAttackPathNull) {
-                    // сначала идем на базу
-                    UnitGiveOrder(unitComponent.unit,
-                        world.settlements_castle_cell[settlementId],
-                        UnitCommand.Attack,
-                        AssignOrderMode.Replace);
-                    // потом на следующую точку
-                    UnitGiveOrder(unitComponent.unit,
-                        attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum],
-                        UnitCommand.Attack,
-                        AssignOrderMode.Queue);
-                } else if (unitComponent.unit.OrdersMind.IsIdle()) {
-                    // идем на следующую точку
-                    UnitGiveOrder(unitComponent.unit,
-                        attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum],
-                        UnitCommand.Attack,
-                        AssignOrderMode.Queue);
-                }
-            } else {
-                // если юнит бездействует
-                if (unitComponent.unit.OrdersMind.IsIdle()) {
-                    // идем на следующую точку
-                    UnitGiveOrder(unitComponent.unit,
-                        attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum],
-                        UnitCommand.Attack,
-                        AssignOrderMode.Queue);
-                }
-            }
-        }
-    }
-}
-
-export function AttackingAlongPathSystem(world: World, gameTickNum: number) {
-    /** радиус реагирования на текущую точку пути атаки, если <= то отправляем в следующую точку */
-    const pathNodeReactionRadius = 5;
-
-    var unitsMap = world.realScena.UnitsMap;
-
-    /** позиции вражеских юнитов на нашей базе */
-    var settlements_enemyPositionOnBase = new Array<Array<Cell>>(world.settlementsCount);
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
-        settlements_enemyPositionOnBase[settlementId] = new Array<Cell>();
-    }
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
-        if (!world.IsSettlementInGame(settlementId)) {
-            continue;
-        }
-        
-        for (var i = 0; i < world.settlements_entities[settlementId].length; i++) {
-            var entity = world.settlements_entities[settlementId][i] as Entity;
-            if (!entity.components.has(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT) ||
-                !entity.components.has(COMPONENT_TYPE.UNIT_COMPONENT)) {
-                continue;
-            }
-
-            var unitComponent = entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
-
-            if (!unitComponent.unit || unitComponent.unit.IsDead) {
-                continue;
-            }
-
-            for (var other_settlementId = 0; other_settlementId < world.settlementsCount; other_settlementId++) {
-                if (!world.IsSettlementInGame(other_settlementId)) {
-                    continue;
-                }
-                // проверка войны
-                if (!world.settlements_settlements_warFlag[settlementId][other_settlementId]) {
-                    continue;
-                }
-                // проверка, что данный юнит на базе врага
-                if (!world.settlements_field[other_settlementId].IsCellInside(unitComponent.unit.Cell.X, unitComponent.unit.Cell.Y)) {
-                    continue;
-                }
-                // заносим данного юнита в список
-                settlements_enemyPositionOnBase[other_settlementId].push(new Cell(unitComponent.unit.Cell.X, unitComponent.unit.Cell.Y));
-            }
-        }
-    }
-    
-    // отдаем приказы
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
-        if (!world.IsSettlementInGame(settlementId)) {
-            continue;
-        }
-
-        for (var i = 0; i < world.settlements_entities[settlementId].length; i++) {
-            var entity = world.settlements_entities[settlementId][i] as Entity;
-            if (!entity.components.has(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT) ||
-                !entity.components.has(COMPONENT_TYPE.UNIT_COMPONENT)) {
-                continue;
-            }
-
-            var unitComponent               = entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
-            var attackingAlongPathComponent = entity.components.get(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT) as AttackingAlongPathComponent;
-
-            if (!unitComponent.unit || unitComponent.unit.IsDead) {
-                continue;
-            }
-
-            var isAttackPathNull = !attackingAlongPathComponent.attackPath;
-
-            // если юнит вообще не знает куда идти, то выбираем путь атаки
-            if (isAttackPathNull) {
-                var selectedAttackPathNum                       = world.settlements_attackPathChoiser[settlementId].choiseAttackPath(unitComponent.unit, world);
-                attackingAlongPathComponent.attackPath          = world.settlements_attack_paths[settlementId][selectedAttackPathNum];
-                attackingAlongPathComponent.currentPathPointNum = 0;
-            }
-
-            // юнит дошел то точки
-            if (distance_L1(unitComponent.unit.Cell.X, unitComponent.unit.Cell.Y,
-                attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].X,
-                attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].Y) <= pathNodeReactionRadius) {
-                
-                // проверка, что в ячейке нету вражеского замка
-                var unitInCell = unitsMap.GetUpperUnit(attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].X, attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].Y);
-                if (unitInCell &&
-                    unitInCell.Cfg.Uid == world.configs["castle"].Uid &&
-                    unitInCell.Owner.Uid < world.settlementsCount &&
-                    world.settlements_settlements_warFlag[settlementId][unitInCell.Owner.Uid]) {
-                    continue;
-                }
-
-                attackingAlongPathComponent.currentPathPointNum++;
-
-                // проверяем, что точка последняя
-                if (attackingAlongPathComponent.currentPathPointNum == attackingAlongPathComponent.attackPath.length) {
-                    // то зацикливаем, ставим 0-ую
-                    attackingAlongPathComponent.currentPathPointNum = 0;
-                }
-
-                UnitGiveOrder(unitComponent.unit,
-                    attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum],
-                    UnitCommand.Attack,
-                    AssignOrderMode.Replace);
-                
-                continue;
-            }
-
-            // защита базы
-            if (settlements_enemyPositionOnBase[settlementId].length > 0 &&
-                world.settlements_field[settlementId].IsCellInside(unitComponent.unit.Cell.X, unitComponent.unit.Cell.Y)) {
-                // ищем ближайшего врага
-                // который в направлении атаки
-                var attackVector     = new Cell(
-                    attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].X - unitComponent.unit.Cell.X,
-                    attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].Y - unitComponent.unit.Cell.Y);
-                var nearPos_num      = -1;
-                var nearPos_distance = 10000;
-                for (var posNum = 0; posNum < settlements_enemyPositionOnBase[settlementId].length; posNum++) {
-                    // проверяем, что враг на пути атаки
-                    if (attackVector.X*(settlements_enemyPositionOnBase[settlementId][posNum].X - unitComponent.unit.Cell.X)
-                        + attackVector.Y*(settlements_enemyPositionOnBase[settlementId][posNum].Y - unitComponent.unit.Cell.Y) < 0) {
-                        continue;
-                    }
-                    var posDistance = distance_L1(unitComponent.unit.Cell.X, unitComponent.unit.Cell.Y, settlements_enemyPositionOnBase[settlementId][posNum].X, settlements_enemyPositionOnBase[settlementId][posNum].Y);
-                    if (posDistance < nearPos_distance) {
-                        nearPos_num      = posNum;
-                        nearPos_distance = posDistance;
-                    }
-                }
-
-                // нашелся юнит по пути атаки идем его атаковать
-                if (nearPos_num != -1) {
-                    UnitGiveOrder(unitComponent.unit,
-                        settlements_enemyPositionOnBase[settlementId][nearPos_num],
-                        UnitCommand.Attack,
-                        AssignOrderMode.Replace);
-                }
-                // если юнит только появился
-                else if (isAttackPathNull) {
-                    // сначала идем на базу
-                    UnitGiveOrder(unitComponent.unit,
-                        world.settlements_castle_cell[settlementId],
-                        UnitCommand.Attack,
-                        AssignOrderMode.Replace);
-                    // потом на следующую точку
-                    UnitGiveOrder(unitComponent.unit,
-                        attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum],
-                        UnitCommand.Attack,
-                        AssignOrderMode.Queue);
-                } else if (unitComponent.unit.OrdersMind.IsIdle()) {
-                    // идем на следующую точку
-                    UnitGiveOrder(unitComponent.unit,
-                        attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum],
-                        UnitCommand.Attack,
-                        AssignOrderMode.Queue);
-                }
-            }
-            else {
-                // если юнит бездействует
-                if (unitComponent.unit.OrdersMind.IsIdle()) {
-                    // идем на следующую точку
-                    UnitGiveOrder(unitComponent.unit,
-                        attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum],
-                        UnitCommand.Attack,
-                        AssignOrderMode.Queue);
-                }
-            }
-        }
     }
 }
 
@@ -810,8 +443,9 @@ export function SpawnBuildingSystem(world: World, gameTickNum: number) {
 
                     // спавним юнитов
                     var generator     = generateCellInSpiral(unitComponent.unit.Cell.X + emergePoint.X, unitComponent.unit.Cell.Y + emergePoint.Y);
-                    var spawnedUnits  = spawnUnits(world.settlements[settlementId], world.configs[spawnBuildingComponent.spawnUnitConfigId], 1, UnitDirection.Down, generator);
+                    var spawnedUnits  = spawnUnits(world.settlements[settlementId], world.configs[spawnBuildingComponent.spawnUnitConfigId], world.spawn_count_coeff, UnitDirection.Down, generator);
                     for (var spawnedUnit of spawnedUnits) {
+                        UnitDisallowCommands(spawnedUnit);
                         world.RegisterUnitEntity(spawnedUnit);
                     }
                 }
@@ -989,15 +623,14 @@ export function BuffSystem(world: World, gameTickNum: number) {
                 case BUFF_TYPE.ATTACK:
                     ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {атака}");
                     ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 150, 0, 0));
-                    ScriptUtils.SetValue(cloneCFG.MainArmament.BulletCombatParams, "Damage", Math.max(1000, 5*cloneCFG.MainArmament.BulletCombatParams.Damage));
-                    ScriptUtils.SetValue(cloneCFG, "Sight", Math.max(14, cloneCFG.Sight + 4));
+                    ScriptUtils.SetValue(cloneCFG.MainArmament.BulletCombatParams, "Damage", Math.min(1000, 5*cloneCFG.MainArmament.BulletCombatParams.Damage));
+                    ScriptUtils.SetValue(cloneCFG, "Sight", Math.min(13, cloneCFG.Sight + 2));
                     if (cloneCFG.MainArmament.Range > 1) {
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "EmitBulletsCountMin", Math.max(5, cloneCFG.MainArmament.EmitBulletsCountMin + 2));
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "EmitBulletsCountMax", Math.max(5, cloneCFG.MainArmament.EmitBulletsCountMax + 2));
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "Range", Math.max(13, cloneCFG.MainArmament.Range + 2));
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ForestRange", Math.max(13, cloneCFG.MainArmament.ForestRange + 2));
-                        ScriptUtils.SetValue(cloneCFG, "OrderDistance", Math.max(13, cloneCFG.OrderDistance + 2));
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "OrderDistance", Math.max(13, cloneCFG.MainArmament.OrderDistance + 2));
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "EmitBulletsCountMin", Math.min(5, cloneCFG.MainArmament.EmitBulletsCountMin + 2));
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "EmitBulletsCountMax", Math.min(5, cloneCFG.MainArmament.EmitBulletsCountMax + 2));
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "Range", Math.min(13, cloneCFG.MainArmament.Range + 2));
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ForestRange", Math.min(13, cloneCFG.MainArmament.ForestRange + 2));
+                        ScriptUtils.SetValue(cloneCFG, "OrderDistance", Math.min(13, cloneCFG.OrderDistance + 2));
                         ScriptUtils.SetValue(cloneCFG.MainArmament, "BaseAccuracy", 0);
                         ScriptUtils.SetValue(cloneCFG.MainArmament, "MaxDistanceDispersion", 300);
                     }
@@ -1005,21 +638,22 @@ export function BuffSystem(world: World, gameTickNum: number) {
                 case BUFF_TYPE.ACCURACY:
                     ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {меткость}");
                     ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 148, 0, 211));
-                    ScriptUtils.SetValue(cloneCFG, "Sight", 3*cloneCFG.Sight);
+                    //ScriptUtils.SetValue(cloneCFG, "Sight", 3*cloneCFG.Sight);
+                    ScriptUtils.SetValue(cloneCFG, "Sight", Math.min(14, cloneCFG.Sight + 4));
                     if (cloneCFG.MainArmament.Range > 1) {
-                        ScriptUtils.SetValue(cloneCFG, "ReloadTime", 3*cloneCFG.ReloadTime);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ReloadTime", 3*cloneCFG.MainArmament.ReloadTime);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "Range", 3*cloneCFG.MainArmament.Range);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ForestRange", 3*cloneCFG.MainArmament.ForestRange);
-                        ScriptUtils.SetValue(cloneCFG, "OrderDistance", 3*cloneCFG.OrderDistance);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "OrderDistance", 3*cloneCFG.MainArmament.OrderDistance);
+                        ScriptUtils.SetValue(cloneCFG, "ReloadTime", 2*cloneCFG.ReloadTime);
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ReloadTime", 2*cloneCFG.MainArmament.ReloadTime);
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "Range", 2*cloneCFG.MainArmament.Range);
+                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ForestRange", 2*cloneCFG.MainArmament.ForestRange);
+                        ScriptUtils.SetValue(cloneCFG, "OrderDistance", 2*cloneCFG.OrderDistance);
                         ScriptUtils.SetValue(cloneCFG.MainArmament, "DisableDispersion", true);
+                        ScriptUtils.SetValue(cloneCFG.MainArmament.BulletCombatParams, "AdditiveBulletSpeed", createPF(30, 0));
                     }
                     break;
                 case BUFF_TYPE.HEALTH:
                     ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {здоровье}");
                     ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 0, 150, 0));
-                    ScriptUtils.SetValue(cloneCFG, "MaxHealth", Math.max(200000, 10*cloneCFG.MaxHealth));
+                    ScriptUtils.SetValue(cloneCFG, "MaxHealth", Math.min(200000, 10*cloneCFG.MaxHealth));
                     break;
                 case BUFF_TYPE.DEFFENSE:
                     ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {защита}");
@@ -1059,7 +693,7 @@ export function BuffSystem(world: World, gameTickNum: number) {
                 replaceParams.NewUnitConfig = cloneCFG;
                 replaceParams.Cell = null;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
                 replaceParams.PreserveHealthLevel = false;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
-                replaceParams.PreserveOrders = true;        // Нужно ли передать приказы?
+                replaceParams.PreserveOrders = false;        // Нужно ли передать приказы?
                 replaceParams.Silent = true;                 // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
                 target_unitComponent.unit = target_unitComponent.unit.Owner.Units.ReplaceUnit(replaceParams);
                 // записываем инфу о баффе (конфиг записывает только для 1-ого, чтобы корректно удалился он)

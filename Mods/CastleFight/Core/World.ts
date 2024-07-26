@@ -5,10 +5,12 @@ import { UnitCommand, TileType, UnitFlags, UnitSpecification, UnitDeathType, Uni
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { world } from "./CastleFightPlugin";
-import { Entity, COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent, SpawnBuildingComponent, UpgradableBuildingComponent, BuffComponent, BUFF_TYPE, ReviveComponent, HeroAltarComponent, IncomeEvent, IncomeIncreaseEvent, SettlementComponent, IncomeLimitedPeriodicalComponent, UnitProducedEvent } from "./ESC_components";
-import { Polygon, Cell as Cell, CfgAddUnitProducer, getCurrentTime, MetricType, distance_L1, distance_L2 } from "./Utils";
+import { Entity, COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent, SpawnBuildingComponent, UpgradableBuildingComponent, BuffComponent, BUFF_TYPE, ReviveComponent, HeroAltarComponent, IncomeEvent, IncomeIncreaseEvent, SettlementComponent, IncomeLimitedPeriodicalComponent, UnitProducedEvent } from "./Components/ESC_components";
+import { Cell as Cell, CfgAddUnitProducer, getCurrentTime, MetricType, distance_Chebyshev, distance_Euclid, CfgSetSpeed, distance_Minkovsky } from "./Utils";
+import { mergeFlags } from "library/dotnet/dotnet-utils";
 
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
+const DeleteUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
 
 export enum GameState {
     INIT = 0,
@@ -28,7 +30,7 @@ export class AttackPathChoiser_NearDistance extends IAttackPathChoiser {
     public constructor (metricType?: MetricType) {
         super();
 
-        this._metricType = metricType ?? MetricType.L1;
+        this._metricType = metricType ?? MetricType.Minkovsky;
     };
 
     public choiseAttackPath(unit: any, world: World) : number {
@@ -37,11 +39,14 @@ export class AttackPathChoiser_NearDistance extends IAttackPathChoiser {
         for (var attackPathNum = 0; attackPathNum < world.settlements_attack_paths[unit.Owner.Uid].length; attackPathNum++) {
             var distance = 0.0;
             switch (this._metricType) {
-                case MetricType.L1:
-                    distance = distance_L1(unit.Cell.X, unit.Cell.Y, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].X, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].Y);
+                case MetricType.Chebyshev:
+                    distance = distance_Chebyshev(unit.Cell.X, unit.Cell.Y, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].X, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].Y);
                     break;
-                case MetricType.L2:
-                    distance = distance_L2(unit.Cell.X, unit.Cell.Y, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].X, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].Y);
+                case MetricType.Minkovsky:
+                    distance = distance_Minkovsky(unit.Cell.X, unit.Cell.Y, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].X, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].Y);
+                    break;
+                case MetricType.Euclid:
+                    distance = distance_Euclid(unit.Cell.X, unit.Cell.Y, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].X, world.settlements_attack_paths[unit.Owner.Uid][attackPathNum][0].Y);
                     break;
             }
             if (distance < nearAttackPathDistance) {
@@ -107,9 +112,6 @@ export class AttackPathChoiser_Periodically_WithCondCell extends IAttackPathChoi
                             this.settlements_attackPaths_condCell[settlementId][attackPathNum][condUnitNum].X,
                             this.settlements_attackPaths_condCell[settlementId][attackPathNum][condUnitNum].Y
                         );
-                        if (!condUnit) {
-                            throw "Can't find condUnit";
-                        }
                         this.settlements_attackPaths_condUnit[settlementId][attackPathNum][condUnitNum] = condUnit;
                     }
                 }
@@ -136,7 +138,7 @@ export class AttackPathChoiser_Periodically_WithCondCell extends IAttackPathChoi
             // проверяем, что путь доступен
             var pathEmpty = true;
             for (var condUnitNum = 0; condUnitNum < this.settlements_attackPaths_condUnit[unitSettlementId][attackPathNum].length; condUnitNum++) {
-                if (this.settlements_attackPaths_condUnit[unitSettlementId][this.settlements_nextAttackPathNum[unitSettlementId]][condUnitNum]) {
+                if (this.settlements_attackPaths_condUnit[unitSettlementId][this.settlements_nextAttackPathNum[unitSettlementId]][condUnitNum] != null) {
                     pathEmpty = false;
                     break;
                 }
@@ -159,8 +161,6 @@ export class World {
     settlements_entities: Array<Array<Entity>>;
     /** для каждого поселения хранится ссылка на главного замка */
     settlements_castleUnit: Array<any>;
-    /** для каждого поселения хранится область вокруг главного замка, которую нужно охранять */
-    settlements_field: Array<Polygon>;
     /** для каждого поселения хранится точка спавна рабочих */
     settlements_workers_reviveCells: Array<Array<Cell>>;
     /** для каждого поселения хранится точка замка */
@@ -195,6 +195,7 @@ export class World {
 
     /** параметры */
     castle_health_coeff: number;
+    spawn_count_coeff: number;
     
     public constructor ( )
     {
@@ -208,6 +209,7 @@ export class World {
         this.systems_executionTime = new Array<number>();
 
         this.castle_health_coeff = 1;
+        this.spawn_count_coeff = 1;
     }
 
     public Init() {
@@ -248,6 +250,8 @@ export class World {
         ScriptUtils.SetValue(this.configs["castle"], "MaxHealth", Math.round(300000*this.castle_health_coeff));
         // броня
         ScriptUtils.SetValue(this.configs["castle"], "Shield", 200);
+        // увеличиваем видимость
+        ScriptUtils.SetValue(this.configs["castle"], "Sight", 12);
 
         ////////////////////
         // Стрельбище (лучник)
@@ -405,6 +409,10 @@ export class World {
         ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].CostResources, "Metal",  0);
         ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].CostResources, "Lumber", 100);
         ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].CostResources, "People", 0);
+        // параметры атаки
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_1"], "Sight", 3);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_1"], "OrderDistance", 10);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_1"].MainArmament, "Range", 10);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_1_1_1_1"));
@@ -444,9 +452,13 @@ export class World {
         // здоровье
         ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "MaxHealth", 2000);
         // броня
-        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "Shield", 0);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "Shield", 200);
         // урон
         ScriptUtils.SetValue(this.configs["unit_1_1_1_2"].MainArmament.BulletCombatParams, "Damage", 1000);
+        // параметры атаки
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "Sight", 3);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"], "OrderDistance", 6);
+        ScriptUtils.SetValue(this.configs["unit_1_1_1_2"].MainArmament, "Range", 6);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_1_1_1_2"));
@@ -486,9 +498,14 @@ export class World {
         // здоровье
         ScriptUtils.SetValue(this.configs["unit_1_1_2"], "MaxHealth", 2000);
         // броня
-        ScriptUtils.SetValue(this.configs["unit_1_1_2"], "Shield", 300);
+        ScriptUtils.SetValue(this.configs["unit_1_1_2"], "Shield", 200);
         // урон
         ScriptUtils.SetValue(this.configs["unit_1_1_2"].MainArmament.BulletCombatParams, "Damage", 1000);
+        // параметры атаки
+        ScriptUtils.SetValue(this.configs["unit_1_1_2"], "Sight", 3);
+        ScriptUtils.SetValue(this.configs["unit_1_1_2"], "OrderDistance", 9);
+        ScriptUtils.SetValue(this.configs["unit_1_1_2"].MainArmament, "Range", 9);
+        ScriptUtils.SetValue(this.configs["unit_1_1_2"].MainArmament, "BaseAccuracy", 1);
         {
             var entity : Entity = new Entity();
             entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, "unit_1_1_2"));
@@ -574,13 +591,13 @@ export class World {
         // здоровье
         ScriptUtils.SetValue(this.configs["unit_1_2_1"], "MaxHealth", 2000);
         // броня
-        ScriptUtils.SetValue(this.configs["unit_1_2_1"], "Shield", 300);
+        ScriptUtils.SetValue(this.configs["unit_1_2_1"], "Shield", 200);
         // урон
         ScriptUtils.SetValue(this.configs["unit_1_2_1"].MainArmament.BulletCombatParams, "Damage", 500);
         // параметры атаки
-        ScriptUtils.SetValue(this.configs["unit_1_2_1"], "Sight", 11);
-        ScriptUtils.SetValue(this.configs["unit_1_2_1"], "OrderDistance", 11);
-        ScriptUtils.SetValue(this.configs["unit_1_2_1"].MainArmament, "Range", 11);
+        ScriptUtils.SetValue(this.configs["unit_1_2_1"], "Sight", 3);
+        ScriptUtils.SetValue(this.configs["unit_1_2_1"], "OrderDistance", 10);
+        ScriptUtils.SetValue(this.configs["unit_1_2_1"].MainArmament, "Range", 10);
         ScriptUtils.SetValue(this.configs["unit_1_2_1"].MainArmament, "BaseAccuracy", 1);
         {
             var entity : Entity = new Entity();
@@ -1046,10 +1063,11 @@ export class World {
         ScriptUtils.SetValue(this.configs["holy_spirit_accuracy"], "Name", "Святой дух меткости");
         // описание
         ScriptUtils.SetValue(this.configs["holy_spirit_accuracy"], "Description", "Тот кого ударит данный дух, получит его силу\n" +
-            "Увеличение дальности видимости в 3 раза\n" +
+            "Увеличение дальности видимости на 4 (макс 14)\n" +
             "Для дальнего боя:\n" +
-            "Увеличение перезарядки в 3 раза\n" +
-            "Увеличение дальности атаки в 3 раза\n"
+            "Увеличение перезарядки в 2 раза\n" +
+            "Увеличение дальности атаки в 2 раза\n" +
+            "Увеличение скорости снаряда примерно в 3 раза\n"
         );
         // здоровье
         ScriptUtils.SetValue(this.configs["holy_spirit_accuracy"], "MaxHealth", 1);
@@ -1098,6 +1116,7 @@ export class World {
         // описание
         ScriptUtils.SetValue(this.configs["holy_spirit_defense"], "Description", "Тот кого ударит данный дух, получит его силу.\n" +
             "Увеличение защиты до max(390, текущая защита)\n" +
+            "Увеличение здоровья в 2 раза\n" +
             "Имунн к огню, магии"
         );
         // здоровье
@@ -1230,12 +1249,18 @@ export class World {
         ScriptUtils.SetValue(this.configs["worker"], "Name", "Работяга");
         // удаляем команду атаки
         this.configs["worker"].AllowedCommands.Remove(UnitCommand.Attack);
+        // здоровье
+        ScriptUtils.SetValue(this.configs["worker"], "MaxHealth", 2000);
         // число людей
         ScriptUtils.SetValue(this.configs["worker"].CostResources, "People", 0);
+        // добавляем иммун к огню
+        ScriptUtils.SetValue(this.configs["worker"], "Flags", mergeFlags(UnitFlags, this.configs["worker"].Flags, UnitFlags.FireResistant));
         // убираем профессию добычу
         if (this.configs["worker"].ProfessionParams.ContainsKey(UnitProfession.Harvester)) {
             this.configs["worker"].ProfessionParams.Remove(UnitProfession.Harvester);
         }
+        // делаем его не даващимся
+        ScriptUtils.SetValue(this.configs["worker"], "Weight", 13);
         
         // добавляем постройки
         {
@@ -1247,8 +1272,7 @@ export class World {
 
             produceList.Add(this.configs["church"]);
 
-            produceList.Add(this.configs["tower_1"]);
-
+            //produceList.Add(this.configs["tower_1"]);
             //produceList.Add(this.configs["hero_altar"]);
         }
         {
@@ -1264,7 +1288,6 @@ export class World {
 
         for (var cfgId in this.configs) {
             if (this.configs[cfgId].MainArmament) {
-                //log.info(this.configs[cfgId].Name, " friend fire off, bullet = ", this.configs[cfgId].MainArmament.BulletConfig.Uid);
                 var bulletCfg = HordeContentApi.GetBulletConfig(this.configs[cfgId].MainArmament.BulletConfig.Uid);
                 ScriptUtils.SetValue(bulletCfg, "CanDamageAllied", false);
             }
@@ -1293,25 +1316,19 @@ export class World {
         machineSpeed.set(TileType.Mounts, 0);
         machineSpeed.set(TileType.Road, 13);
         machineSpeed.set(TileType.Ice, 10);
-        const setSpeedForCfg = (cfg: any, speeds: Map<TileType, number>) => {
-            var tileTypes = speeds.keys();
-            for (var tileType = tileTypes.next(); !tileType.done; tileType = tileTypes.next()) {
-                cfg.Speeds.Item.set(tileType.value, speeds.get(tileType.value));
-            }
-        };
         for (var cfgId in this.configs) {
             if (!this.configs[cfgId].Flags.HasFlag(UnitFlags.Building) &&
                 !this.configs[cfgId].Specification.HasFlag(UnitSpecification.Rider)) {
                 if (this.configs[cfgId].Specification.HasFlag(UnitSpecification.Machine)) {
-                    setSpeedForCfg(this.configs[cfgId], machineSpeed);
+                    CfgSetSpeed(this.configs[cfgId], machineSpeed);
                 } else {
-                    setSpeedForCfg(this.configs[cfgId], infantrySpeed);
+                    CfgSetSpeed(this.configs[cfgId], infantrySpeed);
                 }
             }
         }
 
         ////////////////////
-        // общие параметры для всех зданий
+        // общие параметры для конфигов
         ////////////////////
         
         for (var cfgId in this.configs) {
@@ -1336,11 +1353,11 @@ export class World {
                 }
                 // настраиваем починку
                 if (this.configs[cfgId].ProfessionParams.ContainsKey(UnitProfession.Reparable)) {
-                    //ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Reparable.RecoverCost, "Gold",   0);
-                    //ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Reparable.RecoverCost, "Metal",  0);
-                    //ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Reparable.RecoverCost, "Lumber", 0);
-                    //ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Reparable.RecoverCost, "People", 0);
-                    ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Reparable, "RecoverTime", 4000);
+                    ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Item.get(UnitProfession.Reparable).RecoverCost, "Gold",   0);
+                    ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Item.get(UnitProfession.Reparable).RecoverCost, "Metal",  0);
+                    ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Item.get(UnitProfession.Reparable).RecoverCost, "Lumber", 0);
+                    ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Item.get(UnitProfession.Reparable).RecoverCost, "People", 0);
+                    ScriptUtils.SetValue(this.configs[cfgId].ProfessionParams.Item.get(UnitProfession.Reparable), "RecoverTime", 4000);
                 }
             }
             // юниты
@@ -1350,6 +1367,25 @@ export class World {
                 ScriptUtils.SetValue(this.configs[cfgId].CostResources, "Metal",  0);
                 ScriptUtils.SetValue(this.configs[cfgId].CostResources, "Lumber", 0);
                 ScriptUtils.SetValue(this.configs[cfgId].CostResources, "People", 0);
+
+                // юниты, которые спавняться
+                if (this.cfgUid_entity.has(this.configs[cfgId].Uid)) {
+                    var entity = this.cfgUid_entity.get(this.configs[cfgId].Uid) as Entity;
+                    if (entity.components.has(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT)) {
+                        // Ближники
+                            // увеличиваем хп в 1.5 раза
+                            // обзор ставим 8
+                        if (this.configs[cfgId].MainArmament.Range == 1) {
+                            ScriptUtils.SetValue(this.configs[cfgId], "MaxHealth", Math.floor(1.5 * this.configs[cfgId].MaxHealth));
+                            ScriptUtils.SetValue(this.configs[cfgId], "Sight", 6);
+                        }
+                        // Дальники
+                            // обзор делаем 4
+                        else {
+                            ScriptUtils.SetValue(this.configs[cfgId], "Sight", 4);
+                        }
+                    }
+                }
             }
 
             // проверяем наличие ECS сущности для конфига
@@ -1525,7 +1561,7 @@ export class World {
 
                     var entity = new Entity();
                     entity.components.set(COMPONENT_TYPE.SETTLEMENT_COMPONENT, new SettlementComponent(0, 100, 0, goldTime / goldPerPlayer * 100, 0));
-                    entity.components.set(COMPONENT_TYPE.INCOME_EVENT, new IncomeEvent(0, 0, 200, 1));
+                    entity.components.set(COMPONENT_TYPE.INCOME_EVENT, new IncomeEvent(0, 0, 5000 - totalLumberPerPlayer, 1));
                     entity.components.set(COMPONENT_TYPE.INCOME_LIMITED_PERIODICAL_COMPONENT,
                         new IncomeLimitedPeriodicalComponent(0, 0, totalLumberPerPlayer, 0, 0, 100, totalLumberTime / totalLumberPerPlayer * 100, 0))
                     this.settlements_entities[settlementId].push(entity);
@@ -1575,9 +1611,17 @@ export class World {
             while(enumerator.MoveNext()) {
                 var battleMind = enumerator.Current.BattleMind;
                 battleMind.InstantDeath(null, UnitDeathType.Mele);
-                break;
             }
             enumerator.Dispose();
+
+            // var units = this.settlements[settlementId].Units;
+            // var enumerator   = units.GetEnumerator();
+            // var deleteParams = new DeleteUnitParameters();
+            // while(enumerator.MoveNext()) {
+            //     deleteParams.UnitToDelete = enumerator.Current;
+            //     units.DeleteUnit(deleteParams)
+            // }
+            // enumerator.Dispose();
 
             // заполняем таблицу альянсов
             for (var other_settlementId = 0; other_settlementId < this.settlementsCount; other_settlementId++) {

@@ -14,7 +14,7 @@ export enum LogLevel {
  */
 export class Logger {
     public logLevel: LogLevel = LogLevel.Info;
-    public msgPrefix: String = "";
+    public msgPrefix: string = "";
 
     /**
      * Конструктор.
