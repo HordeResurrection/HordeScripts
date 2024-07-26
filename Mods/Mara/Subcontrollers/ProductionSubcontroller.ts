@@ -130,7 +130,29 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     ForceRequestSingleCfgIdProduction(configId: string): void {
-        if (this.ProductionList.indexOf(configId) >= 0) {
+        if (!this.productionIndex) {
+            this.updateProductionIndex();
+        }
+        
+        let producers = this.productionIndex!.get(configId);
+        
+        let producersCount = 0;
+        let orderedCfgIdsCount = 0;
+
+        if (producers) {
+            producersCount = producers.length;
+            
+            for (let orderedCfgId of this.ProductionList) {
+                if (orderedCfgId == configId) {
+                    orderedCfgIdsCount ++;
+                }
+            }
+        }
+        else {
+            producersCount = 1;
+        }
+        
+        if (orderedCfgIdsCount >= producersCount) {
             return;
         }
         
