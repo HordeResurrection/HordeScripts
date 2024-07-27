@@ -63,7 +63,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                 request.Executor = freeProducer;
                 
                 if (MaraUtils.RequestMasterMindProduction(request, this.settlementController.MasterMind)) {
-                    this.settlementController.Debug(`Added ${request.ConfigId} to the production list`);
+                    this.settlementController.Debug(`Added ${request.ConfigId} to MM queue, producer: ${request.Executor.ToString()}`);
                     addedRequests.push(request);
                     this.settlementController.ReservedUnitsData.ReserveUnit(freeProducer);
                 }
@@ -71,7 +71,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             else if (request.IsForce) {
                 if (!this.productionIndex!.has(request.ConfigId)) {
                     if (MaraUtils.RequestMasterMindProduction(request, this.settlementController.MasterMind)) {
-                        this.settlementController.Debug(`(forcibly) Added ${request.ConfigId} to the production list`);
+                        this.settlementController.Debug(`(forcibly) Added ${request.ConfigId} to MM queue, producer: ${request.Executor.ToString()}`);
                         addedRequests.push(request);
                     }
                 }
