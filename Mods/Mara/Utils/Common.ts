@@ -101,6 +101,9 @@ export class MaraProductionRequest {
         if (isForce != null) {
             this.IsForce = isForce;
         }
+        else {
+            this.IsForce = false;
+        }
     }
 
     public get IsCompleted(): boolean {
