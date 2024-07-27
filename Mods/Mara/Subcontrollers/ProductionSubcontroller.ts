@@ -71,7 +71,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             else if (request.IsForce) {
                 if (!this.productionIndex!.has(request.ConfigId)) {
                     if (MaraUtils.RequestMasterMindProduction(request, this.settlementController.MasterMind)) {
-                        this.settlementController.Debug(`(forcibly) Added ${request.ConfigId} to MM queue, producer: ${request.Executor.ToString()}`);
+                        this.settlementController.Debug(`(forcibly) Added ${request.ConfigId} to MM queue, producer: ${request.Executor?.ToString()}`);
                         addedRequests.push(request);
                     }
                 }
