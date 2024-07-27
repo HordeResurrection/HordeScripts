@@ -63,6 +63,8 @@ export class Example_MasterMindRequest extends HordeExampleBase {
         produceRequestParameters.TargetCell = createPoint(95, 3);       // Местоположение строительства (верхний левый угол)
         produceRequestParameters.MaxRetargetAttempts = 0;               // Количество попыток (за такт) для выбора другого места строительства поблизости
         produceRequestParameters.DisableBuildPlaceChecking = true;      // Принудительное строительство в этой клетке без проверки места
+        produceRequestParameters.ProductEntranceCheckRadius = 2;        // Радиус проверяемого региона вокруг клетки входа (для зданий-казарм и складов)
+
         let producer = workPlayer.GetRealSettlement().Units.GetById(205);
         produceRequestParameters.Producer = producer;                   // Так можно задать юнита-исполнителя (если null, то будет выбран свободный подходящий производитель)
 
