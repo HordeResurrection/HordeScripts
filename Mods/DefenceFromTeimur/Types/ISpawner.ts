@@ -38,7 +38,7 @@ export abstract class ISpawner {
                 continue;
             }
 
-            this.queue.push(new WaveUnit(wave.waveUnits[i].unitClass, wave.waveUnits[i].count));
+            this.queue.push(new WaveUnit(wave.waveUnits[i].unitClass, wave.waveUnits[i].unitClass.GetSpawnCount(wave.waveUnits[i].count)));
         }
     }
 

@@ -8,6 +8,7 @@ import { TeimurLegendaryUnitsClass, Teimur_Legendary_GREED_HORSE } from "./Teimu
 import { log } from "library/common/logging";
 import { WaveUnit } from "../Types/IAttackPlan";
 import { IncomePlanClass, IncomePlansClass } from "./IncomePlans";
+import { eNext, enumerate } from "library/dotnet/dotnet-utils";
 
 export class Player_GOALCASTLE extends IUnit {
     static CfgUid      : string = "#DefenceTeimur_GoalCastle";
@@ -248,6 +249,7 @@ class Player_worker extends IUnit {
         IUnit.InitConfig.call(this);
 
         // добавляем постройку голубятни Теймура если на карте более 1-ой команды
+        
         var producerParams = GlobalVars.configs[this.CfgUid].GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
         var produceList    = producerParams.CanProduceList;
         if (GlobalVars.teams.length == 1 && produceList.Contains(GlobalVars.configs[Player_Teimur_Dovehouse.CfgUid])) {
@@ -255,6 +257,34 @@ class Player_worker extends IUnit {
         } else if (GlobalVars.teams.length > 1 && !produceList.Contains(GlobalVars.configs[Player_Teimur_Dovehouse.CfgUid])) {
             produceList.Add(GlobalVars.configs[Player_Teimur_Dovehouse.CfgUid]);
         }
+
+        // убираем требования у всего, что можно построить
+
+        let cfgCache = new Map<string, boolean>();
+
+        const RemoveTechRequirements = (cfgUid: string) => {
+            // делаем так, чтобы учитывался 1 раз
+            if (cfgCache.has(cfgUid)) {
+                return;
+            } else {
+                cfgCache.set(cfgUid, true);
+            }
+
+            var cfg : any = GlobalVars.HordeContentApi.GetUnitConfig(cfgUid);
+            // удаляем требования
+            cfg.TechConfig.Requirements.Clear();
+            // переходим к следующему ид
+            let producerParams = cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer, true);
+            if (producerParams) {
+                let produceList = enumerate(producerParams.CanProduceList);
+                let produceListItem;
+
+                while ((produceListItem = eNext(produceList)) !== undefined) {
+                    RemoveTechRequirements(produceListItem.Uid);
+                }
+            }
+        }
+        RemoveTechRequirements(Player_worker.CfgUid);
     }
 }
 

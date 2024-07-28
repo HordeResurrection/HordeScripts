@@ -1,5 +1,5 @@
 import { GlobalVars } from "../GlobalData";
-import { TeimurLegendaryUnitsClass, Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER, Teimur_Legendary_HORSE, Teimur_Legendary_DARK_DRAIDER, Teimur_Legendary_FIRE_MAGE, Teimur_Legendary_GREED_HORSE } from "./Teimur_units";
+import { TeimurLegendaryUnitsClass, Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER, Teimur_Legendary_HORSE, Teimur_Legendary_DARK_DRAIDER, Teimur_Legendary_FIRE_MAGE, Teimur_Legendary_GREED_HORSE, Teimur_Scorpion } from "./Teimur_units";
 import { IAttackPlan, WaveUnit, Wave } from "../Types/IAttackPlan";
 import { IUnit, RandomUnit } from "../Types/IUnit";
 import { IIncomePlan } from "../Types/IIncomePlan";
@@ -9,7 +9,7 @@ import { log } from "library/common/logging";
 import { TileType } from "library/game-logic/horde-types";
 
 export class AttackPlan_1 extends IAttackPlan {
-    static Description: string = "Битва малых масштабов. Первая волна на 2-ой минуте.";
+    static Description: string = "Малые волны";
     static IncomePlanClass : typeof IIncomePlan = IncomePlan_1;
     
     constructor () {
@@ -166,7 +166,7 @@ export class AttackPlan_1 extends IAttackPlan {
 }
 
 export class AttackPlan_2 extends IAttackPlan {
-    static Description: string = "Битва малых масштабов. Кармически-рандомно выбираются волны. Первая волна на 2-ой минуте.";
+    static Description: string = "Кармические волны";
     static IncomePlanClass : typeof IIncomePlan = IncomePlan_1;
 
     constructor () {
@@ -180,7 +180,7 @@ export class AttackPlan_2 extends IAttackPlan {
             [
                 new WaveUnit(Teimur_Swordmen, 10),
                 new WaveUnit(Teimur_Archer,   10),
-                new WaveUnit(Teimur_Raider,   4),
+                new WaveUnit(Teimur_Raider,   4)
             ],
             // normal
             [
@@ -188,13 +188,15 @@ export class AttackPlan_2 extends IAttackPlan {
                 new WaveUnit(Teimur_Catapult, 4),
                 new WaveUnit(Teimur_Mag_2,    3.5),
                 new WaveUnit(Teimur_Archer_2, 7),
+                new WaveUnit(Teimur_Scorpion, 2)
             ],
             // hard
             [
                 new WaveUnit(Teimur_Raider,   12),
                 new WaveUnit(Teimur_Balista,  4),
                 new WaveUnit(Teimur_Villur,   2),
-                new WaveUnit(Teimur_Olga,     2)
+                new WaveUnit(Teimur_Olga,     2),
+                new WaveUnit(Teimur_Scorpion, 5)
             ]  
         ];
 
@@ -386,7 +388,7 @@ export class AttackPlan_2 extends IAttackPlan {
 }
 
 export class AttackPlan_3 extends IAttackPlan {
-    static Description : string = "15 волн, 1-ая на 1-ой минуте, сбалансированная армия врага.";
+    static Description : string = "Большие волны";
 
     constructor () {
         super();
@@ -521,8 +523,9 @@ export class AttackPlan_3 extends IAttackPlan {
         );
     }
 }
+
 export class AttackPlan_4 extends IAttackPlan {
-    static Description : string = "Враги идут непрерывно начиная с 3-ой минуты, сбалансированная армия врага.";
+    static Description : string = "Непрерывные волны";
 
     constructor () {
         super();
@@ -615,8 +618,9 @@ export class AttackPlan_4 extends IAttackPlan {
         this.waves.sort((a, b) => a.gameTickNum > b.gameTickNum ? 1 : -1);
     }
 }
+
 export class AttackPlan_5 extends IAttackPlan {
-    static Description : string = "Враги идут непрерывно начиная с 1-ой минуты, в составе армии только рыцари.";
+    static Description : string = "Непрерывные волны рыцарей";
 
     constructor () {
         super();
@@ -643,11 +647,11 @@ export class AttackPlan_test extends IAttackPlan {
         super();
 
         var waveUnits = new Array<WaveUnit>();
-        waveUnits.push(new WaveUnit(Teimur_Legendary_HEAVYMAN, 2));
+        waveUnits.push(new WaveUnit(Teimur_Olga, 4));
 
         this.waves = [];
         this.waves.push(
-            new Wave("ТЕСТ", 0, waveUnits),
+            new Wave("ТЕСТ", 0, [new WaveUnit(Teimur_Scorpion, 1)]),
             new Wave("END", 20*60*50, [])
         );
     }

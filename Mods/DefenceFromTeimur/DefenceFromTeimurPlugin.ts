@@ -4,36 +4,22 @@ import { AttackPlansClass } from "./Realizations/AttackPlans";
 import { Cell, Rectangle } from "./Types/Geometry";
 import { Team } from "./Types/Team";
 import { createHordeColor, createPoint } from "library/common/primitives";
-import { UnitDirection } from "library/game-logic/horde-types";
+import { UnitDeathType, UnitDirection } from "library/game-logic/horde-types";
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_GOALCASTLE } from "./Realizations/Player_units";
-import { TeimurUnitsClass, TeimurLegendaryUnitsClass, TeimurUnitsAllClass } from "./Realizations/Teimur_units";
-import { broadcastMessage, createGameMessageWithNoSound, createGameMessageWithSound } from "library/common/messages";
+import { TeimurUnitsClass, TeimurLegendaryUnitsClass } from "./Realizations/Teimur_units";
+import { broadcastMessage, createGameMessageWithNoSound } from "library/common/messages";
 import { GameState, GlobalVars } from "./GlobalData";
 import { IUnit } from "./Types/IUnit";
-import { IncomePlansClass } from "./Realizations/IncomePlans";
 import { RandomSpawner, RectangleSpawner, RingSpawner } from "./Realizations/Spawners";
-import { printObjectItems } from "library/common/introspection";
-import { log } from "library/common/logging";
 import { ITeimurUnit } from "./Types/ITeimurUnit";
 
-const DeleteUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
+const DeleteUnitParameters  = HCL.HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
 const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
-const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
+const PeopleIncomeLevelT    = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 
 // \TODO
 // DefenceFromTeimurPlugin.GlobalStorage - сохранение
-// удалять всех юнитов, если команда проиграла
-// названия планы атаки сократь, битва малых масштабов, кармические волны
-// у конюшни убрать из требования замок и казарму
-// лесопилку убрать из требований?) а у забора оставить
-// замок убрать из требований
-// ОЛЬГ слишком много.. возможно кто-то должен их контрить
-// можно лукарей сделать без металла, для золота больше инкома!? мол чтобы стратегия была лукари + еще что-то
-// Нужно придумать, почему нельзя идти чисто в лукарей
-// всадники алчности не должны скейлится по числу! нужно исключить их
-// всадник разума перестал захватывать
-// всадник смерти какой-то через чур сильный
 
 export class DefenceFromTeimurPlugin extends HordePluginBase {
     hostPlayerTeamNum : number;
@@ -359,6 +345,8 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
     }
 
     private ChoiseWave(gameTickNum: number) {
+        var FPS = GlobalVars.HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
+
         //////////////////////////////////////////
         // выбор волны
         //////////////////////////////////////////
@@ -398,6 +386,13 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         GlobalVars.attackPlan = new AttackPlansClass[choisedAttackPlanIdx]();
         broadcastMessage("Был выбран план атаки " + choisedAttackPlanIdx, createHordeColor(255, 100, 100, 100));
         broadcastMessage(AttackPlansClass[choisedAttackPlanIdx].Description, createHordeColor(255, 255, 50, 10));
+        {
+            var secondsLeft = Math.round(GlobalVars.attackPlan.waves[0].gameTickNum) / FPS;
+            var minutesLeft = Math.floor(secondsLeft / 60);
+            secondsLeft    -= minutesLeft * 60;
+            secondsLeft     = Math.round(secondsLeft);
+            broadcastMessage("До начала волны " + (minutesLeft > 0 ? minutesLeft + " минут " : "") + secondsLeft + " секунд", createHordeColor(255, 255, 50, 10));
+        }
 
         // инициализируем план инкома
 
@@ -514,6 +509,14 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
                     GlobalVars.teams[teamNum].castle.unit.ScriptData.DefenceFromTeimur_IsDefeat = true;
                     for (var settlement of GlobalVars.teams[teamNum].settlements) {
                         settlement.Existence.ForceTotalDefeat();
+                    }
+
+                    // убиваем юнитов, которые атаковали эту команду игроков
+
+                    for (var unitNum = 0; unitNum < GlobalVars.units.length; unitNum++) {
+                        if (GlobalVars.units[unitNum].teamNum == teamNum) {
+                            GlobalVars.units[unitNum].unit.BattleMind.InstantDeath(null, UnitDeathType.Mele);
+                        }
                     }
                 }
             }

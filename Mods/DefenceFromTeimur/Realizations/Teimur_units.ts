@@ -124,6 +124,37 @@ export class Teimur_Olga extends ITeimurUnit {
         // задаем количество брони
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
     }
+
+    static GetSpawnCount(spawnCount: number) {
+        // Ольгу спавним максимум 4, если больше то здоровье скайлируем
+
+        if (spawnCount <= 4) {
+            // задаем количество здоровья
+            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(40));
+        } else {
+            // задаем количество здоровья
+            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(40 * spawnCount * 0.25));
+        }
+
+        return Math.min(spawnCount, 4);
+    }
+}
+export class Teimur_Scorpion extends ITeimurUnit {
+    static CfgUid    : string = "#DefenceTeimur_Scorpion";
+    static BaseCfgUid: string = "#UnitConfig_Nature_ScorpionBig";
+
+    constructor (unit: any, teamNum: number) {
+        super(unit, teamNum);
+    }
+
+    static InitConfig(): void {
+        ITeimurUnit.InitConfig.call(this);
+
+        // задаем количество здоровья
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 15);
+        // задаем количество брони
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 4);
+    }
 }
 
 export class Teimur_Legendary_SWORDMEN extends ILegendaryUnit {
@@ -554,7 +585,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
         // каждые CapturePeriod/50 секунд захватываем юнитов в пределах захвата
         if (this.captureUnits.length < Teimur_Legendary_HORSE.CaptureUnitsLimit &&
             gameTickNum - this.capturePrevStart > Teimur_Legendary_HORSE.CapturePeriod &&
-            this.unit.EffectsMind.HasEffect(UnitEffectFlag.Burning)) {
+            !this.unit.EffectsMind.HasEffect(UnitEffectFlag.Burning)) {
             this.capturePrevStart = gameTickNum;
 
             // количество юнитов за раз
@@ -681,7 +712,7 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
         // меняем цвет
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 50, 50, 50));
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(300 * Math.sqrt(GlobalVars.difficult)));
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(250 * Math.sqrt(GlobalVars.difficult)));
         // задаем иконку
         //GlobalVars.configs[this.CfgUid].PortraitCatalog.RemoveItem(GlobalVars.configs[this.CfgUid].PortraitCatalog.GetFirst());
         //GlobalVars.configs[this.CfgUid].PortraitCatalog.AddItem(GlobalVars.HordeContentApi.GetUnitConfig("#UnitConfig_Nature_Draider").PortraitCatalog);
@@ -1056,6 +1087,15 @@ export class Teimur_Legendary_GREED_HORSE extends ILegendaryUnit {
             }
         }
     }
+    
+    static GetSpawnCount(spawnCount: number) {
+        // Коня спавним всегда 1, но его здоровье скайлируем
+
+        // задаем количество здоровья
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(130 * Math.sqrt(GlobalVars.difficult) * spawnCount));
+
+        return 1;
+    }
 }
 
 
@@ -1082,7 +1122,8 @@ export const TeimurUnitsClass : Array<typeof IUnit> = [
     Teimur_Balista,
     Teimur_Mag_2,
     Teimur_Villur,
-    Teimur_Olga
+    Teimur_Olga,
+    Teimur_Scorpion
 ];
 
 export const TeimurUnitsAllClass : Array<typeof IUnit> = TeimurLegendaryUnitsClass.concat(TeimurUnitsClass);

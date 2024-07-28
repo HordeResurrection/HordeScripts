@@ -123,4 +123,8 @@ export class ITeimurUnit extends IUnit {
             GlobalVars.configs[this.CfgUid].ProfessionParams.Remove(UnitProfession.Capturable);
         }
     }
+
+    public static GetSpawnCount(spawnCount: number) {
+        return spawnCount;
+    }
 }
