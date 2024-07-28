@@ -23,8 +23,17 @@ const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.
 
 // \TODO
 // DefenceFromTeimurPlugin.GlobalStorage - сохранение
-// забалансить голубятню, например добавить грабеж
-// инженера прокачать, чтобы он запоминал башню которую строит сейчас и достраивал её до конца, а после башни можно построить казарму и строить там рыцарей
+// удалять всех юнитов, если команда проиграла
+// названия планы атаки сократь, битва малых масштабов, кармические волны
+// у конюшни убрать из требования замок и казарму
+// лесопилку убрать из требований?) а у забора оставить
+// замок убрать из требований
+// ОЛЬГ слишком много.. возможно кто-то должен их контрить
+// можно лукарей сделать без металла, для золота больше инкома!? мол чтобы стратегия была лукари + еще что-то
+// Нужно придумать, почему нельзя идти чисто в лукарей
+// всадники алчности не должны скейлится по числу! нужно исключить их
+// всадник разума перестал захватывать
+// всадник смерти какой-то через чур сильный
 
 export class DefenceFromTeimurPlugin extends HordePluginBase {
     hostPlayerTeamNum : number;
@@ -32,18 +41,18 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
     public constructor() {
         super("Оборона от Теймура");
 
-        this.hostPlayerTeamNum = -1;
+        this.hostPlayerTeamNum     = -1;
 
-        GlobalVars.units = new Array<IUnit>();
+        GlobalVars.units           = new Array<IUnit>();
 
-        GlobalVars.ScriptUtils = ScriptUtils;
-        GlobalVars.ActiveScena = ActiveScena;
+        GlobalVars.ScriptUtils     = ScriptUtils;
+        GlobalVars.ActiveScena     = ActiveScena;
         GlobalVars.HordeContentApi = HordeContentApi;
-        GlobalVars.HordeEngine = HordeEngine;
-        GlobalVars.Players     = Players;
-        GlobalVars.scenaWidth  = GlobalVars.ActiveScena.GetRealScena().Size.Width;
-        GlobalVars.scenaHeight = GlobalVars.ActiveScena.GetRealScena().Size.Height;
-        GlobalVars.unitsMap    = GlobalVars.ActiveScena.GetRealScena().UnitsMap;
+        GlobalVars.HordeEngine     = HordeEngine;
+        GlobalVars.Players         = Players;
+        GlobalVars.scenaWidth      = GlobalVars.ActiveScena.GetRealScena().Size.Width;
+        GlobalVars.scenaHeight     = GlobalVars.ActiveScena.GetRealScena().Size.Height;
+        GlobalVars.unitsMap        = GlobalVars.ActiveScena.GetRealScena().UnitsMap;
     }
 
     public onFirstRun() {
@@ -100,6 +109,15 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             GlobalVars.teams[1].castleCell        = new Cell(155, 156);
             GlobalVars.teams[1].allSettlementsIdx = [3, 4, 5];
             GlobalVars.teams[1].spawner           = new RectangleSpawner(new Rectangle(0, 0, 32, 32), 1);
+        } else if (scenaName == "Оборона от Теймура - легион каждый за себя") {
+            GlobalVars.teams = new Array<Team>(6);
+            for (var teamNum = 0; teamNum < 6; teamNum++) {
+                GlobalVars.teams[teamNum]                      = new Team();
+                GlobalVars.teams[teamNum].teimurSettlementId   = 6;
+                GlobalVars.teams[teamNum].castleCell           = new Cell(14 + 40*teamNum, 144);
+                GlobalVars.teams[teamNum].allSettlementsIdx    = [teamNum];
+                GlobalVars.teams[teamNum].spawner              = new RectangleSpawner(new Rectangle(2 + 40*teamNum, 0, 28, 28), teamNum);
+            }
         } else {
             GlobalVars.gameState = GameState.End;
             return;
@@ -179,7 +197,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
                 continue;
             }
 
-            // запоминаем хоста
+            // запоминаем хоста (он самый первый игрок)
             if (this.hostPlayerTeamNum == -1) {
                 this.hostPlayerTeamNum = teamNum;
             }
@@ -273,7 +291,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
             for (var settlement of GlobalVars.teams[teamNum].settlements)
                 settlement.Resources.TakeResources(settlement.Resources.GetCopy());
-        } 
+        }
 
         GlobalVars.gameState = GameState.ChoiseDifficult;
     }

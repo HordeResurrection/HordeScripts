@@ -1,6 +1,6 @@
 import { createHordeColor, createPF, createPoint, createResourcesAmount } from "library/common/primitives";
 import { UnitFlags, UnitCommand, UnitDirection, ProduceAtCommandArgs, UnitDeathType, UnitSpecification, BattleController, BulletState, UnitMapLayer, UnitEffectFlag } from "library/game-logic/horde-types";
-import { UnitProfession, UnitProducerProfessionParams, getUnitProfessionParams } from "library/game-logic/unit-professions";
+import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 import { ChebyshevDistance, CreateBulletConfig, CreateUnitConfig, EuclidDistance, L1Distance, generateRandomCellInRect, spawnUnit, spawnUnits, unitCanBePlacedByRealMap } from "../Utils";
 import { ILegendaryUnit } from "../Types/ILegendaryUnit";
 import { ITeimurUnit } from "../Types/ITeimurUnit";
@@ -86,7 +86,7 @@ export class Teimur_Mag_2 extends ITeimurUnit {
         ITeimurUnit.InitConfig.call(this);
 
         // задаем количество здоровья
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 30);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 40);
         // задаем количество брони
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
     }
@@ -103,7 +103,7 @@ export class Teimur_Villur extends ITeimurUnit {
         ITeimurUnit.InitConfig.call(this);
 
         // задаем количество здоровья
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 30);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 40);
         // задаем количество брони
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
     }
@@ -120,7 +120,7 @@ export class Teimur_Olga extends ITeimurUnit {
         ITeimurUnit.InitConfig.call(this);
 
         // задаем количество здоровья
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 30);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 40);
         // задаем количество брони
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
     }
@@ -516,9 +516,9 @@ export class Teimur_CapturedUnit extends ITeimurUnit {
 export class Teimur_Legendary_HORSE extends ILegendaryUnit {
     static CfgUid      : string = "#DefenceTeimur_legendary_Horse";
     static BaseCfgUid  : string = "#DefenceTeimur_Raider";
-    static Description : string = "Слабости: окружение, огонь. Преимущества: скорость, захват юнитов если не горит.";
+    static Description : string = "Слабости: окружение, огонь. Преимущества: скорость, захват юнитов.";
 
-    static CapturePeriod     : number = 250;
+    static CapturePeriod     : number = 150;
     /** максимальное количество юнитов, которое может захватить */
     static CaptureUnitsLimit : number = 20;
 
@@ -529,7 +529,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
     constructor (unit: any, teamNum: number) {
         super(unit, teamNum);
 
-        this.capturePrevStart = 0;
+        this.capturePrevStart = BattleController.GameTimer.GameFramesCounter;
         this.captureUnits     = new Array<Teimur_CapturedUnit>();
     }
 
@@ -544,6 +544,8 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(120 * Math.sqrt(GlobalVars.difficult)));
         // делаем урон = 0
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.BulletCombatParams, "Damage", 0);
+        // делаем не давящимся
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Weight", 13);
 
         this.CaptureUnitsLimit = Math.floor(this.CaptureUnitsLimit * Math.sqrt(GlobalVars.difficult));
     }
@@ -552,8 +554,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
         // каждые CapturePeriod/50 секунд захватываем юнитов в пределах захвата
         if (this.captureUnits.length < Teimur_Legendary_HORSE.CaptureUnitsLimit &&
             gameTickNum - this.capturePrevStart > Teimur_Legendary_HORSE.CapturePeriod &&
-            this.unit.EffectsMind.HasEffect(UnitEffectFlag.Burning)
-        ) {
+            this.unit.EffectsMind.HasEffect(UnitEffectFlag.Burning)) {
             this.capturePrevStart = gameTickNum;
 
             // количество юнитов за раз
