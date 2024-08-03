@@ -11,8 +11,8 @@ export class MaraPoint {
     public readonly Y: number;
 
     constructor(x: number, y: number) {
-        this.X = x;
-        this.Y = y;
+        this.X = Math.round(x);
+        this.Y = Math.round(y);
     }
 
     public ToString(): string {

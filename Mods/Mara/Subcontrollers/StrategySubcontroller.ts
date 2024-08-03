@@ -269,11 +269,24 @@ export class StrategySubcontroller extends MaraSubcontroller {
             }
         }
 
-        let mostVulnerableUnit: any = null;
+        let clusters = MaraUtils.GetSettlementsSquadsFromUnits(
+            candidates, 
+            [enemySettlement], 
+            (unit) => true,
+            this.settlementController.Settings.UnitSearch.BuildingSearchRadius
+        );
+
+        let mostVulnerableCluster: MaraSquad | null = null;
         let minDefenceStrength = Infinity;
 
-        for (let unit of candidates) {
-            let enemies = this.GetEnemiesInArea(unit.Cell, this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius);
+        for (let cluster of clusters) {
+            let location = cluster.GetLocation();
+            
+            let enemies = this.GetEnemiesInArea(
+                location.SpreadCenter, 
+                location.Spread + this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
+            );
+
             let strength = 0;
 
             for (let enemy of enemies) {
@@ -282,11 +295,11 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
             if (strength < minDefenceStrength) {
                 minDefenceStrength = strength;
-                mostVulnerableUnit = unit;
+                mostVulnerableCluster = cluster;
             }
         }
 
-        return mostVulnerableUnit;
+        return mostVulnerableCluster?.Units[0];
     }
 
     GetExpandOffenseTarget(expandLocation: MaraPoint): any {
