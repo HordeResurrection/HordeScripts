@@ -289,8 +289,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
         if (!MaraUtils.IsPointsEqual(squad.CurrentTargetCell, closestLocation!.Center)) {
             if (
-                MaraUtils.ChebyshevDistance(squadLocation.Point, closestLocation!.Center) > closestLocation!.Radius || 
-                !squad.IsIdle()
+                MaraUtils.ChebyshevDistance(squadLocation.Point, closestLocation!.Center) > closestLocation!.Radius
             ) {
                 let spread = squad.MinSpread * 3;
                 let precision = Math.max(closestLocation!.Radius - spread, 0);
