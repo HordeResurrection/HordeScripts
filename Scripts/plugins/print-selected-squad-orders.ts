@@ -47,7 +47,7 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
         if (squad.Count == 1) {
             this.log.info(`[*] [${tickText}] Selected squad: 1 unit`);
         } else {
-            this.log.info(`[*] [${tickText}] Selected squad:", squad.Count, "units", "(print info for only first unit)`);
+            this.log.info(`[*] [${tickText}] Selected squad:`, squad.Count, "units", `(print info for only first unit)`);
         }
 
         let u = squad.GetFirstUnit();
