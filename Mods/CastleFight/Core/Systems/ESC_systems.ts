@@ -426,7 +426,7 @@ export function SpawnBuildingSystem(world: World, gameTickNum: number) {
                     // проверяем, если здание хочет сбросить таймер спавна
                     if (buildingCfg.Uid == world.configs["reset_spawn"].Uid) {
                         // отменяем постройку
-                        unitComponent.unit.OrdersMind.CancelOrders(true);
+                        unitComponent.unit.OrdersMind.CancelOrdersSafe();
                         // сбрасываем спавн
                         spawnBuildingComponent.spawnTact = gameTickNum + spawnBuildingComponent.spawnPeriodTact;
                     }
@@ -781,7 +781,7 @@ export function UnitProducedSystem(world: World, gameTickNum: number) {
 //                     }
                     
 //                     // отменяем постройку
-//                     unitComponent.unit.OrdersMind.CancelOrders(true);
+//                     unitComponent.unit.OrdersMind.CancelOrdersSafe();
 
 //                     // запрещаем постройку
 //                     var commandsMind       = unitComponent.unit.CommandsMind;

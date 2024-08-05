@@ -145,10 +145,10 @@ export class Example_UnitOrders extends HordeExampleBase {
         this.log.info('Текущий приказ юнита:', activeOrder);
 
         // Отменить приказы юнита кроме текущего
-        ordersMind.CancelOrders(false);
+        ordersMind.CancelOrdersSafe(false);
 
         // Отменить все приказы юнита
-        ordersMind.CancelOrders(true);
+        ordersMind.CancelOrdersSafe(true);
 
         // Устанавливаем smart-приказ юниту (как при клике правой кнопкой мыши)
         let deactivateNotificationsTime = 600;  // отмена инстинктов на столько тактов

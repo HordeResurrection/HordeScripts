@@ -412,7 +412,7 @@ export class Teimur_Legendary_WORKER extends ILegendaryUnit {
         }
 
         // Отменить все приказы юнита
-        this.unit_ordersMind.CancelOrders(true);
+        this.unit_ordersMind.CancelOrdersSafe();
 
         // ищем ближайшее место куда можно построить башню
         var generator = generateCellInSpiral(this.unit.Cell.X, this.unit.Cell.Y);
@@ -444,7 +444,7 @@ export class Teimur_CapturedUnit extends ITeimurUnit {
     }
 
     RegainControlOwner() {
-        this.unit_ordersMind.CancelOrders();
+        this.unit_ordersMind.CancelOrdersSafe();
         this.unit.ChangeOwner(GlobalVars.ActiveScena.GetRealScena().Settlements.GetByUid(this.ownerSettlementUid));
         this.needDeleted = true;
     }
@@ -517,7 +517,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
 
                 var prevOwnerUid = _unit.Owner.Uid;
 
-                _unit.OrdersMind.CancelOrders();
+                _unit.OrdersMind.CancelOrdersSafe();
                 _unit.ChangeOwner(GlobalVars.teams[this.teamNum].teimurSettlement);
 
                 var unitInfo = new Teimur_CapturedUnit(_unit, this.teamNum);
