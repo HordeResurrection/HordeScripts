@@ -493,7 +493,7 @@ export class Teimur_Legendary_WORKER extends ILegendaryUnit {
             }
             // лимит постройки исчерпан
             else {
-                this.unit.CommandsMind.AddAutomatedCommand(UnitCommand.Repair);
+                this.unit.CommandsMind.AddAutomatedCommand(UnitCommand.Repair, AssignOrderMode.Replace);
                 this.state = 3;
             }
         }
