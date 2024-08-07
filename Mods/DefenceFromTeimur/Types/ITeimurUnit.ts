@@ -83,9 +83,9 @@ export class ITeimurUnit extends IUnit {
         this._unitPrevCell = new Cell(this.unit.Cell.X, this.unit.Cell.Y);
         
         // атакуем замок
-        if (this._canAttackBuilding) {
-            this.GivePointCommand(GlobalVars.teams[this.teamNum].castleCell, UnitCommand.Attack, AssignOrderMode.Queue);
-        } else {
+        //if (this._canAttackBuilding) {
+        //    this.GivePointCommand(GlobalVars.teams[this.teamNum].castleCell, UnitCommand.Attack, AssignOrderMode.Queue);
+        //} else {
             // позиция для атаки цели
             var goalPosition;
             {
@@ -97,7 +97,7 @@ export class ITeimurUnit extends IUnit {
                 }
             }
             this.GivePointCommand(goalPosition.value, UnitCommand.Attack, AssignOrderMode.Queue);
-        }
+        //}
     }
 
     public static InitConfig() {
@@ -122,5 +122,9 @@ export class ITeimurUnit extends IUnit {
         if (GlobalVars.configs[this.CfgUid].ProfessionParams.ContainsKey(UnitProfession.Capturable)) {
             GlobalVars.configs[this.CfgUid].ProfessionParams.Remove(UnitProfession.Capturable);
         }
+    }
+
+    public static GetSpawnCount(spawnCount: number) {
+        return spawnCount;
     }
 }

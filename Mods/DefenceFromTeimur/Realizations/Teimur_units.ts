@@ -1,5 +1,5 @@
 import { createHordeColor, createPF, createPoint, createResourcesAmount } from "library/common/primitives";
-import { UnitFlags, UnitCommand, UnitDirection, ProduceAtCommandArgs, UnitHurtType, UnitSpecification, BattleController, BulletState, UnitMapLayer } from "library/game-logic/horde-types";
+import { UnitFlags, UnitCommand, UnitDirection, ProduceAtCommandArgs, UnitHurtType, UnitSpecification, BattleController, BulletState, UnitMapLayer, UnitEffectFlag } from "library/game-logic/horde-types";
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 import { ChebyshevDistance, CreateBulletConfig, CreateUnitConfig, EuclidDistance, L1Distance, generateRandomCellInRect, spawnUnit, spawnUnits, unitCanBePlacedByRealMap } from "../Utils";
 import { ILegendaryUnit } from "../Types/ILegendaryUnit";
@@ -86,7 +86,7 @@ export class Teimur_Mag_2 extends ITeimurUnit {
         ITeimurUnit.InitConfig.call(this);
 
         // задаем количество здоровья
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 30);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 40);
         // задаем количество брони
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
     }
@@ -103,7 +103,7 @@ export class Teimur_Villur extends ITeimurUnit {
         ITeimurUnit.InitConfig.call(this);
 
         // задаем количество здоровья
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 30);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 40);
         // задаем количество брони
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
     }
@@ -120,9 +120,40 @@ export class Teimur_Olga extends ITeimurUnit {
         ITeimurUnit.InitConfig.call(this);
 
         // задаем количество здоровья
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 30);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 40);
         // задаем количество брони
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
+    }
+
+    static GetSpawnCount(spawnCount: number) {
+        // Ольгу спавним максимум 4, если больше то здоровье скайлируем
+
+        if (spawnCount <= 4) {
+            // задаем количество здоровья
+            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(40));
+        } else {
+            // задаем количество здоровья
+            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(40 * spawnCount * 0.25));
+        }
+
+        return Math.min(spawnCount, 4);
+    }
+}
+export class Teimur_Scorpion extends ITeimurUnit {
+    static CfgUid    : string = "#DefenceTeimur_Scorpion";
+    static BaseCfgUid: string = "#UnitConfig_Nature_ScorpionBig";
+
+    constructor (unit: any, teamNum: number) {
+        super(unit, teamNum);
+    }
+
+    static InitConfig(): void {
+        ITeimurUnit.InitConfig.call(this);
+
+        // задаем количество здоровья
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 15);
+        // задаем количество брони
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 4);
     }
 }
 
@@ -341,14 +372,36 @@ export class Teimur_Legendary_RAIDER extends ILegendaryUnit {
 export class Teimur_Legendary_WORKER extends ILegendaryUnit {
     static CfgUid      : string = "#DefenceTeimur_legendary_worker";
     static BaseCfgUid  : string = "#UnitConfig_Barbarian_Worker1";
-    static Description : string = "Слабости: ближний бой, окружение, огонь, ранней атаки. Преимущества: строит башни.";
+    static Description : string = "Слабости: ближний бой, окружение, огонь, ранней атаки. Преимущества: строит башни при получении урона.";
 
+    state: number;
     towersBuild: number;
+    producingUnit: any;
+
+    onProducedHandler: any;
 
     constructor (unit: any, teamNum: number) {
         super(unit, teamNum);
 
+        this.state       = 0;
         this.towersBuild = 3;
+        this.producingUnit = null;
+
+        var that = this;
+
+        // подписываемся на событие о постройке юнитов
+        this.onProducedHandler = unit.Owner.Units.UnitProduced.connect(function (sender, UnitProducedEventArgs) {
+            try {
+                // проверяем, что построил нужный юнит
+                if (UnitProducedEventArgs.ProducerUnit.Id != that.unit.Id) {
+                    return;
+                }
+
+                that.producingUnit = UnitProducedEventArgs.Unit;
+            } catch (ex) {
+                log.exception(ex);
+            }
+        });
     }
 
     static InitConfig() {
@@ -369,6 +422,12 @@ export class Teimur_Legendary_WORKER extends ILegendaryUnit {
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid].CostResources, "Metal",  0);
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid].CostResources, "Lumber", 0);
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid].CostResources, "People", 0);
+        // делаем починку бесплатной
+        var towerRepableProf = GlobalVars.configs[towerUid].ProfessionParams.Item.get(UnitProfession.Reparable);
+        towerRepableProf.RecoverCost.Gold   = 0;
+        towerRepableProf.RecoverCost.Metal  = 0;
+        towerRepableProf.RecoverCost.Lumber = 0;
+        towerRepableProf.RecoverCost.People = 0;
         // убираем требования у башни
         GlobalVars.configs[towerUid].TechConfig.Requirements.Clear();
         // ускоряем время постройки
@@ -398,38 +457,74 @@ export class Teimur_Legendary_WORKER extends ILegendaryUnit {
     }
 
     public OnEveryTick(gameTickNum: number): void {
-        // юнит бездействует и у него фулл хп, то отправляем его на базу врага
-        if (this.unit_ordersMind.IsIdle() && this.unit.Health == GlobalVars.configs[Teimur_Legendary_WORKER.CfgUid].MaxHealth) {
-            this.GivePointCommand(GlobalVars.teams[this.teamNum].castleCell, UnitCommand.MoveToPoint, AssignOrderMode.Queue);
-            return;
-        }
-
-        // проверка, что юнит готов строить башню
-        if (this.towersBuild == 0 ||
-            this.unit.Health == GlobalVars.configs[Teimur_Legendary_WORKER.CfgUid].MaxHealth ||
-            this.unit_ordersMind.ActiveOrder.ProductUnit != undefined) {
-            return;
-        }
-
-        // Отменить все приказы юнита
-        this.unit_ordersMind.CancelOrdersSafe();
-
-        // ищем ближайшее место куда можно построить башню
-        var generator = generateCellInSpiral(this.unit.Cell.X, this.unit.Cell.Y);
-        for (var position = generator.next(); !position.done; position = generator.next()) {
-            if (unitCanBePlacedByRealMap(GlobalVars.configs[Teimur_Legendary_WORKER.CfgUid + "_tower"], position.value.X, position.value.Y)) {
-                // делаем так, чтобы инженер не отвлекался, когда строит башню (убираем реакцию на инстинкты)
-                this.unit_ordersMind.AssignSmartOrder(this.unit.Cell, AssignOrderMode.Replace, 100000);
-
-                this.GivePointProduceCommand(
-                    GlobalVars.configs[Teimur_Legendary_WORKER.CfgUid + "_tower"],
-                    createPoint(position.value.X, position.value.Y),
-                    AssignOrderMode.Replace);
-
-                // уменьшаем количество создаваемых башен на 1
-                this.towersBuild--;
-                break;
+        // состояние идти на базу врага
+        if (this.state == 0) {
+            // если ничего не делаем, то идем на замок
+            if (this.unit_ordersMind.IsIdle()) {
+                this.GivePointCommand(GlobalVars.teams[this.teamNum].castleCell, UnitCommand.MoveToPoint, AssignOrderMode.Queue);
             }
+
+            // если рабочего ударили
+            if (this.unit.Health < GlobalVars.configs[Teimur_Legendary_WORKER.CfgUid].MaxHealth) {
+                this.state = 1;
+            }
+        }
+        // состояние разместить вышку
+        else if (this.state == 1) {
+            if (this.towersBuild > 0) {
+                if (!this.producingUnit) {
+                    // ищем ближайшее место куда можно построить башню
+                    var generator = generateCellInSpiral(this.unit.Cell.X, this.unit.Cell.Y);
+                    for (var position = generator.next(); !position.done; position = generator.next()) {
+                        if (unitCanBePlacedByRealMap(GlobalVars.configs[Teimur_Legendary_WORKER.CfgUid + "_tower"], position.value.X, position.value.Y)) {
+                            this.GivePointProduceCommand(
+                                GlobalVars.configs[Teimur_Legendary_WORKER.CfgUid + "_tower"],
+                                createPoint(position.value.X, position.value.Y),
+                                AssignOrderMode.Replace);
+                            break;
+                        }
+                    }
+                }
+                // рабочий построил вышку
+                else {
+                    this.towersBuild--;
+                    this.state = 2;
+                }
+            }
+            // лимит постройки исчерпан
+            else {
+                this.unit.CommandsMind.AddAutomatedCommand(UnitCommand.Repair);
+                this.state = 3;
+            }
+        }
+        // состояние постройки текущей вышки
+        else if (this.state == 2) {
+            // вышку сломали
+            if (this.producingUnit.IsDead) {
+                this.producingUnit = null;
+                this.state = 1;
+            }
+            else {
+                // вышка не достроена
+                if (this.producingUnit.EffectsMind.BuildingInProgress) {
+                    if (this.unit_ordersMind.IsIdle()) {
+                        this.GivePointCommand(this.producingUnit.Cell, UnitCommand.Build, AssignOrderMode.Replace);
+                    }
+                }
+                // вышку достроили 
+                else {
+                    this.producingUnit = null;
+                    this.state = 1;
+                }
+            }
+        }
+        // state = 3, ничего не делаем
+    }
+
+    public OnDead(gameTickNum: number) {
+        // отписываемся от события
+        if (this.onProducedHandler) {
+            this.onProducedHandler.disconnect();
         }
     }
 }
@@ -454,7 +549,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
     static BaseCfgUid  : string = "#DefenceTeimur_Raider";
     static Description : string = "Слабости: окружение, огонь. Преимущества: скорость, захват юнитов.";
 
-    static CapturePeriod     : number = 250;
+    static CapturePeriod     : number = 150;
     /** максимальное количество юнитов, которое может захватить */
     static CaptureUnitsLimit : number = 20;
 
@@ -465,7 +560,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
     constructor (unit: any, teamNum: number) {
         super(unit, teamNum);
 
-        this.capturePrevStart = 0;
+        this.capturePrevStart = BattleController.GameTimer.GameFramesCounter;
         this.captureUnits     = new Array<Teimur_CapturedUnit>();
     }
 
@@ -480,13 +575,17 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(120 * Math.sqrt(GlobalVars.difficult)));
         // делаем урон = 0
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", 0);
+        // делаем не давящимся
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Weight", 13);
 
         this.CaptureUnitsLimit = Math.floor(this.CaptureUnitsLimit * Math.sqrt(GlobalVars.difficult));
     }
 
     public OnEveryTick(gameTickNum: number): void {
         // каждые CapturePeriod/50 секунд захватываем юнитов в пределах захвата
-        if (this.captureUnits.length < Teimur_Legendary_HORSE.CaptureUnitsLimit && gameTickNum - this.capturePrevStart > Teimur_Legendary_HORSE.CapturePeriod) {
+        if (this.captureUnits.length < Teimur_Legendary_HORSE.CaptureUnitsLimit &&
+            gameTickNum - this.capturePrevStart > Teimur_Legendary_HORSE.CapturePeriod &&
+            !this.unit.EffectsMind.HasEffect(UnitEffectFlag.Burning)) {
             this.capturePrevStart = gameTickNum;
 
             // количество юнитов за раз
@@ -526,6 +625,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
                 GlobalVars.units.push(unitInfo);
                 this.captureUnits.push(unitInfo);
                 spawnDecoration(GlobalVars.ActiveScena.GetRealScena(), GlobalVars.HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), _unit.Position);
+                captureUnitsLimit--;
             }
         }
 
@@ -612,7 +712,7 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
         // меняем цвет
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 50, 50, 50));
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(300 * Math.sqrt(GlobalVars.difficult)));
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(250 * Math.sqrt(GlobalVars.difficult)));
         // задаем иконку
         //GlobalVars.configs[this.CfgUid].PortraitCatalog.RemoveItem(GlobalVars.configs[this.CfgUid].PortraitCatalog.GetFirst());
         //GlobalVars.configs[this.CfgUid].PortraitCatalog.AddItem(GlobalVars.HordeContentApi.GetUnitConfig("#UnitConfig_Nature_Draider").PortraitCatalog);
@@ -788,7 +888,7 @@ export class Teimur_Legendary_FIRE_MAGE extends ILegendaryUnit {
         // траектория полета снаряда
 
         const nPoints : number = 8;
-        bull.ScriptData.Speed               = bull.Cfg.BaseBulletSpeed;// + bull.ShotParams.AdditiveBulletSpeed;
+        bull.ScriptData.Speed               = bull.Cfg.BaseBulletSpeed;// + bull.CombatParams.AdditiveBulletSpeed;
         bull.ScriptData.Trajectories        = {};
         bull.ScriptData.Trajectories.points = new Array<any>(nPoints);
         bull.ScriptData.Trajectories.times  = new Array<number>(nPoints);
@@ -987,6 +1087,15 @@ export class Teimur_Legendary_GREED_HORSE extends ILegendaryUnit {
             }
         }
     }
+    
+    static GetSpawnCount(spawnCount: number) {
+        // Коня спавним всегда 1, но его здоровье скайлируем
+
+        // задаем количество здоровья
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(130 * Math.sqrt(GlobalVars.difficult) * spawnCount));
+
+        return 1;
+    }
 }
 
 
@@ -1013,7 +1122,8 @@ export const TeimurUnitsClass : Array<typeof IUnit> = [
     Teimur_Balista,
     Teimur_Mag_2,
     Teimur_Villur,
-    Teimur_Olga
+    Teimur_Olga,
+    Teimur_Scorpion
 ];
 
 export const TeimurUnitsAllClass : Array<typeof IUnit> = TeimurLegendaryUnitsClass.concat(TeimurUnitsClass);
