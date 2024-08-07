@@ -14,7 +14,40 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     constructor (parent: MaraSettlementController) {
         super(parent);
     }
-    
+
+    public get ProductionList(): Array<string> {
+        let list = [...this.productionList].map((value) => value.ConfigId);
+
+        let masterMind = this.settlementController.MasterMind;
+        let requests = enumerate(masterMind.Requests);
+        let request;
+
+        while ((request = eNext(requests)) !== undefined) {
+            if (request.RequestedCfg) {
+                list.push(request.RequestedCfg.Uid);
+            }
+        }
+        
+        return list;
+    }
+
+    public get ProductionRequests(): Array<MaraProductionRequest> {
+        let list = [...this.productionList];
+
+        let masterMind = this.settlementController.MasterMind;
+        let requests = enumerate(masterMind.Requests);
+        let request;
+
+        while ((request = eNext(requests)) !== undefined) {
+            if (request.RequestedCfg) {
+                let productionRequest = new MaraProductionRequest(request.RequestedCfg.Uid, request.TargetCell, null);
+                list.push(productionRequest);
+            }
+        }
+        
+        return list;
+    }
+
     Tick(tickNumber: number): void {
         if (tickNumber % 10 != 0) {
             return;
@@ -30,7 +63,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                 request.Executor = freeProducer;
                 
                 if (MaraUtils.RequestMasterMindProduction(request, this.settlementController.MasterMind)) {
-                    this.settlementController.Debug(`Added ${request.ConfigId} to the production list`);
+                    this.settlementController.Debug(`Added ${request.ConfigId} to MM queue, producer: ${request.Executor.ToString()}`);
                     addedRequests.push(request);
                     this.settlementController.ReservedUnitsData.ReserveUnit(freeProducer);
                 }
@@ -38,7 +71,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             else if (request.IsForce) {
                 if (!this.productionIndex!.has(request.ConfigId)) {
                     if (MaraUtils.RequestMasterMindProduction(request, this.settlementController.MasterMind)) {
-                        this.settlementController.Debug(`(forcibly) Added ${request.ConfigId} to the production list`);
+                        this.settlementController.Debug(`(forcibly) Added ${request.ConfigId} to MM queue, producer: ${request.Executor?.ToString()}`);
                         addedRequests.push(request);
                     }
                 }
@@ -77,39 +110,8 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
             this.executingRequests = filteredRequests;
         }
-    }
 
-    public get ProductionList(): Array<string> {
-        let list = [...this.productionList].map((value) => value.ConfigId);
-
-        let masterMind = this.settlementController.MasterMind;
-        let requests = enumerate(masterMind.Requests);
-        let request;
-
-        while ((request = eNext(requests)) !== undefined) {
-            if (request.RequestedCfg) {
-                list.push(request.RequestedCfg.Uid);
-            }
-        }
-        
-        return list;
-    }
-
-    public get ProductionRequests(): Array<MaraProductionRequest> {
-        let list = [...this.productionList];
-
-        let masterMind = this.settlementController.MasterMind;
-        let requests = enumerate(masterMind.Requests);
-        let request;
-
-        while ((request = eNext(requests)) !== undefined) {
-            if (request.RequestedCfg) {
-                let productionRequest = new MaraProductionRequest(request.RequestedCfg.Uid, request.TargetCell, null);
-                list.push(productionRequest);
-            }
-        }
-        
-        return list;
+        this.cleanupUnfinishedBuildings(tickNumber);
     }
 
     RequestCfgIdProduction(configId: string): void {
@@ -130,7 +132,29 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     ForceRequestSingleCfgIdProduction(configId: string): void {
-        if (this.ProductionList.indexOf(configId) >= 0) {
+        if (!this.productionIndex) {
+            this.updateProductionIndex();
+        }
+        
+        let producers = this.productionIndex!.get(configId);
+        
+        let producersCount = 0;
+        let orderedCfgIdsCount = 0;
+
+        if (producers) {
+            producersCount = producers.length;
+            
+            for (let orderedCfgId of this.ProductionList) {
+                if (orderedCfgId == configId) {
+                    orderedCfgIdsCount ++;
+                }
+            }
+        }
+        else {
+            producersCount = 1;
+        }
+        
+        if (orderedCfgIdsCount >= producersCount) {
             return;
         }
         
@@ -146,7 +170,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
 
         for (let cfg of requiredConfigs) {
-            if (!existingCfgIds.has(cfg.Uid)) {
+            if (!existingCfgIds.has(cfg.Uid) && !this.productionList.find((value) => {return value.ConfigId == cfg.Uid})) {
                 this.RequestCfgIdProduction(cfg.Uid);
             }
         }
@@ -214,6 +238,22 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
         else {
             return [];
+        }
+    }
+
+    private cleanupUnfinishedBuildings(tickNumber: number) {
+        let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        let unfinishedBuildings = allUnits.filter((u) => MaraUtils.IsBuildingConfig(u.Cfg) && u.EffectsMind.BuildingInProgress);
+        
+        for (let building of unfinishedBuildings) {
+            // 2 is needed since units are processed every second tick in the core logic
+            let lastBuildingTick = building.OrdersMind.ActiveMotion.LastBuildTick * 2;
+
+            if (lastBuildingTick) {
+                if (tickNumber - lastBuildingTick > this.settlementController.Settings.Timeouts.UnfinishedConstructionThreshold) {
+                    MaraUtils.IssueSelfDestructCommand([building], this.settlementController.Player);
+                }
+            }
         }
     }
 

@@ -12,15 +12,10 @@ Creates and manages settlement controllers
 end note
 
 component SettlementController {
-    component BuildingSubcontroller
-    note left of BuildingSubcontroller
+    component ProductionSubcontroller
+    note left of ProductionSubcontroller
     Processes requests to 
-    build structures
-    end note
-
-    component TrainingSubcontroller
-    note left of TrainingSubcontroller
-    Processes requests to train units
+    build structures & train units
     end note
 
     component MiningSubcontroller
@@ -28,15 +23,23 @@ component SettlementController {
     Provides resource gathering
     end note
 
-    component StrategySubcontroller
-    note left of StrategySubcontroller
-    Eliminates enemy and 
-    defends own settlement
+    component TacticalSubcontroller
+    note left of TacticalSubcontroller
+    Manages squads: issues attack orders and
+    pulls back damaged squads
     end note
 
-    BuildingSubcontroller -[hidden]down-> TrainingSubcontroller
-    TrainingSubcontroller -[hidden]down-> MiningSubcontroller
-    MiningSubcontroller -[hidden]down-> StrategySubcontroller
+    component StrategySubcontroller
+    note left of StrategySubcontroller
+    Calculate strategy data such as 
+    army composition for attack,
+    attack target selection, 
+    retreat locations, etc.
+    end note
+
+    ProductionSubcontroller -[hidden]down-> MiningSubcontroller
+    MiningSubcontroller -[hidden]down-> TacticalSubcontroller
+    TacticalSubcontroller -[hidden]down-> StrategySubcontroller
 
     component CurrentState
     
@@ -49,9 +52,9 @@ component SettlementController {
     diagram for reference)
     end note
 
-    CurrentState -left-> BuildingSubcontroller
-    CurrentState -left-> TrainingSubcontroller
+    CurrentState -left-> ProductionSubcontroller
     CurrentState -left-> MiningSubcontroller
+    CurrentState -left-> TacticalSubcontroller
     CurrentState -left-> StrategySubcontroller
 }
 

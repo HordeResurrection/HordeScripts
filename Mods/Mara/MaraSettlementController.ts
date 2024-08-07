@@ -18,7 +18,7 @@ import { SettlementControllerStateFactory } from "./SettlementControllerStateFac
 import { MaraResourceCluster, MaraResourceType } from "./MaraResourceMap";
 import { eNext, enumerate } from "library/dotnet/dotnet-utils";
 
-export class SettlementLocation {
+export class SettlementClusterLocation {
     Center: any;
     Radius: number;
 
@@ -145,7 +145,7 @@ export class MaraSettlementController {
     private nextState: MaraSettlementControllerState | null;
     private currentUnitComposition: UnitComposition | null;
     private currentDevelopedUnitComposition: UnitComposition | null;
-    private settlementLocation: SettlementLocation | null;
+    private settlementLocation: SettlementClusterLocation | null;
 
     constructor (settlement, settlementMM, player, tickOffset) {
         this.TickOffset = tickOffset;
@@ -178,7 +178,7 @@ export class MaraSettlementController {
     }
 
     public get State(): MaraSettlementControllerState {
-        return this.State;
+        return this.state;
     }
     
     public set State(value: MaraSettlementControllerState) {
@@ -293,7 +293,7 @@ export class MaraSettlementController {
         return new Map(this.currentDevelopedUnitComposition);
     }
 
-    GetSettlementLocation(): SettlementLocation | null {
+    GetSettlementLocation(): SettlementClusterLocation | null {
         if (this.settlementLocation) {
             return this.settlementLocation;
         }
@@ -315,7 +315,7 @@ export class MaraSettlementController {
 
             let location = squads[0].GetLocation();
             let radius = Math.round((location.Spread / 2)) + 10;
-            this.settlementLocation = new SettlementLocation(location.Point, radius);
+            this.settlementLocation = new SettlementClusterLocation(location.Point, radius);
 
             return this.settlementLocation;
         }

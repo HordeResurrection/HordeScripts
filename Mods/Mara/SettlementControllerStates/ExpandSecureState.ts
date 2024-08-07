@@ -64,6 +64,10 @@ export class ExpandSecureState extends MaraSettlementControllerState {
         }
     }
 
+    TacticalControllerTick(): void {
+        this.settlementController.TacticalController.AttackTick();
+    }
+
     private proceedToBuildExpand(): void {
         this.settlementController.Info(`Expand location is secured, proceeding to build expand`);
         this.settlementController.State = SettlementControllerStateFactory.MakeExpandBuildState(this.settlementController);
