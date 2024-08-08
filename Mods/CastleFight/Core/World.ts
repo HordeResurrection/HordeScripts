@@ -1260,7 +1260,7 @@ export class World {
             this.configs["worker"].ProfessionParams.Remove(UnitProfession.Harvester);
         }
         // делаем его не даващимся
-        ScriptUtils.SetValue(this.configs["worker"], "Weight", 13);
+        ScriptUtils.SetValue(this.configs["worker"], "PressureResist", 22);
         
         // добавляем постройки
         {

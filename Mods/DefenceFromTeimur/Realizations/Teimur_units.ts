@@ -259,7 +259,7 @@ export class Teimur_Legendary_ARCHER extends ILegendaryUnit {
         // увеличиваем дальность
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "Range", 10);
         // делаем так, чтобы не давили всадники
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Weight", 12);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 21);
         // задаем количество здоровья от числа игроков
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
         // делаем имунитет к огню
@@ -290,7 +290,7 @@ export class Teimur_Legendary_ARCHER_2 extends ILegendaryUnit {
         // увеличиваем дальность
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "Range", 10);
         // делаем так, чтобы не давили всадники
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Weight", 12);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 21);
         // задаем количество здоровья от числа игроков
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
         // делаем имунитет к огню
@@ -444,7 +444,7 @@ export class Teimur_Legendary_WORKER extends ILegendaryUnit {
         // задаем количество здоровья от числа игроков
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
         // делаем так, чтобы не давили всадники
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Weight", 12);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 21);
         // удаляем команду атаки
         GlobalVars.configs[this.CfgUid].AllowedCommands.Remove(UnitCommand.Attack);
         // добавляем в список построек легендарную башню
@@ -576,7 +576,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
         // делаем урон = 0
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", 0);
         // делаем не давящимся
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Weight", 13);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 22);
 
         this.CaptureUnitsLimit = Math.floor(this.CaptureUnitsLimit * Math.sqrt(GlobalVars.difficult));
     }
