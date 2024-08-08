@@ -1,5 +1,5 @@
 import { createHordeColor, createPF, createPoint, createResourcesAmount } from "library/common/primitives";
-import { UnitFlags, UnitCommand, UnitDirection, ProduceAtCommandArgs, UnitDeathType, UnitSpecification, BattleController, BulletState, UnitMapLayer, UnitEffectFlag } from "library/game-logic/horde-types";
+import { UnitFlags, UnitCommand, UnitDirection, ProduceAtCommandArgs, UnitDeathType, UnitSpecification, BattleController, BulletState, UnitMapLayer, UnitEffectFlag, TileType } from "library/game-logic/horde-types";
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 import { ChebyshevDistance, CreateBulletConfig, CreateUnitConfig, EuclidDistance, L1Distance, generateRandomCellInRect, spawnUnit, spawnUnits, unitCanBePlacedByRealMap } from "../Utils";
 import { ILegendaryUnit } from "../Types/ILegendaryUnit";
@@ -322,6 +322,10 @@ export class Teimur_Legendary_RAIDER extends ILegendaryUnit {
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
         // делаем урон = 0
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.BulletCombatParams, "Damage", 0);
+        // устанавливаем скорость
+        GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Grass, 14);
+        GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Marsh, 14);
+        GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Sand,  14);
     }
 
     public OnEveryTick(gameTickNum: number): void {
@@ -577,6 +581,10 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.BulletCombatParams, "Damage", 0);
         // делаем не давящимся
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Weight", 13);
+        // устанавливаем скорость
+        GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Grass, 14);
+        GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Marsh, 14);
+        GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Sand,  14);
 
         this.CaptureUnitsLimit = Math.floor(this.CaptureUnitsLimit * Math.sqrt(GlobalVars.difficult));
     }
@@ -713,6 +721,10 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 50, 50, 50));
         // задаем количество здоровья от числа игроков
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(250 * Math.sqrt(GlobalVars.difficult)));
+        // устанавливаем скорость
+        GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Grass, 14);
+        GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Marsh, 14);
+        GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Sand,  14);
         // задаем иконку
         //GlobalVars.configs[this.CfgUid].PortraitCatalog.RemoveItem(GlobalVars.configs[this.CfgUid].PortraitCatalog.GetFirst());
         //GlobalVars.configs[this.CfgUid].PortraitCatalog.AddItem(GlobalVars.HordeContentApi.GetUnitConfig("#UnitConfig_Nature_Draider").PortraitCatalog);
@@ -1027,6 +1039,8 @@ export class Teimur_Legendary_GREED_HORSE extends ILegendaryUnit {
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 255, 155, 0));
         // задаем количество здоровья от числа игроков
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(130 * Math.sqrt(GlobalVars.difficult)));
+        // делаем так, чтобы не давили всадники
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Weight", 12);
     }
 
     public OnEveryTick(gameTickNum: number): void {

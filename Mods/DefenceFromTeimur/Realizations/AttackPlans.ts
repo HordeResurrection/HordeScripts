@@ -663,7 +663,7 @@ export class AttackPlan_test extends IAttackPlan {
 
         this.waves = [];
         this.waves.push(
-            new Wave("ТЕСТ", 0, [new WaveUnit(Teimur_Scorpion, 1)]),
+            new Wave("ТЕСТ", 0, [new WaveUnit(Teimur_Legendary_RAIDER, 1)]),
             new Wave("END", 20*60*50, [])
         );
     }
