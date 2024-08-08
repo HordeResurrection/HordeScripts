@@ -92,40 +92,44 @@ class UnitExperienceSystem {
         if (this.level < ExperienceSystemGlobalData.Levels_ExpCoeff.length - 1) {
             // пассивная прибавка опыта
         
-            if (this.level < 0 && gameTickNum > this.passiveExpIncomePrevTick + ExperienceSystemGlobalData.PassiveExpIncome_Period) {
-                //log.info("passive exp ", ExperienceSystemGlobalData.PassiveExpIncome_Value);
-                this.experience               += this.configExpCoeff
-                    * ExperienceSystemGlobalData.Levels_ExpCoeff[this.level + 1]
-                    * ExperienceSystemGlobalData.PassiveExpIncome_Value;
-                this.passiveExpIncomePrevTick += ExperienceSystemGlobalData.PassiveExpIncome_Period;
-            }
+            // Проверяем, что юнит не в здании и не оператор техники
+            if (!this.unit.EffectsMind.InContainer) {
 
-            // обновляем синюю полосу
+                if (this.level < 0 && gameTickNum > this.passiveExpIncomePrevTick + ExperienceSystemGlobalData.PassiveExpIncome_Period) {
+                    //log.info("passive exp ", ExperienceSystemGlobalData.PassiveExpIncome_Value);
+                    this.experience               += this.configExpCoeff
+                        * ExperienceSystemGlobalData.Levels_ExpCoeff[this.level + 1]
+                        * ExperienceSystemGlobalData.PassiveExpIncome_Value;
+                    this.passiveExpIncomePrevTick += ExperienceSystemGlobalData.PassiveExpIncome_Period;
+                }
 
-            this.unitDTO.Experience = Math.floor(this.experience);
+                // обновляем синюю полосу
 
-            // проверка, что пора давать новый уровень
+                this.unitDTO.Experience = Math.floor(this.experience);
 
-            if (this.experience >= ExperienceSystemGlobalData.MaxExp) {
-                // заменяем юнита
+                // проверка, что пора давать новый уровень
 
-                let replaceParams                   = new ReplaceUnitParameters();
-                replaceParams.OldUnit               = this.unit;
-                replaceParams.NewUnitConfig         = LEVEL_SYSTEM_GLOBAL_DATA.GetNextLevelCfg(this);
-                // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
-                replaceParams.Cell                  = null;
-                // Нужно ли передать уровень здоровья? (в процентном соотношении)
-                replaceParams.PreserveHealthLevel   = true;
-                // Нужно ли передать приказы?
-                replaceParams.PreserveOrders        = true;
-                // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
-                replaceParams.Silent                = true;
-                
-                var replacedUnit = this.unit.Owner.Units.ReplaceUnit(replaceParams);
-                if (replacedUnit) {
-                    // оповещения всех
-                    if (ExperienceSystemGlobalData.Levels_Alerts[this.level + 1]) {
-                        broadcastMessage("ВНИМАНИЕ. " + this.unit.Owner.TownName + " получил " + replacedUnit.Cfg.Name.replace("\n", ""), ExperienceSystemGlobalData.Levels_TintColor[this.level + 1]);
+                if (this.experience >= ExperienceSystemGlobalData.MaxExp) {
+                    // заменяем юнита
+
+                    let replaceParams                   = new ReplaceUnitParameters();
+                    replaceParams.OldUnit               = this.unit;
+                    replaceParams.NewUnitConfig         = LEVEL_SYSTEM_GLOBAL_DATA.GetNextLevelCfg(this);
+                    // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
+                    replaceParams.Cell                  = null;
+                    // Нужно ли передать уровень здоровья? (в процентном соотношении)
+                    replaceParams.PreserveHealthLevel   = true;
+                    // Нужно ли передать приказы?
+                    replaceParams.PreserveOrders        = true;
+                    // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
+                    replaceParams.Silent                = true;
+                    
+                    var replacedUnit = this.unit.Owner.Units.ReplaceUnit(replaceParams);
+                    if (replacedUnit) {
+                        // оповещения всех
+                        if (ExperienceSystemGlobalData.Levels_Alerts[this.level + 1]) {
+                            broadcastMessage("ВНИМАНИЕ. " + this.unit.Owner.TownName + " получил " + replacedUnit.Cfg.Name.replace("\n", ""), ExperienceSystemGlobalData.Levels_TintColor[this.level + 1]);
+                        }
                     }
                 }
             }
