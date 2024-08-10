@@ -68,14 +68,6 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                     this.settlementController.ReservedUnitsData.ReserveUnit(freeProducer);
                 }
             }
-            else if (request.IsForce) {
-                if (!this.productionIndex!.has(request.ConfigId)) {
-                    if (MaraUtils.RequestMasterMindProduction(request, this.settlementController.MasterMind)) {
-                        this.settlementController.Debug(`(forcibly) Added ${request.ConfigId} to MM queue, producer: ${request.Executor?.ToString()}`);
-                        addedRequests.push(request);
-                    }
-                }
-            }
         }
 
         if (addedRequests.length > 0) {
@@ -123,6 +115,10 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     RequestProduction(request: MaraProductionRequest): void {
         this.productionList.push(request);
         this.settlementController.Debug(`Added ${request.ToString()} to target production list`);
+
+        if (request.IsForce) {
+            this.requestAbsentProductionChainItemsProduction(request.ConfigId);
+        }
     }
 
     RequestSingleCfgIdProduction(configId: string): void {
@@ -159,21 +155,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
         
         this.RequestCfgIdProduction(configId);
-
-        let requiredConfigs = MaraUtils.GetCfgIdProductionChain(configId, this.settlementController.Settlement);
-        
-        let existingUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
-        let existingCfgIds = new Set<string>();
-
-        for (let unit of existingUnits) {
-            existingCfgIds.add(unit.Cfg.Uid);
-        }
-
-        for (let cfg of requiredConfigs) {
-            if (!existingCfgIds.has(cfg.Uid) && !this.productionList.find((value) => {return value.ConfigId == cfg.Uid})) {
-                this.RequestCfgIdProduction(cfg.Uid);
-            }
-        }
+        this.requestAbsentProductionChainItemsProduction(configId);
     }
 
     CancelAllProduction(): void {
@@ -238,6 +220,23 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
         else {
             return [];
+        }
+    }
+
+    private requestAbsentProductionChainItemsProduction(configId: string): void {
+        let requiredConfigs = MaraUtils.GetCfgIdProductionChain(configId, this.settlementController.Settlement);
+        
+        let existingUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        let existingCfgIds = new Set<string>();
+
+        for (let unit of existingUnits) {
+            existingCfgIds.add(unit.Cfg.Uid);
+        }
+
+        for (let cfg of requiredConfigs) {
+            if (!existingCfgIds.has(cfg.Uid) && !this.productionList.find((value) => {return value.ConfigId == cfg.Uid})) {
+                this.RequestCfgIdProduction(cfg.Uid);
+            }
         }
     }
 
