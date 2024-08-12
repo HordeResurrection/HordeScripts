@@ -22,6 +22,10 @@ export class StrategySubcontroller extends MaraSubcontroller {
         this.globalStrategy.Init(this.settlementController);
     }
 
+    public get GlobalStrategy(): SettlementGlobalStrategy {
+        return this.globalStrategy;
+    }
+
     public get Player(): any {
         return this.settlementController.Player;
     }

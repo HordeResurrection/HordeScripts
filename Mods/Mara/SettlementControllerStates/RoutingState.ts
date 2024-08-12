@@ -82,8 +82,23 @@ export class RoutingState extends MaraSettlementControllerState {
 
     private defineOffensiveStrategy(): void {
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
-        let combatCfgId = produceableCfgIds.find( (value) => {return MaraUtils.IsCombatConfigId(value)} );
-        let offensiveCfgId = produceableCfgIds.find( (value) => {return MaraUtils.IsCombatConfigId(value) && !MaraUtils.IsBuildingConfigId(value)} );
+        
+        let combatCfgId = produceableCfgIds.find( (value) => {
+            return (
+                MaraUtils.IsCombatConfigId(value) && 
+                (
+                    this.settlementController.StrategyController.GlobalStrategy.OffensiveCfgIds.has(value) ||
+                    this.settlementController.StrategyController.GlobalStrategy.DefensiveBuildingsCfgIds.has(value)
+                )
+            );
+        } );
+
+        let offensiveCfgId = produceableCfgIds.find( 
+            (value) => {
+                return MaraUtils.IsCombatConfigId(value) && !MaraUtils.IsBuildingConfigId(value) &&
+                    this.settlementController.StrategyController.GlobalStrategy.OffensiveCfgIds.has(value)
+            } 
+        );
 
         if (offensiveCfgId) {
             this.pickBuildUpOrDevelopment(this.settlementController.Settings.ControllerStates.BuildUpProbabilityWhenOffensePossible * 100);
