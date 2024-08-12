@@ -7,7 +7,7 @@ import { MaraSubcontroller } from "./MaraSubcontroller";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
-    private productionList: Array<MaraProductionRequest> = [];
+    private queuedRequests: Array<MaraProductionRequest> = [];
     private executingRequests: Array<MaraProductionRequest> = [];
     private productionIndex: Map<string, Array<any>> | null = null;
 
@@ -16,7 +16,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     public get ProductionList(): Array<string> {
-        let list = [...this.productionList].map((value) => value.ConfigId);
+        let list = [...this.queuedRequests].map((value) => value.ConfigId);
 
         let masterMind = this.settlementController.MasterMind;
         let requests = enumerate(masterMind.Requests);
@@ -32,7 +32,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     public get ProductionRequests(): Array<MaraProductionRequest> {
-        let list = [...this.productionList];
+        let list = [...this.queuedRequests];
 
         let masterMind = this.settlementController.MasterMind;
         let requests = enumerate(masterMind.Requests);
@@ -56,7 +56,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         this.productionIndex = null;
         let addedRequests: Array<MaraProductionRequest> = [];
 
-        for (let request of this.productionList) {
+        for (let request of this.queuedRequests) {
             let freeProducer = this.getProducer(request.ConfigId);
 
             if (freeProducer) {
@@ -74,10 +74,10 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             this.settlementController.Debug(`Removed ${addedRequests.length} units from target production list`);
 
             for (let request of addedRequests) {
-                let index = this.productionList.indexOf(request);
+                let index = this.queuedRequests.indexOf(request);
 
                 if (index > -1) {
-                    this.productionList.splice(index, 1);
+                    this.queuedRequests.splice(index, 1);
                 }
             }
 
@@ -108,12 +108,12 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
     RequestCfgIdProduction(configId: string): void {
         let request = new MaraProductionRequest(configId, null, null);
-        this.productionList.push(request);
+        this.queuedRequests.push(request);
         this.settlementController.Debug(`Added ${configId} to target production list`);
     }
 
     RequestProduction(request: MaraProductionRequest): void {
-        this.productionList.push(request);
+        this.queuedRequests.push(request);
         this.settlementController.Debug(`Added ${request.ToString()} to target production list`);
 
         if (request.IsForce) {
@@ -159,7 +159,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     CancelAllProduction(): void {
-        this.productionList = [];
+        this.queuedRequests = [];
         this.settlementController.Debug(`Cleared target production list`);
     }
 
