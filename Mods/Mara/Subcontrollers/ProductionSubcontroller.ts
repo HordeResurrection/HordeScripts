@@ -234,7 +234,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
 
         for (let cfg of requiredConfigs) {
-            if (!existingCfgIds.has(cfg.Uid) && !this.productionList.find((value) => {return value.ConfigId == cfg.Uid})) {
+            if (!existingCfgIds.has(cfg.Uid) && !this.ProductionList.find((value) => {return value == cfg.Uid})) {
                 this.RequestCfgIdProduction(cfg.Uid);
             }
         }
