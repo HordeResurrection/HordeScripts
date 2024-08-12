@@ -96,22 +96,36 @@ export class RebuildState extends ProductionState {
         }
 
         let harvestersToProduce = MaraUtils.SubstractCompositionLists(requiredHarvesters, existingHarvesters);
+        let orderedHarvestersCount = 0;
 
         harvestersToProduce.forEach(
             (value, key) => {
                 for (let i = 0; i < value; i++) {
+                    if (orderedHarvestersCount >= this.settlementController.Settings.ControllerStates.MaxHarvesterProductionBatch) {
+                        break;
+                    }
+                    
                     result.push(this.makeProductionRequest(key, null, null));
+                    orderedHarvestersCount ++;
                 }
             }
         );
 
-        if (initialHarvesterCount < maxHarvesterCount) {
+        if (
+            initialHarvesterCount < maxHarvesterCount &&
+            orderedHarvestersCount < this.settlementController.Settings.ControllerStates.MaxHarvesterProductionBatch
+        ) {
             let harvesterConfigIds = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
             let cfgId = MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, harvesterConfigIds);
 
             if (cfgId != null) {
                 for (let i = 0; i < maxHarvesterCount - initialHarvesterCount; i++) {
                     result.push(this.makeProductionRequest(cfgId, null, null));
+                    orderedHarvestersCount ++;
+
+                    if (orderedHarvestersCount >= this.settlementController.Settings.ControllerStates.MaxHarvesterProductionBatch) {
+                        break;
+                    }
                 }
             }
         }

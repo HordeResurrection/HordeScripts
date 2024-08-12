@@ -46,6 +46,8 @@ class ControllerStatesSettings {
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;
     public AttackStrengthToEnemyStrengthRatio: number = 1.5;
+
+    public MaxHarvesterProductionBatch: number = 6;
 }
 
 class ResourceMiningSettings {
