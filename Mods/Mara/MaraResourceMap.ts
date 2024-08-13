@@ -240,7 +240,7 @@ export class MaraResourceCluster {
         return this.Index.ToString();
     }
 
-    UpdateWoodAmount() {
+    public UpdateWoodAmount() {
         let totalTreesCount = 0;
         
         for (let cell of this.WoodCells) {

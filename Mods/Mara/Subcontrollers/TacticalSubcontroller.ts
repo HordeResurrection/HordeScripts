@@ -41,12 +41,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         return this.settlementController.StrategyController.EnemySettlements;
     }
 
-    public get AllSquads(): Array<MaraControllableSquad> {
-        return [...this.offensiveSquads, ...this.defensiveSquads, ...this.reinforcementSquads, ...this.militiaSquads];
-    }
-
     public get SquadsSettings(): any {
         return this.settlementController.Settings.Squads;
+    }
+
+    private get allSquads(): Array<MaraControllableSquad> {
+        return [...this.offensiveSquads, ...this.defensiveSquads, ...this.reinforcementSquads, ...this.militiaSquads];
     }
 
     Tick(tickNumber: number): void {
@@ -54,7 +54,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             squad.Tick(tickNumber);
         }
 
-        for (let squad of this.AllSquads) {
+        for (let squad of this.allSquads) {
             squad.Tick(tickNumber);
         }
         
@@ -102,7 +102,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         let retreatLocations = this.getRetreatLocations();
 
         if (retreatLocations.length > 0) {
-            for (let squad of this.AllSquads) {
+            for (let squad of this.allSquads) {
                 if (squad.IsIdle()) {
                     this.sendSquadToOneOfLocations(squad, retreatLocations);
                 }
@@ -121,7 +121,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.currentTarget = null;
 
         if (
-            this.AllSquads.length == 0
+            this.allSquads.length == 0
         ) {
             this.ComposeSquads();
         }
@@ -225,7 +225,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     private canDefend(): boolean {
-        return this.AllSquads.length > 0;
+        return this.allSquads.length > 0;
     }
 
     private makeMilitia(): void {
@@ -585,7 +585,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
         let settlementCenter = settlementLocation.Center;
         
-        for (let squad of this.AllSquads) {
+        for (let squad of this.allSquads) {
             let distanceToSettlement = MaraUtils.ChebyshevDistance(
                 squad.GetLocation().Point,
                 settlementCenter

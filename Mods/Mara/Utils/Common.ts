@@ -136,15 +136,6 @@ export class MaraProductionRequest {
         }
     }
 
-    public EqualsTo(other: MaraProductionRequest): boolean {
-        return (
-            this.ConfigId == other.ConfigId &&
-            this.Point?.X == other.Point?.X &&
-            this.Point?.Y == other.Point?.Y &&
-            (this.Precision == null || this.Precision == other.Precision)
-        );
-    }
-
     public ToString(): string {
         let location: string; 
         

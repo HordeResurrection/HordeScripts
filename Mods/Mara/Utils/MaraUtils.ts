@@ -138,10 +138,6 @@ export class MaraUtils {
         return ScriptUtils.GetValue(object, propertyName);
     }
 
-    static SetValue(object: any, propertyName: string, newValue: any): void {
-        ScriptUtils.SetValue(object, propertyName, newValue);
-    }
-
     static CastToType(object: any, type: any): any {
         try {
             return host.cast(type, object);
@@ -472,27 +468,6 @@ export class MaraUtils {
         }
     }
 
-    static AddCompositionLists(
-        list1: UnitComposition, 
-        list2: UnitComposition
-    ): UnitComposition {
-        let newList = new Map<string, number>();
-        
-        list1.forEach(
-            (value, key, map) => {
-                MaraUtils.AddToMapItem(newList, key, value);
-            }
-        );
-
-        list2.forEach(
-            (value, key, map) => {
-                MaraUtils.AddToMapItem(newList, key, value);
-            }
-        );
-
-        return newList;
-    }
-
     static SubstractCompositionLists(
         minuend: UnitComposition, 
         subtrahend: UnitComposition
@@ -515,26 +490,6 @@ export class MaraUtils {
         );
 
         return newList;
-    }
-    
-    static SetContains(
-        set: UnitComposition, 
-        subset: UnitComposition
-    ): boolean {
-        let isContain = true;
-
-        subset.forEach( //using forEach here because keys(), values() or entries() return empty iterators for some reason
-            (val, key, m) => {
-                if ( !set.has(key) ) {
-                    isContain = false;
-                }
-                else if ((set.get(key) ?? 0) < val) {
-                    isContain = false;
-                }    
-            }
-        )
-
-        return isContain;
     }
 
     static GetAllSettlements(): Array<any> {
@@ -718,12 +673,6 @@ export class MaraUtils {
         }
     }
 
-    static ConfigHasProfession(unitConfig: any, profession: any): boolean {
-        let professionParams = unitConfig.GetProfessionParams(profession, true);
-
-        return (professionParams != null);
-    }
-
     static ChebyshevDistance(cell1: any, cell2: any): number {
         const xDiff = Math.abs(cell1.X - cell2.X);
         const yDiff = Math.abs(cell1.Y - cell2.Y);
@@ -813,6 +762,12 @@ export class MaraUtils {
         return settlement.Existence.IsTotalDefeat || settlement.Existence.IsAlmostDefeat;
     }
 
+    private static configHasProfession(unitConfig: any, profession: any): boolean {
+        let professionParams = unitConfig.GetProfessionParams(profession, true);
+
+        return (professionParams != null);
+    }
+
     static IsAllDamagerConfigId(cfgId: string): boolean {
         let cfg = MaraUtils.GetUnitConfig(cfgId);
         return MaraUtils.IsAllDamagerConfig(cfg);
@@ -841,7 +796,7 @@ export class MaraUtils {
 
     static IsCombatConfig(unitConfig: any): boolean {
         let mainArmament = unitConfig.MainArmament;
-        let isHarvester = MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Harvester);
+        let isHarvester = MaraUtils.configHasProfession(unitConfig, UnitProfession.Harvester);
 
         return mainArmament != null && !isHarvester;
     }
@@ -852,7 +807,7 @@ export class MaraUtils {
     }
 
     static IsProducerConfig(cfg: any): boolean {
-        return MaraUtils.ConfigHasProfession(cfg, UnitProfession.UnitProducer);
+        return MaraUtils.configHasProfession(cfg, UnitProfession.UnitProducer);
     }
 
     static IsTechConfig(cfg: any): boolean {
@@ -885,7 +840,7 @@ export class MaraUtils {
     }
 
     static IsMineConfig(unitConfig: any): boolean {
-        return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Mine);
+        return MaraUtils.configHasProfession(unitConfig, UnitProfession.Mine);
     }
 
     static IsMineConfigId(cfgId: string): boolean {
@@ -894,7 +849,7 @@ export class MaraUtils {
     }
 
     static IsSawmillConfig(unitConfig: any): boolean {
-        return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Sawmill);
+        return MaraUtils.configHasProfession(unitConfig, UnitProfession.Sawmill);
     }
 
     static IsSawmillConfigId(cfgId: string): boolean {
@@ -903,7 +858,7 @@ export class MaraUtils {
     }
 
     static IsHarvesterConfig(unitConfig: any): boolean {
-        return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.Harvester);
+        return MaraUtils.configHasProfession(unitConfig, UnitProfession.Harvester);
     }
 
     static IsHarvesterConfigId(cfgId: string): boolean {
@@ -921,7 +876,7 @@ export class MaraUtils {
     }
 
     static IsMetalStockConfig(unitConfig: any): boolean {
-        return MaraUtils.ConfigHasProfession(unitConfig, UnitProfession.MetalStock);
+        return MaraUtils.configHasProfession(unitConfig, UnitProfession.MetalStock);
     }
 
     static IsMetalStockConfigId(cfgId: string): boolean {
@@ -947,10 +902,6 @@ export class MaraUtils {
 
     static GetAllMetalStockConfigIds(settlement: any): Array<string> {
         return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsMetalStockConfig);
-    }
-
-    static GetAllProducerConfigIds(settlement: any): Array<string> {
-        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.IsProducerConfig);
     }
 
     static GetAllConfigIds(settlement: any, configFilter: (config: any) => boolean): Array<string> {
