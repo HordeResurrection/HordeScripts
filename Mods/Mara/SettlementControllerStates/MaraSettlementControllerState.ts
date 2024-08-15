@@ -1,7 +1,12 @@
-import { MaraSettlementController, TargetExpandData } from "Mara/MaraSettlementController";
-import { FsmState, MaraPoint, MaraResources } from "Mara/Utils/Common";
-import { MaraResourceCluster, MaraResourceMap, MaraResourceType } from "../MaraResourceMap";
-import { MaraUtils } from "../Utils/MaraUtils";
+import { MaraSettlementController } from "Mara/MaraSettlementController";
+import { TargetExpandData } from "../Common/Settlement/TargetExpandData";
+import { FsmState } from "Mara/Common/FsmState";
+import { MaraResources } from "../Common/Resources/MaraResources";
+import { MaraPoint } from "../Common/MaraPoint";
+import { MaraResourceMap } from "../Common/Resources/MaraResourceMap";
+import { MaraResourceType } from "../Common/Resources/MaraResourceType";
+import { MaraUtils } from "../MaraUtils";
+import { MaraResourceCluster } from "../Common/Resources/MaraResourceCluster";
 
 export abstract class MaraSettlementControllerState extends FsmState {
     protected readonly settlementController: MaraSettlementController;

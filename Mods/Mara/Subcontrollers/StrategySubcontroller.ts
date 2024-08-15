@@ -1,14 +1,16 @@
 
 import { MaraSettlementController } from "Mara/MaraSettlementController";
-import { MaraPoint } from "Mara/Utils/Common";
-import { UnitComposition, MaraUtils, AlmostDefeatCondition, AllowedCompositionItem } from "Mara/Utils/MaraUtils";
+import { MaraPoint } from "../Common/MaraPoint";
+import { MaraUtils, AlmostDefeatCondition } from "Mara/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSquad } from "./Squads/MaraSquad";
-import { MaraResourceCluster } from "../MaraResourceMap";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { Mara } from "../Mara";
-import { SettlementGlobalStrategy } from "../Utils/SettlementControllerGlobalStrategy";
+import { SettlementGlobalStrategy } from "../Common/Settlement/SettlementControllerGlobalStrategy";
 import { UnitFlags } from "library/game-logic/horde-types";
+import { UnitComposition } from "../Common/UnitComposition";
+import { MaraResourceCluster } from "../Common/Resources/MaraResourceCluster";
+import { AllowedCompositionItem } from "../Common/AllowedCompositionItem";
 
 export class StrategySubcontroller extends MaraSubcontroller {
     EnemySettlements: Array<any> = []; //but actually Settlement

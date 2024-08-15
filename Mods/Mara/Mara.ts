@@ -1,7 +1,7 @@
 import { log } from "library/common/logging";
 import { MaraSettlementController } from "./MaraSettlementController";
-import { MaraUtils } from "./Utils/MaraUtils";
-import { MaraResourceMap } from "./MaraResourceMap";
+import { MaraUtils } from "./MaraUtils";
+import { MaraResourceMap } from "./Common/Resources/MaraResourceMap";
 import { PathFinder } from "library/game-logic/path-find";
 
 export enum MaraLogLevel {

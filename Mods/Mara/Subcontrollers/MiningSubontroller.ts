@@ -1,10 +1,13 @@
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
-import { MaraResourceCluster, MaraResourceMap, MaraResourceType } from "../MaraResourceMap";
-import { MaraPoint, MaraResources } from "../Utils/Common";
-import { MaraUtils, ResourceType } from "../Utils/MaraUtils";
+import { MaraResourceMap } from "../Common/Resources/MaraResourceMap";
+import { MaraResourceType } from "../Common/Resources/MaraResourceType";
+import { MaraResources } from "../Common/Resources/MaraResources";
+import { MaraPoint } from "../Common/MaraPoint";
+import { MaraUtils, ResourceType } from "../MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 import { eNext, enumerate } from "library/dotnet/dotnet-utils";
+import { MaraResourceCluster } from "../Common/Resources/MaraResourceCluster";
 
 class MineData {
     public Mine: any = null;

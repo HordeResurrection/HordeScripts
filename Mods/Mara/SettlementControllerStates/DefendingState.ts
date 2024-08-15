@@ -1,8 +1,9 @@
-import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
+import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
 import { MaraSquad } from "../Subcontrollers/Squads/MaraSquad";
-import { MaraPoint } from "../Utils/Common";
+import { MaraPoint } from "../Common/MaraPoint";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
-import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
+import { MaraUtils, } from "Mara/MaraUtils";
+import { UnitComposition } from "Mara/Common/UnitComposition";
 
 export class DefendingState extends MaraSettlementControllerState {
     private reinforcementsCfgIds: Array<string>;

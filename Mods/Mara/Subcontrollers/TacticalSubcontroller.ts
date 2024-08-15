@@ -1,5 +1,6 @@
-import { MaraSettlementController, SettlementClusterLocation } from "Mara/MaraSettlementController";
-import { MaraUtils } from "Mara/Utils/MaraUtils";
+import { MaraSettlementController } from "Mara/MaraSettlementController";
+import { SettlementClusterLocation } from "../Common/Settlement/SettlementClusterLocation";
+import { MaraUtils } from "Mara/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraControllableSquad } from "./Squads/MaraControllableSquad";
 import { TileType } from "library/game-logic/horde-types";

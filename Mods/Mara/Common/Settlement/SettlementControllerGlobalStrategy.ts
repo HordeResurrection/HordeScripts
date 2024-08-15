@@ -1,5 +1,5 @@
-import { MaraSettlementController } from "../MaraSettlementController";
-import { MaraUtils } from "./MaraUtils";
+import { MaraSettlementController } from "../../MaraSettlementController";
+import { MaraUtils } from "../../MaraUtils";
 
 class SelectionResult {
     CfgIds: Set<string>;

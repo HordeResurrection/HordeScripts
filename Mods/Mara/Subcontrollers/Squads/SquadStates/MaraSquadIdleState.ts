@@ -1,4 +1,4 @@
-import { MaraUtils } from "Mara/Utils/MaraUtils";
+import { MaraUtils } from "Mara/MaraUtils";
 import { TileType } from "library/game-logic/horde-types";
 import { MaraSquadAttackState } from "./MaraSquadAttackState";
 import { MaraSquadBattleState } from "./MaraSquadBattleState";

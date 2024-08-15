@@ -1,4 +1,4 @@
-import { MaraUtils } from "Mara/Utils/MaraUtils";
+import { MaraUtils } from "Mara/MaraUtils";
 import { MaraSquadAttackState } from "./MaraSquadAttackState";
 import { MaraSquadIdleState } from "./MaraSquadIdleState";
 import { MaraSquadState } from "./MaraSquadState";

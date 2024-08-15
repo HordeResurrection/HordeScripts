@@ -11,43 +11,15 @@ import { ProductionSubcontroller } from "./Subcontrollers/ProductionSubcontrolle
 import { MaraSquad } from "./Subcontrollers/Squads/MaraSquad";
 import { StrategySubcontroller } from "./Subcontrollers/StrategySubcontroller";
 import { TacticalSubcontroller } from "./Subcontrollers/TacticalSubcontroller";
-import { MaraPoint } from "./Utils/Common";
-import { MaraUtils, UnitComposition } from "./Utils/MaraUtils";
-import { MaraSettlementControllerSettings } from "./SettlementControllerSettings";
-import { SettlementControllerStateFactory } from "./SettlementControllerStateFactory";
-import { MaraResourceCluster, MaraResourceType } from "./MaraResourceMap";
+import { MaraPoint } from "./Common/MaraPoint";
+import { MaraUtils } from "./MaraUtils";
+import { UnitComposition } from "./Common/UnitComposition";
+import { MaraSettlementControllerSettings } from "./Common/Settlement/SettlementControllerSettings";
+import { SettlementControllerStateFactory } from "./Common/Settlement/SettlementControllerStateFactory";
 import { eNext, enumerate } from "library/dotnet/dotnet-utils";
-
-export class SettlementClusterLocation {
-    Center: any;
-    Radius: number;
-
-    constructor(center: any, radius: number) {
-        this.Center = center;
-        this.Radius = radius;
-    }
-}
-
-export class TargetExpandData {
-    Cluster: MaraResourceCluster | null;
-    ResourceType: MaraResourceType[] = [];
-    BuildCenter: MaraPoint | null = null;
-
-    constructor(cluster: MaraResourceCluster | null, resourceType: MaraResourceType[]) {
-        this.Cluster = cluster;
-        this.ResourceType = resourceType;
-    }
-}
-
-export class EconomySnapshotItem {
-    ConfigId: string;
-    Position: MaraPoint | undefined;
-
-    constructor(configId: string, position?: MaraPoint) {
-        this.ConfigId = configId;
-        this.Position = position;
-    }
-}
+import { SettlementClusterLocation } from "./Common/Settlement/SettlementClusterLocation";
+import { TargetExpandData } from "./Common/Settlement/TargetExpandData";
+import { EconomySnapshotItem } from "./Common/Settlement/EconomySnapshotItem";
 
 class ReservedUnitsData {
     public ReservableUnits: Array<Map<number, any>>;
