@@ -78,6 +78,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                     }
 
                     request.OnProductionFinished();
+                    this.settlementController.Debug(`Request ${request.ToString()} is completed with result ${request.IsSuccess}`);
                 }
                 else {
                     filteredRequests.push(request);
