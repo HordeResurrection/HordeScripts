@@ -381,8 +381,28 @@ export class MaraUtils {
         let cell: any;
         for (cell = generator.next(); !cell.done; cell = generator.next()) {
             let unit = unitsMap.GetUpperUnit(cell.value.X, cell.value.Y);
+            
             if (!unit) {
-                return {X: cell.value.X, Y: cell.value.Y};
+                let resultCell = cell.value;
+                let neighbors = MaraUtils.GetUnitsInArea(resultCell, 1);
+
+                let isTargetedCell = false;
+
+                for (let neighbor of neighbors) {
+                    if (neighbor.MoveToCell) {
+                        if (
+                            neighbor.MoveToCell.X == resultCell.X && 
+                            neighbor.MoveToCell.Y == resultCell.Y
+                        ) {
+                            isTargetedCell = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!isTargetedCell) {
+                    return {X: resultCell.X, Y: resultCell.Y};
+                }
             }
         }
 

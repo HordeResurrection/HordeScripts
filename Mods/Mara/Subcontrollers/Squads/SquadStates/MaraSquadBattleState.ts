@@ -418,7 +418,10 @@ export class MaraSquadBattleState extends MaraSquadState {
 
     private distributeTargets_liter(): void {
         let attackCell = MaraUtils.FindFreeCell(this.enemySquads[0].GetLocation().Point);
-        MaraUtils.IssueAttackCommand(this.squad.Units, this.squad.Controller.Player, attackCell);
+
+        if (attackCell) {
+            MaraUtils.IssueAttackCommand(this.squad.Units, this.squad.Controller.Player, attackCell);
+        }
     }
 
     private calcCellHeuristic(targetCell: any, unit: any): number {
