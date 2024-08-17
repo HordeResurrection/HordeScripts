@@ -8,7 +8,7 @@ import { UnitHurtType, UnitDirection } from "library/game-logic/horde-types";
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_GOALCASTLE } from "./Realizations/Player_units";
 import { TeimurUnitsClass, TeimurLegendaryUnitsClass } from "./Realizations/Teimur_units";
-import { broadcastMessage, createGameMessageWithNoSound } from "library/common/messages";
+import { broadcastMessage, createGameMessageWithNoSound, createGameMessageWithSound } from "library/common/messages";
 import { GameState, GlobalVars } from "./GlobalData";
 import { IUnit } from "./Types/IUnit";
 import { RandomSpawner, RectangleSpawner, RingSpawner } from "./Realizations/Spawners";
@@ -548,8 +548,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             secondsLeft     = Math.round(secondsLeft);
             let msg         = createGameMessageWithNoSound("Осталось продержаться " + (minutesLeft > 0 ? minutesLeft + " минут " : "") + secondsLeft + " секунд", createHordeColor(255, 100, 100, 100));
             for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0 ||
-                    GlobalVars.teams[teamNum].castle.unit.IsDead) {
+                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
                     continue;
                 }
 
@@ -563,12 +562,23 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
         if (GlobalVars.attackPlan.waves[GlobalVars.attackPlan.waveNum].gameTickNum < gameTickNum) {
             for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0 ||
-                    GlobalVars.teams[teamNum].castle.unit.IsDead) {
+                // проверяем, что поселение в игре
+                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
                     continue;
                 }
 
-                GlobalVars.teams[teamNum].spawner.SpawnWave(GlobalVars.attackPlan.waves[GlobalVars.attackPlan.waveNum]);
+                // оповещаем всех о волне
+                var wave = GlobalVars.attackPlan.waves[GlobalVars.attackPlan.waveNum];
+                for (var settlement of GlobalVars.teams[teamNum].settlements) {
+                    let msg2 = createGameMessageWithSound(wave.message, createHordeColor(255, 255, 50, 10));
+                    settlement.Messages.AddMessage(msg2);
+                }
+                
+                // у кого стоит замок спавним волну
+                if (GlobalVars.teams[teamNum].castle.unit.IsDead) {
+                    continue;
+                }
+                GlobalVars.teams[teamNum].spawner.SpawnWave(wave);
             }
             GlobalVars.attackPlan.waveNum++;
         }

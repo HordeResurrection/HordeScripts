@@ -696,8 +696,6 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
 
     /** оживленные юниты */
     reviveUnits: Array<Teimur_RevivedUnit>;
-    /** ид оживленных юнитов */
-    mapReviveUnits: Map<number, boolean>;
 
     revivePrevStart : number;
     constructor (unit: any, teamNum: number) {
@@ -705,7 +703,6 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
 
         this.revivePrevStart = 0;
         this.reviveUnits     = new Array<Teimur_RevivedUnit>();
-        this.mapReviveUnits  = new Map<number, boolean>();
 
         // поскольку трупы на карте живут не долго, то делаем обработку юнита чаще
         this.processingTickModule   = 10;
@@ -751,11 +748,12 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
                 var _unit = u.value;
 
                 if (
-                    // проверка, что уже оживлен
-                    this.mapReviveUnits.has(_unit.Id) ||
-                    // пропускаем здания и живых
-                    _unit.Cfg.IsBuilding ||
+                    // пропускаем живых
                     !_unit.IsDead ||
+                    // ранее воскрешенных
+                    _unit.Cfg.Uid.includes("_REVIVED") ||
+                    // здания
+                    _unit.Cfg.IsBuilding ||
                     // технику
                     _unit.Cfg.Specification.HasFlag(UnitSpecification.Machine) ||
                     // и магов
@@ -785,9 +783,6 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
                 var reviveUnit = spawnUnit(GlobalVars.teams[this.teamNum].teimurSettlement, GlobalVars.configs[revivedCfgUid], UnitDirection.Down, _unit.Cell);
                 if (reviveUnit != null) {
                     var unitInfo = new Teimur_RevivedUnit(reviveUnit, this.teamNum);
-                    this.mapReviveUnits.set(_unit.Id, true);
-                    this.mapReviveUnits.set(unitInfo.unit.Id, true);
-
                     GlobalVars.units.push(unitInfo);
                     this.reviveUnits.push(unitInfo);
                     spawnDecoration(GlobalVars.ActiveScena.GetRealScena(), GlobalVars.HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), _unit.Position);

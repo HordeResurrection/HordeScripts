@@ -28,11 +28,6 @@ export abstract class ISpawner {
     }
 
     public SpawnWave(wave: Wave) {
-        for (var settlement of GlobalVars.teams[this.teamNum].settlements) {
-            let msg2 = createGameMessageWithSound(wave.message, createHordeColor(255, 255, 50, 10));
-            settlement.Messages.AddMessage(msg2);
-        }
-
         for (var i = 0; i < wave.waveUnits.length; i++) {
             if (wave.waveUnits[i].count == 0) {
                 continue;
