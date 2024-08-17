@@ -5,7 +5,7 @@ import { MaraSquadBattleState } from "./MaraSquadBattleState";
 import { MaraSquadIdleGatheringUpState } from "./MaraSquadIdleGatheringUpState";
 import { MaraSquadMoveState } from "./MaraSquadMoveState";
 import { MaraSquadState } from "./MaraSquadState";
-import { Mara } from "../../../Mara";
+//import { Mara } from "../../../Mara";
 
 export class MaraSquadIdleState extends MaraSquadState {
     OnEntry(): void {
@@ -80,7 +80,8 @@ export class MaraSquadIdleState extends MaraSquadState {
             }
             else {
                 while (cellIndex < forestCells.length) {
-                    if (MaraUtils.IsPathExists(unit.Cell, forestCells[cellIndex], unit.Cfg, Mara.Pathfinder)) {
+                    //if (MaraUtils.IsPathExists(unit.Cell, forestCells[cellIndex], unit.Cfg, Mara.Pathfinder)) {
+                    if (MaraUtils.IsCellReachable(forestCells[cellIndex], unit)) {
                         MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, forestCells[cellIndex]);
                         break;
                     }
