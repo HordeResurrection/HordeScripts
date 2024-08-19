@@ -57,11 +57,15 @@ export class StrategySubcontroller extends MaraSubcontroller {
             this.SelectEnemy();
         }
 
-        let ratio = this.selectAttackToDefenseRatio();
+        let ratio = MaraUtils.RandomSelect<number>(
+            this.settlementController.MasterMind,
+            this.settlementController.Settings.CombatSettings.OffensiveToDefensiveRatios
+        ) ?? 1;
+
         this.settlementController.AttackToDefenseUnitRatio = ratio;
         this.settlementController.Debug(`Calculated attack to defense ratio: ${ratio}`);
         
-        let requiredStrength = this.settlementController.Settings.ControllerStates.AttackStrengthToEnemyStrengthRatio * 
+        let requiredStrength = this.settlementController.Settings.CombatSettings.AttackStrengthToEnemyStrengthRatio * 
             Math.max(
                 this.calcSettlementStrength(this.currentEnemy), 
                 this.settlementController.Settings.ControllerStates.MinAttackStrength
@@ -122,7 +126,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         }
         
         if (requiredStrength > 0) {
-            requiredStrength *= this.settlementController.Settings.ControllerStates.AttackStrengthToEnemyStrengthRatio;
+            requiredStrength *= this.settlementController.Settings.CombatSettings.AttackStrengthToEnemyStrengthRatio;
             this.settlementController.Debug(`Required Strength to secure expand: ${requiredStrength}`);
 
             let composition = this.getOffensiveUnitComposition(requiredStrength);
@@ -618,22 +622,5 @@ export class StrategySubcontroller extends MaraSubcontroller {
         }
 
         return unitComposition;
-    }
-
-    private selectAttackToDefenseRatio(): number {
-        let choise = MaraUtils.Random(this.settlementController.MasterMind, 3);
-
-        switch (choise) {
-            case 0:
-                return 1;
-            case 1:
-                return 0.75;
-            case 2: 
-                return 0.5;
-            case 3:
-                return 0.25;
-            default:
-                return 0;
-        }
     }
 }
