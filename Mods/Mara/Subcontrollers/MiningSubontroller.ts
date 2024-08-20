@@ -1,10 +1,13 @@
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
-import { MaraResourceCluster, MaraResourceMap, MaraResourceType } from "../MaraResourceMap";
-import { MaraPoint, MaraResources } from "../Utils/Common";
-import { MaraUtils, ResourceType } from "../Utils/MaraUtils";
+import { MaraResourceMap } from "../Common/Resources/MaraResourceMap";
+import { MaraResourceType } from "../Common/Resources/MaraResourceType";
+import { MaraResources } from "../Common/Resources/MaraResources";
+import { MaraPoint } from "../Common/MaraPoint";
+import { MaraUtils, ResourceType } from "../MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 import { eNext, enumerate } from "library/dotnet/dotnet-utils";
+import { MaraResourceCluster } from "../Common/Resources/MaraResourceCluster";
 
 class MineData {
     public Mine: any = null;
@@ -17,10 +20,10 @@ class SawmillData {
 }
 
 export class MiningSubcontroller extends MaraSubcontroller {
-    public Mines: Array<MineData> = [];
     public Sawmills: Array<SawmillData> = [];
 
     private metalStocks: Array<any> | null = null;
+    private mines: Array<MineData> = [];
     
     constructor (parent: MaraSettlementController) {
         super(parent);
@@ -58,11 +61,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         let freeHousing = Math.max(settlement.Census.MaxPeople - settlement.Census.BusyAndReservedPeople, 0);
         totalResources.People = settlementResources.FreePeople + freeHousing;
 
-        for (let mineData of this.Mines) {
-            // if (mineData.Miners.length == 0) {
-            //     continue;
-            // }
-
+        for (let mineData of this.mines) {
             let mineResources = this.getMineResources(mineData.Mine);
 
             totalResources.Gold += mineResources.Gold;
@@ -70,10 +69,6 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
 
         for (let sawmillData of this.Sawmills) {
-            // if (sawmillData.Woodcutters.length == 0) {
-            //     continue;
-            // }
-            
             MaraResourceMap.ResourceClusters.forEach(
                 (value) => {
                     if (
@@ -101,7 +96,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         return this.getUnengagedHarvesters();
     }
 
-    GetRectResources(topLeft: MaraPoint, bottomRight: MaraPoint): MaraResources {
+    public GetRectResources(topLeft: MaraPoint, bottomRight: MaraPoint): MaraResources {
         let result = new MaraResources(0, 0, 0, 0);
 
         for (let row = topLeft.Y; row <= bottomRight.Y; row++) {
@@ -185,7 +180,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         this.checkForUnaccountedBuildings();
         let maxMiners = 0;
 
-        for (let mineData of this.Mines) {
+        for (let mineData of this.mines) {
             maxMiners += this.getMinerCount(mineData.Mine);
         }
         
@@ -230,7 +225,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
     private getUnengagedHarvesters(): Array<any> {
         let engagedHarvesters: Array<any> = [];
 
-        for (let mineData of this.Mines) {
+        for (let mineData of this.mines) {
             engagedHarvesters.push(...mineData.Miners);
         }
 
@@ -268,9 +263,9 @@ export class MiningSubcontroller extends MaraSubcontroller {
     private cleanup(): void {
         this.metalStocks = null;
         
-        this.Mines = this.Mines.filter((value) => {return this.buildingFilter(value.Mine)});
+        this.mines = this.mines.filter((value) => {return this.buildingFilter(value.Mine)});
 
-        for (let mineData of this.Mines) {
+        for (let mineData of this.mines) {
             mineData.Miners = mineData.Miners.filter((value) => {return this.isUnreservedHarvester(value)});
         }
 
@@ -291,12 +286,12 @@ export class MiningSubcontroller extends MaraSubcontroller {
             }
 
             if (MaraUtils.IsMineConfig(unit.Cfg)) {
-                let mineData = this.Mines.find((value) => {return value.Mine == unit});
+                let mineData = this.mines.find((value) => {return value.Mine == unit});
                 
                 if (!mineData && this.settlementController.StrategyController.IsSafeExpand(unit.CellCenter)) {
                     mineData = new MineData();
                     mineData.Mine = unit;
-                    this.Mines.push(mineData);
+                    this.mines.push(mineData);
                 }
             }
             else if (MaraUtils.IsSawmillConfig(unit.Cfg)) {
@@ -331,7 +326,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
     private redistributeHarvesters(): void {
         let minerRequrement = 0;
 
-        for (let mineData of this.Mines) {
+        for (let mineData of this.mines) {
             let requiredMiners = this.getMinerCount(mineData.Mine);
             
             if (mineData.Miners.length < requiredMiners) {
@@ -370,7 +365,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         const maxWoodcutters = this.settlementController.Settings.ResourceMining.MaxWoodcuttersPerSawmill;
 
         while (freeHarvesterIndex < freeHarvesters.length) {
-            let understaffedMineData = this.Mines.find(
+            let understaffedMineData = this.mines.find(
                 (value) => {
                     let requiredMiners = this.getMinerCount(value.Mine);
                     return value.Miners.length < requiredMiners;
@@ -419,7 +414,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
     }
 
     private engageIdleHarvesters(): void {
-        for (let mineData of this.Mines) {
+        for (let mineData of this.mines) {
             for (let miner of mineData.Miners) {
                 if (miner.OrdersMind.IsIdle()) {
                     MaraUtils.IssueMineCommand([miner], this.settlementController.Player, mineData.Mine.Cell);
@@ -444,7 +439,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
     }
 
     private destroyEmptyMines(): void {
-        for (let mineData of this.Mines) {
+        for (let mineData of this.mines) {
             let mineResources = this.getMineResources(mineData.Mine);
 
             if (mineResources.Gold == 0 && mineResources.Metal == 0) {

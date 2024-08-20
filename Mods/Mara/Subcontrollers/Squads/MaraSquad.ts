@@ -1,5 +1,5 @@
-import { MaraUtils } from "Mara/Utils/MaraUtils";
-import { MaraPoint } from "../../Utils/Common";
+import { MaraUtils } from "Mara/MaraUtils";
+import { MaraPoint } from "../../Common/MaraPoint";
 
 export class MaraSquadLocation {
     Point: MaraPoint;

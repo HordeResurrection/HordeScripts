@@ -1,4 +1,4 @@
-import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
+import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 
 export class ExpandSecureState extends MaraSettlementControllerState {

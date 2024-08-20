@@ -1,6 +1,6 @@
-import { FsmState } from "Mara/Utils/Common";
-import { MaraUtils } from "Mara/Utils/MaraUtils";
+import { MaraUtils } from "Mara/MaraUtils";
 import { MaraControllableSquad } from "../MaraControllableSquad";
+import { FsmState } from "../../../Common/FsmState";
 
 export abstract class MaraSquadState extends FsmState {
     protected squad: MaraControllableSquad;

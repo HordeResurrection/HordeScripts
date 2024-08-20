@@ -1,7 +1,10 @@
-import { MaraUtils, UnitComposition } from "Mara/Utils/MaraUtils";
+import { MaraUtils } from "Mara/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
-import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
-import { MaraPoint, MaraProductionRequest, MaraResources } from "../Utils/Common";
+import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
+import { MaraProductionRequest } from "../Common/MaraProductionRequest";
+import { MaraResources } from "../Common/Resources/MaraResources";
+import { MaraPoint } from "../Common/MaraPoint";
+import { UnitComposition } from "../Common/UnitComposition";
 
 export abstract class ProductionState extends MaraSettlementControllerState {
     private requests: Array<MaraProductionRequest>;

@@ -1,7 +1,8 @@
-import { MaraUtils } from "Mara/Utils/MaraUtils";
+import { MaraUtils } from "Mara/MaraUtils";
 import { ProductionState } from "./ProductionState";
-import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
-import { MaraProductionRequest, MaraResources } from "../Utils/Common";
+import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
+import { MaraProductionRequest } from "../Common/MaraProductionRequest";
+import { MaraResources } from "../Common/Resources/MaraResources";
 
 export class DevelopingState extends ProductionState {
     protected getProductionRequests(): Array<MaraProductionRequest> {
@@ -46,6 +47,7 @@ export class DevelopingState extends ProductionState {
         });
 
         let maxHarvesterCount = this.settlementController.MiningController.GetOptimalHarvesterCount();
+        let orderedHarvestersCount = 0;
 
         if (harvesterCount < maxHarvesterCount) {
             let harvesterConfigIds = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
@@ -54,6 +56,11 @@ export class DevelopingState extends ProductionState {
             if (cfgId != null) {
                 for (let i = 0; i < maxHarvesterCount - harvesterCount; i++) {
                     result.push(this.makeProductionRequest(cfgId, null, null));
+                    orderedHarvestersCount ++;
+
+                    if (orderedHarvestersCount >= this.settlementController.Settings.ControllerStates.MaxHarvesterProductionBatch) {
+                        break;
+                    }
                 }
             }
         }

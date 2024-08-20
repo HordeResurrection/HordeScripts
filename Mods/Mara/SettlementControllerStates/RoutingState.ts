@@ -1,7 +1,9 @@
-import { MaraResourceMap, MaraResourceType } from "../MaraResourceMap";
-import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
-import { MaraResources } from "../Utils/Common";
-import { MaraUtils, NonUniformRandomSelectItem } from "../Utils/MaraUtils";
+import { MaraResourceMap } from "../Common/Resources/MaraResourceMap";
+import { MaraResourceType } from "../Common/Resources/MaraResourceType";
+import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
+import { MaraResources } from "../Common/Resources/MaraResources";
+import { MaraUtils } from "../MaraUtils";
+import { NonUniformRandomSelectItem } from "../Common/NonUniformRandomSelectItem";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 
 class NextStrategyItem implements NonUniformRandomSelectItem {
@@ -82,8 +84,23 @@ export class RoutingState extends MaraSettlementControllerState {
 
     private defineOffensiveStrategy(): void {
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
-        let combatCfgId = produceableCfgIds.find( (value) => {return MaraUtils.IsCombatConfigId(value)} );
-        let offensiveCfgId = produceableCfgIds.find( (value) => {return MaraUtils.IsCombatConfigId(value) && !MaraUtils.IsBuildingConfigId(value)} );
+        
+        let combatCfgId = produceableCfgIds.find( (value) => {
+            return (
+                MaraUtils.IsCombatConfigId(value) && 
+                (
+                    this.settlementController.StrategyController.GlobalStrategy.OffensiveCfgIds.has(value) ||
+                    this.settlementController.StrategyController.GlobalStrategy.DefensiveBuildingsCfgIds.has(value)
+                )
+            );
+        } );
+
+        let offensiveCfgId = produceableCfgIds.find( 
+            (value) => {
+                return MaraUtils.IsCombatConfigId(value) && !MaraUtils.IsBuildingConfigId(value) &&
+                    this.settlementController.StrategyController.GlobalStrategy.OffensiveCfgIds.has(value)
+            } 
+        );
 
         if (offensiveCfgId) {
             this.pickBuildUpOrDevelopment(this.settlementController.Settings.ControllerStates.BuildUpProbabilityWhenOffensePossible * 100);

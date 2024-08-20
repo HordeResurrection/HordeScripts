@@ -1,8 +1,10 @@
 import { ProductionState } from "./ProductionState";
-import { SettlementControllerStateFactory } from "../SettlementControllerStateFactory";
-import { MaraUtils, UnitComposition } from "../Utils/MaraUtils";
-import { EconomySnapshotItem } from "../MaraSettlementController";
-import { MaraPoint, MaraProductionRequest } from "../Utils/Common";
+import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
+import { MaraUtils } from "../MaraUtils";
+import { UnitComposition } from "../Common/UnitComposition";
+import { EconomySnapshotItem } from "../Common/Settlement/EconomySnapshotItem";
+import { MaraProductionRequest } from "../Common/MaraProductionRequest";
+import { MaraPoint } from "../Common/MaraPoint";
 
 export class RebuildState extends ProductionState {
     protected getProductionRequests(): Array<MaraProductionRequest> {
@@ -96,22 +98,36 @@ export class RebuildState extends ProductionState {
         }
 
         let harvestersToProduce = MaraUtils.SubstractCompositionLists(requiredHarvesters, existingHarvesters);
+        let orderedHarvestersCount = 0;
 
         harvestersToProduce.forEach(
             (value, key) => {
                 for (let i = 0; i < value; i++) {
+                    if (orderedHarvestersCount >= this.settlementController.Settings.ControllerStates.MaxHarvesterProductionBatch) {
+                        break;
+                    }
+                    
                     result.push(this.makeProductionRequest(key, null, null));
+                    orderedHarvestersCount ++;
                 }
             }
         );
 
-        if (initialHarvesterCount < maxHarvesterCount) {
+        if (
+            initialHarvesterCount < maxHarvesterCount &&
+            orderedHarvestersCount < this.settlementController.Settings.ControllerStates.MaxHarvesterProductionBatch
+        ) {
             let harvesterConfigIds = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
             let cfgId = MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, harvesterConfigIds);
 
             if (cfgId != null) {
                 for (let i = 0; i < maxHarvesterCount - initialHarvesterCount; i++) {
                     result.push(this.makeProductionRequest(cfgId, null, null));
+                    orderedHarvestersCount ++;
+
+                    if (orderedHarvestersCount >= this.settlementController.Settings.ControllerStates.MaxHarvesterProductionBatch) {
+                        break;
+                    }
                 }
             }
         }

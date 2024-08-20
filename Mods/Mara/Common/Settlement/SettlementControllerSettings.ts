@@ -40,12 +40,13 @@ class SquadsSettings {
 }
 
 class ControllerStatesSettings {
-    public BuildUpProbabilityWhenOffensePossible = 0.70;
+    public BuildUpProbabilityWhenOffensePossible = 0.60;
     public BuildUpProbabilityWhenDefensePossible = 0.35;
     
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;
-    public AttackStrengthToEnemyStrengthRatio: number = 1.5;
+
+    public MaxHarvesterProductionBatch: number = 6;
 }
 
 class ResourceMiningSettings {
@@ -66,4 +67,7 @@ class CombatSettings {
     public MaxCompositionUnitCount: number = 20;
     public MaxUsedOffensiveCfgIdCount: number = 4;
     public MaxUsedDefensiveCfgIdCount: number = 1;
+    
+    public OffensiveToDefensiveRatios: Array<number> = [1, 0.75, 0.5, 0.25, 0];
+    public AttackStrengthToEnemyStrengthRatio: number = 1.5;
 }

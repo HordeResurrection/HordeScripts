@@ -1,11 +1,12 @@
-import { MaraUtils } from "Mara/Utils/MaraUtils";
+import { MaraUtils } from "Mara/MaraUtils";
 import { MaraSquad, MaraSquadLocation } from "../MaraSquad";
 import { MaraSquadAttackState } from "./MaraSquadAttackState";
 import { MaraSquadMoveState } from "./MaraSquadMoveState";
 import { MaraSquadState } from "./MaraSquadState";
 import { TileType } from "library/game-logic/horde-types";
 import { MaraSquadPullbackState } from "./MaraSquadPullbackState";
-import { MaraCellDataHolder, MaraPoint } from "../../../Utils/Common";
+import { MaraCellDataHolder } from "../../../Common/MaraCellDataHolder";
+import { MaraPoint } from "../../../Common/MaraPoint";
 
 class MaraThreatMap extends MaraCellDataHolder {
     constructor () {
@@ -417,7 +418,10 @@ export class MaraSquadBattleState extends MaraSquadState {
 
     private distributeTargets_liter(): void {
         let attackCell = MaraUtils.FindFreeCell(this.enemySquads[0].GetLocation().Point);
-        MaraUtils.IssueAttackCommand(this.squad.Units, this.squad.Controller.Player, attackCell);
+
+        if (attackCell) {
+            MaraUtils.IssueAttackCommand(this.squad.Units, this.squad.Controller.Player, attackCell);
+        }
     }
 
     private calcCellHeuristic(targetCell: any, unit: any): number {
