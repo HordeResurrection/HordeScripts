@@ -374,7 +374,7 @@ export class MaraUtils {
     }
 
     // finds a free cell nearest to given
-    static FindFreeCell(point): any {
+    static FindFreeCell(point: any): any {
         let unitsMap = DotnetHolder.UnitsMap;
         
         let generator = generateCellInSpiral(point.X, point.Y);
@@ -592,7 +592,22 @@ export class MaraUtils {
     }
 
     static IssueMoveCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
-        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.MoveToPoint, isReplaceMode);
+        let capturingUnits: Array<any> = [];
+        let nonCapturingUnits: Array<any> = [];
+
+        for (let unit of units) {
+            if (unit.Cfg.AllowedCommands.ContainsKey(UnitCommand.Capture)) {
+                capturingUnits.push(unit);
+            }
+            else {
+                nonCapturingUnits.push(unit);
+            }
+        }
+
+        let freeCell = MaraUtils.FindFreeCell(location);
+        
+        MaraUtils.issuePointBasedCommand(capturingUnits, player, freeCell, UnitCommand.Capture, isReplaceMode);
+        MaraUtils.issuePointBasedCommand(nonCapturingUnits, player, location, UnitCommand.MoveToPoint, isReplaceMode);
     }
 
     static IssueHarvestLumberCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
