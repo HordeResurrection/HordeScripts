@@ -174,21 +174,17 @@ export class StrategySubcontroller extends MaraSubcontroller {
     }
 
     GetReinforcementCfgIds(): Array<string> {
-        let economyComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
+        let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
         let combatUnitCfgIds = new Array<string>();
-
-        economyComposition.forEach(
-            (val, key, map) => {
-                let config = MaraUtils.GetUnitConfig(key);
-                
-                if (
-                    MaraUtils.IsCombatConfig(config) &&
-                    config.BuildingConfig == null
-                ) {
-                    combatUnitCfgIds.push(key);
-                }
+        
+        for (let cfgId of produceableCfgIds) {
+            if (
+                MaraUtils.IsCombatConfigId(cfgId) &&
+                !MaraUtils.IsBuildingConfigId(cfgId)
+            ) {
+                combatUnitCfgIds.push(cfgId);
             }
-        );
+        }
 
         if (combatUnitCfgIds.length == 0) {
             combatUnitCfgIds.push(this.globalStrategy.LowestTechOffensiveCfgId);
