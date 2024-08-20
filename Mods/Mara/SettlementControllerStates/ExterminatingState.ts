@@ -57,7 +57,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
                 }
             }
             else {
-                if (!this.currentTarget || !this.currentTarget.IsAlive) {
+                if (!this.isValidTarget(this.currentTarget)) {
                     this.selectTarget(enemy);
                 }
             }
@@ -97,7 +97,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
         }
     }
 
-    private selectTarget(enemy: any) {
+    private selectTarget(enemy: any): void {
         this.currentTarget = null;
         let target = this.settlementController.StrategyController.GetOffensiveTarget(enemy);
 
@@ -107,9 +107,16 @@ export class ExterminatingState extends MaraSettlementControllerState {
         }
     }
 
-    private requestReinforcementsProduction() {
+    private requestReinforcementsProduction(): void {
         for (let cfgId of this.reinforcementsCfgIds) {
             this.settlementController.ProductionController.RequestSingleCfgIdProduction(cfgId);
         }
+    }
+    private isValidTarget(unit: any): boolean {
+        return !(
+            !unit || 
+            !unit.IsAlive ||
+            this.settlementController.StrategyController.CurrentEnemy == unit.Owner
+        );
     }
 }
