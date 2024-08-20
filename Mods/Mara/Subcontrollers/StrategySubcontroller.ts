@@ -123,6 +123,8 @@ export class StrategySubcontroller extends MaraSubcontroller {
             for (let unit of enemyUnits) {
                 requiredStrength += MaraUtils.GetUnitStrength(unit);
             }
+
+            requiredStrength = Math.max(this.settlementController.Settings.ControllerStates.MinAttackStrength, requiredStrength);
         }
         
         if (requiredStrength > 0) {
