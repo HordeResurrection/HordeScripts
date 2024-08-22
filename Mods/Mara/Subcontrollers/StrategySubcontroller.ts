@@ -179,10 +179,19 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
         let combatUnitCfgIds = new Array<string>();
         
+        let allowedCfgIds = new Set<string>(
+            [
+                ...this.globalStrategy.OffensiveCfgIds,
+                ...this.globalStrategy.DefensiveBuildingsCfgIds,
+            ]
+        );
+        
+        
         for (let cfgId of produceableCfgIds) {
             if (
                 MaraUtils.IsCombatConfigId(cfgId) &&
-                !MaraUtils.IsBuildingConfigId(cfgId)
+                !MaraUtils.IsBuildingConfigId(cfgId) &&
+                allowedCfgIds.has(cfgId)
             ) {
                 combatUnitCfgIds.push(cfgId);
             }
