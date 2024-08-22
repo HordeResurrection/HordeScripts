@@ -421,20 +421,22 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     private getUnitMovementType(unit: any) {
-        let moveType = unit.Cfg.MoveType.ToString();
-
+        let speedsThresholds = this.settlementController.Settings.CombatSettings.UnitSpeedClusterizationThresholds;
         let unitSpeed = unit.Cfg.Speeds.Item(TileType.Grass);
-        let speedGroupCode = "";
+        let speedGroupCode: number | null = null;
 
-        if (unitSpeed <= 9) {
-            speedGroupCode = "1";
+        for (let i = 0; i < speedsThresholds.length; i++) {
+            if (unitSpeed <= speedsThresholds[i]) {
+                speedGroupCode = i;
+                break;
+            }
         }
-        else if (unitSpeed <= 14) {
-            speedGroupCode = "2";
+
+        if (speedGroupCode == null) {
+            speedGroupCode = speedsThresholds.length;
         }
-        else {
-            speedGroupCode = "3";
-        }
+
+        let moveType = unit.Cfg.MoveType.ToString();
 
         return `${moveType}:${speedGroupCode}`;
     }
