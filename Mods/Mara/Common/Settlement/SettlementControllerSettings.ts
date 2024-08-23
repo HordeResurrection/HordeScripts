@@ -47,6 +47,7 @@ class ControllerStatesSettings {
     public MinAttackStrength: number = 100;
 
     public MaxHarvesterProductionBatch: number = 6;
+    public MaxSameCfgIdProducerCount: number = 3;
 }
 
 class ResourceMiningSettings {

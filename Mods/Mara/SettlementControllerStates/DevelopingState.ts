@@ -75,8 +75,18 @@ export class DevelopingState extends ProductionState {
                 let producingCfgIds = this.settlementController.ProductionController.GetProducingCfgIds(key);
 
                 if (producingCfgIds.length > 0) {
-                    let producerCfgId = MaraUtils.RandomSelect(this.settlementController.MasterMind, producingCfgIds);
-                    reinforcementProducers.push(producerCfgId!);
+                    let totalProducerCount = 0;
+
+                    for (let cfgId of producingCfgIds) {
+                        if (economyComposition.has(cfgId)) {
+                            totalProducerCount += economyComposition.get(cfgId)!;
+                        }
+                    }
+
+                    if (totalProducerCount < this.settlementController.Settings.ControllerStates.MaxSameCfgIdProducerCount) {
+                        let producerCfgId = MaraUtils.RandomSelect(this.settlementController.MasterMind, producingCfgIds);
+                        reinforcementProducers.push(producerCfgId!);
+                    }
                 }
             }
         });
