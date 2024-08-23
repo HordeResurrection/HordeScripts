@@ -89,8 +89,8 @@ export class RoutingState extends MaraSettlementControllerState {
             return (
                 MaraUtils.IsCombatConfigId(value) && 
                 (
-                    this.settlementController.StrategyController.GlobalStrategy.OffensiveCfgIds.has(value) ||
-                    this.settlementController.StrategyController.GlobalStrategy.DefensiveBuildingsCfgIds.has(value)
+                    this.settlementController.StrategyController.GlobalStrategy.OffensiveCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0 || 
+                    this.settlementController.StrategyController.GlobalStrategy.DefensiveBuildingsCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0
                 )
             );
         } );
@@ -98,7 +98,7 @@ export class RoutingState extends MaraSettlementControllerState {
         let offensiveCfgId = produceableCfgIds.find( 
             (value) => {
                 return MaraUtils.IsCombatConfigId(value) && !MaraUtils.IsBuildingConfigId(value) &&
-                    this.settlementController.StrategyController.GlobalStrategy.OffensiveCfgIds.has(value)
+                    this.settlementController.StrategyController.GlobalStrategy.OffensiveCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0
             } 
         );
 
