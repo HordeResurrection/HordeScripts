@@ -303,7 +303,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     private findWeakestReinforceableSquad(
         squads: Array<MaraControllableSquad>, 
         squadMovementType: string,
-        squadFilter: ((squad: MaraControllableSquad) => boolean) | null = null
+        squadFilter?: (squad: MaraControllableSquad) => boolean
     ): MaraControllableSquad | null {
         let weakestSquad: MaraControllableSquad | null = null;
 
