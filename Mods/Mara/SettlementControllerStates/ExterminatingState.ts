@@ -116,7 +116,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
         return !(
             !unit || 
             !unit.IsAlive ||
-            this.settlementController.StrategyController.CurrentEnemy == unit.Owner
+            this.settlementController.StrategyController.CurrentEnemy != unit.Owner
         );
     }
 }
