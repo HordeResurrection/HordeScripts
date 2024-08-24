@@ -60,7 +60,10 @@ export class MaraSquadAttackState extends MaraSquadState {
 
     private isEnemyNearby(units: Array<any>): boolean {
         for (let unit of units) {
-            if (this.squad.Controller.EnemySettlements.indexOf(unit.Owner) > -1) {
+            if (
+                unit.IsAlive &&
+                this.squad.Controller.EnemySettlements.indexOf(unit.Owner) > -1
+            ) {
                 return true;
             }
         }
