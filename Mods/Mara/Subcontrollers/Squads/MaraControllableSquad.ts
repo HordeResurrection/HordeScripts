@@ -81,6 +81,18 @@ export class MaraControllableSquad extends MaraSquad {
         return enemies.length > 0;
     }
 
+    GetNearbyUnits(): Array<any> {
+        let units = MaraUtils.GetSettlementUnitsInArea(
+            this.GetLocation().Point, 
+            this.Controller.SquadsSettings.EnemySearchRadius,
+            [],
+            (unit) => true,
+            true
+        );
+
+        return units;
+    }
+
     ToString(): string {
         let unitNames = this.Units.map((value) => value.ToString());
         return unitNames.join("\n");

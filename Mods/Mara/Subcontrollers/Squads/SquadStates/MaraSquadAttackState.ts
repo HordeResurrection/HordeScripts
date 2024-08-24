@@ -14,7 +14,9 @@ export class MaraSquadAttackState extends MaraSquadState {
     OnExit(): void {}
 
     Tick(tickNumber: number): void {
-        if (this.squad.IsEnemyNearby()) {
+        let nearbyUnits = this.squad.GetNearbyUnits();
+        
+        if (this.isEnemyNearby(nearbyUnits)) {
             this.squad.SetState(new MaraSquadBattleState(this.squad));
             return;
         }
@@ -38,8 +40,8 @@ export class MaraSquadAttackState extends MaraSquadState {
             return;
         }
 
-        if (this.atLeastOneCapturingUnitInSquad()) {
-            if (this.isCapturableUnitsNearby()) {
+        if (this.isCapturableUnitsNearby(nearbyUnits)) {
+            if (this.atLeastOneCapturingUnitInSquad()) {
                 this.squad.SetState(new MaraSquadCaptureState(this.squad));
                 return;
             }
@@ -56,22 +58,22 @@ export class MaraSquadAttackState extends MaraSquadState {
         }
     }
 
-    private isCapturableUnitsNearby(): boolean {
-        let units = MaraUtils.GetSettlementUnitsInArea(
-            this.squad.GetLocation().Point, 
-            this.squad.Controller.SquadsSettings.EnemySearchRadius,
-            this.squad.Controller.EnemySettlements,
-            (unit) => {
-                return (
-                    unit.BattleMind.CanBeCapturedNow() && 
-                    !MaraUtils.IsBuildingConfig(unit.Cfg) //&&
-                    //MaraUtils.IsCellReachable(unit.Cell, this.squad.Units[0])
-                )
-            },
-            true
-        );
+    private isEnemyNearby(units: Array<any>): boolean {
+        for (let unit of units) {
+            if (this.squad.Controller.EnemySettlements.indexOf(unit.Owner) > -1) {
+                return true;
+            }
+        }
 
-        return units.length > 0;
+        return false;
+    }
+
+    private isCapturableUnitsNearby(units: Array<any>): boolean {
+        return units.findIndex((unit) => {
+                return unit.BattleMind.CanBeCapturedNow() && 
+                !MaraUtils.IsBuildingConfig(unit.Cfg)
+            }
+        ) >= 0;
     }
 
     private atLeastOneCapturingUnitInSquad(): boolean {

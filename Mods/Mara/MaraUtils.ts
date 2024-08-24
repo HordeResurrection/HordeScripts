@@ -222,7 +222,7 @@ export class MaraUtils {
         let units = MaraUtils.GetUnitsInArea(cell, radius, unitFilter);
         units = units.filter((unit) => {
             return (
-                settelements.indexOf(unit.Owner) > -1 && 
+                (settelements.length == 0 || settelements.indexOf(unit.Owner) > -1) && 
                 (unit.IsAlive || includeUnalive) && 
                 unit.Cfg.HasNotFlags(UnitFlags.Passive)
             );
