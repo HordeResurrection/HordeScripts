@@ -4,6 +4,7 @@ import { MaraSquadMoveState } from "./MaraSquadMoveState";
 import { MaraSquadState } from "./MaraSquadState";
 import { MaraSquadIdleState } from "./MaraSquadIdleState";
 import { MaraSquadAttackGatheringUpState } from "./MaraSquadAttackGatheringUpState";
+import { MaraSquadCaptureState } from "./MaraSquadCaptureState";
 
 export class MaraSquadAttackState extends MaraSquadState {
     OnEntry(): void {
@@ -36,6 +37,13 @@ export class MaraSquadAttackState extends MaraSquadState {
             this.initiateAttack();
             return;
         }
+
+        if (this.atLeastOneCapturingUnitInSquad()) {
+            if (this.isCapturableUnitsNearby()) {
+                this.squad.SetState(new MaraSquadCaptureState(this.squad));
+                return;
+            }
+        }
         
         let distance = MaraUtils.ChebyshevDistance(
             this.squad.CurrentTargetCell, 
@@ -46,5 +54,33 @@ export class MaraSquadAttackState extends MaraSquadState {
             this.squad.SetState(new MaraSquadIdleState(this.squad));
             return;
         }
+    }
+
+    private isCapturableUnitsNearby(): boolean {
+        let units = MaraUtils.GetSettlementUnitsInArea(
+            this.squad.GetLocation().Point, 
+            this.squad.Controller.SquadsSettings.EnemySearchRadius,
+            this.squad.Controller.EnemySettlements,
+            (unit) => {
+                return (
+                    unit.BattleMind.CanBeCapturedNow() && 
+                    !MaraUtils.IsBuildingConfig(unit.Cfg) //&&
+                    //MaraUtils.IsCellReachable(unit.Cell, this.squad.Units[0])
+                )
+            },
+            true
+        );
+
+        return units.length > 0;
+    }
+
+    private atLeastOneCapturingUnitInSquad(): boolean {
+        for (let unit of this.squad.Units) {
+            if (MaraUtils.IsCapturingConfig(unit.Cfg)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

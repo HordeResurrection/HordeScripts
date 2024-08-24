@@ -216,11 +216,16 @@ export class MaraUtils {
         cell: any, 
         radius: number, 
         settelements: Array<any>,
-        unitFilter?: (unit: any) => boolean
+        unitFilter?: (unit: any) => boolean,
+        includeUnalive?: boolean
     ): Array<any> {
         let units = MaraUtils.GetUnitsInArea(cell, radius, unitFilter);
         units = units.filter((unit) => {
-            return settelements.indexOf(unit.Owner) > -1 && unit.IsAlive && unit.Cfg.HasNotFlags(UnitFlags.Passive)
+            return (
+                settelements.indexOf(unit.Owner) > -1 && 
+                (unit.IsAlive || includeUnalive) && 
+                unit.Cfg.HasNotFlags(UnitFlags.Passive)
+            );
         });
 
         return units;
@@ -592,22 +597,11 @@ export class MaraUtils {
     }
 
     static IssueMoveCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
-        let capturingUnits: Array<any> = [];
-        let nonCapturingUnits: Array<any> = [];
+        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.MoveToPoint, isReplaceMode);
+    }
 
-        for (let unit of units) {
-            if (unit.Cfg.AllowedCommands.ContainsKey(UnitCommand.Capture)) {
-                capturingUnits.push(unit);
-            }
-            else {
-                nonCapturingUnits.push(unit);
-            }
-        }
-
-        let freeCell = MaraUtils.FindFreeCell(location);
-        
-        MaraUtils.issuePointBasedCommand(capturingUnits, player, freeCell, UnitCommand.Capture, isReplaceMode);
-        MaraUtils.issuePointBasedCommand(nonCapturingUnits, player, location, UnitCommand.MoveToPoint, isReplaceMode);
+    static IssueCaptureCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
+        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.Capture, isReplaceMode);
     }
 
     static IssueHarvestLumberCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
@@ -765,6 +759,15 @@ export class MaraUtils {
     static IsCombatConfigId(cfgId: string): boolean {
         let cfg = MaraUtils.GetUnitConfig(cfgId);
         return MaraUtils.IsCombatConfig(cfg);
+    }
+
+    static IsCapturingConfig(unitConfig: any): boolean {
+        return unitConfig.AllowedCommands.ContainsKey(UnitCommand.Capture);
+    }
+
+    static IsCapturingConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId);
+        return MaraUtils.IsCapturingConfig(cfg);
     }
 
     static IsProducerConfig(cfg: any): boolean {
