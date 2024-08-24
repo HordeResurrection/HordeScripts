@@ -436,9 +436,26 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             speedGroupCode = speedsThresholds.length;
         }
 
-        let moveType = unit.Cfg.MoveType.ToString();
+        let moveType = "";
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Grass);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Forest);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Water);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Marsh);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Sand);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Mounts);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Road);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Ice);
 
         return `${moveType}:${speedGroupCode}`;
+    }
+
+    private speedToMoveTypeFlag(speed: number): string {
+        if (speed > 0) {
+            return "1";
+        }
+        else {
+            return "0";
+        }
     }
 
     private clusterizeUnitsByMovementType(units: Array<any>): Array<Array<any>> {
