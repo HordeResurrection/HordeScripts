@@ -303,7 +303,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     private findWeakestReinforceableSquad(
         squads: Array<MaraControllableSquad>, 
         squadMovementType: string,
-        squadFilter: ((squad: MaraControllableSquad) => boolean) | null = null
+        squadFilter?: (squad: MaraControllableSquad) => boolean
     ): MaraControllableSquad | null {
         let weakestSquad: MaraControllableSquad | null = null;
 
@@ -421,22 +421,41 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     private getUnitMovementType(unit: any) {
-        let moveType = unit.Cfg.MoveType.ToString();
-
+        let speedsThresholds = this.settlementController.Settings.CombatSettings.UnitSpeedClusterizationThresholds;
         let unitSpeed = unit.Cfg.Speeds.Item(TileType.Grass);
-        let speedGroupCode = "";
+        let speedGroupCode: number | null = null;
 
-        if (unitSpeed <= 9) {
-            speedGroupCode = "1";
+        for (let i = 0; i < speedsThresholds.length; i++) {
+            if (unitSpeed <= speedsThresholds[i]) {
+                speedGroupCode = i;
+                break;
+            }
         }
-        else if (unitSpeed <= 14) {
-            speedGroupCode = "2";
+
+        if (speedGroupCode == null) {
+            speedGroupCode = speedsThresholds.length;
         }
-        else {
-            speedGroupCode = "3";
-        }
+
+        let moveType = "";
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Grass);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Forest);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Water);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Marsh);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Sand);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Mounts);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Road);
+        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Ice);
 
         return `${moveType}:${speedGroupCode}`;
+    }
+
+    private speedToMoveTypeFlag(speed: number): string {
+        if (speed > 0) {
+            return "1";
+        }
+        else {
+            return "0";
+        }
     }
 
     private clusterizeUnitsByMovementType(units: Array<any>): Array<Array<any>> {

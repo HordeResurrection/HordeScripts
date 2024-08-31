@@ -7,34 +7,35 @@ import { MaraResources } from "../Common/Resources/MaraResources";
 export class DevelopingState extends ProductionState {
     protected getProductionRequests(): Array<MaraProductionRequest> {
         let economyComposition = this.settlementController.GetCurrentEconomyComposition();
-        let requiredProductionChain = this.settlementController.StrategyController.GetRequiredProductionChainCfgIds();
-        
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
-        produceableCfgIds = produceableCfgIds.filter((value) => requiredProductionChain.has(value));
         
-        let absentProducers: string[] = [];
-        let absentTech: string[] = [];
+        let globalStrategy = this.settlementController.StrategyController.GlobalStrategy;
+        let allRequiredCfgIdItems = [...globalStrategy.DefensiveBuildingsCfgIds, ...globalStrategy.OffensiveCfgIds];
+        
+        let unavailableCfgIdItems = allRequiredCfgIdItems.filter(
+            (value) => {
+                return produceableCfgIds.findIndex((item) => item == value.CfgId) < 0
+            }
+        )
 
-        for (let cfgId of produceableCfgIds) {
-            if (economyComposition.has(cfgId)) {
-                continue;
+        let shortestUnavailableChain: Array<string> | null = null;
+        
+        for (let item of unavailableCfgIdItems) {
+            let unavailableChain: Array<string> = [];
+            
+            for (let cfgId of item.ProductionChain) {
+                if (!economyComposition.has(cfgId)) {
+                    unavailableChain.push(cfgId);
+                }
             }
 
-            let config = MaraUtils.GetUnitConfig(cfgId);
-            let unitLimit = this.settlementController.Settlement.RulesOverseer.GetCurrentLimitForUnit(config) ?? Infinity;
-
-            if (unitLimit > 0) {
-                if (MaraUtils.IsProducerConfig(config)) {
-                    absentProducers.push(cfgId);
-                }
-                else if (MaraUtils.IsTechConfig(config)) {
-                    absentTech.push(cfgId);
-                }
+            if (
+                !shortestUnavailableChain || 
+                unavailableChain.length < shortestUnavailableChain.length
+            ) {
+                shortestUnavailableChain = unavailableChain;
             }
         }
-
-        this.settlementController.Debug(`Absent producers: ${absentProducers.join(", ")}`);
-        this.settlementController.Debug(`Absent tech: ${absentTech.join(", ")}`);
 
         let result = new Array<MaraProductionRequest>();
 
@@ -67,16 +68,25 @@ export class DevelopingState extends ProductionState {
 
         let combatComposition = this.settlementController.StrategyController.GetSettlementAttackArmyComposition();
         let estimation = this.settlementController.ProductionController.EstimateProductionTime(combatComposition);
-        let reinforcementProducers:Array<string> = [];
+        let reinforcementProducers: Array<string> = [];
 
         estimation.forEach((value, key) => {
             if (value > this.settlementController.Settings.Timeouts.UnitProductionEstimationThreshold / 2) {
                 let producingCfgIds = this.settlementController.ProductionController.GetProducingCfgIds(key);
-                producingCfgIds = producingCfgIds.filter((value) => requiredProductionChain.has(value));
 
                 if (producingCfgIds.length > 0) {
-                    let producerCfgId = MaraUtils.RandomSelect(this.settlementController.MasterMind, producingCfgIds);
-                    reinforcementProducers.push(producerCfgId!);
+                    let totalProducerCount = 0;
+
+                    for (let cfgId of producingCfgIds) {
+                        if (economyComposition.has(cfgId)) {
+                            totalProducerCount += economyComposition.get(cfgId)!;
+                        }
+                    }
+
+                    if (totalProducerCount < this.settlementController.Settings.ControllerStates.MaxSameCfgIdProducerCount) {
+                        let producerCfgId = MaraUtils.RandomSelect(this.settlementController.MasterMind, producingCfgIds);
+                        reinforcementProducers.push(producerCfgId!);
+                    }
                 }
             }
         });
@@ -85,19 +95,17 @@ export class DevelopingState extends ProductionState {
 
         let selectedCfgIds: Array<string> | null = null;
  
-        if (absentProducers.length > 0) {
-            selectedCfgIds = absentProducers;
-        }
-        else if (absentTech.length > 0) {
-            selectedCfgIds = absentTech;
+        if (shortestUnavailableChain) {
+            selectedCfgIds = shortestUnavailableChain;
         }
         else if (reinforcementProducers.length > 0) {
             selectedCfgIds = reinforcementProducers;
         }
 
         if (selectedCfgIds) {
-            let cfgId =  MaraUtils.RandomSelect(this.settlementController.MasterMind, selectedCfgIds);
-            result.push(this.makeProductionRequest(cfgId!, null, null));
+            for (let item of selectedCfgIds) {
+                result.push(this.makeProductionRequest(item, null, null));
+            }
         }
 
         return result;

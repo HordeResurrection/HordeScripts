@@ -2,8 +2,7 @@ import { MaraSettlementController } from "../../MaraSettlementController";
 import { MaraUtils } from "../../MaraUtils";
 
 class SelectionResult {
-    CfgIds: Set<string>;
-    ProductionChainCfgIds: Set<string>;
+    ConfigData: Map<string, CfgIdSelectionItem>;
     LowestTechCfgId: string = "";
 }
 
@@ -13,9 +12,8 @@ class CfgIdSelectionItem {
 }
 
 export class SettlementGlobalStrategy {
-    OffensiveCfgIds: Set<string>;
-    DefensiveBuildingsCfgIds: Set<string>;
-    ProductionChainCfgIds: Set<string>;
+    OffensiveCfgIds: Array<CfgIdSelectionItem>;
+    DefensiveBuildingsCfgIds: Array<CfgIdSelectionItem>;
     LowestTechOffensiveCfgId: string;
     
     private isInited: boolean = false;
@@ -42,7 +40,7 @@ export class SettlementGlobalStrategy {
             settlementController.Settings.CombatSettings.MaxUsedOffensiveCfgIdCount
         );
 
-        this.OffensiveCfgIds = offensiveResults.CfgIds;
+        this.OffensiveCfgIds = Array.from(offensiveResults.ConfigData.values());
         this.LowestTechOffensiveCfgId = offensiveResults.LowestTechCfgId;
 
         let availableDefensiveCfgIds = availableCfgIds.filter(
@@ -55,17 +53,11 @@ export class SettlementGlobalStrategy {
             settlementController.Settings.CombatSettings.MaxUsedDefensiveCfgIdCount
         );
 
-        this.DefensiveBuildingsCfgIds = defensiveResults.CfgIds;
-
-        this.ProductionChainCfgIds = new Set<string>();
-
-        offensiveResults.ProductionChainCfgIds.forEach((value) => {this.ProductionChainCfgIds.add(value)});
-        defensiveResults.ProductionChainCfgIds.forEach((value) => {this.ProductionChainCfgIds.add(value)});
+        this.DefensiveBuildingsCfgIds = Array.from(defensiveResults.ConfigData.values());
 
         settlementController.Debug(`Inited global strategy`);
-        settlementController.Debug(`Offensive CfgIds: ${Array.from(this.OffensiveCfgIds.keys()).join(", ")}`);
-        settlementController.Debug(`Defensive CfgIds: ${Array.from(this.DefensiveBuildingsCfgIds.keys()).join(", ")}`);
-        settlementController.Debug(`Tech Chain: ${Array.from(this.ProductionChainCfgIds.keys()).join(", ")}`);
+        settlementController.Debug(`Offensive CfgIds: ${this.OffensiveCfgIds.map((value) => value.CfgId).join(", ")}`);
+        settlementController.Debug(`Defensive CfgIds: ${this.DefensiveBuildingsCfgIds.map((value) => value.CfgId).join(", ")}`);
     }
 
     private initCfgIdsType(
@@ -123,13 +115,10 @@ export class SettlementGlobalStrategy {
             result.LowestTechCfgId = lowestTechItem.CfgId;
         }
 
-        result.CfgIds = new Set<string>(resultSelectionItems.map((value) => value.CfgId));
-        result.ProductionChainCfgIds = new Set<string>();
+        result.ConfigData = new Map<string, CfgIdSelectionItem>();
 
         for (let item of resultSelectionItems) {
-            for (let cfgId of item.ProductionChain) {
-                result.ProductionChainCfgIds.add(cfgId);
-            }
+            result.ConfigData.set(item.CfgId, item);
         }
 
         return result;

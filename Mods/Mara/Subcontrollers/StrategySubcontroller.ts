@@ -95,7 +95,10 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
         let defensiveCfgIds = produceableCfgIds.filter(
             (value) => {
-                return this.globalStrategy.OffensiveCfgIds.has(value) || this.globalStrategy.DefensiveBuildingsCfgIds.has(value);
+                return (
+                    this.globalStrategy.OffensiveCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0 || 
+                    this.globalStrategy.DefensiveBuildingsCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0
+                );
             }
         );
         this.settlementController.Debug(`Defensive Cfg IDs: ${defensiveCfgIds}`);
@@ -123,6 +126,8 @@ export class StrategySubcontroller extends MaraSubcontroller {
             for (let unit of enemyUnits) {
                 requiredStrength += MaraUtils.GetUnitStrength(unit);
             }
+
+            requiredStrength = Math.max(this.settlementController.Settings.ControllerStates.MinAttackStrength, requiredStrength);
         }
         
         if (requiredStrength > 0) {
@@ -174,21 +179,26 @@ export class StrategySubcontroller extends MaraSubcontroller {
     }
 
     GetReinforcementCfgIds(): Array<string> {
-        let economyComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
+        let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
         let combatUnitCfgIds = new Array<string>();
-
-        economyComposition.forEach(
-            (val, key, map) => {
-                let config = MaraUtils.GetUnitConfig(key);
-                
-                if (
-                    MaraUtils.IsCombatConfig(config) &&
-                    config.BuildingConfig == null
-                ) {
-                    combatUnitCfgIds.push(key);
-                }
-            }
+        
+        let allowedCfgIds = new Set<string>(
+            [
+                ...this.globalStrategy.OffensiveCfgIds.map((value) => value.CfgId),
+                ...this.globalStrategy.DefensiveBuildingsCfgIds.map((value) => value.CfgId)
+            ]
         );
+        
+        
+        for (let cfgId of produceableCfgIds) {
+            if (
+                MaraUtils.IsCombatConfigId(cfgId) &&
+                !MaraUtils.IsBuildingConfigId(cfgId) &&
+                allowedCfgIds.has(cfgId)
+            ) {
+                combatUnitCfgIds.push(cfgId);
+            }
+        }
 
         if (combatUnitCfgIds.length == 0) {
             combatUnitCfgIds.push(this.globalStrategy.LowestTechOffensiveCfgId);
@@ -198,7 +208,21 @@ export class StrategySubcontroller extends MaraSubcontroller {
     }
 
     GetRequiredProductionChainCfgIds(): Set<string> {
-        return this.globalStrategy.ProductionChainCfgIds;
+        let result = new Set<string>();
+
+        for (let item of this.globalStrategy.OffensiveCfgIds) {
+            for (let cfgId of item.ProductionChain) {
+                result.add(cfgId);
+            }
+        }
+
+        for (let item of this.globalStrategy.DefensiveBuildingsCfgIds) {
+            for (let cfgId of item.ProductionChain) {
+                result.add(cfgId);
+            }
+        }
+
+        return result;
     }
 
     SelectEnemy(): any { //but actually Settlement
@@ -531,7 +555,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         
         let offensiveCfgIds = produceableCfgIds.filter(
             (value) => {
-                return this.globalStrategy.OffensiveCfgIds.has(value)
+                return this.globalStrategy.OffensiveCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0
             }
         );
 
@@ -541,7 +565,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
     private getGuardingUnitComposition(produceableCfgIds: string[], requiredStrength: number): UnitComposition {
         let cfgIds = produceableCfgIds.filter(
             (value) => {
-                return this.globalStrategy.DefensiveBuildingsCfgIds.has(value);
+                return this.globalStrategy.DefensiveBuildingsCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0
             }
         );
         this.settlementController.Debug(`Guarding Cfg IDs: ${cfgIds}`);

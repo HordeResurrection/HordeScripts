@@ -4,6 +4,7 @@ import { MaraSquadMoveState } from "./MaraSquadMoveState";
 import { MaraSquadState } from "./MaraSquadState";
 import { MaraSquadIdleState } from "./MaraSquadIdleState";
 import { MaraSquadAttackGatheringUpState } from "./MaraSquadAttackGatheringUpState";
+import { MaraSquadCaptureState } from "./MaraSquadCaptureState";
 
 export class MaraSquadAttackState extends MaraSquadState {
     OnEntry(): void {
@@ -13,7 +14,9 @@ export class MaraSquadAttackState extends MaraSquadState {
     OnExit(): void {}
 
     Tick(tickNumber: number): void {
-        if (this.squad.IsEnemyNearby()) {
+        let nearbyUnits = this.squad.GetNearbyUnits();
+        
+        if (this.isEnemyNearby(nearbyUnits)) {
             this.squad.SetState(new MaraSquadBattleState(this.squad));
             return;
         }
@@ -36,6 +39,13 @@ export class MaraSquadAttackState extends MaraSquadState {
             this.initiateAttack();
             return;
         }
+
+        if (this.isCapturableUnitsNearby(nearbyUnits)) {
+            if (this.atLeastOneCapturingUnitInSquad()) {
+                this.squad.SetState(new MaraSquadCaptureState(this.squad));
+                return;
+            }
+        }
         
         let distance = MaraUtils.ChebyshevDistance(
             this.squad.CurrentTargetCell, 
@@ -46,5 +56,36 @@ export class MaraSquadAttackState extends MaraSquadState {
             this.squad.SetState(new MaraSquadIdleState(this.squad));
             return;
         }
+    }
+
+    private isEnemyNearby(units: Array<any>): boolean {
+        for (let unit of units) {
+            if (
+                unit.IsAlive &&
+                this.squad.Controller.EnemySettlements.indexOf(unit.Owner) > -1
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private isCapturableUnitsNearby(units: Array<any>): boolean {
+        return units.findIndex((unit) => {
+                return unit.BattleMind.CanBeCapturedNow() && 
+                !MaraUtils.IsBuildingConfig(unit.Cfg)
+            }
+        ) >= 0;
+    }
+
+    private atLeastOneCapturingUnitInSquad(): boolean {
+        for (let unit of this.squad.Units) {
+            if (MaraUtils.IsCapturingConfig(unit.Cfg)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -40,13 +40,14 @@ class SquadsSettings {
 }
 
 class ControllerStatesSettings {
-    public BuildUpProbabilityWhenOffensePossible = 0.60;
+    public BuildUpProbabilityWhenOffensePossible = 0.70;
     public BuildUpProbabilityWhenDefensePossible = 0.35;
     
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;
 
     public MaxHarvesterProductionBatch: number = 6;
+    public MaxSameCfgIdProducerCount: number = 3;
 }
 
 class ResourceMiningSettings {
@@ -70,4 +71,5 @@ class CombatSettings {
     
     public OffensiveToDefensiveRatios: Array<number> = [1, 0.75, 0.5, 0.25, 0];
     public AttackStrengthToEnemyStrengthRatio: number = 1.5;
+    public UnitSpeedClusterizationThresholds: Array<number> = [9, 14]; //this must be in ascending order
 }
