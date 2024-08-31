@@ -438,6 +438,9 @@ export class Teimur_Legendary_WORKER extends ILegendaryUnit {
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid], "ProductionTime", 200);
         // убираем возможность захвата
         GlobalVars.configs[towerUid].ProfessionParams.Remove(UnitProfession.Capturable);
+        // делаем поджигательные стрелы
+        GlobalVars.ScriptUtils.GetValue(GlobalVars.configs[towerUid].MainArmament, "BulletConfigRef")
+            .SetConfig(HordeContentApi.GetBulletConfig("#BulletConfig_FireArrow"));
         
         // (легендарный) крестьянин
 
@@ -772,11 +775,15 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
                 // создаем конфиг трупа
 
                 const revivedCfgUid = _unit.Cfg.Uid + "_REVIVED";
-                GlobalVars.configs[revivedCfgUid] = CreateUnitConfig(_unit.Cfg.Uid, revivedCfgUid);
-                // назначаем имя
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[revivedCfgUid], "Name", "{Восставший} " + GlobalVars.configs[revivedCfgUid].Name);
-                // меняем цвет
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[revivedCfgUid], "TintColor", createHordeColor(255, 50, 50, 50));
+                if (HordeContentApi.HasUnitConfig(revivedCfgUid)) {
+                    GlobalVars.configs[revivedCfgUid] = HordeContentApi.GetUnitConfig(revivedCfgUid);
+                } else {
+                    GlobalVars.configs[revivedCfgUid] = HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig(_unit.Cfg.Uid), revivedCfgUid);
+                    // назначаем имя
+                    GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[revivedCfgUid], "Name", "{Восставший} " + GlobalVars.configs[revivedCfgUid].Name);
+                    // меняем цвет
+                    GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[revivedCfgUid], "TintColor", createHordeColor(255, 50, 50, 50));
+                }
                 
                 // пытаемся поднять трупа в клетке его смерти
 

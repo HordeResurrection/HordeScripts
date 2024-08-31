@@ -5,23 +5,21 @@ import { PointCommandArgs } from "library/game-logic/horde-types";
 import { Cell } from "./Types/Geometry";
 
 export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
+    // при наличии конфига удаляем его
     if (HordeContentApi.HasUnitConfig(newConfigUid)) {
-        log.info("GET baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
-        return HordeContentApi.GetUnitConfig(newConfigUid);
-    } else {
-        log.info("CREATE baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
-        return HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig(baseConfigUid), newConfigUid);
+        return HordeContentApi.GetUnitConfig(newConfigUid)
+        //HordeContentApi.RemoveConfig(HordeContentApi.GetUnitConfig(newConfigUid));
     }
+    return HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig(baseConfigUid), newConfigUid);
 }
 
 export function CreateBulletConfig(baseConfigUid: string, newConfigUid: string) {
+    // при наличии конфига удаляем его
     if (HordeContentApi.HasBulletConfig(newConfigUid)) {
-        log.info("GET baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
         return HordeContentApi.GetBulletConfig(newConfigUid);
-    } else {
-        log.info("CREATE baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
-        return HordeContentApi.CloneConfig(HordeContentApi.GetBulletConfig(baseConfigUid), newConfigUid);
+        //HordeContentApi.RemoveConfig(HordeContentApi.GetBulletConfig(newConfigUid));
     }
+    return HordeContentApi.CloneConfig(HordeContentApi.GetBulletConfig(baseConfigUid), newConfigUid);
 }
 
 export function unitCanBePlacedByRealMap(uCfg, x, y) {
