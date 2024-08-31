@@ -90,13 +90,6 @@ export abstract class ISpawner {
                     GlobalVars.units.push(new this.queue[i].unitClass(spawnedUnit, this.teamNum));
                 }
 
-                if (spawnedUnits.length > 0 && GlobalVars.units[GlobalVars.units.length - 1] instanceof ILegendaryUnit) {
-                    let msg1 = createGameMessageWithSound("Замечен " + GlobalVars.configs[this.queue[i].unitClass.CfgUid].Name, createHordeColor(255, 140, 140, 140));
-                    GlobalVars.teams[this.teamNum].settlement.Messages.AddMessage(msg1);
-                    let msg2 = createGameMessageWithSound((this.queue[i].unitClass as unknown as typeof ILegendaryUnit).Description, createHordeColor(255, 140, 140, 140));
-                    GlobalVars.teams[this.teamNum].settlement.Messages.AddMessage(msg2);
-                }
-
                 if (spawnedUnits.length < this.queue[i].count) {
                     this.queue[i].count -= spawnedUnits.length;
                     return;

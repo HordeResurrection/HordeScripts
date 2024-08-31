@@ -12,35 +12,30 @@ import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { ChebyshevDistance, spawnUnits } from "../Utils";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
+import { spawnDecoration } from "library/game-logic/decoration-spawn";
 
-export class Buff_FireMagImmune extends IBuff {
-    static CfgUid         :   string = "#" + CFGPrefix + "_Buff_FireMagImmune";
-    static BaseCfgUid     :   string = "#UnitConfig_Slavyane_Church";
-    static MaxCount       :   number = 1;
+// export class Buff_Reroll extends IBuff {
+//     static CfgUid         : string = "#" + CFGPrefix + "_Buff_Reroll";
+//     static BaseCfgUid     : string = "#UnitConfig_Slavyane_Swordmen";
 
-    constructor(teamNum: number) {
-        super(teamNum);
+//     constructor(teamNum: number) {
+//         super(teamNum);
+//         this.needDeleted = true;
+//     }
 
-        var towerCfg = GlobalVars.configs[PlayerTowersClass[teamNum].CfgUid];
-        // добавляем резист
-        ScriptUtils.SetValue(towerCfg, "Flags", mergeFlags(UnitFlags, towerCfg.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
-        // респавним башню
-        (GlobalVars.teams[teamNum].tower as Player_TOWER_BASE).Respawn();
-        // удаляем бафф
-        this.needDeleted = true;
-    }
+//     static InitConfig() {
+//         IBuff.InitConfig.call(this);
 
-    static InitConfig() {
-        IBuff.InitConfig.call(this);
-
-        // имя
-        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Построить церковь");
-        // описание
-        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "Добавляем имунн к огню и магии");
-        // стоимость
-        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Gold", 3000);
-    }
-};
+//         // имя
+//         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Немножко выпить");
+//         //
+//         ScriptUtils.GetValue(GlobalVars.configs[this.CfgUid], "PortraitCatalogRef").SetConfig(GlobalVars.HordeContentApi.GetAnimationCatalog("#AnimCatalog_RerollPortrait"));
+//         // описание
+//         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "Вы вроде ничего не купили, но ассортимент изменился.");
+//         // стоимость
+//         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Gold", 50);
+//     }
+// };
 
 export class Buff_DoublingMaxBuff extends IBuff {
     static CfgUid         : string = "#" + CFGPrefix + "_Buff_DoublingMaxBuff";
@@ -57,7 +52,10 @@ export class Buff_DoublingMaxBuff extends IBuff {
         let maxBuffCount = 0;
         for (var buffClassIdx = 0; buffClassIdx < ImprovementsBuffsClass.length; buffClassIdx++) {
             // отшельник не может удвоить сам себя!
-            if (ImprovementsBuffsClass[buffClassIdx].name == "Buff_DoublingMaxBuff") {
+            // не может удвоить реролл
+            if (ImprovementsBuffsClass[buffClassIdx].name == "Buff_DoublingMaxBuff" ||
+                ImprovementsBuffsClass[buffClassIdx].name == "Buff_Reroll"
+            ) {
                 continue;
             }
             if (maxBuffIdx == -1 || Buff_Improvements.TowerBuffsCount[teamNum][buffClassIdx] > maxBuffCount) {
@@ -174,9 +172,17 @@ export class Buff_AddShield extends IBuff {
     constructor(teamNum: number) {
         super(teamNum);
 
+        var level = Buff_Improvements.TowerBuffsCount[teamNum][Buff_Improvements.OpBuffNameToBuffIdx.get(this.constructor.name) as number];
+
         // добавляем 1 броню в конфиг башни
         var towerCfg = GlobalVars.configs[PlayerTowersClass[teamNum].CfgUid];
         ScriptUtils.SetValue(towerCfg, "Shield", towerCfg.Shield + 1);
+        // добавляем резист
+        if (level == 5) {
+            ScriptUtils.SetValue(towerCfg, "Flags", mergeFlags(UnitFlags, towerCfg.Flags, UnitFlags.FireResistant));
+        } else if (level == 8) {
+            ScriptUtils.SetValue(towerCfg, "Flags", mergeFlags(UnitFlags, towerCfg.Flags, UnitFlags.MagicResistant));
+        }
         // респавним башню
         (GlobalVars.teams[teamNum].tower as Player_TOWER_BASE).Respawn();
         // удаляем бафф
@@ -189,7 +195,7 @@ export class Buff_AddShield extends IBuff {
         // имя
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Укрепить башню");
         // описание
-        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "Добавляет 1 броню");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "Добавляет 1 броню. На 5 уровне добавляет иммун к огню. На 8 уровне добавляет иммун к магии.");
         // стоимость
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Gold", 500);
     }
@@ -399,11 +405,18 @@ export class IBuff_Defender_Unit extends IBuff {
         // если защитника прокачали
         if (this.defenderUnit != null && this.defenderCurrLevel != defenderLevel) {
             this.defenderCurrLevel    = defenderLevel;
-            
-            this.defenderUnit.unit.BattleMind.InstantDeath(null, UnitHurtType.Mele);
-            this.defenderDeadTickNum  = gameTickNum - this.constructor['DefenderRespawnTime'];
-            this.defenderKillsCounter = this.defenderUnit.unit.KillsCounter;
-            this.defenderUnit         = null;
+
+            var units                   = GlobalVars.teams[this.teamNum].settlement.Units;
+            var deleteParams            = new DeleteUnitParameters();
+            deleteParams.UnitToDelete   = this.defenderUnit.unit;
+            units.DeleteUnit(deleteParams);
+
+            spawnDecoration(GlobalVars.ActiveScena.GetRealScena(), GlobalVars.HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), this.defenderUnit.unit.Position);
+
+            this.defenderUnit.needDeleted = true;
+            this.defenderDeadTickNum      = gameTickNum - this.constructor['DefenderRespawnTime'];
+            this.defenderKillsCounter     = this.defenderUnit.unit.KillsCounter;
+            this.defenderUnit             = null;
         }
 
         // если защитник умер
@@ -725,6 +738,7 @@ export class Buff_PeriodAttack_Villur extends IBuff_PeriodAttack_Bullet {
 }
 
 const ImprovementsBuffsClass : Array<typeof IBuff> = [
+    //Buff_Reroll,
     Buff_PeriodIncomeGold,
     Buff_PeriodHealing,
     Buff_AddShield,
@@ -738,7 +752,6 @@ const ImprovementsBuffsClass : Array<typeof IBuff> = [
     Buff_PeriodAttack_Villur,
     Buff_HpToGold,
     Buff_DoublingMaxBuff,
-    Buff_FireMagImmune,
     Buff_Defender_Heavyman,
     Buff_Defender_Raider
 ];
@@ -747,8 +760,9 @@ export class Buff_Improvements extends IBuff {
     static CfgUid         :   string = "#" + CFGPrefix + "_Buff_Improvements";
     static BaseCfgUid     :   string = "#UnitConfig_Slavyane_Worker1";
 
-    static ImprovementPlans : Array<Array<number>>;
-    static TowerBuffsCount  : Array<Array<number>>;
+    static ImprovementPlans    : Array<Array<number>>;
+    static TowerBuffsCount     : Array<Array<number>>;
+    static OpBuffNameToBuffIdx : Map<string, number>;
 
     onProducedHandler: any;
 
@@ -840,7 +854,13 @@ export class Buff_Improvements extends IBuff {
     static InitConfig() {
         IBuff.InitConfig.call(this);
 
-        // инициализируем первые 3 баффа
+        // инициализируем оператор перевода
+        this.OpBuffNameToBuffIdx = new Map<string, number>();
+        for (var buffClassIdx = 0; buffClassIdx < ImprovementsBuffsClass.length; buffClassIdx++) {
+            this.OpBuffNameToBuffIdx.set(ImprovementsBuffsClass[buffClassIdx].name, buffClassIdx);
+        }
+
+        // инициализируем первые 4 баффа
 
         this.ImprovementPlans = new Array<Array<number>>();
         this.ImprovementPlans.push(new Array<number>());
