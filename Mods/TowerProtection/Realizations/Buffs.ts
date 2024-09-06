@@ -1,4 +1,4 @@
-import { PointCommandArgs, UnitArmament, UnitCommand, UnitDirection, UnitFlags, UnitHurtType, UnitMapLayer } from "library/game-logic/horde-types";
+import { PointCommandArgs, TilePayload, TileType, UnitArmament, UnitCommand, UnitDirection, UnitFlags, UnitHurtType, UnitMapLayer } from "library/game-logic/horde-types";
 import { CFGPrefix, DeleteUnitParameters, GlobalVars } from "../GlobalData";
 import { IBuff } from "../Types/IBuff";
 import { Player_TOWER_BASE, PlayerTowersClass } from "./Player_units";
@@ -13,6 +13,9 @@ import { ChebyshevDistance, spawnUnits } from "../Utils";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
+import { printObjectItems } from "library/common/introspection";
+import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
+import { Rectangle } from "../Types/Geometry";
 
 // export class Buff_Reroll extends IBuff {
 //     static CfgUid         : string = "#" + CFGPrefix + "_Buff_Reroll";
@@ -37,6 +40,185 @@ import { spawnDecoration } from "library/game-logic/decoration-spawn";
 //     }
 // };
 
+export class Buff_DigMoat extends IBuff {
+    static CfgUid         : string = "#" + CFGPrefix + "_Buff_DigMoat";
+    static BaseCfgUid     : string = "#UnitConfig_Nature_Draider";
+    static MaxCount       : number = 4;
+
+    constructor(teamNum: number) {
+        super(teamNum);
+        this.needDeleted = true;
+
+        var buffLevel = Buff_Improvements.TowersBuffsCount[this.teamNum][Buff_Improvements.OpBuffNameToBuffIdx.get(this.constructor.name) as number];
+        var towerCell = GlobalVars.teams[this.teamNum].towerCell;
+        var waterRectangle : Rectangle = new Rectangle(0,0,0,0);
+        if (buffLevel == 0) {
+            waterRectangle = new Rectangle(towerCell.X - 5, towerCell.Y - 1, 1, 4);
+        } else if (buffLevel == 1) {
+            waterRectangle = new Rectangle(towerCell.X + 1 + 5, towerCell.Y - 1, 1, 4);
+        } else if (buffLevel == 2) {
+            waterRectangle = new Rectangle(towerCell.X - 1, towerCell.Y + 1 + 5, 4, 1);
+        } else if (buffLevel == 3) {
+            waterRectangle = new Rectangle(towerCell.X - 1, towerCell.Y - 5, 4, 1);
+        } 
+
+        // 1 линия // 122 151 152 123 125
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 2, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[122], true);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 1, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[151], true);
+        for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++)
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(x, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[152], true);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[123], true);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[125], true);
+        // 2 линия // 126  22  10  23 128
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 2, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[126], true);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 1, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[22], true);
+        for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++)
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(x, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[10], true);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[23], true);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[128], true);
+        // 3 линия // 126  38   3  16 147
+        for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++)
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 2, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[126], true);
+        for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++)
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 1, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[38], true);
+        for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++) {
+            for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++) {
+                ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(x, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[1], true);
+            }
+        }
+        for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++)
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[16], true);
+        for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++)
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W + 1, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[147], true);
+        // 4 линия // 127  18  20  25 128
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 2, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[127], true);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 1, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[18], true);
+        for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++)
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(x, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[20], true);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[25], true);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[128], true);
+        // 5 линия // 130 143 144 143 134
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 2, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[130], true);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 1, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[143], true);
+        for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++)
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(x, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[144], true);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[143], true);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[134], true);
+
+        // не работает
+
+        //ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", [createPoint(16, 22), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[1], true]);
+
+        // не работает 
+
+        // var cellX = 19, cellY = 20;
+        // for (var x = cellX - 1; x <= cellX + 1; x++) {
+        //     for (var y = cellY - 1; y <= cellY + 1; y++) {
+        //         GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(x, y), TileType.Sand, TilePayload.Exploded);
+        //     }
+        // }
+        // GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(cellX, cellY), TileType.Water, TilePayload.Exploded);
+
+        // не работает
+
+        //GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(16, 22), TileType.Sand, TilePayload.None);
+        //GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(17, 22), TileType.Water, TilePayload.Scorched);
+        //GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(18, 22), TileType.Water, TilePayload.Chopped);
+        //GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(19, 22), TileType.Water, TilePayload.Exploded);
+    }
+
+    static InitConfig() {
+        IBuff.InitConfig.call(this);
+
+        // имя
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Вырыть ров");
+        // описание
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "Вырыть вокруг ров, который мешает подойди к башне");
+        // стоимость
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Gold", 300);
+
+        ScriptUtils.GetValue(GlobalVars.configs[this.CfgUid], "PortraitCatalogRef").SetConfig(GlobalVars.HordeContentApi.GetAnimationCatalog("#AnimCatalog_digMoatBuffPortrait"));
+    }
+};
+
+// export class Buff_SellEnemyBuff extends IBuff {
+//     static CfgUid         : string = "#" + CFGPrefix + "_Buff_SellEnemyBuff";
+//     static BaseCfgUid     : string = "#UnitConfig_Slavyane_Swordmen";
+//     static HpCost         : number = 300;
+
+//     constructor(teamNum: number) {
+//         super(teamNum);
+//         this.needDeleted = true;
+
+//         // ищем случайного игрока
+//         var enemyTeamsNum = new Array<number>();
+//         for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+//             if (teamNum == this.teamNum || !GlobalVars.teams[teamNum].inGame || GlobalVars.teams[teamNum].tower.unit.IsDead) {
+//                 continue;
+//             }
+//             enemyTeamsNum.push(teamNum);
+//         }
+
+//         // проверяем, что враги есть
+//         if (enemyTeamsNum.length == 0) {
+//             var msg = createGameMessageWithNoSound("Противников нет, кровавый ритуал отменен",
+//                 createHordeColor(255, 140, 140, 140));
+//             GlobalVars.teams[teamNum].settlement.Messages.AddMessage(msg);
+//             return;
+//         }
+
+//         // выбираем случайного врага
+//         var targetTeamNum = enemyTeamsNum[GlobalVars.rnd.RandomNumber(0, enemyTeamsNum.length - 1)];
+        
+//         // выбираем случайный бафф
+//         var availableBuffClassIdxs = new Array<number>();
+//         for (var buffClassIdx = 0; buffClassIdx < ImprovementsBuffsClass.length; buffClassIdx++) {
+//             // проверяем, что бафф прокачен
+//             if (Buff_Improvements.TowerBuffsCount[targetTeamNum][buffClassIdx] == 0) {
+//                 continue;
+//             }
+            
+//             availableBuffClassIdxs.push(buffClassIdx);
+//         }
+
+//         // выбираем случайный баф
+//         var targetBuffClassIdx = availableBuffClassIdxs[GlobalVars.rnd.RandomNumber(0, availableBuffClassIdxs.length - 1)]; 
+
+//         // ищем бафф улучшения
+
+
+//         // убавляем макс хп на HpValue хп в конфиг башни
+//         var towerCfg = GlobalVars.configs[PlayerTowersClass[teamNum].CfgUid];
+//         ScriptUtils.SetValue(towerCfg, "MaxHealth", Math.max(towerCfg.MaxHealth - Buff_SellEnemyBuff.HpCost, 1));
+//         // респавним башню
+//         (GlobalVars.teams[teamNum].tower as Player_TOWER_BASE).Respawn();
+//     }
+
+//     static InitConfig() {
+//         IBuff.InitConfig.call(this);
+
+//         // вычисляем среднюю стоимость
+//         var avg_sum = 0.0;
+//         var avg_count = 0;
+//         for (var buffClassIdx = 0; buffClassIdx < ImprovementsBuffsClass.length; buffClassIdx++) {
+//             var goldCost = GlobalVars.configs[ImprovementsBuffsClass[buffClassIdx].CfgUid].CostResources.Gold;
+//             if (goldCost == 0) {
+//                 continue;
+//             }
+//             avg_sum   += goldCost;
+//             avg_count ++;
+//         }
+//         this.HpCost = Math.floor(1.1 * avg_sum / avg_count)
+
+//         // имя
+//         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Провести кроварый ритуал");
+//         // описание
+//         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "Потратить " + this.HpCost + " хп, чтобы случайный вражеский игрок потеряет случайный бафф.");
+
+//         ScriptUtils.GetValue(GlobalVars.configs[this.CfgUid], "PortraitCatalogRef").SetConfig(GlobalVars.HordeContentApi.GetAnimationCatalog("#AnimCatalog_sellEnemyBuffPortrait"));
+//     }
+// };
+
 export class Buff_DoublingMaxBuff extends IBuff {
     static CfgUid         : string = "#" + CFGPrefix + "_Buff_DoublingMaxBuff";
     static BaseCfgUid     : string = "#UnitConfig_Nature_Draider";
@@ -50,30 +232,27 @@ export class Buff_DoublingMaxBuff extends IBuff {
         // ищем максимально прокаченный бафф
         let maxBuffIdx   = -1;
         let maxBuffCount = 0;
-        for (var buffClassIdx = 0; buffClassIdx < ImprovementsBuffsClass.length; buffClassIdx++) {
+        for (var buffClassIdx = 0; buffClassIdx < Buff_Improvements.ImprovementsBuffsClass.length; buffClassIdx++) {
             // отшельник не может удвоить сам себя!
             // не может удвоить реролл
-            if (ImprovementsBuffsClass[buffClassIdx].name == "Buff_DoublingMaxBuff" ||
-                ImprovementsBuffsClass[buffClassIdx].name == "Buff_Reroll"
+            if (Buff_Improvements.ImprovementsBuffsClass[buffClassIdx].name == "Buff_DoublingMaxBuff" ||
+                Buff_Improvements.ImprovementsBuffsClass[buffClassIdx].name == "Buff_Reroll"
             ) {
                 continue;
             }
-            if (maxBuffIdx == -1 || Buff_Improvements.TowerBuffsCount[teamNum][buffClassIdx] > maxBuffCount) {
+            if (maxBuffIdx == -1 || Buff_Improvements.TowersBuffsCount[teamNum][buffClassIdx] > maxBuffCount) {
                 maxBuffIdx   = buffClassIdx;
-                maxBuffCount = Buff_Improvements.TowerBuffsCount[teamNum][buffClassIdx];
+                maxBuffCount = Buff_Improvements.TowersBuffsCount[teamNum][buffClassIdx];
             }
         }
 
-        var msg = createGameMessageWithNoSound("Темный отшельник удволи бафф '"
-            + GlobalVars.configs[ImprovementsBuffsClass[maxBuffIdx].CfgUid].Name + "' " + maxBuffCount + " -> " + (2 * maxBuffCount),
+        var msg = createGameMessageWithNoSound("Темный отшельник удвоил '"
+            + GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[maxBuffIdx].CfgUid].Name + "' " + maxBuffCount + " -> " + (2 * maxBuffCount),
             createHordeColor(255, 140, 140, 140));
         GlobalVars.teams[teamNum].settlement.Messages.AddMessage(msg);
 
         // удваиваем количество данного баффа
-        for (var i = 0; i < maxBuffCount; i++) {
-            GlobalVars.buffs.push(new ImprovementsBuffsClass[maxBuffIdx](teamNum));
-        }
-        Buff_Improvements.TowerBuffsCount[teamNum][maxBuffIdx] += maxBuffCount;
+        Buff_Improvements.TowersBuffImprRef[this.teamNum].AddBuff(maxBuffIdx, maxBuffCount, true);
 
         // убавляем макс хп на HpValue хп в конфиг башни
         var towerCfg = GlobalVars.configs[PlayerTowersClass[teamNum].CfgUid];
@@ -103,7 +282,7 @@ export class Buff_PeriodIncomeGold extends IBuff {
     constructor(teamNum: number) {
         super(teamNum);
 
-        this.activePrevTickNum = GlobalVars.gameTickNum - GlobalVars.startGameTickNum;
+        this.activePrevTickNum = GlobalVars.gameTickNum - GlobalVars.gameStateChangedTickNum;
         this.remainder         = 0;
     }
 
@@ -172,16 +351,18 @@ export class Buff_AddShield extends IBuff {
     constructor(teamNum: number) {
         super(teamNum);
 
-        var level = Buff_Improvements.TowerBuffsCount[teamNum][Buff_Improvements.OpBuffNameToBuffIdx.get(this.constructor.name) as number];
+        var nextLevel = Buff_Improvements.TowersBuffsCount[teamNum][Buff_Improvements.OpBuffNameToBuffIdx.get(this.constructor.name) as number] + 1;
 
         // добавляем 1 броню в конфиг башни
         var towerCfg = GlobalVars.configs[PlayerTowersClass[teamNum].CfgUid];
         ScriptUtils.SetValue(towerCfg, "Shield", towerCfg.Shield + 1);
         // добавляем резист
-        if (level == 5) {
+        if (nextLevel == 6) {
             ScriptUtils.SetValue(towerCfg, "Flags", mergeFlags(UnitFlags, towerCfg.Flags, UnitFlags.FireResistant));
-        } else if (level == 8) {
+            //ScriptUtils.SetValue(towerCfg, "TintColor", createHordeColor(255, 178, 34, 34));
+        } else if (nextLevel == 9) {
             ScriptUtils.SetValue(towerCfg, "Flags", mergeFlags(UnitFlags, towerCfg.Flags, UnitFlags.MagicResistant));
+            //ScriptUtils.SetValue(towerCfg, "TintColor", createHordeColor(255, 192, 5, 248));
         }
         // респавним башню
         (GlobalVars.teams[teamNum].tower as Player_TOWER_BASE).Respawn();
@@ -195,7 +376,7 @@ export class Buff_AddShield extends IBuff {
         // имя
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Укрепить башню");
         // описание
-        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "Добавляет 1 броню. На 5 уровне добавляет иммун к огню. На 8 уровне добавляет иммун к магии.");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "Добавляет 1 броню. На 6 уровне добавляет иммун к огню. На 9 уровне добавляет иммун к магии.");
         // стоимость
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Gold", 500);
     }
@@ -299,22 +480,76 @@ export class DefenderUnit extends IUnit {
         }
 
         // патрулируем вокруг башни
+        // if (this.unit_ordersMind.IsIdle()) {
+        //     var commandsMind       = this.unit.CommandsMind;
+        //     var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
+
+        //     if (disallowedCommands.ContainsKey(UnitCommand.Attack)) disallowedCommands.Remove(UnitCommand.Attack);
+
+        //     var pointCommandArgs1 = new PointCommandArgs(createPoint(towerCell.X - this.patrolRadius,     towerCell.Y - this.patrolRadius),     UnitCommand.Attack, AssignOrderMode.Queue);
+        //     var pointCommandArgs2 = new PointCommandArgs(createPoint(towerCell.X + this.patrolRadius + 1, towerCell.Y - this.patrolRadius),     UnitCommand.Attack, AssignOrderMode.Queue);
+        //     var pointCommandArgs3 = new PointCommandArgs(createPoint(towerCell.X + this.patrolRadius + 1, towerCell.Y + this.patrolRadius + 1), UnitCommand.Attack, AssignOrderMode.Queue);
+        //     var pointCommandArgs4 = new PointCommandArgs(createPoint(towerCell.X - this.patrolRadius,     towerCell.Y + this.patrolRadius + 1), UnitCommand.Attack, AssignOrderMode.Queue);
+        //     this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs1);
+        //     this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs2);
+        //     this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs3);
+        //     this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs4);
+
+        //     disallowedCommands.Add(UnitCommand.Attack, 1);
+        // }
+
         if (this.unit_ordersMind.IsIdle()) {
-            var commandsMind       = this.unit.CommandsMind;
-            var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
+            var targetsUnitInfo : any[] = [];
 
-            if (disallowedCommands.ContainsKey(UnitCommand.Attack)) disallowedCommands.Remove(UnitCommand.Attack);
+            // ищем ближайшие цели
+            let unitsIter = iterateOverUnitsInBox(this.unit.Cell, 10);
+            for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
+                var _unit = u.value;
 
-            var pointCommandArgs1 = new PointCommandArgs(createPoint(towerCell.X - this.patrolRadius,     towerCell.Y - this.patrolRadius),     UnitCommand.Attack, AssignOrderMode.Queue);
-            var pointCommandArgs2 = new PointCommandArgs(createPoint(towerCell.X + this.patrolRadius + 1, towerCell.Y - this.patrolRadius),     UnitCommand.Attack, AssignOrderMode.Queue);
-            var pointCommandArgs3 = new PointCommandArgs(createPoint(towerCell.X + this.patrolRadius + 1, towerCell.Y + this.patrolRadius + 1), UnitCommand.Attack, AssignOrderMode.Queue);
-            var pointCommandArgs4 = new PointCommandArgs(createPoint(towerCell.X - this.patrolRadius,     towerCell.Y + this.patrolRadius + 1), UnitCommand.Attack, AssignOrderMode.Queue);
-            this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs1);
-            this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs2);
-            this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs3);
-            this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs4);
+                if (_unit.IsDead || _unit.Id == this.unit.Id || _unit.Owner.Uid == GlobalVars.teams[this.teamNum].settlementIdx) {
+                    continue;
+                }
 
-            disallowedCommands.Add(UnitCommand.Attack, 1);
+                // +0.5,+0.5 это чтобы центр башни
+                // итоговое расстояние уменьшаем на 1, чтобы расстояние от края башни считалось
+                targetsUnitInfo.push({
+                    unit: _unit,
+                    distance: ChebyshevDistance(_unit.Cell.X, _unit.Cell.Y, this.unit.Cell.X + 0.5, this.unit.Cell.Y + 0.5) - 1
+                });
+            }
+
+            if (targetsUnitInfo.length > 0) {
+                // сортируем
+                targetsUnitInfo.sort((a, b) => {
+                    return a.distance - b.distance;
+                });
+
+                var commandsMind       = this.unit.CommandsMind;
+                var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
+
+                if (disallowedCommands.ContainsKey(UnitCommand.Attack)) disallowedCommands.Remove(UnitCommand.Attack);
+
+                var pointCommandArgs1 = new PointCommandArgs(
+                    targetsUnitInfo[0].unit.Cell,
+                    UnitCommand.Attack,
+                    AssignOrderMode.Queue);
+                this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs1);
+
+                disallowedCommands.Add(UnitCommand.Attack, 1);
+            } else {
+                var commandsMind       = this.unit.CommandsMind;
+                var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
+
+                if (disallowedCommands.ContainsKey(UnitCommand.MoveToPoint)) disallowedCommands.Remove(UnitCommand.MoveToPoint);
+                
+                var pointCommandArgs1 = new PointCommandArgs(
+                    createPoint(towerCell.X, towerCell.Y),
+                    UnitCommand.MoveToPoint,
+                    AssignOrderMode.Queue);
+                this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs1);
+
+                disallowedCommands.Add(UnitCommand.MoveToPoint, 1);
+            }
         }
     }
 }
@@ -354,7 +589,7 @@ export class IBuff_Defender_Unit extends IBuff {
         } else {
             TeamsDefenderLevel[this.teamNum]++;
             this.defenderUnit           = null;
-            this.defenderDeadTickNum    = GlobalVars.gameTickNum - GlobalVars.startGameTickNum;
+            this.defenderDeadTickNum    = GlobalVars.gameTickNum - GlobalVars.gameStateChangedTickNum;
             this.defenderKillsCounter   = 0;
             this.defenderCurrLevel      = 1;
 
@@ -540,7 +775,7 @@ export class IBuff_PeriodAttack_Bullet extends IBuff {
     constructor(teamNum: number) {
         super(teamNum);
 
-        this.reloadPrevTickNum = GlobalVars.gameTickNum - GlobalVars.startGameTickNum;
+        this.reloadPrevTickNum = GlobalVars.gameTickNum - GlobalVars.gameStateChangedTickNum;
         this.reloadTicks       = this.constructor['ReloadTicks'];
         this._bulletCfg        = this.constructor['_BulletCfg'];
         this._sourceArmament   = this.constructor['_SourceArmament'];
@@ -691,7 +926,7 @@ export class Buff_PeriodAttack_Balista extends IBuff_PeriodAttack_Bullet {
         // описание
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "Стреляет каждые " + (this.ReloadTicks / 50) + " секунды");
         // стоимость
-        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Gold", 200);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Gold", 250);
     }
 }
 
@@ -737,32 +972,36 @@ export class Buff_PeriodAttack_Villur extends IBuff_PeriodAttack_Bullet {
     }
 }
 
-const ImprovementsBuffsClass : Array<typeof IBuff> = [
-    //Buff_Reroll,
-    Buff_PeriodIncomeGold,
-    Buff_PeriodHealing,
-    Buff_AddShield,
-    Buff_AddMaxHP,
-    Buff_PeriodAttack_Swordmen,
-    Buff_PeriodAttack_Arrow,
-    Buff_PeriodAttack_Arrow_2,
-    Buff_PeriodAttack_Catapult,
-    Buff_PeriodAttack_Balista,
-    Buff_PeriodAttack_Ikon,
-    Buff_PeriodAttack_Villur,
-    Buff_HpToGold,
-    Buff_DoublingMaxBuff,
-    Buff_Defender_Heavyman,
-    Buff_Defender_Raider
-];
-
 export class Buff_Improvements extends IBuff {
     static CfgUid         :   string = "#" + CFGPrefix + "_Buff_Improvements";
     static BaseCfgUid     :   string = "#UnitConfig_Slavyane_Worker1";
 
     static ImprovementPlans    : Array<Array<number>>;
-    static TowerBuffsCount     : Array<Array<number>>;
+    static TowersBuffsCount     : Array<Array<number>>;
+    static TowersBuffImprRef : Array<Buff_Improvements>;
     static OpBuffNameToBuffIdx : Map<string, number>;
+    static ImprovementsBuffsClass : Array<typeof IBuff> = [
+        //Buff_Reroll,
+        Buff_PeriodIncomeGold,
+        Buff_PeriodHealing,
+        Buff_DigMoat,
+        Buff_AddShield,
+        Buff_AddMaxHP,
+        Buff_PeriodAttack_Swordmen,
+        Buff_PeriodAttack_Arrow,
+        Buff_PeriodAttack_Arrow_2,
+        Buff_PeriodAttack_Catapult,
+        Buff_PeriodAttack_Balista,
+        Buff_PeriodAttack_Ikon,
+        Buff_PeriodAttack_Villur,
+        Buff_HpToGold,
+        Buff_DoublingMaxBuff,
+        Buff_Defender_Heavyman,
+        Buff_Defender_Raider,
+    
+        // важно, чтобы данный бафф был после всех
+        //Buff_SellEnemyBuff
+    ];
 
     onProducedHandler: any;
 
@@ -785,61 +1024,8 @@ export class Buff_Improvements extends IBuff {
                     return;
                 }
 
-                // отменяем постройку
-                GlobalVars.teams[that.teamNum].tower.unit.OrdersMind.CancelOrdersSafe();
-
-                var producedUnitCfg = UnitProducedEventArgs.Unit.Cfg;
-
-                // ищем номер баффа
-                for (var buffClassIdx = 0; buffClassIdx < ImprovementsBuffsClass.length; buffClassIdx++) {
-                    var buffClass = ImprovementsBuffsClass[buffClassIdx];
-                    if (buffClass.CfgUid == producedUnitCfg.Uid) {
-                        var buffCfg = GlobalVars.configs[buffClass.CfgUid];
-
-                        // проверяем, что баффов не больше нужного количества
-                        if (buffClass.MaxCount > 0 && Buff_Improvements.TowerBuffsCount[teamNum][buffClassIdx] >= buffClass.MaxCount) {
-                            GlobalVars.teams[teamNum].incomeGold   += buffCfg.CostResources.Gold;
-                            GlobalVars.teams[teamNum].incomeMetal  += buffCfg.CostResources.Metal;
-                            GlobalVars.teams[teamNum].incomeLumber += buffCfg.CostResources.Lumber;
-                            GlobalVars.teams[teamNum].incomePeople += buffCfg.CostResources.People;
-
-                            let msg = createGameMessageWithNoSound("Достигнут лимит '"
-                                + buffCfg.Name + "' = " + Buff_Improvements.TowerBuffsCount[teamNum][buffClassIdx] + ". Потраченное возвращено.",
-                                createHordeColor(255, 200, 200, 200));
-                            GlobalVars.teams[that.teamNum].settlement.Messages.AddMessage(msg);
-                        } else {
-                            GlobalVars.buffs.push(new buffClass(that.teamNum));
-                            Buff_Improvements.TowerBuffsCount[teamNum][buffClassIdx]++;
-
-                            let msg = createGameMessageWithNoSound("Добавлен '" + buffCfg.Name
-                                + "', всего " + Buff_Improvements.TowerBuffsCount[teamNum][buffClassIdx] + (buffClass.MaxCount > 0 ? " / " + buffClass.MaxCount : ""),
-                                createHordeColor(255, 200, 200, 200));
-                            GlobalVars.teams[that.teamNum].settlement.Messages.AddMessage(msg);
-                        }
-
-                        that.towerProduceList.Clear();
-                        that.impPlanCurrNum++;
-
-                        // динамически генерируем план
-                        if (that.impPlanCurrNum == Buff_Improvements.ImprovementPlans.length) {
-                            Buff_Improvements.ImprovementPlans.push([]);
-                            var keys    = Array.from(Array(ImprovementsBuffsClass.length).keys());
-                            for (var i = 0; i < 3; i++) {
-                                var index = GlobalVars.rnd.RandomNumber(0, keys.length - 1);
-                                var key   = keys[index];
-                                keys.splice(index, 1);
-                                Buff_Improvements.ImprovementPlans[Buff_Improvements.ImprovementPlans.length - 1].push(key);
-                            }
-                        }
-
-                        // устанавливаем следующий набор баффов
-                        for (var buffClassIdx of Buff_Improvements.ImprovementPlans[that.impPlanCurrNum]) {
-                            that.towerProduceList.Add(GlobalVars.configs[ImprovementsBuffsClass[buffClassIdx].CfgUid]);
-                        }
-
-                        break;
-                    }
-                }
+                // добавляем бафф
+                that.TryBuyBuff(UnitProducedEventArgs.Unit.Cfg.Uid);
 
                 // удаляем юнита
                 var deleteParams          = new DeleteUnitParameters();
@@ -849,22 +1035,107 @@ export class Buff_Improvements extends IBuff {
                 log.exception(ex);
             }
         });
+
+        // сохраняем ссылку для всех
+        Buff_Improvements.TowersBuffImprRef[this.teamNum] = this;
+    }
+
+    public TryBuyBuff(buffCfgUid : string) {
+        // отменяем постройку
+        GlobalVars.teams[this.teamNum].tower.unit.OrdersMind.CancelOrdersSafe();
+
+        // ищем номер баффа
+        for (var buffClassIdx = 0; buffClassIdx < Buff_Improvements.ImprovementsBuffsClass.length; buffClassIdx++) {
+            var buffClass = Buff_Improvements.ImprovementsBuffsClass[buffClassIdx];
+            if (buffClass.CfgUid == buffCfgUid) {
+                var buffCfg = GlobalVars.configs[buffClass.CfgUid];
+
+                // добавляем бафф
+                var addCount = this.AddBuff(buffClassIdx);
+
+                // если не добавлен, то возвращаем деньги
+                if (addCount == 0) {
+                    GlobalVars.teams[this.teamNum].incomeGold   += buffCfg.CostResources.Gold;
+                    GlobalVars.teams[this.teamNum].incomeMetal  += buffCfg.CostResources.Metal;
+                    GlobalVars.teams[this.teamNum].incomeLumber += buffCfg.CostResources.Lumber;
+                    GlobalVars.teams[this.teamNum].incomePeople += buffCfg.CostResources.People;
+
+                    let msg = createGameMessageWithNoSound("Достигнут лимит '"
+                        + buffCfg.Name + "' = " + Buff_Improvements.TowersBuffsCount[this.teamNum][buffClassIdx] + ". Потраченное возвращено.",
+                        createHordeColor(255, 200, 200, 200));
+                    GlobalVars.teams[this.teamNum].settlement.Messages.AddMessage(msg);
+                }
+                // если добавлен
+                else {
+                    let msg = createGameMessageWithNoSound("Добавлен " + (addCount == 1 ? "" : addCount) + " '" + buffCfg.Name
+                        + "', всего " + Buff_Improvements.TowersBuffsCount[this.teamNum][buffClassIdx] + (buffClass.MaxCount > 0 ? " / " + buffClass.MaxCount : ""),
+                        createHordeColor(255, 200, 200, 200));
+                    GlobalVars.teams[this.teamNum].settlement.Messages.AddMessage(msg);
+                }
+
+                this.towerProduceList.Clear();
+                this.impPlanCurrNum++;
+
+                // динамически генерируем план
+                if (this.impPlanCurrNum == Buff_Improvements.ImprovementPlans.length) {
+                    Buff_Improvements.ImprovementPlans.push([]);
+                    var keys    = Array.from(Array(Buff_Improvements.ImprovementsBuffsClass.length).keys());
+                    for (var i = 0; i < 3; i++) {
+                        var index = GlobalVars.rnd.RandomNumber(0, keys.length - 1);
+                        var key   = keys[index];
+                        keys.splice(index, 1);
+                        Buff_Improvements.ImprovementPlans[Buff_Improvements.ImprovementPlans.length - 1].push(key);
+                    }
+                }
+
+                // устанавливаем следующий набор баффов
+                for (var buffClassIdx of Buff_Improvements.ImprovementPlans[this.impPlanCurrNum]) {
+                    this.towerProduceList.Add(GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[buffClassIdx].CfgUid]);
+                }
+
+                break;
+            }
+        }
+    }
+
+    /** добавить бафф */
+    public AddBuff(buffClassIdx: number, count: number = 1, forceFlag: boolean = false) : number {
+        var buffClass = Buff_Improvements.ImprovementsBuffsClass[buffClassIdx];
+        var i = 0;
+        for (; i < count && (forceFlag || buffClass.MaxCount <= 0 || Buff_Improvements.TowersBuffsCount[this.teamNum][buffClassIdx] < buffClass.MaxCount); i++) {
+            GlobalVars.buffs.push(new buffClass(this.teamNum));
+            Buff_Improvements.TowersBuffsCount[this.teamNum][buffClassIdx]++;
+        }
+
+        return i;
+    }
+
+    /** удалить бафф */
+    public DeleteBuff(buffClassIdx: number, count: number = 1) : number {
+        var buffClass = Buff_Improvements.ImprovementsBuffsClass[buffClassIdx];
+        var i = 0;
+        for (; i < count && Buff_Improvements.TowersBuffsCount[this.teamNum][buffClassIdx] > 0; i++) {
+            GlobalVars.buffs.push(new buffClass(this.teamNum, true));
+            Buff_Improvements.TowersBuffsCount[this.teamNum][buffClassIdx]--;
+        }
+        return i;
     }
 
     static InitConfig() {
         IBuff.InitConfig.call(this);
 
         // инициализируем оператор перевода
+
         this.OpBuffNameToBuffIdx = new Map<string, number>();
-        for (var buffClassIdx = 0; buffClassIdx < ImprovementsBuffsClass.length; buffClassIdx++) {
-            this.OpBuffNameToBuffIdx.set(ImprovementsBuffsClass[buffClassIdx].name, buffClassIdx);
+        for (var buffClassIdx = 0; buffClassIdx < Buff_Improvements.ImprovementsBuffsClass.length; buffClassIdx++) {
+            this.OpBuffNameToBuffIdx.set(Buff_Improvements.ImprovementsBuffsClass[buffClassIdx].name, buffClassIdx);
         }
 
-        // инициализируем первые 4 баффа
+        // инициализируем первые 3 баффа
 
         this.ImprovementPlans = new Array<Array<number>>();
         this.ImprovementPlans.push(new Array<number>());
-        var keys    = Array.from(Array(ImprovementsBuffsClass.length).keys());
+        var keys    = Array.from(Array(Buff_Improvements.ImprovementsBuffsClass.length).keys());
         for (var i = 0; i < 3; i++) {
             var index = GlobalVars.rnd.RandomNumber(0, keys.length - 1);
             var key   = keys[index];
@@ -872,16 +1143,17 @@ export class Buff_Improvements extends IBuff {
             this.ImprovementPlans[this.ImprovementPlans.length - 1].push(key);
         }
 
-        this.TowerBuffsCount = new Array<Array<number>>(GlobalVars.teams.length);
+        this.TowersBuffsCount = new Array<Array<number>>(GlobalVars.teams.length);
+        this.TowersBuffImprRef = new Array<Buff_Improvements>(GlobalVars.teams.length);
         for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
             if (!GlobalVars.teams[teamNum].inGame ||
                 GlobalVars.teams[teamNum].tower.unit.IsDead) {
                 continue;
             }
 
-            this.TowerBuffsCount[teamNum] = new Array<number>(ImprovementsBuffsClass.length);
-            for (var buffClassIdx = 0; buffClassIdx < ImprovementsBuffsClass.length; buffClassIdx++) {
-                this.TowerBuffsCount[teamNum][buffClassIdx] = 0;
+            this.TowersBuffsCount[teamNum] = new Array<number>(Buff_Improvements.ImprovementsBuffsClass.length);
+            for (var buffClassIdx = 0; buffClassIdx < Buff_Improvements.ImprovementsBuffsClass.length; buffClassIdx++) {
+                this.TowersBuffsCount[teamNum][buffClassIdx] = 0;
             }
 
             var producerParams    = GlobalVars.configs[PlayerTowersClass[teamNum].CfgUid].GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
@@ -890,7 +1162,32 @@ export class Buff_Improvements extends IBuff {
             // инициализируем первый план
             towerProduceList.Clear();
             for (var buffClassIdx of Buff_Improvements.ImprovementPlans[0]) {
-                towerProduceList.Add(GlobalVars.configs[ImprovementsBuffsClass[buffClassIdx].CfgUid]);
+                towerProduceList.Add(GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[buffClassIdx].CfgUid]);
+            }
+        }
+    }
+
+    private _surrounded : boolean = false;
+    public OnEveryTick(gameTickNum: number): void {
+        if (GlobalVars.teams[this.teamNum].tower.unit_ordersMind.ActiveOrder.ProductUnitConfig) {
+            var activeMotion = GlobalVars.teams[this.teamNum].tower.unit_ordersMind.ActiveMotion;
+            if (activeMotion.LeftTime <= 0) {
+                // нас окружили, а бафф уже готов
+                // ставим флаг об этом
+                if (!this._surrounded) {
+                    this._surrounded = true;
+                }
+                // нас окружили, а бафф уже готов и флаг уже стоит
+                // значит применяет бафф вручную
+                else {
+                    this._surrounded = false;
+
+                    // делаем так, чтобы деньги не вернули
+                    activeMotion.IsPaid = false;
+
+                    // добавить бафф
+                    this.TryBuyBuff(GlobalVars.teams[this.teamNum].tower.unit_ordersMind.ActiveOrder.ProductUnitConfig.Uid);
+                }
             }
         }
     }
@@ -906,10 +1203,10 @@ export class Buff_Improvements extends IBuff {
         var spentMetal  = 0;
         var spentLumber = 0;
         var spentPeople = 0;
-        for (var i = 0; i < ImprovementsBuffsClass.length; i++) {
-            var buffCfg   = GlobalVars.configs[ImprovementsBuffsClass[i].CfgUid];
+        for (var i = 0; i < Buff_Improvements.ImprovementsBuffsClass.length; i++) {
+            var buffCfg   = GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[i].CfgUid];
             var buffName  = buffCfg.Name;
-            var buffCount = Buff_Improvements.TowerBuffsCount[this.teamNum][i];
+            var buffCount = Buff_Improvements.TowersBuffsCount[this.teamNum][i];
 
             if (buffCount == 0) {
                 continue;
@@ -929,6 +1226,6 @@ export class Buff_Improvements extends IBuff {
 }
 
 export const BuffsClass : Array<typeof IBuff> = [
-    ...ImprovementsBuffsClass,
+    ...Buff_Improvements.ImprovementsBuffsClass,
     Buff_Improvements
 ];

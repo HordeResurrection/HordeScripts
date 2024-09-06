@@ -13,9 +13,13 @@ export const PeopleIncomeLevelT    = HCL.HordeClassLibrary.World.Settlements.Mod
 export const UnitQueryFlag         = HCL.HordeClassLibrary.UnitComponents.Enumerations.UnitQueryFlag;
 
 export class GlobalVars {
+    /** текущее игровое состояние */
+    private static _gameState: GameState;
+
+    /** время смены игрового тика */
+    public static gameStateChangedTickNum: number;
     /** текущий игровой тик */
     public static gameTickNum: number;
-    public static gameState: GameState;
     /** массив конфигов */
     public static configs: any;
     /** команды */
@@ -28,8 +32,6 @@ export class GlobalVars {
     public static units: Array<IUnit>;
     /** все заскриптованные баффы в игре */
     public static buffs: Array<IBuff>;
-    /** время старта игры */
-    public static startGameTickNum: number;
     /** рандомайзер */
     public static rnd: any;
     /** ScriptUtils */
@@ -47,4 +49,12 @@ export class GlobalVars {
     /** юниты на карте */
     public static unitsMap : any;
     public static HCL : any;
+
+    public static GetGameState() : GameState {
+        return this._gameState;
+    }
+    public static SetGameState(gameState : GameState) {
+        this._gameState              = gameState;
+        this.gameStateChangedTickNum = this.gameTickNum;
+    }
 }
