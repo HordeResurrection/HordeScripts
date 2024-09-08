@@ -48,10 +48,14 @@ export class Example_SettlementWorks extends HordeExampleBase {
         }
         enumerator.Dispose();
 
-        // Объявить поражение
+        // Модуль победы/поражения
         let existence = realSettlement.Existence;
-        // Убрать false и тогда этому поселению будет засчитано поражение
-        if (false) { existence.ForceTotalDefeat(); }
+        
+        // Объявить поражение
+        if (false) { existence.ForceTotalDefeat(); }  // Убрать false и тогда этому поселению будет засчитано поражение
+        
+        // Сбросить состояние победы/поражения
+        if (false) { existence.ForceResetToCombat(); }
     }
 }
 
