@@ -17,31 +17,46 @@ import { Buff_AddShield, Buff_Improvements, Buff_PeriodAttack_Arrow, Buff_Period
 import { IBuff } from "./Types/IBuff";
 import { printObjectItems } from "library/common/introspection";
 
-// + писать сколько кадров продержался
-// бафф - защита раз в сколько-то сек
-// + рерол за 50 монет (4-ый слот)
+// * поправил описания баффа укрепления
+// * защитники теперь атакуют ближайших юнитов, а не патрулируют
+// * сделать чтобы баффы покупались при окружении башни
+// * при поражении пишется сколько игрок продержался
+// * новая игра начинается не сразу, а после 10 секунд
+// * каждые 30 секунд поочереди пишется топ 3 баффа игрока
+// * баллиста стоимость: 200 -> 250
+// * добавил бафф вырыть ров
 
-//+ 📌 Предложение: делать для защитников не InstantDeath, а Delete + анимация пыли. Тогда их нельзя будет поднять, да и смотрится лучше
+
+// попробовать сделать бафф стена, она убивает всех юнитов вокруг башни и ставит туда забор
+
+// можно добавить улучшение на спавн защитников, чем выше прокачано, тем их больше, а не просто апп статов, или, к примеру, после 5 или 10 уровня каждый апп - +1 защиткик
+// просто этого одного защитника быстро сносят, а так будет толк идти в ветку защитников, тем более, если они сами еще будут качаться, то они зачистят карту от юнитов. можно вообще сделать ветку суммонов, вороны там голуби, но конечно надо смотреть на сколько игра это потянет
+
+// кто-то мог занять место башни, поэтому пытаться заспавнить еще
+// игрок вышел, а рестарт не работает
+// вместо осталось до победы писать 3 макс баффа 
+
+// - писать сколько кадров продержался
+// бафф - защита раз в сколько-то сек
+
 //📌 Предложение 2: нужно сократить время раунда. Весь азарт режима в первой части, а концовка лагучая и скучная. Продержался 75к тактов - молодец, флаг тебе в руки. Не мучай ни себя, ни ком
 //📌 идея: для некоторых апгрейдов показывать сколько шагов осталось
 // сделать чтобы в конце игры выводило количество побед последнего игрока
-// подкрутить рандом баффов (церковь чтобы не часто появлялась)
-// засчитывать улучшение когда LeftTime = 0
-// +- в конце игры можно выводить статистику каждого игрока, мол сколько баффов было, сколько убито?
-//      сколько продержался, сколько денег получено, можно прям таблицу в чат вывести)) для каждого игрока
 
 // почему-то удаление конфигов ломает систему опыта!!
 
 export class TowerProtection extends HordePluginBase {
     hostPlayerTeamNum : number;
 
-    // 
+    // таймеры
     timers: Array<number>;
+    // номер команды для оповещения
+    notifiedTeamNumber: number;
 
     public constructor() {
         super("Башенная защита");
 
-        GlobalVars.gameState = GameState.PreInit;
+        GlobalVars.SetGameState(GameState.PreInit);
     }
 
     public onFirstRun() {
@@ -49,7 +64,8 @@ export class TowerProtection extends HordePluginBase {
 
     public onEveryTick(gameTickNum: number) {
         GlobalVars.gameTickNum = gameTickNum;
-        switch (GlobalVars.gameState) {
+
+        switch (GlobalVars.GetGameState()) {
             case GameState.PreInit:
                 this.PreInit(gameTickNum);
                 break;
@@ -73,11 +89,12 @@ export class TowerProtection extends HordePluginBase {
 
     private PreInit(gameTickNum: number) {
         this.hostPlayerTeamNum     = -1;
+        this.notifiedTeamNumber    = -1;
 
         GlobalVars.units           = new Array<IUnit>();
         GlobalVars.buffs           = new Array<IBuff>();
 
-        GlobalVars.startGameTickNum = 0;
+        GlobalVars.gameStateChangedTickNum = 0;
         GlobalVars.ScriptUtils     = ScriptUtils;
         GlobalVars.ActiveScena     = ActiveScena;
         GlobalVars.HordeContentApi = HordeContentApi;
@@ -96,7 +113,7 @@ export class TowerProtection extends HordePluginBase {
         }
 
         // переходим к следующему состоянию
-        GlobalVars.gameState       = GameState.Init;
+        GlobalVars.SetGameState(GameState.Init);
 
         // проверяем, что за карта
         var scenaName = GlobalVars.ActiveScena.GetRealScena().ScenaName;
@@ -120,7 +137,7 @@ export class TowerProtection extends HordePluginBase {
                 }
             }
         } else {
-            GlobalVars.gameState = GameState.End;
+            GlobalVars.SetGameState(GameState.End);
         }
     }
 
@@ -243,7 +260,7 @@ export class TowerProtection extends HordePluginBase {
             GlobalVars.teams[teamNum].settlement.Resources.TakeResources(GlobalVars.teams[teamNum].settlement.Resources.GetCopy());
         }
 
-        GlobalVars.gameState = GameState.ChoiseDifficult;
+        GlobalVars.SetGameState(GameState.ChoiseDifficult);
     }
 
     private ChoiseDifficult(gameTickNum: number) {
@@ -273,7 +290,7 @@ export class TowerProtection extends HordePluginBase {
         GlobalVars.teams[this.hostPlayerTeamNum].tower = new Player_TOWER_CHOISE_ATTACKPLAN(GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.Owner.Units.ReplaceUnit(replaceParams), this.hostPlayerTeamNum);
 
         // меняем состояние игры
-        GlobalVars.gameState = GameState.ChoiseWave;
+        GlobalVars.SetGameState(GameState.ChoiseWave);
     }
 
     private ChoiseWave(gameTickNum: number) {
@@ -303,7 +320,8 @@ export class TowerProtection extends HordePluginBase {
         //////////////////////////////////////////
 
         // запоминаем тик начала игры
-        GlobalVars.startGameTickNum = gameTickNum;
+        GlobalVars.gameStateChangedTickNum = gameTickNum;
+        GlobalVars.SetGameState(GameState.Run);
 
         // инициализируем конфиги
 
@@ -396,84 +414,24 @@ export class TowerProtection extends HordePluginBase {
                     }
             });
         }
-
-        GlobalVars.gameState        = GameState.Run;
     }
 
     private Run(gameTickNum: number) {
         // смещаем номер такта, чтобы время считалось относительно начала игры
-        gameTickNum -= GlobalVars.startGameTickNum;
+        gameTickNum -= GlobalVars.gameStateChangedTickNum;
 
         var FPS = GlobalVars.HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
 
         // присуждаем поражение если башня уничтожена
 
         var timerNum = 0;
-        var time     = new Date().getTime();
-        if (gameTickNum % 50 == 0) {
-            // присуждаем победу
-            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-                if (!GlobalVars.teams[teamNum].inGame) {
-                    continue;
-                }
-
-                if (GlobalVars.teams[teamNum].spawner.waveNum >= GlobalVars.attackPlan.waves.length) {
-                    GlobalVars.teams[teamNum].settlement.Existence.ForceVictory();
-                    GlobalVars.gameState = GameState.End;
-                }
-            }
-            // присуждаем поражение
-            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-                if (!GlobalVars.teams[teamNum].inGame) {
-                    continue;
-                }
-
-                // присуждаем поражение, если замок уничтожен
-                if ((GlobalVars.teams[teamNum].tower.unit.IsDead && GlobalVars.teams[teamNum].tower.unit.ScriptData.DefenceFromTeimur_IsDefeat == undefined) ||
-                    (GlobalVars.gameState == GameState.End && GlobalVars.teams[teamNum].spawner.waveNum < GlobalVars.attackPlan.waves.length)) {
-                    GlobalVars.teams[teamNum].tower.unit.ScriptData.DefenceFromTeimur_IsDefeat = true;
-                    GlobalVars.teams[teamNum].settlement.Existence.ForceTotalDefeat();
-
-                    // убиваем юнитов, которые атаковали эту команду игроков
-
-                    for (var unitNum = 0; unitNum < GlobalVars.units.length; unitNum++) {
-                        if (GlobalVars.units[unitNum].teamNum == teamNum) {
-                            GlobalVars.units[unitNum].unit.BattleMind.InstantDeath(null, UnitHurtType.Mele);
-                        }
-                    }
-
-                    // уничтожаем баффы
-
-                    for (var buffNum = 0; buffNum < GlobalVars.buffs.length; buffNum++) {
-                        if (GlobalVars.buffs[buffNum].teamNum == teamNum) {
-                            GlobalVars.buffs[buffNum].needDeleted = true;
-                        }
-                    }
-                }
-            }
-            // проверяем не уничтожены ли все замки
-            var allCastlesDead = true;
-            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-                if (!GlobalVars.teams[teamNum].inGame) {
-                    continue;
-                }
-
-                if (!GlobalVars.teams[teamNum].tower.unit.IsDead) {
-                    allCastlesDead = false;
-                    break;
-                }
-            }
-            if (allCastlesDead) {
-                GlobalVars.gameState = GameState.End;
-            }
-        }
-        this.timers[timerNum++] += new Date().getTime() - time;
 
         // проверяем не конец игры ли
 
-        time     = new Date().getTime();
+        var time     = new Date().getTime();
         if (GlobalVars.attackPlan.waves.length <= GlobalVars.attackPlan.waveNum) {
-            GlobalVars.gameState = GameState.End;
+            GlobalVars.SetGameState(GameState.End);
+
             // замок с максимальных ХП побеждает
             var victory_teamNum = -1;
             var victory_castleHP = 0;
@@ -504,7 +462,7 @@ export class TowerProtection extends HordePluginBase {
                 }
 
                 if (GlobalVars.teams[teamNum].tower.unit.IsDead && GlobalVars.teams[teamNum].tower.unit.ScriptData.DefenceFromTeimur_IsDefeat == undefined) {
-                    this.log.info("ИГРОК ", teamNum, " проиграл, он продержался ", gameTickNum, " тактов!");
+                    broadcastMessage(GlobalVars.teams[teamNum].nickname + " проиграл, он продержался " + gameTickNum + " тактов!", GlobalVars.teams[teamNum].settlement.SettlementColor);
                     GlobalVars.teams[teamNum].tower.unit.ScriptData.DefenceFromTeimur_IsDefeat = true;
                     GlobalVars.teams[teamNum].settlement.Existence.ForceTotalDefeat();
 
@@ -547,53 +505,38 @@ export class TowerProtection extends HordePluginBase {
                 }
                 this.log.info(str);
 
-                GlobalVars.gameState = GameState.End;
+                GlobalVars.SetGameState(GameState.End);
             }
         }
         this.timers[timerNum++] += new Date().getTime() - time;
 
-        // оповещаем о текущем победителе
+        // оповещаем сколько осталось и о игроке
 
-        time     = new Date().getTime();
-        if (gameTickNum % (30 * FPS) == 0) {
-            var maxHealth = 0;
-            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-                if (!GlobalVars.teams[teamNum].inGame ||
-                    GlobalVars.teams[teamNum].tower.unit.IsDead) {
-                    continue;
-                }
-
-                const towerHealth = GlobalVars.teams[teamNum].tower.unit.Health;
-                if (maxHealth < towerHealth) {
-                    maxHealth = towerHealth;
-                }
+        if (gameTickNum % (30 * FPS) == 0 && GlobalVars.GetGameState() != GameState.End) {
+            this.notifiedTeamNumber++;
+            while (!GlobalVars.teams[this.notifiedTeamNumber].inGame  ||
+                GlobalVars.teams[this.notifiedTeamNumber].tower.unit.IsDead) {
+                this.notifiedTeamNumber = (this.notifiedTeamNumber + 1) % GlobalVars.teams.length;
             }
 
-            var topTeamsNum = new Array<number>();
-            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-                if (!GlobalVars.teams[teamNum].inGame ||
-                    GlobalVars.teams[teamNum].tower.unit.IsDead) {
-                    continue;
-                }
+            // ищем 3 максимальный баффа
+            var sortedBuffsIdx : Array<number> = Array.from(Array(Buff_Improvements.TowersBuffsCount[this.notifiedTeamNumber].length).keys());
+            sortedBuffsIdx.sort((a : number, b : number) => {
+                return Buff_Improvements.TowersBuffsCount[this.notifiedTeamNumber][b] - Buff_Improvements.TowersBuffsCount[this.notifiedTeamNumber][a];
+            });
 
-                const towerHealth = GlobalVars.teams[teamNum].tower.unit.Health;
-                if (maxHealth == towerHealth) {
-                    topTeamsNum.push(teamNum);
-                }
+            var secondsLeft     = Math.round(GlobalVars.attackPlan.waves[GlobalVars.attackPlan.waves.length - 1].gameTickNum - gameTickNum) / FPS;
+            var minutesLeft     = Math.floor(secondsLeft / 60);
+            secondsLeft        -= minutesLeft * 60;
+            secondsLeft         = Math.round(secondsLeft);
+            let msgStr : string = "Осталось продержаться " + (minutesLeft > 0 ? minutesLeft + " минут " : "") + secondsLeft + " секунд\n";
+            msgStr             += "Самые мощные баффы игрока " + GlobalVars.teams[this.notifiedTeamNumber].nickname + ":\n";
+            for (var i = 0; i < 3; i++) {
+                var buffIdx = sortedBuffsIdx[i];
+                msgStr += "\t" + GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[buffIdx].CfgUid].Name + " : " + Buff_Improvements.TowersBuffsCount[this.notifiedTeamNumber][buffIdx] + "\n"
             }
 
-            var secondsLeft = Math.round(GlobalVars.attackPlan.waves[GlobalVars.attackPlan.waves.length - 1].gameTickNum - gameTickNum) / FPS;
-            var minutesLeft = Math.floor(secondsLeft / 60);
-            secondsLeft    -= minutesLeft * 60;
-            secondsLeft     = Math.round(secondsLeft);
-            let msg : any   = null;
-            if (topTeamsNum.length == 1) {
-                msg = createGameMessageWithNoSound("Игроку " + GlobalVars.teams[topTeamsNum[0]].nickname + " осталось до победы " + (minutesLeft > 0 ? minutesLeft + " минут " : "") + secondsLeft + " секунд",
-                GlobalVars.teams[topTeamsNum[0]].color);
-            } else {
-                msg = createGameMessageWithNoSound("Осталось продержаться " + (minutesLeft > 0 ? minutesLeft + " минут " : "") + secondsLeft + " секунд", createHordeColor(255, 140, 140, 140));
-            }
-
+            var msg = createGameMessageWithNoSound(msgStr, GlobalVars.teams[this.notifiedTeamNumber].color);
             for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
                 if (!GlobalVars.teams[teamNum].inGame) {
                     continue;
@@ -601,7 +544,6 @@ export class TowerProtection extends HordePluginBase {
                 GlobalVars.teams[teamNum].settlement.Messages.AddMessage(msg);
             }
         }
-        this.timers[timerNum++] += new Date().getTime() - time;
 
         // спавнер
 
@@ -687,16 +629,24 @@ export class TowerProtection extends HordePluginBase {
             }
         }
         this.timers[timerNum++] += new Date().getTime() - time;
+
+        // если закончилась игра, то
+
+        if (GlobalVars.GetGameState() == GameState.End) {
+            broadcastMessage("Игра начнется через 10 секунд!", createHordeColor(255, 140, 140, 140));
+        }
     }
 
     private End(gameTickNum: number) {
-        GlobalVars.gameState = GameState.PreInit;
-        // тут нужно TotalDefead превратить в что-то другое
-        for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-            if (!GlobalVars.teams[teamNum].inGame) {
-                continue;
+        if (GlobalVars.gameStateChangedTickNum + 10*50 < gameTickNum) {
+            GlobalVars.SetGameState(GameState.PreInit);
+            // тут нужно TotalDefead превратить в что-то другое
+            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+                if (!GlobalVars.teams[teamNum].inGame) {
+                    continue;
+                }
+                GlobalVars.ScriptUtils.SetValue(GlobalVars.teams[teamNum].settlement.Existence, "Status", GlobalVars.HCL.HordeClassLibrary.World.Settlements.Existence.ExistenceStatus.CombatNow);
             }
-            GlobalVars.ScriptUtils.SetValue(GlobalVars.teams[teamNum].settlement.Existence, "Status", GlobalVars.HCL.HordeClassLibrary.World.Settlements.Existence.ExistenceStatus.CombatNow);
         }
     }
 }

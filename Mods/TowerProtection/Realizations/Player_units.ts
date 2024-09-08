@@ -4,7 +4,7 @@ import { CfgAddUnitProducer, ChebyshevDistance, CreateUnitConfig } from "../Util
 import { AttackPlansClass } from "./AttackPlans";
 import { CFGPrefix, GlobalVars, ReplaceUnitParameters } from "../GlobalData";
 import { UnitCommand, UnitMapLayer } from "library/game-logic/horde-types";
-import { createPoint } from "library/common/primitives";
+import { createHordeColor, createPoint } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
 import { log } from "library/common/logging";

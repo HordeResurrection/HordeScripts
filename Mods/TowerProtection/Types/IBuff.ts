@@ -20,11 +20,11 @@ export class IBuff {
     /** флаг, что юнита нужно удалить из списка юнитов, чтобы отключить обработку */
     needDeleted: boolean;
 
-    constructor (teamNum: number) {
+    constructor (teamNum: number, deleteFlag: boolean = false) {
         this.teamNum              = teamNum;
         this.processingTickModule = 50;
-        this.processingTick       = (GlobalVars.gameTickNum - GlobalVars.startGameTickNum) % this.processingTickModule;
-        this.needDeleted          = false;
+        this.processingTick       = (GlobalVars.gameTickNum - GlobalVars.gameStateChangedTickNum) % this.processingTickModule;
+        this.needDeleted          = deleteFlag;
     }
 
     public static InitConfig() {
@@ -41,6 +41,7 @@ export class IBuff {
             ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 1);
             // убираем требования
             GlobalVars.configs[this.CfgUid].TechConfig.Requirements.Clear();
+            // убираем флаги здания
             ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Flags", UnitFlags.FireResistant);
             // делаем размер 1 х 1
             ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].Size, "Width", 1);
