@@ -156,6 +156,19 @@ export const MindCharacterConfig = HCL.HordeClassLibrary.HordeContent.Configs.Ma
 
 
 // ===================================================
+// --- Прочие объекты сцены
+
+export const StringVisualEffect = HCL.HordeClassLibrary.World.Objects.VisualEffects.StringVisualEffect;
+
+
+// ===================================================
+// --- Графика
+
+export const DrawLayer = HCL.HordeClassLibrary.World.Simple.DrawLayer;
+export const FontUtils = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Game.UI.Utils.FontUtils", "HordeResurrection.Game"));
+
+
+// ===================================================
 // --- Прочее
 
 export const AnimatorScriptTasks = HCL.HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.Tasks.AnimatorScriptTasks;

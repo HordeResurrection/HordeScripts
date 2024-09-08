@@ -72,6 +72,9 @@ export function allExamples() {
     addExample(new Example_HookSentChatMessages());
     addExample(new Example_HookReceivedChatMessages());
 
+    // - Примеры работы с декорациями
+    addExample(new Example_StringDecoration());
+
     // - Примеры кастомных объектов
     addExample(new Example_CustomBullet());
     addExample(new Example_CustomUnit());
@@ -118,4 +121,5 @@ import { Example_CustomUnitCanBePlaced } from "examples/custom-unit-can-be-place
 import { Example_PathFind } from "examples/path-find-example";
 import { Example_SettlementResourcesBonus } from "examples/settlement-resources-bonus";
 import { Example_UnitEnumerateEvents, Example_UnitHandleEvents } from "examples/unit-event-examples";
+import { Example_StringDecoration } from "examples/string-decoration";
 
