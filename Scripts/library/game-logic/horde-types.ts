@@ -159,6 +159,7 @@ export const MindCharacterConfig = HCL.HordeClassLibrary.HordeContent.Configs.Ma
 // --- Прочие объекты сцены
 
 export const StringVisualEffect = HCL.HordeClassLibrary.World.Objects.VisualEffects.StringVisualEffect;
+export const GeometryVisualEffect = HCL.HordeClassLibrary.World.Objects.VisualEffects.GeometryVisualEffect;
 
 
 // ===================================================
@@ -166,6 +167,14 @@ export const StringVisualEffect = HCL.HordeClassLibrary.World.Objects.VisualEffe
 
 export const DrawLayer = HCL.HordeClassLibrary.World.Simple.DrawLayer;
 export const FontUtils = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Game.UI.Utils.FontUtils", "HordeResurrection.Game"));
+export const GeometryCanvas = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Game.Render.GeometryCanvas.GeometryCanvas", "HordeResurrection.Game"));
+
+
+// ===================================================
+// --- Типы для использования в рендере
+
+export const Stride_Vector2 = xHost.type(ScriptUtils.GetTypeByName("Stride.Core.Mathematics.Vector2", "Stride.Core.Mathematics"));
+export const Stride_Color = xHost.type(ScriptUtils.GetTypeByName("Stride.Core.Mathematics.Color", "Stride.Core.Mathematics"));
 
 
 // ===================================================

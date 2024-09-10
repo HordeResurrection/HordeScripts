@@ -1,5 +1,5 @@
 import { createHordeColor } from "library/common/primitives";
-import { StringVisualEffect, DrawLayer, FontUtils } from "./horde-types";
+import { StringVisualEffect, DrawLayer, FontUtils, GeometryVisualEffect } from "./horde-types";
 
 
 /**
@@ -27,6 +27,20 @@ export function spawnString(scena, text, position, ticksToLive) {
     let decorationString = new StringVisualEffect(args);
     scena.ObjectController.RegisterVisualEffect(decorationString);
     return decorationString;
+}
+
+/**
+ * Создание геометрии-декорации в заданных координатах
+ */
+export function spawnGeometry(scena, geometry, position, ticksToLive) {
+    let args = new GeometryVisualEffect.CreationArgs();
+    args.GeometryBuffer = geometry;
+    args.TicksToLive = ticksToLive;
+    args.Center = position;
+
+    let decorationGeometry = new GeometryVisualEffect(args);
+    scena.ObjectController.RegisterVisualEffect(decorationGeometry);
+    return decorationGeometry;
 }
 
 /**

@@ -74,6 +74,7 @@ export function allExamples() {
 
     // - Примеры работы с декорациями
     addExample(new Example_StringDecoration());
+    addExample(new Example_GeometryDecoration());
 
     // - Примеры кастомных объектов
     addExample(new Example_CustomBullet());
@@ -121,5 +122,6 @@ import { Example_CustomUnitCanBePlaced } from "examples/custom-unit-can-be-place
 import { Example_PathFind } from "examples/path-find-example";
 import { Example_SettlementResourcesBonus } from "examples/settlement-resources-bonus";
 import { Example_UnitEnumerateEvents, Example_UnitHandleEvents } from "examples/unit-event-examples";
-import { Example_StringDecoration } from "examples/string-decoration";
+import { Example_StringDecoration } from "examples/decoration-string";
+import { Example_GeometryDecoration } from "examples/decoration-geometry";
 

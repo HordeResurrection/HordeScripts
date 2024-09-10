@@ -65,6 +65,6 @@ export class Example_StringDecoration extends HordeExampleBase {
 
         let ttl = this.decorationString.TicksToLive;
         this.decorationString.Text = `Привет ОРДА !!!\nЭто что? Буквы в Орде?!\n${Math.floor(ttl / 10) / 10}`;
-        this.decorationString.PositionInt = createPoint(this.center.X + x, this.center.Y + y);
+        this.decorationString.Position = createPoint(this.center.X + x, this.center.Y + y);
     }
 }
