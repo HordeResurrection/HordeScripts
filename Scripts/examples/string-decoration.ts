@@ -8,7 +8,7 @@ import { DrawLayer, FontUtils } from "library/game-logic/horde-types";
  */
 export class Example_StringDecoration extends HordeExampleBase {
     private decorationString: any;
-    private center: {x, y};
+    private center: any;
     private startTick: number;
 
     /**
@@ -17,7 +17,7 @@ export class Example_StringDecoration extends HordeExampleBase {
     public constructor() {
         super("String decoration");
 
-        this.center = {x: 600, y: 600};
+        this.center = createPoint(600, 600);
     }
 
     /**
@@ -33,11 +33,12 @@ export class Example_StringDecoration extends HordeExampleBase {
             this.globalStorage.decorationString.Free();
         
         // Создаём новую строку
-        let position = createPoint(this.center.x, this.center.y);
-        this.decorationString = spawnString(ActiveScena, "Привет ОРДА !!!", position);
+        let position = this.center;
+        let ticksToLive = 2000;
+        this.decorationString = spawnString(ActiveScena, "Привет ОРДА !!!", position, ticksToLive);
         this.globalStorage.decorationString = this.decorationString;
 
-        // Установка параметров
+        // Установка графических параметров
         this.decorationString.Height = 18;
         this.decorationString.Color = createHordeColor(255, 100, 255, 100);
         this.decorationString.DrawLayer = DrawLayer.Birds;  // Отображать поверх всех юнитов
@@ -54,21 +55,16 @@ export class Example_StringDecoration extends HordeExampleBase {
     public onEveryTick(gameTickNum: number) {
         const pi = 3.14;
         const T = 500;
-        const TTL = 2000;
 
         let t = gameTickNum - this.startTick;
-        if (t >= TTL) {
-            this.decorationString.Free();
-            return;
-        }
-
         let a = 2 * pi * t / T;
         let r = 10 + 2 * a;
 
         let x = Math.floor(r * Math.cos(a));
         let y = Math.floor(r * Math.sin(a));
 
-        this.decorationString.Text = `Привет ОРДА !!!\nЭто что? Буквы в Орде?!\n${Math.floor((TTL - t) / 10) / 10}`;
-        this.decorationString.PositionInt = createPoint(this.center.x + x, this.center.y + y);
+        let ttl = this.decorationString.TicksToLive;
+        this.decorationString.Text = `Привет ОРДА !!!\nЭто что? Буквы в Орде?!\n${Math.floor(ttl / 10) / 10}`;
+        this.decorationString.PositionInt = createPoint(this.center.X + x, this.center.Y + y);
     }
 }

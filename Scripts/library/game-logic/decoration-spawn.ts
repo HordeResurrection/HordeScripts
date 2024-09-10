@@ -14,9 +14,10 @@ export function spawnDecoration(scena, decorationCfg, position) {
 /**
  * Создание строки-декорации в заданных координатах
  */
-export function spawnString(scena, text, position) {
+export function spawnString(scena, text, position, ticksToLive) {
     let args = new StringVisualEffect.CreationArgs();
     args.Text = text;
+    args.TicksToLive = ticksToLive;
     args.Center = position;
     args.DrawLayer = DrawLayer.Units;
     args.Color = createHordeColor(255, 255, 255, 255);
