@@ -33,7 +33,7 @@ export class Example_GeometryDecoration extends HordeExampleBase {
             this.globalStorage.geometryDecoration.Free();
         
         // Создаём буфер геометрии (данные для видеокарты)
-        let geometryBuffer = this._makeGeometry(new Stride_Color(0x88, 0xf0, 0xf0), 1.0, true);
+        let geometryBuffer = this._makeGeometry();
 
         // Создаём новую декорацию (объект в игре)
         let position = this.center;
@@ -47,16 +47,31 @@ export class Example_GeometryDecoration extends HordeExampleBase {
      */
     public onEveryTick(gameTickNum: number) {
         
-        // Перемещение декорации
+        // Перемещение декорации.
+        // Здесь код траектории по периметру треугольника
+        const dist = 100;
+        const stages = 3;
         let t = DataStorage.gameTickNum - this.startTick;
-        if ((t / 10) % 200 < 100) {
-            this.geometryDecoration.Position = createPoint(Math.floor(this.center.X + (t / 10) % 100), this.center.Y);
-        } else {
-            this.geometryDecoration.Position = createPoint(Math.floor(this.center.X + 100 - (t / 10) % 100), this.center.Y);
+        let stage = Math.floor(((t / 10) % (stages * dist)) / dist);
+        if (stage == 0) {
+            this.geometryDecoration.Position = createPoint(
+                Math.floor(this.center.X + (t / 10) % dist),
+                this.center.Y
+            );
+        } else if (stage == 1) {
+            this.geometryDecoration.Position = createPoint(
+                this.center.X + dist,
+                Math.floor(this.center.Y - (t / 10) % dist)
+            );
+        } else if (stage == 2) {
+            this.geometryDecoration.Position = createPoint(
+                Math.floor(this.center.X + dist - (t / 10) % dist),
+                Math.floor(this.center.Y - dist + (t / 10) % dist),
+            );
         }
 
         // Пересоздание буфера геометрии с учетом течения времени - имитация движения
-        let geometryBuffer = this._makeGeometry(new Stride_Color(0x88, 0xf0, 0xf0), 1.0, true);
+        let geometryBuffer = this._makeGeometry();
         this.geometryDecoration.GeometryBuffer = geometryBuffer;
         
         // Внимание!
@@ -67,8 +82,12 @@ export class Example_GeometryDecoration extends HordeExampleBase {
     /**
      * Код для формирования низкоуровневого буфера с геометрией.
      */
-    private _makeGeometry(color, thickness: number, antiAliased: boolean) {
+    private _makeGeometry() {
 
+        const thickness = 1.0;
+        const antiAliased = false;  // Можно установить сглаживание, но будет мыльно
+
+        const N = 12;
         let t = DataStorage.gameTickNum - this.startTick;
         let position = this._getRadialPosition(t, 100);
 
@@ -76,18 +95,47 @@ export class Example_GeometryDecoration extends HordeExampleBase {
         let geometryCanvas = new GeometryCanvas();
 
         // Рисуем линию
+        let color = new Stride_Color(0x88, 0xf0, 0xf0);
         geometryCanvas.DrawLine(new Stride_Vector2(0, 0), position, color, thickness, antiAliased);
 
-        // Рисуем окружность
-        geometryCanvas.DrawCircleFast(position, 7, color, thickness, false);
+        // Рисуем заполненный круг
+        let radius = 7;
+        let numSegments = 5;  // Если задать малое количество сегментов окружности, то получится правильный многоугольник
+        color = new Stride_Color(0x88, 0xf0, 0xf0, 0xa0);
+        geometryCanvas.DrawCircleFilled(position, radius, color, numSegments, antiAliased);
 
         // Можно использовать встроенные заготовки, но для них уже заранее заданы цвет, толщина линий и другие параметры.
         // (Таким же образом можно делать и свои заготовки)
         const UnitInForestTemplates = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Game.Render.GeometryCanvas.UnitInForestTemplates", "HordeResurrection.Game"));
         let inForestGeometryBuffer = UnitInForestTemplates.GetFigure(UnitHealthLevel.Good);
-        for (let i = 0; i < 12; i++) {
-            geometryCanvas.PlaceTemplateAt(inForestGeometryBuffer, this._getRadialPosition(i * 40, 10 + (t + i * 10) % 100));
+        for (let i = 0; i < N; i++) {
+            position = this._getRadialPosition(i * 40, 10 + (t % 100 + i * 6) % 100);
+            geometryCanvas.PlaceTemplateAt(inForestGeometryBuffer, position);
         }
+
+        // Рисуем ломаную линию
+        let points = host.newArr(Stride_Vector2, N);
+        for (let i = 0; i < N; i++) {
+            position = this._getRadialPosition((i+t/2) * 10, 120);
+            points[i] = position;
+        }
+        color = new Stride_Color(0x88, 0xf0, 0xf0);
+        geometryCanvas.DrawPolyLine(points, color, thickness * 2, antiAliased);
+
+        // Рисуем заполненный четырехугольник
+        let a = 8;
+        let v1 = Stride_Vector2.Add(points[0], new Stride_Vector2(0, -a));
+        let v2 = Stride_Vector2.Add(points[0], new Stride_Vector2(a, 0));
+        let v3 = Stride_Vector2.Add(points[0], new Stride_Vector2(0, a));
+        let v4 = Stride_Vector2.Add(points[0], new Stride_Vector2(-a, 0));
+        color = new Stride_Color(0x88, 0xf0, 0xf0);
+        geometryCanvas.DrawQuadFilled(v1, v2, v3, v4, color, antiAliased);
+
+        // Рисуем окружность
+        color = new Stride_Color(0x88, 0xf0, 0xf0);
+        position = points[N-1];
+        radius = 5;
+        geometryCanvas.DrawCircleFast(position, radius, color, thickness, antiAliased);
 
         // Результат - буфер с вершинами и индексами для видеокарты
         let geometryBuffer = geometryCanvas.GetBuffers();
