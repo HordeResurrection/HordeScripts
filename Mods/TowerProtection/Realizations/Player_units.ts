@@ -81,9 +81,10 @@ export class Player_TOWER_BASE extends IUnit {
     public GetTargetUnit(armamentDistance: number): any {
         // если запросили оружие, которое имеет дальность больше максимальной
         if (armamentDistance >= this._armamentsMaxDistance) {
+
             this._armamentsTargetEndNum.push(this._targetsUnitInfo.length);
             this._armamentsTargetNextNum.push(this._targetsUnitInfo.length - 1);
-            armamentDistance++;
+            this._armamentsMaxDistance++;
             while (armamentDistance >= this._armamentsMaxDistance) {
                 this._armamentsTargetEndNum.push(this._targetsUnitInfo.length);
                 this._armamentsTargetNextNum.push(this._targetsUnitInfo.length - 1);
@@ -103,8 +104,6 @@ export class Player_TOWER_BASE extends IUnit {
     }
 
     public OnEveryTick(gameTickNum: number): void {
-        //log.info("this._armamentsMaxDistance = ", this._armamentsMaxDistance);
-
         if (this._armamentsMaxDistance != 0) {
             this._targetsUnitInfo = [];
 
@@ -130,6 +129,12 @@ export class Player_TOWER_BASE extends IUnit {
             // инициализируем массивы по выборам целей для орудий
             if (this._targetsUnitInfo.length != 0) {
                 var armamentDistance = 0;
+
+                // перевыделяем массивы текущих целей
+                this._armamentsTargetNextNum = new Array<number>(this._armamentsMaxDistance);
+                this._armamentsTargetEndNum  = new Array<number>(this._armamentsMaxDistance);
+
+                // инициализируем массивы целей
                 for (var targetNum = 0; targetNum < this._targetsUnitInfo.length; targetNum++) {
                     for (; armamentDistance < this._targetsUnitInfo[targetNum].distance && armamentDistance < this._armamentsMaxDistance; armamentDistance++) {
                         this._armamentsTargetEndNum[armamentDistance]  = targetNum;

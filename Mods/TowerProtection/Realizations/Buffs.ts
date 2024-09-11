@@ -45,65 +45,72 @@ export class Buff_DigMoat extends IBuff {
     static BaseCfgUid     : string = "#UnitConfig_Nature_Draider";
     static MaxCount       : number = 4;
 
+    // замененные тайлы бафом
+
+    private prevTilesCfg  : Array<any>;
+    private prevTilesCell : Array<any>;
+
     constructor(teamNum: number) {
         super(teamNum);
-        this.needDeleted = true;
+
+        this.prevTilesCfg = new Array<any>();
+        this.prevTilesCell = new Array<any>();
 
         var buffLevel = Buff_Improvements.TowersBuffsCount[this.teamNum][Buff_Improvements.OpBuffNameToBuffIdx.get(this.constructor.name) as number];
         var towerCell = GlobalVars.teams[this.teamNum].towerCell;
         var waterRectangle : Rectangle = new Rectangle(0,0,0,0);
         if (buffLevel == 0) {
-            waterRectangle = new Rectangle(towerCell.X - 5, towerCell.Y - 1, 1, 4);
+            waterRectangle = new Rectangle(towerCell.X, towerCell.Y + 1 + 4, 2, 1);
         } else if (buffLevel == 1) {
-            waterRectangle = new Rectangle(towerCell.X + 1 + 5, towerCell.Y - 1, 1, 4);
+            waterRectangle = new Rectangle(towerCell.X, towerCell.Y - 4, 2, 1);
         } else if (buffLevel == 2) {
-            waterRectangle = new Rectangle(towerCell.X - 1, towerCell.Y + 1 + 5, 4, 1);
+            waterRectangle = new Rectangle(towerCell.X - 5, towerCell.Y - 4, 1, 10);
         } else if (buffLevel == 3) {
-            waterRectangle = new Rectangle(towerCell.X - 1, towerCell.Y - 5, 4, 1);
+            waterRectangle = new Rectangle(towerCell.X + 1 + 5, towerCell.Y - 4, 1, 10);
         } 
 
         // 1 линия // 122 151 152 123 125
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 2, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[122], true);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 1, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[151], true);
+        this._SetTile(createPoint(waterRectangle.X - 2, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[122]);
+        this._SetTile(createPoint(waterRectangle.X - 1, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[151]);
         for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++)
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(x, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[152], true);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[123], true);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[125], true);
+        this._SetTile(createPoint(x, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[152]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[123]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[125]);
         // 2 линия // 126  22  10  23 128
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 2, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[126], true);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 1, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[22], true);
+        this._SetTile(createPoint(waterRectangle.X - 2, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[126]);
+        this._SetTile(createPoint(waterRectangle.X - 1, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[22]);
         for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++)
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(x, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[10], true);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[23], true);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[128], true);
+        this._SetTile(createPoint(x, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[10]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[23]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[128]);
         // 3 линия // 126  38   3  16 147
         for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++)
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 2, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[126], true);
+        this._SetTile(createPoint(waterRectangle.X - 2, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[126]);
         for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++)
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 1, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[38], true);
+        this._SetTile(createPoint(waterRectangle.X - 1, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[38]);
         for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++) {
             for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++) {
-                ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(x, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[1], true);
+                this._SetTile(createPoint(x, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[1]);
             }
         }
         for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++)
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[16], true);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[16]);
         for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++)
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W + 1, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[147], true);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[147]);
         // 4 линия // 127  18  20  25 128
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 2, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[127], true);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 1, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[18], true);
+        this._SetTile(createPoint(waterRectangle.X - 2, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[127]);
+        this._SetTile(createPoint(waterRectangle.X - 1, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[18]);
         for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++)
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(x, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[20], true);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[25], true);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[128], true);
+        this._SetTile(createPoint(x, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[20]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[25]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[128]);
         // 5 линия // 130 143 144 143 134
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 2, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[130], true);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X - 1, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[143], true);
+        this._SetTile(createPoint(waterRectangle.X - 2, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[130]);
+        this._SetTile(createPoint(waterRectangle.X - 1, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[143]);
         for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++)
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(x, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[144], true);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[143], true);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[134], true);
+        this._SetTile(createPoint(x, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[144]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[143]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[134]);
 
         // не работает
 
@@ -127,6 +134,12 @@ export class Buff_DigMoat extends IBuff {
         //GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(19, 22), TileType.Water, TilePayload.Exploded);
     }
 
+    private _SetTile(cell: any, tileCfg: any) {
+        this.prevTilesCfg.push(GlobalVars.ActiveScena.GetRealScena().LandscapeMap.Item.get(cell).Cfg);
+        this.prevTilesCell.push(cell);
+        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", cell, tileCfg, true);
+    }
+
     static InitConfig() {
         IBuff.InitConfig.call(this);
 
@@ -138,6 +151,14 @@ export class Buff_DigMoat extends IBuff {
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Gold", 300);
 
         ScriptUtils.GetValue(GlobalVars.configs[this.CfgUid], "PortraitCatalogRef").SetConfig(GlobalVars.HordeContentApi.GetAnimationCatalog("#AnimCatalog_digMoatBuffPortrait"));
+    }
+
+    public OnDead(gameTickNum: number) {
+        // убираем изменения ланшафта
+        var landscapeMap = GlobalVars.ActiveScena.GetRealScena().LandscapeMap;
+        for (var tileNum = 0; tileNum < this.prevTilesCfg.length; tileNum++) {
+            ScriptUtils.Invoke(landscapeMap, "ChangeTileByConfig", this.prevTilesCell[tileNum], this.prevTilesCfg[tileNum], true);
+        }
     }
 };
 
