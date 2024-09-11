@@ -3,7 +3,7 @@ import { IUnit } from "../Types/IUnit";
 import { CreateUnitConfig } from "../Utils";
 import { AttackPlansClass } from "./AttackPlans";
 import { GlobalVars } from "../GlobalData";
-import { UnitCommand, UnitFlags, UnitHurtType } from "library/game-logic/horde-types";
+import { UnitCommand, UnitFlags, UnitHurtType, UnitSpecification } from "library/game-logic/horde-types";
 import { TeimurLegendaryUnitsClass, Teimur_Legendary_GREED_HORSE } from "./Teimur_units";
 import { log } from "library/common/logging";
 import { WaveUnit } from "../Types/IAttackPlan";
@@ -286,6 +286,8 @@ class Player_worker extends IUnit {
                 if (cfg.MainArmament) {
                     val = true;
                 } else if (cfg.Flags.HasFlag(UnitFlags.Compound)) {
+                    val = true;
+                } else if (cfg.Specification.HasFlag(UnitSpecification.Church)) {
                     val = true;
                 }
                 cfgCache.set(cfgUid, val);
