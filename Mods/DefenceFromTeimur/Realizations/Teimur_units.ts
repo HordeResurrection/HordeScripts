@@ -217,7 +217,7 @@ export class Teimur_Legendary_SWORDMEN extends ILegendaryUnit {
 export class Teimur_Legendary_HEAVYMAN extends ILegendaryUnit {
     static CfgUid      : string = "#DefenceTeimur_legendary_heavymen";
     static BaseCfgUid  : string = "#DefenceTeimur_Heavymen";
-    static Description : string = "Слабости: давится, огонь. Преимущества: очень силен в ближнем бою.";
+    static Description : string = "Слабости: огонь. Преимущества: очень силен в ближнем бою.";
 
     constructor (unit: any, teamNum: number) {
         super(unit, teamNum);
@@ -231,7 +231,6 @@ export class Teimur_Legendary_HEAVYMAN extends ILegendaryUnit {
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
         // увеличиваем хп
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(400 * Math.sqrt(GlobalVars.difficult)));
-        // делаем броню 3, чтобы стрели не брали его
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 3);
     }
 }
@@ -438,9 +437,6 @@ export class Teimur_Legendary_WORKER extends ILegendaryUnit {
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid], "ProductionTime", 200);
         // убираем возможность захвата
         GlobalVars.configs[towerUid].ProfessionParams.Remove(UnitProfession.Capturable);
-        // делаем поджигательные стрелы
-        GlobalVars.ScriptUtils.GetValue(GlobalVars.configs[towerUid].MainArmament, "BulletConfigRef")
-            .SetConfig(HordeContentApi.GetBulletConfig("#BulletConfig_FireArrow"));
         
         // (легендарный) крестьянин
 

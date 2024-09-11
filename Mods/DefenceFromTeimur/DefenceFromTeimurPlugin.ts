@@ -3,7 +3,7 @@ import HordePluginBase from "plugins/base-plugin";
 import { AttackPlansClass } from "./Realizations/AttackPlans";
 import { Cell, Rectangle } from "./Types/Geometry";
 import { Team } from "./Types/Team";
-import { createHordeColor, createPoint } from "library/common/primitives";
+import { createHordeColor, createPoint, createResourcesAmount } from "library/common/primitives";
 import { UnitHurtType, UnitDirection } from "library/game-logic/horde-types";
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_GOALCASTLE } from "./Realizations/Player_units";
@@ -398,6 +398,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
         GlobalVars.incomePlan = new AttackPlansClass[choisedAttackPlanIdx].IncomePlanClass();
         broadcastMessage(AttackPlansClass[choisedAttackPlanIdx].IncomePlanClass.Description, createHordeColor(255, 255, 50, 10));
+        broadcastMessage("Активирован режим общих ресурсов, каждый 10 секунд идет усреднение ресов", createHordeColor(255, 255, 50, 10));
 
         // считаем сколько будет врагов
 
@@ -615,6 +616,37 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
         if (gameTickNum % 50 == 2) {
             GlobalVars.incomePlan.OnEveryTick(gameTickNum);
+        }
+
+        // усредняем ресурсы игроков
+
+        if (gameTickNum % 500 == 0) {
+            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+                // проверяем, что поселение в игре
+                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
+                    continue;
+                }
+
+                var avgGold   : number = 0;
+                var avgMetal  : number = 0;
+                var avgLumber : number = 0;
+                var avgPeople : number = 0;
+                for (var settlement of GlobalVars.teams[teamNum].settlements) {
+                    avgGold   += settlement.Resources.Gold;
+                    avgMetal  += settlement.Resources.Metal;
+                    avgLumber += settlement.Resources.Lumber;
+                    avgPeople += settlement.Resources.FreePeople;
+                }
+                avgGold   = Math.round(avgGold   / GlobalVars.teams[teamNum].settlements.length);
+                avgMetal  = Math.round(avgMetal  / GlobalVars.teams[teamNum].settlements.length);
+                avgLumber = Math.round(avgLumber / GlobalVars.teams[teamNum].settlements.length);
+                avgPeople = Math.round(avgPeople / GlobalVars.teams[teamNum].settlements.length);
+                
+                for (var settlement of GlobalVars.teams[teamNum].settlements) {
+                    settlement.Resources.TakeResources(settlement.Resources.GetCopy());
+                    settlement.Resources.AddResources(createResourcesAmount(avgGold, avgMetal, avgLumber, avgPeople));
+                }
+            }
         }
     }
 
