@@ -831,7 +831,7 @@ export class MaraUtils {
     }
 
     static IsHousingConfig(unitConfig: any): boolean {
-        return unitConfig.ProducedPeople > 0 && !MaraUtils.IsProducerConfig(unitConfig);
+        return unitConfig.ProducedPeople > 0 && !MaraUtils.IsMetalStockConfig(unitConfig);
     }
 
     static IsHousingConfigId(cfgId: string): boolean {
