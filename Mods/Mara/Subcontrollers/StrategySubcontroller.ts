@@ -74,7 +74,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let requiredOffensiveStrength = ratio * requiredStrength;
         this.settlementController.Debug(`Calculated required offensive strength: ${requiredOffensiveStrength}`);
 
-        let currentOffensiveStrength = this.calcSettlementStrength(this.settlementController.Settlement) - this.GetCurrentDefensiveStrength();
+        let currentOffensiveStrength = this.getCurrentTotalStrength() - this.GetCurrentDefensiveStrength();
         this.settlementController.Debug(`Current offensive strength: ${currentOffensiveStrength}`);
 
         let ofensiveStrengthToProduce = requiredOffensiveStrength - currentOffensiveStrength;
@@ -590,6 +590,19 @@ export class StrategySubcontroller extends MaraSubcontroller {
         }
 
         return settlementStrength;
+    }
+
+    private getCurrentTotalStrength(): number {
+        let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        let totalStrength = 0;
+        
+        for (let unit of allUnits) {
+            if (MaraUtils.IsCombatConfig(unit.Cfg) && unit.IsAlive) {
+                totalStrength += MaraUtils.GetUnitStrength(unit);
+            }
+        }
+
+        return totalStrength;
     }
 
     private makeCombatUnitComposition(allowedConfigs: Array<AllowedCompositionItem>, requiredStrength: any): UnitComposition {
