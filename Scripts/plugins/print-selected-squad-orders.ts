@@ -1,3 +1,4 @@
+import { IDisposableT, IEnumeratorT } from "library/dotnet/dotnet-types";
 import HordePluginBase from "./base-plugin";
 
 
@@ -47,7 +48,7 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
         if (squad.Count == 1) {
             this.log.info(`[*] [${tickText}] Selected squad: 1 unit`);
         } else {
-            this.log.info(`[*] [${tickText}] Selected squad:`, squad.Count, "units", `(print info for only first unit)`);
+            this.log.info(`[*] [${tickText}] Selected squad:`, squad.Count, "units", "(print info for only first unit)");
         }
 
         let u = squad.GetFirstUnit();
@@ -58,11 +59,12 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
         
         this.log.info('==', u);
 
-        this._printOrders(u, '-   ');
+        this._printCurrentOrder(u, '-   ');
+        this._printNextOrders(u, '-   ');
         this._printNotifications(u, '-   ');
     }
 
-    private _printOrders(u, prefix = "") {
+    private _printCurrentOrder(u, prefix = "") {
         if (!u) {
             return;
         }
@@ -85,9 +87,40 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
         this.log.info(prefix + '  Motion:', ordersMind.ActiveMotion);
         this.log.info(prefix + '  Motive:', str(ordersMind.ActiveOrder.MotiveNotification));
         
+    }
+
+    private _printNextOrders(u, prefix = "") {
+        if (!u) {
+            return;
+        }
+
+        let nextOrders: Array<any> = [];
+
+        let ordersMind = u.OrdersMind;
         let queue = ScriptUtils.GetValue(ordersMind, "OrdersQueue");
-        let next = queue.GetNextExpectedOrder();
-        this.log.info(prefix + 'Next:', str(next));
+
+        let instinctOrder = ScriptUtils.GetValue(queue, "CurrentInstinctOrder");
+        if (instinctOrder) {
+            nextOrders.push(instinctOrder);
+        }
+
+        let enumerator = host.cast(IEnumeratorT, queue.GetFollowingOrdersEnumerator());
+        while (enumerator.MoveNext()) {
+            nextOrders.push(enumerator.Current);
+        }
+        host.cast(IDisposableT, enumerator).Dispose();
+
+        if (nextOrders.length > 0) {
+            for (let i = 0; i < nextOrders.length; i++) {
+                if (i == 0) {
+                    this.log.info(prefix + `Next:`, str(nextOrders[i]));
+                } else {
+                    this.log.info(prefix + `  +${i}:`, str(nextOrders[i]));
+                }
+            }
+        } else {
+            this.log.info(prefix + 'Next: <Queue is empty>');
+        }
     }
     
     private _printNotifications(u, prefix = "") {

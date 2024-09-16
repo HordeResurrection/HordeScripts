@@ -4,6 +4,7 @@
 
 const PrimitivesNS = HordePrimitives.HordeResurrection.Basic.Primitives;
 export const Point2D = PrimitivesNS.Geometry.Point2D;
+export const Size2D = PrimitivesNS.Geometry.Size2D;
 export const Rect2D = PrimitivesNS.Geometry.Rect2D;
 export const Box3D = PrimitivesNS.Geometry.Box3D;
 export const PreciseFraction = PrimitivesNS.PreciseFraction;

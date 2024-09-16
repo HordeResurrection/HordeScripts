@@ -33,6 +33,7 @@ export class Example_ReplaceUnit extends HordeExampleBase {
         replaceParams.PreserveHealthLevel = true;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
         replaceParams.PreserveExperience = true;    // Нужно ли передать опыт?
         replaceParams.PreserveOrders = true;        // Нужно ли передать приказы?
+        replaceParams.PreserveKillsCounter = true;  // Нужно ли передать счетчик убийств?
         replaceParams.Silent = true;                // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
         
         // Замена
