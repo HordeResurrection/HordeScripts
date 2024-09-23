@@ -592,7 +592,13 @@ export class MaraUtils {
     //#endregion
     
     //#region Unit Commands
-    static IssueAttackCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
+    static IssueAttackCommand(
+        units: Array<any>, 
+        player: any, 
+        location: any, 
+        isReplaceMode: boolean = true, 
+        ignoreUnits: boolean = true
+    ): void {
         MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.Attack, isReplaceMode);
     }
 
@@ -629,7 +635,14 @@ export class MaraUtils {
         virtualInput.oneClickCommand(command);
     }
 
-    private static issuePointBasedCommand(units: Array<any>, player: any, location: any, command: any, isReplaceMode: boolean = true): void {
+    private static issuePointBasedCommand(
+        units: Array<any>, 
+        player: any, 
+        location: any, 
+        command: any, 
+        isReplaceMode: boolean = true,
+        ignoreUnits: boolean = false
+    ): void {
         let virtualInput = MaraUtils.playersInput[player];
         
         if (!virtualInput) {
@@ -641,7 +654,7 @@ export class MaraUtils {
         let unitIds = units.map((unit) => unit.Id);
         
         virtualInput.selectUnitsById(unitIds, VirtualSelectUnitsMode.Select);
-        virtualInput.pointBasedCommand(createPoint(location.X, location.Y), command, mode);
+        virtualInput.pointBasedCommand(createPoint(location.X, location.Y), command, mode, ignoreUnits);
         virtualInput.commit();
     }
 

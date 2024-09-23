@@ -271,7 +271,7 @@ export class MaraSquadBattleState extends MaraSquadState {
             }
 
             if (optimalTargetData) {
-                let attackCell = optimalTargetData.target.MoveToCell ?? optimalTargetData.target.Cell;
+                let attackCell = optimalTargetData.target.Cell;
                 
                 if (optimalTargetData.heuristic < Infinity) {
                     if (MaraUtils.ChebyshevDistance(unit.Cell, optimalTargetData.cell) > 0) {
@@ -284,11 +284,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                     }
                 }
                 else {
-                    let nearestFreeCell = MaraUtils.FindFreeCell(attackCell);
-                    
-                    if (nearestFreeCell) {
-                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, nearestFreeCell);
-                    }
+                    MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell);
                 }
             }
             else {
@@ -390,7 +386,7 @@ export class MaraSquadBattleState extends MaraSquadState {
             }
 
             if (optimalTargetData) {
-                let attackCell = optimalTargetData.target.MoveToCell ?? optimalTargetData.target.Cell;
+                let attackCell = optimalTargetData.target.Cell;
                 
                 if (optimalTargetData.heuristic < Infinity) {
                     if (MaraUtils.ChebyshevDistance(unit.Cell, optimalTargetData.cell) > 0) {
@@ -403,11 +399,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                     }
                 }
                 else {
-                    let nearestFreeCell = MaraUtils.FindFreeCell(attackCell);
-                    
-                    if (nearestFreeCell) {
-                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, nearestFreeCell);
-                    }
+                    MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell);
                 }
             }
             else {
@@ -417,7 +409,7 @@ export class MaraSquadBattleState extends MaraSquadState {
     }
 
     private distributeTargets_liter(): void {
-        let attackCell = MaraUtils.FindFreeCell(this.enemySquads[0].GetLocation().Point);
+        let attackCell = this.enemySquads[0].GetLocation().Point;
 
         if (attackCell) {
             MaraUtils.IssueAttackCommand(this.squad.Units, this.squad.Controller.Player, attackCell);
