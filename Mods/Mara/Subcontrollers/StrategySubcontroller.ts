@@ -11,6 +11,7 @@ import { UnitFlags } from "library/game-logic/horde-types";
 import { UnitComposition } from "../Common/UnitComposition";
 import { MaraResourceCluster } from "../Common/Resources/MaraResourceCluster";
 import { AllowedCompositionItem } from "../Common/AllowedCompositionItem";
+import { MaraRect } from "../Common/MaraRect";
 
 export class StrategySubcontroller extends MaraSubcontroller {
     EnemySettlements: Array<any> = []; //but actually Settlement
@@ -116,7 +117,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
     GetExpandAttackArmyComposition(expandLocation: MaraPoint): UnitComposition {
         let requiredStrength = 0;
         
-        let enemyUnits = MaraUtils.GetSettlementUnitsInArea(
+        let enemyUnits = MaraUtils.GetSettlementUnitsAroundPoint(
             expandLocation, 
             this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius, 
             this.EnemySettlements
@@ -148,7 +149,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
     }
 
     GetExpandGuardArmyComposition(expandLocation: MaraPoint): UnitComposition {
-        let expandGuardUnits = MaraUtils.GetSettlementUnitsInArea(
+        let expandGuardUnits = MaraUtils.GetSettlementUnitsAroundPoint(
             expandLocation, 
             this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius,
             [this.settlementController.Settlement],
@@ -316,7 +317,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         for (let cluster of clusters) {
             let location = cluster.GetLocation();
             
-            let enemies = this.GetEnemiesInArea(
+            let enemies = this.GetEnemiesAroundPoint(
                 location.SpreadCenter, 
                 location.Spread + this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
             );
@@ -337,7 +338,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
     }
 
     GetExpandOffenseTarget(expandLocation: MaraPoint): any {
-        let enemyUnits = MaraUtils.GetSettlementUnitsInArea(
+        let enemyUnits = MaraUtils.GetSettlementUnitsAroundPoint(
             expandLocation, 
             this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius, 
             this.EnemySettlements
@@ -381,15 +382,17 @@ export class StrategySubcontroller extends MaraSubcontroller {
             return false;
         }
 
-        if (!this.isSafeLocation(settlementLocation.Center, settlementLocation.Radius))  {
+        if (!this.isSafeLocation(settlementLocation.BoundingRect))  {
             return true;
         }
 
         for (let expandPoint of this.settlementController.Expands) {
             if (
                 !this.isSafeLocation(
-                    expandPoint, 
-                    this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
+                    MaraRect.CreateFromPoint(
+                        expandPoint, 
+                        this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
+                    )
                 )
             ) {
                 return true;
@@ -399,8 +402,10 @@ export class StrategySubcontroller extends MaraSubcontroller {
         if (this.settlementController.TargetExpand?.BuildCenter) {
             if (
                 !this.isSafeLocation(
-                    this.settlementController.TargetExpand.BuildCenter, 
-                    this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
+                    MaraRect.CreateFromPoint(
+                        this.settlementController.TargetExpand.BuildCenter, 
+                        this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
+                    )
                 )
             ) {
                 return true;
@@ -412,13 +417,19 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
     IsSafeExpand(point: any): boolean {
         return this.isSafeLocation(
-            point, 
-            this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
+            MaraRect.CreateFromPoint(
+                point, 
+                this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
+            )
         );
     }
 
-    GetEnemiesInArea(cell: any, radius: number): Array<any> {
-        return MaraUtils.GetSettlementUnitsInArea(cell, radius, this.EnemySettlements);
+    GetEnemiesInArea(rect: MaraRect): Array<any> {
+        return MaraUtils.GetSettlementUnitsInArea(rect, this.EnemySettlements);
+    }
+
+    GetEnemiesAroundPoint(point: MaraPoint, radius: number): Array<any> {
+        return MaraUtils.GetSettlementUnitsAroundPoint(point, radius, this.EnemySettlements);
     }
 
     GetCurrentDefensiveStrength(): number {
@@ -481,7 +492,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
             let distance = MaraUtils.ChebyshevDistance(cluster.Center, settlementLocation.Center);
 
-            let units = MaraUtils.GetUnitsInArea(
+            let units = MaraUtils.GetUnitsAroundPoint(
                 cluster.Center,
                 cluster.Size, //radius = cluster radius * 2
                 (unit) => {
@@ -532,10 +543,9 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return result;
     }
 
-    private isSafeLocation(point: any, radius: number): boolean {
+    private isSafeLocation(rect: MaraRect): boolean {
         let enemies = MaraUtils.GetSettlementUnitsInArea(
-            point, 
-            radius, 
+            rect,
             this.EnemySettlements
         );
 

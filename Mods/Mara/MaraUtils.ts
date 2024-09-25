@@ -13,6 +13,7 @@ import { MaraSettlementData } from "./Common/Settlement/MaraSettlementData";
 import { AllowedCompositionItem } from "./Common/AllowedCompositionItem";
 import { NonUniformRandomSelectItem } from "./Common/NonUniformRandomSelectItem";
 import { UnitComposition } from "./Common/UnitComposition";
+import { MaraRect } from "./Common/MaraRect";
 
 const DEFAULT_UNIT_SEARCH_RADIUS = 3;
 
@@ -185,7 +186,7 @@ export class MaraUtils {
             let squadLocation = currentSquad.GetLocation();
             let newRadius = radius + squadLocation.Spread / 2;
 
-            let newUnits = MaraUtils.GetSettlementUnitsInArea(
+            let newUnits = MaraUtils.GetSettlementUnitsAroundPoint(
                 squadLocation.SpreadCenter, 
                 newRadius,
                 settlements,
@@ -211,15 +212,29 @@ export class MaraUtils {
 
         return currentSquad;
     }
-    
-    static GetSettlementUnitsInArea(
-        cell: any, 
-        radius: number, 
+
+    static GetSettlementUnitsAroundPoint(
+        point: any,
+        radius: number,
         settelements: Array<any>,
         unitFilter?: (unit: any) => boolean,
         includeUnalive?: boolean
     ): Array<any> {
-        let units = MaraUtils.GetUnitsInArea(cell, radius, unitFilter);
+        return MaraUtils.GetSettlementUnitsInArea(
+            MaraRect.CreateFromPoint(new MaraPoint(point.X, point.Y), radius),
+            settelements,
+            unitFilter,
+            includeUnalive
+        );
+    }
+    
+    static GetSettlementUnitsInArea(
+        rect: MaraRect,
+        settelements: Array<any>,
+        unitFilter?: (unit: any) => boolean,
+        includeUnalive?: boolean
+    ): Array<any> {
+        let units = MaraUtils.GetUnitsInArea(rect, unitFilter);
         units = units.filter((unit) => {
             return (
                 (settelements.length == 0 || settelements.indexOf(unit.Owner) > -1) && 
@@ -245,13 +260,20 @@ export class MaraUtils {
         return result;
     }
 
-    static GetUnitsInArea(cell: any, radius: number, unitFilter?: (unit: any) => boolean): Array<any> {
+    static GetUnitsAroundPoint(point: any, radius: number, unitFilter?: (unit: any) => boolean): Array<any> {
+        return MaraUtils.GetUnitsInArea(
+            MaraRect.CreateFromPoint(new MaraPoint(point.X, point.Y), radius),
+            unitFilter
+        );
+    }
+    
+    static GetUnitsInArea(rect: MaraRect, unitFilter?: (unit: any) => boolean): Array<any> {
         let box = createBox(
-            Math.round(cell.X - radius), 
-            Math.round(cell.Y - radius), 
+            Math.round(rect.TopLeft.X), 
+            Math.round(rect.TopLeft.Y), 
             0, 
-            Math.round(cell.X + radius), 
-            Math.round(cell.Y + radius), 
+            Math.round(rect.BottomRight.X), 
+            Math.round(rect.BottomRight.Y), 
             2
         );
 
@@ -314,7 +336,7 @@ export class MaraUtils {
         return result;
     }
 
-    static GetCircumscribingRect(points: Array<MaraPoint>): {topLeft: MaraPoint; bottomRight: MaraPoint;} {
+    static GetBoundingRect(points: Array<MaraPoint>): MaraRect {
         let topPoint: MaraPoint = new MaraPoint(Infinity, Infinity);
         let bottomPoint: MaraPoint = new MaraPoint(0, 0);
         let leftPoint: MaraPoint = new MaraPoint(Infinity, Infinity);
@@ -338,10 +360,40 @@ export class MaraUtils {
             }
         }
 
-        return {
-            topLeft: new MaraPoint(leftPoint.X, topPoint.Y), 
-            bottomRight: new MaraPoint(rightPoint.X, bottomPoint.Y)
-        };
+        return new MaraRect(
+            new MaraPoint(leftPoint.X, topPoint.Y),
+            new MaraPoint(rightPoint.X, bottomPoint.Y)
+        );
+    }
+
+    static GetUnitsBoundingRect(units: Array<any>): MaraRect {
+        let topPoint: MaraPoint = new MaraPoint(Infinity, Infinity);
+        let bottomPoint: MaraPoint = new MaraPoint(0, 0);
+        let leftPoint: MaraPoint = new MaraPoint(Infinity, Infinity);
+        let rightPoint: MaraPoint = new MaraPoint(0, 0);
+
+        for (let unit of units) {
+            if (unit.Cell.Y < topPoint.Y) {
+                topPoint = new MaraPoint(unit.Cell.X, unit.Cell.Y);
+            }
+
+            if (unit.Cell.X < leftPoint.X) {
+                leftPoint = new MaraPoint(unit.Cell.X, unit.Cell.Y);
+            }
+
+            if (unit.Cell.Y + unit.Cfg.Size.Height > bottomPoint.Y) {
+                bottomPoint = new MaraPoint(unit.Cell.X, unit.Cell.Y + unit.Cfg.Size.Height);
+            }
+
+            if (unit.Cell.X + unit.Cfg.Size.Width > rightPoint.X) {
+                rightPoint = new MaraPoint(unit.Cell.X + unit.Cfg.Size.Width, unit.Cell.Y);
+            }
+        }
+
+        return new MaraRect(
+            new MaraPoint(leftPoint.X, topPoint.Y),
+            new MaraPoint(rightPoint.X, bottomPoint.Y)
+        );
     }
 
     static FindClosestCell(
@@ -389,7 +441,7 @@ export class MaraUtils {
             
             if (!unit) {
                 let resultCell = cell.value;
-                let neighbors = MaraUtils.GetUnitsInArea(resultCell, 1);
+                let neighbors = MaraUtils.GetUnitsAroundPoint(resultCell, 1);
 
                 let isTargetedCell = false;
 

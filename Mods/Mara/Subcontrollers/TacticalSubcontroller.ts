@@ -5,6 +5,7 @@ import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraControllableSquad } from "./Squads/MaraControllableSquad";
 import { TileType } from "library/game-logic/horde-types";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
+import { MaraRect } from "../Common/MaraRect";
 
 export class TacticalSubcontroller extends MaraSubcontroller {
     private offensiveSquads: Array<MaraControllableSquad> = [];
@@ -290,10 +291,11 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
         if (!MaraUtils.IsPointsEqual(squad.CurrentTargetCell, closestLocation!.Center)) {
             if (
-                MaraUtils.ChebyshevDistance(squadLocation.Point, closestLocation!.Center) > closestLocation!.Radius
+                !closestLocation!.BoundingRect.IsPointInside(squadLocation.Point)
             ) {
                 let spread = squad.MinSpread * 3;
-                let precision = Math.max(closestLocation!.Radius - spread, 0);
+                let minDimension = Math.min(closestLocation!.BoundingRect.Width, closestLocation!.BoundingRect.Heigth);
+                let precision = Math.max(minDimension - spread, 0);
                 
                 squad.Move(closestLocation!.Center, precision);
             }
@@ -566,12 +568,14 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         }
 
         for (let expand of this.settlementController.Expands) {
+            let radius = Math.max(
+                this.settlementController.Settings.ResourceMining.WoodcuttingRadius, 
+                this.settlementController.Settings.ResourceMining.MiningRadius
+            );
+            
             let expandLocation = new SettlementClusterLocation(
                 expand, 
-                Math.max(
-                    this.settlementController.Settings.ResourceMining.WoodcuttingRadius, 
-                    this.settlementController.Settings.ResourceMining.MiningRadius
-                )
+                MaraRect.CreateFromPoint(expand, radius)
             );
 
             result.push(expandLocation);
@@ -603,15 +607,8 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             return;
         }
 
-        let settlementCenter = settlementLocation.Center;
-        
         for (let squad of this.allSquads) {
-            let distanceToSettlement = MaraUtils.ChebyshevDistance(
-                squad.GetLocation().Point,
-                settlementCenter
-            );
-
-            if (distanceToSettlement > settlementLocation.Radius) {
+            if (!settlementLocation.BoundingRect.IsPointInside(squad.GetLocation().Point)) {
                 continue;
             }
             

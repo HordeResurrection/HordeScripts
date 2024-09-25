@@ -72,7 +72,7 @@ export class MaraControllableSquad extends MaraSquad {
     }
 
     IsEnemyNearby(): boolean {
-        let enemies = MaraUtils.GetSettlementUnitsInArea(
+        let enemies = MaraUtils.GetSettlementUnitsAroundPoint(
             this.GetLocation().Point, 
             this.Controller.SquadsSettings.EnemySearchRadius,
             this.Controller.EnemySettlements
@@ -82,7 +82,7 @@ export class MaraControllableSquad extends MaraSquad {
     }
 
     GetNearbyUnits(): Array<any> {
-        let units = MaraUtils.GetSettlementUnitsInArea(
+        let units = MaraUtils.GetSettlementUnitsAroundPoint(
             this.GetLocation().Point, 
             this.Controller.SquadsSettings.EnemySearchRadius,
             [],

@@ -20,6 +20,7 @@ import { eNext, enumerate } from "library/dotnet/dotnet-utils";
 import { SettlementClusterLocation } from "./Common/Settlement/SettlementClusterLocation";
 import { TargetExpandData } from "./Common/Settlement/TargetExpandData";
 import { EconomySnapshotItem } from "./Common/Settlement/EconomySnapshotItem";
+import { MaraRect } from "./Common/MaraRect";
 
 class ReservedUnitsData {
     public ReservableUnits: Array<Map<number, any>>;
@@ -286,8 +287,15 @@ export class MaraSettlementController {
             }
 
             let location = squads[0].GetLocation();
-            let radius = Math.round((location.Spread / 2)) + 10;
-            this.settlementLocation = new SettlementClusterLocation(location.Point, radius);
+            let boundingRect = MaraUtils.GetUnitsBoundingRect(squads[0].Units);
+            
+            this.settlementLocation = new SettlementClusterLocation(
+                location.Point,
+                new MaraRect(
+                    new MaraPoint(boundingRect.TopLeft.X - 10, boundingRect.TopLeft.Y - 10),
+                    new MaraPoint(boundingRect.BottomRight.X + 10, boundingRect.BottomRight.Y + 10),
+                )
+            );
 
             return this.settlementLocation;
         }
@@ -299,7 +307,7 @@ export class MaraSettlementController {
     СleanupExpands(): void {
         this.Expands = this.Expands.filter(
             (value) => {
-                let expandBuildings = MaraUtils.GetSettlementUnitsInArea(
+                let expandBuildings = MaraUtils.GetSettlementUnitsAroundPoint(
                     value,
                     Math.max(this.Settings.ResourceMining.WoodcuttingRadius, this.Settings.ResourceMining.MiningRadius),
                     [this.Settlement],

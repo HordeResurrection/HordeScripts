@@ -118,13 +118,13 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
     public FindMinePosition(resourceCluster: MaraResourceCluster, mineConfig: any, targetResourceType: MaraResourceType): MaraPoint | null {
         let mineralCells = [...resourceCluster.GoldCells, ...resourceCluster.MetalCells];
-        let rect = MaraUtils.GetCircumscribingRect(mineralCells);
+        let rect = MaraUtils.GetBoundingRect(mineralCells);
 
         let optimalPosition: MaraPoint | null = null;
         let optimalPositionResources: MaraResources | null = null;
 
-        for (let row = rect.topLeft.Y - mineConfig.Size.Height; row <= rect.bottomRight.Y; row++) {
-            for (let col = rect.topLeft.X - mineConfig.Size.Width; col <= rect.bottomRight.X; col++) {
+        for (let row = rect.TopLeft.Y - mineConfig.Size.Height; row <= rect.BottomRight.Y; row++) {
+            for (let col = rect.TopLeft.X - mineConfig.Size.Width; col <= rect.BottomRight.X; col++) {
                 if (unitCanBePlacedByRealMap(mineConfig, col, row)) {
                     let positionResources = this.GetRectResources(
                         new MaraPoint(col, row),

@@ -39,7 +39,7 @@ export class RebuildState extends ProductionState {
                     let settlementLocation = this.settlementController.GetSettlementLocation();
 
                     if (settlementLocation) {
-                        if (MaraUtils.ChebyshevDistance(item.Position, settlementLocation.Center) < settlementLocation.Radius) {
+                        if (settlementLocation.BoundingRect.IsPointInside(item.Position)) {
                             requiredBuildings.push(item);
                         }
                     }

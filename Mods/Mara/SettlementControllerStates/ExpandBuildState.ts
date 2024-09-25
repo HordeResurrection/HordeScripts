@@ -116,12 +116,11 @@ export class ExpandBuildState extends ProductionState {
         if (settlementLocation) {
             let distance = MaraUtils.ChebyshevDistance(expandCenter, settlementLocation.Center);
             let radius = Math.max(
-                settlementLocation.Radius,
                 this.settlementController.Settings.ResourceMining.MiningRadius,
                 this.settlementController.Settings.ResourceMining.WoodcuttingRadius
             );
 
-            return distance > radius;
+            return !settlementLocation.BoundingRect.IsPointInside(expandCenter) && distance > radius;
         }
         else {
             return false;
@@ -211,7 +210,7 @@ export class ExpandBuildState extends ProductionState {
             result.push(...this.orderMineProduction(targetExpand.Cluster!, MaraResourceType.Metal));
         }
         
-        let metalStocks = MaraUtils.GetSettlementUnitsInArea(
+        let metalStocks = MaraUtils.GetSettlementUnitsAroundPoint(
             this.expandCenter, 
             this.settlementController.Settings.ResourceMining.MiningRadius,
             [this.settlementController.Settlement],

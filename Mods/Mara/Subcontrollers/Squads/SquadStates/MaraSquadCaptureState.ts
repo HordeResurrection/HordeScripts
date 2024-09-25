@@ -27,7 +27,7 @@ export class MaraSquadCaptureState extends MaraSquadState {
     }
 
     private getCapturableUnitsNearby(): Array<any> {
-        let units = MaraUtils.GetSettlementUnitsInArea(
+        let units = MaraUtils.GetSettlementUnitsAroundPoint(
             this.squad.GetLocation().Point, 
             this.squad.Controller.SquadsSettings.EnemySearchRadius,
             this.squad.Controller.EnemySettlements,
