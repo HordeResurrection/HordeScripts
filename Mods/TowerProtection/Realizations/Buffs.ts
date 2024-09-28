@@ -1111,10 +1111,11 @@ export class Buff_Improvements extends IBuff {
                 for (var buffClassIdx of Buff_Improvements.ImprovementPlans[this.impPlanCurrNum]) {
                     this.towerProduceList.Add(GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[buffClassIdx].CfgUid]);
                 }
+                
                 // разрешаем постройку
-                var commandsMind       = GlobalVars.teams[this.teamNum].tower.unit.CommandsMind;
-                var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
-                if (disallowedCommands.ContainsKey(UnitCommand.Produce)) disallowedCommands.Remove(UnitCommand.Produce);
+                // var commandsMind       = GlobalVars.teams[this.teamNum].tower.unit.CommandsMind;
+                // var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
+                // if (disallowedCommands.ContainsKey(UnitCommand.Produce)) disallowedCommands.Remove(UnitCommand.Produce);
 
                 break;
             }

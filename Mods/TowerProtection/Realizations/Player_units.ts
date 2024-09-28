@@ -158,13 +158,14 @@ export class Player_TOWER_BASE extends IUnit {
             u.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer).CanProduceList.Clear();
             // сохраняем конфиг
             u.ScriptData.TowerProtection_ProductUnitConfig = u.OrdersMind.ActiveOrder.ProductUnitConfig;
-            // запрещаем постройку
-            var commandsMind       = u.CommandsMind;
-            var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
-            if (disallowedCommands.ContainsKey(UnitCommand.Produce)) disallowedCommands.Remove(UnitCommand.Produce);
-            disallowedCommands.Add(UnitCommand.Produce, 1);
             // отменяем приказы
             u.OrdersMind.CancelOrdersSafe(true);
+
+            // запрещаем постройку
+            // var commandsMind       = u.CommandsMind;
+            // var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
+            // if (disallowedCommands.ContainsKey(UnitCommand.Produce)) disallowedCommands.Remove(UnitCommand.Produce);
+            // disallowedCommands.Add(UnitCommand.Produce, 1);
         }
     }
 }
