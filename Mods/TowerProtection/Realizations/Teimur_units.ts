@@ -734,7 +734,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
                 const _unitOwnerUid = _unit.Owner.Uid;
                 
                 // пропускаем союзников
-                if (_unitOwnerUid == GlobalVars.teams[this.teamNum].teimurSettlementId
+                if (_unitOwnerUid == GlobalVars.teams[this.teamNum].teimurSettlementIdx
                     // здания
                     || _unit.Cfg.IsBuilding
                     // юнитов с иммуном к магии

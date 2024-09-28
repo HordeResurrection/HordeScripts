@@ -4,6 +4,7 @@ import { createPoint } from "library/common/primitives";
 import { PointCommandArgs } from "library/game-logic/horde-types";
 import { Cell } from "./Types/Geometry";
 import { getUnitProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
+import { AOrderBaseT } from "plugins/print-selected-squad-orders";
 
 export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
     // при наличии конфига удаляем его

@@ -395,7 +395,7 @@ export class Buff_AddShield extends IBuff {
         IBuff.InitConfig.call(this);
 
         // имя
-        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Укрепить башню");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Укрепить броню");
         // описание
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "Добавляет 1 броню. На 6 уровне добавляет иммун к огню. На 9 уровне добавляет иммун к магии.");
         // стоимость
@@ -424,7 +424,7 @@ export class Buff_AddMaxHP extends IBuff {
         IBuff.InitConfig.call(this);
 
         // имя
-        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Укрепить башню");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Укрепить хп");
         // описание
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "Добавляет 500 хп к текущему и максимальному здоровью");
         // стоимость
@@ -456,7 +456,7 @@ export class Buff_HpToGold extends IBuff {
         IBuff.InitConfig.call(this);
 
         // имя
-        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Пригласить торговца Теймера");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Пригласить торговца Теймура");
         // описание
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "Купить 450 золота за 500 здоровья. Осторожно! Меньше 1 здоровье не опустится!");
     }
@@ -1036,35 +1036,32 @@ export class Buff_Improvements extends IBuff {
         var producerParams    = GlobalVars.configs[PlayerTowersClass[this.teamNum].CfgUid].GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
         this.towerProduceList = producerParams.CanProduceList;
 
-        var that = this;
+        // var that = this;
         // подписываемся на событие о постройке юнитов
-        this.onProducedHandler = GlobalVars.teams[teamNum].settlement.Units.UnitProduced.connect(function (sender, UnitProducedEventArgs) {
-            try {
-                // проверяем, что построил нужный юнит
-                if (UnitProducedEventArgs.ProducerUnit.Id != GlobalVars.teams[that.teamNum].tower.unit.Id) {
-                    return;
-                }
+        // this.onProducedHandler = GlobalVars.teams[teamNum].settlement.Units.UnitProduced.connect(function (sender, UnitProducedEventArgs) {
+        //     try {
+        //         // проверяем, что построил нужный юнит
+        //         if (UnitProducedEventArgs.ProducerUnit.Id != GlobalVars.teams[that.teamNum].tower.unit.Id) {
+        //             return;
+        //         }
 
-                // добавляем бафф
-                that.TryBuyBuff(UnitProducedEventArgs.Unit.Cfg.Uid);
+        //         // добавляем бафф
+        //         that.TryBuyBuff(UnitProducedEventArgs.Unit.Cfg.Uid);
 
-                // удаляем юнита
-                var deleteParams          = new DeleteUnitParameters();
-                deleteParams.UnitToDelete = UnitProducedEventArgs.Unit;
-                GlobalVars.teams[that.teamNum].settlement.Units.DeleteUnit(deleteParams);
-            } catch (ex) {
-                log.exception(ex);
-            }
-        });
+        //         // удаляем юнита
+        //         var deleteParams          = new DeleteUnitParameters();
+        //         deleteParams.UnitToDelete = UnitProducedEventArgs.Unit;
+        //         GlobalVars.teams[that.teamNum].settlement.Units.DeleteUnit(deleteParams);
+        //     } catch (ex) {
+        //         log.exception(ex);
+        //     }
+        // });
 
         // сохраняем ссылку для всех
         Buff_Improvements.TowersBuffImprRef[this.teamNum] = this;
     }
 
     public TryBuyBuff(buffCfgUid : string) {
-        // отменяем постройку
-        GlobalVars.teams[this.teamNum].tower.unit.OrdersMind.CancelOrdersSafe();
-
         // ищем номер баффа
         for (var buffClassIdx = 0; buffClassIdx < Buff_Improvements.ImprovementsBuffsClass.length; buffClassIdx++) {
             var buffClass = Buff_Improvements.ImprovementsBuffsClass[buffClassIdx];
@@ -1094,6 +1091,7 @@ export class Buff_Improvements extends IBuff {
                     GlobalVars.teams[this.teamNum].settlement.Messages.AddMessage(msg);
                 }
 
+                // гененируем план
                 this.towerProduceList.Clear();
                 this.impPlanCurrNum++;
 
@@ -1113,6 +1111,10 @@ export class Buff_Improvements extends IBuff {
                 for (var buffClassIdx of Buff_Improvements.ImprovementPlans[this.impPlanCurrNum]) {
                     this.towerProduceList.Add(GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[buffClassIdx].CfgUid]);
                 }
+                // разрешаем постройку
+                var commandsMind       = GlobalVars.teams[this.teamNum].tower.unit.CommandsMind;
+                var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
+                if (disallowedCommands.ContainsKey(UnitCommand.Produce)) disallowedCommands.Remove(UnitCommand.Produce);
 
                 break;
             }
@@ -1188,28 +1190,10 @@ export class Buff_Improvements extends IBuff {
         }
     }
 
-    private _surrounded : boolean = false;
     public OnEveryTick(gameTickNum: number): void {
-        if (GlobalVars.teams[this.teamNum].tower.unit_ordersMind.ActiveOrder.ProductUnitConfig) {
-            var activeMotion = GlobalVars.teams[this.teamNum].tower.unit_ordersMind.ActiveMotion;
-            if (activeMotion.LeftTime <= 0) {
-                // нас окружили, а бафф уже готов
-                // ставим флаг об этом
-                if (!this._surrounded) {
-                    this._surrounded = true;
-                }
-                // нас окружили, а бафф уже готов и флаг уже стоит
-                // значит применяет бафф вручную
-                else {
-                    this._surrounded = false;
-
-                    // делаем так, чтобы деньги не вернули
-                    activeMotion.IsPaid = false;
-
-                    // добавить бафф
-                    this.TryBuyBuff(GlobalVars.teams[this.teamNum].tower.unit_ordersMind.ActiveOrder.ProductUnitConfig.Uid);
-                }
-            }
+        if (GlobalVars.teams[this.teamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig && GlobalVars.teams[this.teamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig != null) {
+            this.TryBuyBuff(GlobalVars.teams[this.teamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig.Uid);
+            delete GlobalVars.teams[this.teamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig;
         }
     }
 
@@ -1219,30 +1203,30 @@ export class Buff_Improvements extends IBuff {
             this.onProducedHandler.disconnect();
         }
         // выводим игроку его баффы
-        var str         = "Вами были куплены следующие баффы:\n";
-        var spentGold   = 0;
-        var spentMetal  = 0;
-        var spentLumber = 0;
-        var spentPeople = 0;
-        for (var i = 0; i < Buff_Improvements.ImprovementsBuffsClass.length; i++) {
-            var buffCfg   = GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[i].CfgUid];
-            var buffName  = buffCfg.Name;
-            var buffCount = Buff_Improvements.TowersBuffsCount[this.teamNum][i];
+        // var str         = "Вами были куплены следующие баффы:\n";
+        // var spentGold   = 0;
+        // var spentMetal  = 0;
+        // var spentLumber = 0;
+        // var spentPeople = 0;
+        // for (var i = 0; i < Buff_Improvements.ImprovementsBuffsClass.length; i++) {
+        //     var buffCfg   = GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[i].CfgUid];
+        //     var buffName  = buffCfg.Name;
+        //     var buffCount = Buff_Improvements.TowersBuffsCount[this.teamNum][i];
 
-            if (buffCount == 0) {
-                continue;
-            }
+        //     if (buffCount == 0) {
+        //         continue;
+        //     }
 
-            str += buffName + " : " + buffCount + "\n";
+        //     str += buffName + " : " + buffCount + "\n";
 
-            spentGold   += buffCfg.CostResources.Gold;
-            spentMetal  += buffCfg.CostResources.Metal;
-            spentLumber += buffCfg.CostResources.Lumber;
-            spentPeople += buffCfg.CostResources.People;
-        }
-        str += "Вы потратили: " + spentMetal + " металла " + spentGold + " золота " + spentLumber + " дерева " + spentPeople + " людей\n";
-        let msg = createGameMessageWithNoSound(str, createHordeColor(255, 200, 200, 200));
-        GlobalVars.teams[this.teamNum].settlement.Messages.AddMessage(msg);
+        //     spentGold   += buffCfg.CostResources.Gold;
+        //     spentMetal  += buffCfg.CostResources.Metal;
+        //     spentLumber += buffCfg.CostResources.Lumber;
+        //     spentPeople += buffCfg.CostResources.People;
+        // }
+        // str += "Вы потратили: " + spentMetal + " металла " + spentGold + " золота " + spentLumber + " дерева " + spentPeople + " людей\n";
+        // let msg = createGameMessageWithNoSound(str, createHordeColor(255, 200, 200, 200));
+        // GlobalVars.teams[this.teamNum].settlement.Messages.AddMessage(msg);
     }
 }
 

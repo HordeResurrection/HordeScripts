@@ -40,7 +40,7 @@ export class ITeimurUnit extends IUnit {
             let unitsIter = iterateOverUnitsInBox(createPoint(this.unit.Cell.X, this.unit.Cell.Y), 2);
             for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
                 var _unit = u.value;
-                if (_unit.Owner.Uid == GlobalVars.teams[this.teamNum].teimurSettlementId) {
+                if (_unit.Owner.Uid == GlobalVars.teams[this.teamNum].teimurSettlementIdx) {
                     continue;
                 }
 
