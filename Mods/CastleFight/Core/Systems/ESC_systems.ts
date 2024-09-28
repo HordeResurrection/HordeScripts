@@ -3,7 +3,7 @@ import { generateCellInSpiral } from "library/common/position-tools";
 import { createHordeColor, createResourcesAmount } from "library/common/primitives";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
-import { UnitDeathType, UnitCommand, UnitDirection, UnitFlags, DiplomacyStatus } from "library/game-logic/horde-types";
+import { UnitCommand, UnitDirection, UnitFlags, DiplomacyStatus } from "library/game-logic/horde-types";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { COMPONENT_TYPE, UnitComponent, BuffableComponent, BUFF_TYPE, SettlementComponent, IncomeIncreaseEvent, IncomeIncreaseComponent, IncomeEvent, IncomeLimitedPeriodicalComponent, Entity, AttackingAlongPathComponent, SpawnBuildingComponent, ReviveComponent, UpgradableBuildingComponent, UpgradableBuildingEvent, BuffEvent, BuffComponent, UnitProducedEvent } from "../Components/ESC_components";
 import { Cell, distance_Chebyshev, UnitGiveOrderToNearEmptyCell, UnitDisallowCommands, spawnUnits } from "../Utils";
@@ -194,7 +194,7 @@ export function WordClearSystem(world: World, gameTickNum: number) {
             // уничтожаем замок если жив
 
             if (!world.settlements_castleUnit[settlementId].IsDead) {
-                world.settlements_castleUnit[settlementId].BattleMind.InstantDeath(null, UnitDeathType.Mele);
+                world.settlements_castleUnit[settlementId].Delete()
                 killUnitsCount++;
             }
 
@@ -208,25 +208,10 @@ export function WordClearSystem(world: World, gameTickNum: number) {
                     continue;
                 }
 
-                unit.BattleMind.InstantDeath(null, UnitDeathType.Mele);
+                unit.Delete();
                 killUnitsCount++;
             }
             unitsEnumerator.Dispose();
-
-            // for (var i = 0; i < world.settlements_entities[settlementId].length; i++) {
-            //     var entity = world.settlements_entities[settlementId][i];
-            //     if (!entity.components.has(COMPONENT_TYPE.UNIT_COMPONENT)) {
-            //         continue;
-            //     }
-            //     var unitComponent = entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
-
-            //     if (unitComponent.unit.IsDead) {
-            //         continue;
-            //     }
-
-            //     unitComponent.unit.BattleMind.InstantDeath(null, UnitDeathType.Mele);
-            //     killUnitsCount++;
-            // }
         }
     }
 
@@ -606,8 +591,7 @@ export function BuffSystem(world: World, gameTickNum: number) {
 
             // убиваем духа
             {
-                var battleMind = unitComponent.unit.BattleMind;
-                battleMind.InstantDeath(null, UnitDeathType.Mele);
+                unitComponent.unit.Delete();
             }
 
             var target_entity = world.settlements_entities[target_settlementId][target_entityId] as Entity;
@@ -621,9 +605,9 @@ export function BuffSystem(world: World, gameTickNum: number) {
             var spawnCount = 1;
             switch (buffComponent.buffType) {
                 case BUFF_TYPE.ATTACK:
-                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {атака}");
+                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + "\n{атака}");
                     ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 150, 0, 0));
-                    ScriptUtils.SetValue(cloneCFG.MainArmament.BulletCombatParams, "Damage", Math.min(1000, 5*cloneCFG.MainArmament.BulletCombatParams.Damage));
+                    ScriptUtils.SetValue(cloneCFG.MainArmament.ShotParams, "Damage", Math.min(1000, 5*cloneCFG.MainArmament.ShotParams.Damage));
                     ScriptUtils.SetValue(cloneCFG, "Sight", Math.min(13, cloneCFG.Sight + 2));
                     if (cloneCFG.MainArmament.Range > 1) {
                         ScriptUtils.SetValue(cloneCFG.MainArmament, "EmitBulletsCountMin", Math.min(5, cloneCFG.MainArmament.EmitBulletsCountMin + 2));
@@ -636,7 +620,7 @@ export function BuffSystem(world: World, gameTickNum: number) {
                     }
                     break;
                 case BUFF_TYPE.ACCURACY:
-                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {меткость}");
+                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + "\n{меткость}");
                     ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 148, 0, 211));
                     //ScriptUtils.SetValue(cloneCFG, "Sight", 3*cloneCFG.Sight);
                     ScriptUtils.SetValue(cloneCFG, "Sight", Math.min(14, cloneCFG.Sight + 4));
@@ -647,23 +631,23 @@ export function BuffSystem(world: World, gameTickNum: number) {
                         ScriptUtils.SetValue(cloneCFG.MainArmament, "ForestRange", 2*cloneCFG.MainArmament.ForestRange);
                         ScriptUtils.SetValue(cloneCFG, "OrderDistance", 2*cloneCFG.OrderDistance);
                         ScriptUtils.SetValue(cloneCFG.MainArmament, "DisableDispersion", true);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament.BulletCombatParams, "AdditiveBulletSpeed", createPF(30, 0));
+                        ScriptUtils.SetValue(cloneCFG.MainArmament.ShotParams, "AdditiveBulletSpeed", createPF(30, 0));
                     }
                     break;
                 case BUFF_TYPE.HEALTH:
-                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {здоровье}");
+                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + "\n{здоровье}");
                     ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 0, 150, 0));
                     ScriptUtils.SetValue(cloneCFG, "MaxHealth", Math.min(200000, 10*cloneCFG.MaxHealth));
                     break;
                 case BUFF_TYPE.DEFFENSE:
-                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {защита}");
+                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + "\n{защита}");
                     ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 255, 215, 0));
                     ScriptUtils.SetValue(cloneCFG, "MaxHealth", 2*cloneCFG.MaxHealth);
                     ScriptUtils.SetValue(cloneCFG, "Shield", Math.max(390, cloneCFG.Shield));
                     ScriptUtils.SetValue(cloneCFG, "Flags", mergeFlags(UnitFlags, cloneCFG.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
                     break;
                 case BUFF_TYPE.CLONING:
-                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + " {клонирования}");
+                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + "\n{клонирования}");
                     ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 255, 255, 255));
                     spawnCount = 12;
                     break;

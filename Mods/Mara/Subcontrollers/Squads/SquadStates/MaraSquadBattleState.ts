@@ -154,7 +154,7 @@ export class MaraSquadBattleState extends MaraSquadState {
         let target = MaraUtils.GetUnitTarget(unit);
 
         if (target) {
-            let unitDps = unit.Cfg.MainArmament.BulletCombatParams.Damage;
+            let unitDps = unit.Cfg.MainArmament.ShotParams.Damage;
 
             if (unit.Cfg.MainArmament.MaxDistanceDispersion > 0) {
                 MaraUtils.ForEachCell(target.Cell, 1, (cell) => {

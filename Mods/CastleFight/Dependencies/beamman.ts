@@ -114,7 +114,7 @@ export class BeammanPlugin extends HordePluginBase {
 
         // Создание снаряда
         let armament = u.BattleMind.SelectedArmament;
-        spawnBullet(u, motion.Target, armament, armament.BulletConfig, armament.BulletCombatParams, targetPosition, targetPosition, motion.TargetMapLayer);
+        spawnBullet(u, motion.Target, armament, armament.BulletConfig, armament.ShotParams, targetPosition, targetPosition, motion.TargetMapLayer);
 
         // В большинстве случаев для создания снаряда удобно использовать метод "Shot",
         // но он не позволяет задать SourcePosition, который необходим здесь для удара дубины

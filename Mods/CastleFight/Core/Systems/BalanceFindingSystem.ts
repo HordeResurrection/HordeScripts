@@ -1,7 +1,7 @@
 import { log } from "library/common/logging";
 import { generateCellInSpiral } from "library/common/position-tools";
 import {  createPoint } from "library/common/primitives";
-import { UnitDirection, PointCommandArgs, UnitCommand, UnitDeathType } from "library/game-logic/horde-types";
+import { UnitDirection, PointCommandArgs, UnitCommand } from "library/game-logic/horde-types";
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { spawnUnit } from "library/game-logic/unit-spawn";
@@ -229,7 +229,7 @@ class Arena {
             }
 
             for (var i = 0; i < this.battleFieldsUnits[fieldNum].length; i++) {
-                this.battleFieldsUnits[fieldNum][i].BattleMind.InstantDeath(null, UnitDeathType.Mele);
+                this.battleFieldsUnits[fieldNum][i].Delete();
             }
         }
     }
