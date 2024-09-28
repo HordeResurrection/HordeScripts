@@ -1,13 +1,14 @@
 import { log } from "library/common/logging";
 import { createHordeColor, createPoint } from "library/common/primitives";
 import { isReplayMode } from "library/game-logic/game-tools";
-import { UnitCommand, TileType, UnitFlags, UnitSpecification, UnitHurtType, UnitDirection } from "library/game-logic/horde-types";
+import { UnitCommand, UnitFlags, UnitSpecification, UnitDirection, TileType } from "library/game-logic/horde-types";
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { world } from "./CastleFightPlugin";
 import { Entity, COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent, SpawnBuildingComponent, UpgradableBuildingComponent, BuffComponent, BUFF_TYPE, ReviveComponent, HeroAltarComponent, IncomeEvent, IncomeIncreaseEvent, SettlementComponent, IncomeLimitedPeriodicalComponent, UnitProducedEvent } from "./Components/ESC_components";
 import { Cell as Cell, CfgAddUnitProducer, getCurrentTime, MetricType, distance_Chebyshev, distance_Euclid, CfgSetSpeed, distance_Minkovsky } from "./Utils";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
+import { printObjectItems } from "library/common/introspection";
 
 const PeopleIncomeLevelT = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 const DeleteUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
@@ -1260,7 +1261,7 @@ export class World {
             this.configs["worker"].ProfessionParams.Remove(UnitProfession.Harvester);
         }
         // делаем его не даващимся
-        ScriptUtils.SetValue(this.configs["worker"], "PressureResist", 22);
+        ScriptUtils.SetValue(this.configs["worker"], "PressureResist", 13);
         
         // добавляем постройки
         {
@@ -1424,8 +1425,12 @@ export class World {
                         spawnUnitCfg.Name + "\n" +
                         "  здоровье " + spawnUnitCfg.MaxHealth + "\n" +
                         "  броня " + spawnUnitCfg.Shield + "\n" +
-                        "  атака " + spawnUnitCfg.MainArmament.ShotParams.Damage + "\n" +
-                        "  радиус атаки " + spawnUnitCfg.MainArmament.Range + "\n" +
+                        (
+                            spawnUnitCfg.MainArmament
+                            ? "  атака " + spawnUnitCfg.MainArmament.ShotParams.Damage + "\n" +
+                              "  радиус атаки " + spawnUnitCfg.MainArmament.Range + "\n"
+                            : ""
+                        ) +
                         "  скорость бега " + spawnUnitCfg.Speeds.Item(TileType.Grass) + "\n"
                         + (spawnUnitCfg.Flags.HasFlag(UnitFlags.FireResistant) || spawnUnitCfg.Flags.HasFlag(UnitFlags.MagicResistant)
                             ? "  иммунитет к " + (spawnUnitCfg.Flags.HasFlag(UnitFlags.FireResistant) ? "огню " : "") + 
@@ -1609,8 +1614,7 @@ export class World {
             var units = this.settlements[settlementId].Units;
             var enumerator = units.GetEnumerator();
             while(enumerator.MoveNext()) {
-                var battleMind = enumerator.Current.BattleMind;
-                battleMind.InstantDeath(null, UnitHurtType.Mele);
+                enumerator.Current.Delete();
             }
             enumerator.Dispose();
 
