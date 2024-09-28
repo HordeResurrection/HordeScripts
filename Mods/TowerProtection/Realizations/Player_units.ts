@@ -3,11 +3,12 @@ import { IUnit } from "../Types/IUnit";
 import { CfgAddUnitProducer, ChebyshevDistance, CreateUnitConfig } from "../Utils";
 import { AttackPlansClass } from "./AttackPlans";
 import { CFGPrefix, GlobalVars, ReplaceUnitParameters } from "../GlobalData";
-import { UnitCommand, UnitMapLayer } from "library/game-logic/horde-types";
+import { UnitCommand, UnitMapLayer, UnitState } from "library/game-logic/horde-types";
 import { createHordeColor, createPoint } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
 import { log } from "library/common/logging";
+import { setUnitStateWorker } from "library/game-logic/workers-tools";
 
 export class Player_TOWER_BASE extends IUnit {
     static CfgUid      : string = "#" + CFGPrefix + "_Goal_Tower";
@@ -63,6 +64,8 @@ export class Player_TOWER_BASE extends IUnit {
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Sight", 13);
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "OrderDistance", 13);
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "Range", 13);
+        // задаем кастомный обработчик постройки
+        setUnitStateWorker(GlobalVars.plugin, GlobalVars.configs[this.CfgUid], UnitState.Produce, this.stateWorker_Produce);
     }
 
     public Respawn() {
@@ -146,6 +149,22 @@ export class Player_TOWER_BASE extends IUnit {
                     this._armamentsTargetNextNum[armamentDistance] = this._targetsUnitInfo.length - 1;
                 }
             }
+        }
+    }
+
+    private static stateWorker_Produce (u) {
+        if(u.Owner.Resources.TakeResourcesIfEnough(u.OrdersMind.ActiveOrder.ProductUnitConfig.CostResources)) {
+            // очишаем список построек
+            u.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer).CanProduceList.Clear();
+            // сохраняем конфиг
+            u.ScriptData.TowerProtection_ProductUnitConfig = u.OrdersMind.ActiveOrder.ProductUnitConfig;
+            // запрещаем постройку
+            var commandsMind       = u.CommandsMind;
+            var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
+            if (disallowedCommands.ContainsKey(UnitCommand.Produce)) disallowedCommands.Remove(UnitCommand.Produce);
+            disallowedCommands.Add(UnitCommand.Produce, 1);
+            // отменяем приказы
+            u.OrdersMind.CancelOrdersSafe(true);
         }
     }
 }
@@ -260,6 +279,15 @@ export class Player_TOWER_CHOISE_DIFFICULT extends IUnit {
                 produceList.Add(GlobalVars.configs[unitChoise_CfgUid]);
             }
         }
+        // задаем кастомный обработчик постройки
+        setUnitStateWorker(GlobalVars.plugin, GlobalVars.configs[this.CfgUid], UnitState.Produce, this.stateWorker_Produce);
+    }
+
+    private static stateWorker_Produce (u) {
+        if(u.Owner.Resources.TakeResourcesIfEnough(u.OrdersMind.ActiveOrder.ProductUnitConfig.CostResources)) {
+            u.ScriptData.TowerProtection_ProductUnitConfig = u.OrdersMind.ActiveOrder.ProductUnitConfig;
+        }
+        u.OrdersMind.CancelOrdersSafe(true);
     }
 }
 
@@ -315,6 +343,15 @@ export class Player_TOWER_CHOISE_ATTACKPLAN extends IUnit {
                 produceList.Add(GlobalVars.configs[unitChoise_CfgUid]);
             }
         }
+        // задаем кастомный обработчик постройки
+        setUnitStateWorker(GlobalVars.plugin, GlobalVars.configs[this.CfgUid], UnitState.Produce, this.stateWorker_Produce);
+    }
+
+    private static stateWorker_Produce (u) {
+        if(u.Owner.Resources.TakeResourcesIfEnough(u.OrdersMind.ActiveOrder.ProductUnitConfig.CostResources)) {
+            u.ScriptData.TowerProtection_ProductUnitConfig = u.OrdersMind.ActiveOrder.ProductUnitConfig;
+        }
+        u.OrdersMind.CancelOrdersSafe(true);
     }
 }
 

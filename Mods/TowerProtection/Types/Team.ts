@@ -4,7 +4,7 @@ import { ISpawner } from "./ISpawner";
 import { Player_TOWER_BASE } from "../Realizations/Player_units";
 
 export class Team {
-    teimurSettlementId: number;
+    teimurSettlementIdx: number;
     teimurSettlement:   any;
     settlementIdx:      number;
     settlement:         any;

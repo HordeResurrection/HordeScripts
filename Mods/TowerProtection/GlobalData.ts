@@ -49,6 +49,7 @@ export class GlobalVars {
     /** юниты на карте */
     public static unitsMap : any;
     public static HCL : any;
+    public static plugin : any;
 
     public static GetGameState() : GameState {
         return this._gameState;

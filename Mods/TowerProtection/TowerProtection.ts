@@ -1,7 +1,7 @@
 import { broadcastMessage, createGameMessageWithNoSound } from "library/common/messages";
 import { createPoint, createHordeColor, createResourcesAmount } from "library/common/primitives";
 import { isReplayMode } from "library/game-logic/game-tools";
-import { UnitDirection, UnitHurtType } from "library/game-logic/horde-types";
+import { DrawLayer, FontUtils, UnitDirection, UnitHurtType } from "library/game-logic/horde-types";
 import HordePluginBase from "plugins/base-plugin";
 import { GameState, GlobalVars, PeopleIncomeLevelT, ReplaceUnitParameters } from "./GlobalData";
 import { AttackPlansClass } from "./Realizations/AttackPlans";
@@ -16,6 +16,7 @@ import { spawnUnit } from "./Utils";
 import { Buff_AddShield, Buff_Improvements, Buff_PeriodAttack_Arrow, Buff_PeriodAttack_Arrow_2, Buff_PeriodAttack_Catapult, Buff_PeriodAttack_Ikon, Buff_PeriodHealing, Buff_PeriodIncomeGold, BuffsClass } from "./Realizations/Buffs";
 import { IBuff } from "./Types/IBuff";
 import { printObjectItems } from "library/common/introspection";
+import { spawnString } from "library/game-logic/decoration-spawn";
 
 
 // попробовать сделать бафф стена, она убивает всех юнитов вокруг башни и ставит туда забор
@@ -43,11 +44,14 @@ export class TowerProtection extends HordePluginBase {
     timers: Array<number>;
     // номер команды для оповещения
     notifiedTeamNumber: number;
+    // для команд хранит строки с описанием бафов
+    teamsStringDecorationObj: Array<any>;
 
     public constructor() {
         super("Башенная защита");
 
         GlobalVars.SetGameState(GameState.PreInit);
+        GlobalVars.plugin = this;
     }
 
     public onFirstRun() {
@@ -117,7 +121,7 @@ export class TowerProtection extends HordePluginBase {
                     const shiftY  = 6*8*i;
                     this.log.info("i = ", i, " j = ", j, " teamNum = ", teamNum, " shiftX = ", shiftX, " shiftY = ", shiftY);
                     GlobalVars.teams[teamNum]                    = new Team();
-                    GlobalVars.teams[teamNum].teimurSettlementId = 6;
+                    GlobalVars.teams[teamNum].teimurSettlementIdx = 6;
                     GlobalVars.teams[teamNum].towerCell          = new Cell(shiftX + 23, shiftY + 23);
                     GlobalVars.teams[teamNum].settlementIdx      = teamNum;
                     GlobalVars.teams[teamNum].spawner            = new RectangleRingSpawner(
@@ -146,7 +150,7 @@ export class TowerProtection extends HordePluginBase {
             GlobalVars.teams[teamNum].incomePeople = 0;
             GlobalVars.teams[teamNum].nickname     = "";
             GlobalVars.teams[teamNum].settlement       = GlobalVars.ActiveScena.GetRealScena().Settlements.GetByUid('' + GlobalVars.teams[teamNum].settlementIdx);
-            GlobalVars.teams[teamNum].teimurSettlement = GlobalVars.ActiveScena.GetRealScena().Settlements.GetByUid('' + GlobalVars.teams[teamNum].teimurSettlementId);
+            GlobalVars.teams[teamNum].teimurSettlement = GlobalVars.ActiveScena.GetRealScena().Settlements.GetByUid('' + GlobalVars.teams[teamNum].teimurSettlementIdx);
             GlobalVars.teams[teamNum].color            = GlobalVars.teams[teamNum].settlement.SettlementColor;
         }
 
@@ -157,7 +161,7 @@ export class TowerProtection extends HordePluginBase {
 
             this.log.info("player of settlementId ", settlementId);
 
-            if (GlobalVars.teams.find((team) => { return team.teimurSettlementId == settlementId;}) ||
+            if (GlobalVars.teams.find((team) => { return team.teimurSettlementIdx == settlementId;}) ||
                 (isReplayMode() && !realPlayer.IsReplay)) {
                 continue;
             }
@@ -251,25 +255,59 @@ export class TowerProtection extends HordePluginBase {
             GlobalVars.teams[teamNum].settlement.Resources.TakeResources(GlobalVars.teams[teamNum].settlement.Resources.GetCopy());
         }
 
+        // инициализируем строковые декорации игроков
+
+        this.teamsStringDecorationObj = new Array<number>(GlobalVars.teams.length);
+        for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+            if (!GlobalVars.teams[teamNum].inGame) {
+                continue;
+            }
+
+            var strDecObj = spawnString(
+                GlobalVars.ActiveScena,
+                GlobalVars.teams[teamNum].nickname + ":\n",
+                createPoint(32*(GlobalVars.teams[teamNum].towerCell.X - 20), 32*(GlobalVars.teams[teamNum].towerCell.Y - 20)),
+                100000000);
+            strDecObj.Height = 18;
+            //strDecObj.Color = GlobalVars.teams[teamNum].color;
+            strDecObj.DrawLayer = DrawLayer.Birds;
+            strDecObj.Font = FontUtils.DefaultFont;        // Шрифт Северного Ветра (нельзя изменить высоту букв)
+            //strDecObj.Font = FontUtils.DefaultVectorFont;  // Шрифт, что используется в чате
+
+            this.teamsStringDecorationObj[teamNum] = strDecObj;
+        }
+
         GlobalVars.SetGameState(GameState.ChoiseDifficult);
     }
 
     private ChoiseDifficult(gameTickNum: number) {
-        // проверяем, что выбрана сложность
-
         // проверяем выбирается ли сложность
-        if (!GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.OrdersMind.ActiveOrder.ProductUnitConfig) {
+        if (!GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig &&
+            GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig == null
+        ) {
             return;
         }
-
+        
         // выбранная сложность
-        GlobalVars.difficult = parseInt(GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
+        GlobalVars.difficult = parseInt(GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig.Shield);
+        delete GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig;
         this.log.info("selected difficult = ", GlobalVars.difficult);
         broadcastMessage("Была выбрана сложность " + GlobalVars.difficult, createHordeColor(255, 140, 140, 140));
 
         // заменяем данный замок на замок выбора волны
+
         Player_TOWER_CHOISE_ATTACKPLAN.InitConfig();
 
+        // GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.Delete();
+        // GlobalVars.teams[this.hostPlayerTeamNum].tower.unit = null;
+        // GlobalVars.teams[this.hostPlayerTeamNum].tower = new Player_TOWER_CHOISE_ATTACKPLAN(spawnUnit(
+        //     GlobalVars.teams[this.hostPlayerTeamNum].settlement,
+        //     GlobalVars.configs[Player_TOWER_CHOISE_ATTACKPLAN.CfgUid],
+        //     UnitDirection.Down,
+        //     createPoint(GlobalVars.teams[this.hostPlayerTeamNum].towerCell.X, GlobalVars.teams[this.hostPlayerTeamNum].towerCell.Y)
+        // ), this.hostPlayerTeamNum);
+
+        Player_TOWER_CHOISE_ATTACKPLAN.InitConfig();
         let replaceParams = new ReplaceUnitParameters();
         this.log.info("this.hostPlayerTeamNum = ", this.hostPlayerTeamNum);
         replaceParams.OldUnit = GlobalVars.teams[this.hostPlayerTeamNum].tower.unit;
@@ -294,12 +332,16 @@ export class TowerProtection extends HordePluginBase {
         var choisedAttackPlanIdx = -1;
 
         // проверяем выбирается ли волна
-        if (!GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.OrdersMind.ActiveOrder.ProductUnitConfig) {
+        if (!GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig &&
+            GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig == null
+        ) {
             return;
         }
 
         // выбранная волна
-        choisedAttackPlanIdx = parseInt(GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
+        this.log.info("selected wave ", GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig.Shield);
+        choisedAttackPlanIdx = parseInt(GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig.Shield);
+        delete GlobalVars.teams[this.hostPlayerTeamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig;
 
         // проверяем, что выбран план атаки
         if (choisedAttackPlanIdx == -1) {
@@ -354,6 +396,15 @@ export class TowerProtection extends HordePluginBase {
                 continue;
             }
 
+            // GlobalVars.teams[teamNum].tower.unit.Delete();
+            // GlobalVars.teams[teamNum].tower.unit = null;
+            // GlobalVars.teams[teamNum].tower = new PlayerTowersClass[teamNum](spawnUnit(
+            //     GlobalVars.teams[teamNum].settlement,
+            //     GlobalVars.configs[PlayerTowersClass[teamNum].CfgUid],
+            //     UnitDirection.Down,
+            //     createPoint(GlobalVars.teams[teamNum].towerCell.X, GlobalVars.teams[teamNum].towerCell.Y)
+            // ), teamNum);
+            
             let replaceParams                 = new ReplaceUnitParameters();
             replaceParams.OldUnit             = GlobalVars.teams[teamNum].tower.unit;
             replaceParams.NewUnitConfig       = GlobalVars.configs[PlayerTowersClass[teamNum].CfgUid];
@@ -362,6 +413,7 @@ export class TowerProtection extends HordePluginBase {
             replaceParams.PreserveOrders      = false; // Нужно ли передать приказы?
             replaceParams.Silent              = true;  // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
             GlobalVars.teams[teamNum].tower   = new PlayerTowersClass[teamNum](GlobalVars.teams[teamNum].tower.unit.Owner.Units.ReplaceUnit(replaceParams), teamNum);
+
             GlobalVars.units.push(GlobalVars.teams[teamNum].tower);
             GlobalVars.buffs.push(new Buff_Improvements(teamNum));
             GlobalVars.buffs.push(new Buff_PeriodIncomeGold(teamNum));
@@ -533,6 +585,28 @@ export class TowerProtection extends HordePluginBase {
                     continue;
                 }
                 GlobalVars.teams[teamNum].settlement.Messages.AddMessage(msg);
+            }
+        }
+
+        // пишем на карте о 3-ех максимальных бафах
+
+        if (gameTickNum % 60 == 4) {
+            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+                if (!GlobalVars.teams[teamNum].inGame ||
+                    GlobalVars.teams[teamNum].tower.unit.IsDead) {
+                    continue;
+                }
+
+                var sortedBuffsIdx : Array<number> = Array.from(Array(Buff_Improvements.TowersBuffsCount[teamNum].length).keys());
+                sortedBuffsIdx.sort((a : number, b : number) => {
+                    return Buff_Improvements.TowersBuffsCount[teamNum][b] - Buff_Improvements.TowersBuffsCount[teamNum][a];
+                });
+
+                this.teamsStringDecorationObj[teamNum].Text = GlobalVars.teams[teamNum].nickname + ", продержался тактов : " + gameTickNum + ", баффы :\n";
+                for (var buffNum = 0; buffNum < sortedBuffsIdx.length; buffNum++) {
+                    var buffIdx = sortedBuffsIdx[buffNum];
+                    this.teamsStringDecorationObj[teamNum].Text += "\t" + Buff_Improvements.TowersBuffsCount[teamNum][buffIdx] + " : " + GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[buffIdx].CfgUid].Name + "\n";
+                }
             }
         }
 
