@@ -48,10 +48,14 @@ export class Example_SettlementWorks extends HordeExampleBase {
         }
         enumerator.Dispose();
 
-        // Объявить поражение
+        // Модуль победы/поражения
         let existence = realSettlement.Existence;
-        // Убрать false и тогда этому поселению будет засчитано поражение
-        if (false) { existence.ForceTotalDefeat(); }
+        
+        // Объявить поражение
+        if (false) { existence.ForceTotalDefeat(); }  // Убрать false и тогда этому поселению будет засчитано поражение
+        
+        // Сбросить состояние победы/поражения
+        if (false) { existence.ForceResetToCombat(); }
     }
 }
 
@@ -145,7 +149,7 @@ export class Example_SettlementUnitsInfo extends HordeExampleBase {
         logUnit('- Первый в ActiveBuildings', professionCenter.ActiveBuildings.First());
         logUnit('- Первый в DevelopmentBoosterBuildings', professionCenter.DevelopmentBoosterBuildings.First());
         logUnit('- Первый в MaxGrowthSpeedIncreaseBuildings', professionCenter.MaxGrowthSpeedIncreaseBuildings.First());
-        logUnit('- Первый в Harmless', professionCenter.Harmless.First());
+        logUnit('- Первый в Unarmed', professionCenter.Unarmed.First());
 
         // Информация о производстве
         let settlementProduction = realSettlement.Production;

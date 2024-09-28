@@ -49,7 +49,7 @@ export const UnitTechConfig = HCL.HordeClassLibrary.HordeContent.Configs.Units.U
 export const Unit = HCL.HordeClassLibrary.World.Objects.Units.Unit;
 export const KnownUnit = HCL.HordeClassLibrary.World.Objects.Units.KnownUnit;
 export const UnitArmament = HCL.HordeClassLibrary.UnitComponents.BattleSystem.UnitArmament;
-export const BulletCombatParams = HCL.HordeClassLibrary.World.Objects.Bullets.BulletCombatParams;
+export const ShotParams = HCL.HordeClassLibrary.World.Objects.Bullets.ShotParams;
 
 
 // ===================================================
@@ -61,7 +61,7 @@ export const CaptureCondition = HCL.HordeClassLibrary.UnitComponents.Enumeration
 export const CompoundPart = HCL.HordeClassLibrary.UnitComponents.Enumerations.CompoundPart;
 export const PatternUnitFeature = HCL.HordeClassLibrary.UnitComponents.Enumerations.PatternUnitFeature;
 export const ResourceItemType = HCL.HordeClassLibrary.UnitComponents.Enumerations.ResourceItemType;
-export const UnitDeathType = HCL.HordeClassLibrary.UnitComponents.Enumerations.UnitDeathType;
+export const UnitHurtType = HCL.HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType;
 export const UnitDirection = HCL.HordeClassLibrary.UnitComponents.Enumerations.UnitDirection;
 export const UnitAnimDirection = HCL.HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection;
 export const UnitAnimState = HCL.HordeClassLibrary.UnitComponents.Enumerations.UnitAnimState;
@@ -99,7 +99,7 @@ export const OrderHarvestLumber = HCL.HordeClassLibrary.UnitComponents.OrdersSys
 export const OrderHoldPosition = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderHoldPosition;
 export const OrderMine = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderMine;
 export const OrderMoveAway = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderMoveAway;
-export const OrderMoveOut = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderMoveOut;
+export const OrderMoveOutRegion = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderMoveOutRegion;
 export const OrderMoveToPoint = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderMoveToPoint;
 export const OrderMoveToStock = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderMoveToStock;
 export const OrderPanikMoving = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderPanikMoving;
@@ -128,6 +128,12 @@ export const MotionHit = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Motio
 export const ScriptUnitWorkerState = HCL.HordeClassLibrary.UnitComponents.Workers.Script.ScriptUnitWorkerState;
 export const ScriptUnitWorkerEveryTick = HCL.HordeClassLibrary.UnitComponents.Workers.Script.ScriptUnitWorkerEveryTick;
 export const ScriptUnitWorkerGetOrder = HCL.HordeClassLibrary.UnitComponents.Workers.Script.ScriptUnitWorkerGetOrder;
+export const ScriptUnitWorkerGetSpeedAtCell = HCL.HordeClassLibrary.UnitComponents.Workers.Script.ScriptUnitWorkerGetSpeedAtCell;
+export const GetSpeedAtCellByKnownMapJsResult = HCL.HordeClassLibrary.UnitComponents.Workers.Script.GetSpeedAtCellByKnownMapJsResult;
+export const GetSpeedAtCellByRealMapJsResult = HCL.HordeClassLibrary.UnitComponents.Workers.Script.GetSpeedAtCellByRealMapJsResult;
+export const ScriptUnitWorkerCanBePlaced = HCL.HordeClassLibrary.UnitComponents.Workers.Script.ScriptUnitWorkerCanBePlaced;
+export const CanBePlacedByKnownMapJsResult = HCL.HordeClassLibrary.UnitComponents.Workers.Script.CanBePlacedByKnownMapJsResult;
+export const CanBePlacedByRealMapJsResult = HCL.HordeClassLibrary.UnitComponents.Workers.Script.CanBePlacedByRealMapJsResult;
 
 // ===================================================
 // --- Конфиги
@@ -147,6 +153,28 @@ export const UnitAnimationsCatalog = HCL.HordeClassLibrary.HordeContent.Configs.
 export const VisualEffectConfig = HCL.HordeClassLibrary.HordeContent.Configs.VisualEffects.VisualEffectConfig;
 export const UnitCommandConfig = HCL.HordeClassLibrary.HordeContent.Configs.UnitCommandConfig;
 export const MindCharacterConfig = HCL.HordeClassLibrary.HordeContent.Configs.MasterMind.MindCharacterConfig;
+
+
+// ===================================================
+// --- Прочие объекты сцены
+
+export const StringVisualEffect = HCL.HordeClassLibrary.World.Objects.VisualEffects.StringVisualEffect;
+export const GeometryVisualEffect = HCL.HordeClassLibrary.World.Objects.VisualEffects.GeometryVisualEffect;
+
+
+// ===================================================
+// --- Графика
+
+export const DrawLayer = HCL.HordeClassLibrary.World.Simple.DrawLayer;
+export const FontUtils = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Game.UI.Utils.FontUtils", "HordeResurrection.Game"));
+export const GeometryCanvas = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Game.Render.GeometryCanvas.GeometryCanvas", "HordeResurrection.Game"));
+
+
+// ===================================================
+// --- Типы для использования в рендере
+
+export const Stride_Vector2 = xHost.type(ScriptUtils.GetTypeByName("Stride.Core.Mathematics.Vector2", "Stride.Core.Mathematics"));
+export const Stride_Color = xHost.type(ScriptUtils.GetTypeByName("Stride.Core.Mathematics.Color", "Stride.Core.Mathematics"));
 
 
 // ===================================================

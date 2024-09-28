@@ -51,6 +51,9 @@ export class Example_InputLowLevel extends HordeExampleBase {
         this.log.info('- Команда атаки (в очередь)');
         this.playerVirtualInput.pointBasedCommand(createPoint(19, 19), UnitCommand.Attack, AssignOrderMode.Queue);
 
+        this.log.info('- Команда "идти и атаковать" (в очередь)');
+        this.playerVirtualInput.pointBasedCommand(createPoint(20, 5), UnitCommand.Attack, AssignOrderMode.Queue, true);
+
         this.log.info('- Имитация нажатия созданных элементов ввода');
         this.playerVirtualInput.commit();
     }
