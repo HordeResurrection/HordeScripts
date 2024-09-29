@@ -651,7 +651,7 @@ export class MaraUtils {
         isReplaceMode: boolean = true, 
         ignoreUnits: boolean = true
     ): void {
-        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.Attack, isReplaceMode);
+        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.Attack, isReplaceMode, ignoreUnits);
     }
 
     static IssueMoveCommand(units: Array<any>, player: any, location: any, isReplaceMode: boolean = true): void {
