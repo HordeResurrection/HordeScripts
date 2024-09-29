@@ -252,7 +252,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         );
     }
 
-    private buildingFilter(building: any): boolean {
+    private isValidHarvestingBuilding(building: any): boolean {
         return (
             building.IsAlive && 
             building.Owner == this.settlementController.Settlement &&
@@ -263,13 +263,13 @@ export class MiningSubcontroller extends MaraSubcontroller {
     private cleanup(): void {
         this.metalStocks = null;
         
-        this.mines = this.mines.filter((value) => {return this.buildingFilter(value.Mine)});
+        this.mines = this.mines.filter((value) => {return this.isValidHarvestingBuilding(value.Mine)});
 
         for (let mineData of this.mines) {
             mineData.Miners = mineData.Miners.filter((value) => {return this.isUnreservedHarvester(value)});
         }
 
-        this.Sawmills = this.Sawmills.filter((value) => {return this.buildingFilter(value.Sawmill)});
+        this.Sawmills = this.Sawmills.filter((value) => {return this.isValidHarvestingBuilding(value.Sawmill)});
 
         for (let sawmillData of this.Sawmills) {
             sawmillData.Woodcutters = sawmillData.Woodcutters.filter((value) => {return this.isUnreservedHarvester(value)})
@@ -288,7 +288,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
             if (MaraUtils.IsMineConfig(unit.Cfg)) {
                 let mineData = this.mines.find((value) => {return value.Mine == unit});
                 
-                if (!mineData && this.settlementController.StrategyController.IsSafeExpand(unit.CellCenter)) {
+                if (!mineData && this.isValidHarvestingBuilding(unit)) {
                     mineData = new MineData();
                     mineData.Mine = unit;
                     this.mines.push(mineData);
@@ -297,7 +297,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
             else if (MaraUtils.IsSawmillConfig(unit.Cfg)) {
                 let sawmillData = this.Sawmills.find((value) => {return value.Sawmill == unit});
 
-                if (!sawmillData && this.settlementController.StrategyController.IsSafeExpand(unit.CellCenter)) {
+                if (!sawmillData && this.isValidHarvestingBuilding(unit)) {
                     sawmillData = new SawmillData();
                     sawmillData.Sawmill = unit;
                     this.Sawmills.push(sawmillData);
