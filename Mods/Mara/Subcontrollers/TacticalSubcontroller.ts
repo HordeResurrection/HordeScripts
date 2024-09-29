@@ -216,6 +216,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.militiaSquads = [];
     }
 
+    DebugSquad(message: string) {
+        if (this.settlementController.Settings.Squads.DebugSquads) {
+            this.settlementController.Debug(message);
+        }
+    }
+
     private needRetreat(): boolean {
         let defensiveStrength = 0;
         this.defensiveSquads.forEach((squad) => {defensiveStrength += squad.Strength});
@@ -371,6 +377,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
             if (weakestSquad != null) {
                 weakestSquad.AddUnits(cluster);
+                this.DebugSquad(`Reinforced squad ${weakestSquad.ToString()} by units ${cluster.map((value) => value.ToString()).join("\n")}`);
 
                 for (let unit of cluster) {
                     this.unitsInSquads.set(unit.Id, unit);
@@ -395,6 +402,8 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             }
 
             weakestSquad.AddUnits(squad.Units);
+            this.DebugSquad(`Reinforced squad ${weakestSquad.ToString()} by units ${squad.Units.map((value) => value.ToString()).join("\n")}`);
+
             usedReinforcementSquads.push(squad);
         }
 
@@ -489,7 +498,6 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         for (let unit of units) {
             currentSquadStrength += MaraUtils.GetUnitStrength(unit);
             squadUnits.push(unit);
-            this.settlementController.Debug(`Added unit ${unit.ToString()} into squad`);
 
             if (currentSquadStrength >= this.settlementController.Settings.Squads.MinStrength) {
                 let squad = this.createSquad(squadUnits);

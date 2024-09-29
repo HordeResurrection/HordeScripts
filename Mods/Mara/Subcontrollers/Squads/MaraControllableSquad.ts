@@ -5,6 +5,8 @@ import { MaraSquadIdleState } from "./SquadStates/MaraSquadIdleState";
 import { MaraSquadState } from "./SquadStates/MaraSquadState";
 
 export class MaraControllableSquad extends MaraSquad {
+    static IdSequence: number = 0;
+    
     private controller: TacticalSubcontroller;
     private initialStrength: number;
     private state: MaraSquadState;
@@ -22,6 +24,12 @@ export class MaraControllableSquad extends MaraSquad {
         return this.Strength / this.initialStrength;
     }
 
+    public get Id(): number {
+        return this.id;
+    }
+
+    id: number;
+
     AttackTargetCell: any; //but actually cell
     MovementTargetCell: any; //but actually cell
     CurrentTargetCell: any; //but actually cell
@@ -29,9 +37,16 @@ export class MaraControllableSquad extends MaraSquad {
 
     constructor(units:Array<any>, controller: TacticalSubcontroller){
         super(units);
+
+        MaraControllableSquad.IdSequence ++;
+        this.id = MaraControllableSquad.IdSequence;
+
         this.controller = controller;
         this.initialStrength = Math.max(this.Strength, this.controller.SquadsSettings.MinStrength);
         this.recalcMinSpread();
+
+        let unitNames = this.Units.map((value) => value.ToString());
+        this.debug(`Squad created. Units:\n${unitNames.join("\n")}`);
 
         this.SetState(new MaraSquadIdleState(this));
     }
@@ -64,6 +79,8 @@ export class MaraControllableSquad extends MaraSquad {
         }
 
         this.state = newState;
+        this.debug(`entering state ${this.state.constructor.name}`);
+
         this.state.OnEntry();
     }
 
@@ -94,8 +111,13 @@ export class MaraControllableSquad extends MaraSquad {
     }
 
     ToString(): string {
-        let unitNames = this.Units.map((value) => value.ToString());
-        return unitNames.join("\n");
+        let result = `${this.id}`;        
+        return result;
+    }
+
+    private debug(message: string): void {
+        let squadName = this.ToString();
+        this.controller.DebugSquad(`[Squad ${squadName}]: ${message}`);
     }
 
     private recalcMinSpread(): void {
