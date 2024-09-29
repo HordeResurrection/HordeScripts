@@ -5,7 +5,6 @@ import { MaraSquadBattleState } from "./MaraSquadBattleState";
 import { MaraSquadIdleGatheringUpState } from "./MaraSquadIdleGatheringUpState";
 import { MaraSquadMoveState } from "./MaraSquadMoveState";
 import { MaraSquadState } from "./MaraSquadState";
-//import { Mara } from "../../../Mara";
 
 export class MaraSquadIdleState extends MaraSquadState {
     OnEntry(): void {
@@ -45,7 +44,7 @@ export class MaraSquadIdleState extends MaraSquadState {
     }
 
     private distributeUnits(): void {
-        let unitsToDistribute:any[] = [];
+        let unitsToDistribute: any[] = [];
 
         for (let unit of this.squad.Units) {
             let tileType = MaraUtils.GetTileType(unit.Cell);
@@ -70,6 +69,8 @@ export class MaraSquadIdleState extends MaraSquadState {
             this.squad.MinSpread * (
                 this.squad.Controller.SquadsSettings.MaxSpreadMultiplier + this.squad.Controller.SquadsSettings.MinSpreadMultiplier
             ) / 2;
+
+        searchRadius /= 2; // since spreads above represent diameters
             
         let forestCells = MaraUtils.FindCells(this.squad.CurrentTargetCell, searchRadius, MaraUtils.ForestCellFilter);
         let cellIndex = 0;

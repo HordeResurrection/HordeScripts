@@ -303,7 +303,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
                 let minDimension = Math.min(closestLocation!.BoundingRect.Width, closestLocation!.BoundingRect.Heigth);
                 let precision = Math.max(minDimension - spread, 0);
                 
-                squad.Move(closestLocation!.Center, precision);
+                squad.Move(closestLocation!.Center, precision / 2);
             }
         }
     }
