@@ -593,7 +593,7 @@ export class MaraUtils {
         for (let item of items) {
             accumulatedBound += item.Weight;
 
-            if (accumulatedBound <= pick) {
+            if (pick <= accumulatedBound) {
                 return item;
             }
         }

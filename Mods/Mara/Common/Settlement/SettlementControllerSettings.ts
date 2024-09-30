@@ -43,7 +43,8 @@ class SquadsSettings {
 
 class ControllerStatesSettings {
     public BuildUpProbabilityWhenOffensePossible = 0.70;
-    public BuildUpProbabilityWhenDefensePossible = 0.35;
+    public BuildUpProbabilityWhenDefensePossible = 0.30;
+    public UnnecessaryExpandProbability = 0.20;
     
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;
