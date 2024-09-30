@@ -103,7 +103,10 @@ export class MaraSquadBattleState extends MaraSquadState {
         if (tickNumber % 50 == 0) {
             this.updateThreats();
             
-            if (this.enemyUnits.length == 0) {
+            if (
+                this.enemyUnits.length == 0 || 
+                !this.squad.CanAttackAtLeastOneUnit(this.enemyUnits)
+            ) {
                 this.squad.Attack(this.squad.CurrentTargetCell);
                 this.squad.SetState(new MaraSquadAttackState(this.squad));
                 return;

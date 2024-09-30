@@ -17,8 +17,12 @@ export class MaraSquadAttackState extends MaraSquadState {
         let nearbyUnits = this.squad.GetNearbyUnits();
         
         if (this.isEnemyNearby(nearbyUnits)) {
-            this.squad.SetState(new MaraSquadBattleState(this.squad));
-            return;
+            let enemyUnits = nearbyUnits.filter(u => this.isEnemyUnit(u));
+
+            if (this.squad.CanAttackAtLeastOneUnit(enemyUnits)) {
+                this.squad.SetState(new MaraSquadBattleState(this.squad));
+                return;
+            }
         }
         
         if (this.squad.MovementTargetCell != null) {
@@ -58,12 +62,16 @@ export class MaraSquadAttackState extends MaraSquadState {
         }
     }
 
+    private isEnemyUnit(unit: any): boolean {
+        return (
+            unit.IsAlive &&
+            this.squad.Controller.EnemySettlements.indexOf(unit.Owner) > -1
+        );
+    }
+
     private isEnemyNearby(units: Array<any>): boolean {
         for (let unit of units) {
-            if (
-                unit.IsAlive &&
-                this.squad.Controller.EnemySettlements.indexOf(unit.Owner) > -1
-            ) {
+            if (this.isEnemyUnit(unit)) {
                 return true;
             }
         }

@@ -110,6 +110,18 @@ export class MaraControllableSquad extends MaraSquad {
         return units;
     }
 
+    CanAttackAtLeastOneUnit(targetUnits: Array<any>): boolean {
+        for (let unit of this.Units) {
+            for (let target of targetUnits) {
+                if (MaraUtils.CanAttack(unit, target)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     ToString(): string {
         let result = `${this.id}`;        
         return result;

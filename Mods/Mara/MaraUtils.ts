@@ -68,6 +68,8 @@ class DotnetHolder {
     }
 }
 
+class AttackAbilityCache {}
+
 export class MaraUtils {
     //#region Horde Data
     static GetScena(): any {
@@ -774,6 +776,22 @@ export class MaraUtils {
         else {
             return 0;
         }
+    }
+
+    private static attackAbilityCache = new AttackAbilityCache();
+
+    static CanAttack(sourceUnit: any, targetUnit: any): boolean {
+        let sourceCfgId = sourceUnit.Cfg.Uid;
+        let targetCfgId = targetUnit.Cfg.Uid;
+
+        let result: boolean = MaraUtils.attackAbilityCache[sourceCfgId + targetCfgId];
+
+        if (result == null) {
+            result = sourceUnit.BattleMind.CanAttackTarget(targetUnit);
+            MaraUtils.attackAbilityCache[sourceCfgId + targetCfgId] = result;
+        }
+
+        return result;
     }
     //#endregion
     
