@@ -276,6 +276,8 @@ export class RoutingState extends MaraSettlementControllerState {
 
         let minResourceToThresholdRatio = Infinity;
 
+        //TODO: rewrite code below to get rid of certain resource names
+        
         if (resources.People < PEOPLE_THRESHOLD) {
             this.settlementController.Debug(`Low people`);
             result.NeedExpand = true;
