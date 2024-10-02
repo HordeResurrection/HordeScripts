@@ -490,12 +490,12 @@ export class MaraUtils {
         
         for (
             let row = Math.max(center.Y - radius, 0);
-            row < endRow;
+            row <= endRow;
             row++
         ) {
             for (
                 let col = Math.max(center.X - radius, 0);
-                col < endCol;
+                col <= endCol;
                 col++
             ) {
                 action({X: col, Y: row});
