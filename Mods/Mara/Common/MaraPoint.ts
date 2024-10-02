@@ -1,6 +1,4 @@
 
-
-
 export class MaraPoint {
     public readonly X: number;
     public readonly Y: number;
