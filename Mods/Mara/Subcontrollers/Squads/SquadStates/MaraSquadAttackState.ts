@@ -71,7 +71,7 @@ export class MaraSquadAttackState extends MaraSquadState {
 
     private isEnemyNearby(units: Array<any>): boolean {
         for (let unit of units) {
-            if (this.isEnemyUnit(unit)) {
+            if (this.isEnemyUnit(unit) && unit.IsAlive) {
                 return true;
             }
         }
