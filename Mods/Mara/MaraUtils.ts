@@ -1,7 +1,7 @@
 import { Mara, MaraLogLevel } from "Mara/Mara";
 import { MaraSquad } from "Mara/Subcontrollers/Squads/MaraSquad";
 import { createBox, createPoint } from "library/common/primitives";
-import { UnitFlags, UnitCommand, AllContent, UnitConfig, UnitQueryFlag } from "library/game-logic/horde-types";
+import { UnitFlags, UnitCommand, AllContent, UnitConfig, UnitQueryFlag, UnitSpecification } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
 import { MaraProductionRequest } from "./Common/MaraProductionRequest";
@@ -147,6 +147,10 @@ export class MaraUtils {
         }
 
         return allowedCfgItems;
+    }
+
+    static GetSettlementCensusModel(settlement: any): any {
+        return ScriptUtils.GetValue(settlement.Census, "Model");
     }
     //#endregion
     
@@ -929,6 +933,15 @@ export class MaraUtils {
     static IsMetalStockConfigId(cfgId: string): boolean {
         let cfg = MaraUtils.GetUnitConfig(cfgId);
         return MaraUtils.IsMetalStockConfig(cfg);
+    }
+
+    static IsDevelopmentBoosterConfig(unitConfig: any): boolean {
+        return unitConfig.Specification.HasFlag(UnitSpecification.MaxGrowthSpeedIncrease);
+    }
+
+    static IsDevelopmentBoosterConfigId(cfgId: string): boolean {
+        let cfg = MaraUtils.GetUnitConfig(cfgId);
+        return MaraUtils.IsDevelopmentBoosterConfig(cfg);
     }
 
     static GetAllSawmillConfigIds(settlement: any): Array<string> {
