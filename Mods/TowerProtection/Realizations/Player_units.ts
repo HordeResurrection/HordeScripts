@@ -9,8 +9,9 @@ import { spawnBullet } from "library/game-logic/bullet-spawn";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
 import { log } from "library/common/logging";
 import { setUnitStateWorker } from "library/game-logic/workers-tools";
+import { IProducerUnit } from "../Types/IProducerUnit";
 
-export class Player_TOWER_BASE extends IUnit {
+export class Player_TOWER_BASE extends IProducerUnit {
     static CfgUid      : string = "#" + CFGPrefix + "_Goal_Tower";
     static BaseCfgUid  : string = "#UnitConfig_Slavyane_Tower";
 
@@ -32,7 +33,7 @@ export class Player_TOWER_BASE extends IUnit {
     }
 
     public static InitConfig() {
-        IUnit.InitConfig.call(this);
+        IProducerUnit.InitConfig.call(this);
 
         // ХП
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 3000);
@@ -54,18 +55,11 @@ export class Player_TOWER_BASE extends IUnit {
         GlobalVars.configs[this.CfgUid].AllowedCommands.Remove(UnitCommand.DestroySelf);
         // запрещаем атаку
         GlobalVars.configs[this.CfgUid].AllowedCommands.Remove(UnitCommand.Attack);
-        // даем профессию найма
-        CfgAddUnitProducer(GlobalVars.configs[this.CfgUid]);
-        // очищаем список построек
-        var producerParams = GlobalVars.configs[this.CfgUid].GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
-        var produceList    = producerParams.CanProduceList;
-        produceList.Clear();
+
         // видимость и дальность атаки делаем = 13
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Sight", 13);
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "OrderDistance", 13);
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "Range", 13);
-        // задаем кастомный обработчик постройки
-        setUnitStateWorker(GlobalVars.plugin, GlobalVars.configs[this.CfgUid], UnitState.Produce, this.stateWorker_Produce);
     }
 
     public Respawn() {
@@ -149,23 +143,6 @@ export class Player_TOWER_BASE extends IUnit {
                     this._armamentsTargetNextNum[armamentDistance] = this._targetsUnitInfo.length - 1;
                 }
             }
-        }
-    }
-
-    private static stateWorker_Produce (u) {
-        if(u.Owner.Resources.TakeResourcesIfEnough(u.OrdersMind.ActiveOrder.ProductUnitConfig.CostResources)) {
-            // очишаем список построек
-            u.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer).CanProduceList.Clear();
-            // сохраняем конфиг
-            u.ScriptData.TowerProtection_ProductUnitConfig = u.OrdersMind.ActiveOrder.ProductUnitConfig;
-            // отменяем приказы
-            u.OrdersMind.CancelOrdersSafe(true);
-
-            // запрещаем постройку
-            // var commandsMind       = u.CommandsMind;
-            // var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
-            // if (disallowedCommands.ContainsKey(UnitCommand.Produce)) disallowedCommands.Remove(UnitCommand.Produce);
-            // disallowedCommands.Add(UnitCommand.Produce, 1);
         }
     }
 }

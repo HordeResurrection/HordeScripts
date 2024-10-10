@@ -1024,8 +1024,6 @@ export class Buff_Improvements extends IBuff {
         //Buff_SellEnemyBuff
     ];
 
-    onProducedHandler: any;
-
     impPlanCurrNum   : number;
     towerProduceList : any;
 
@@ -1035,27 +1033,6 @@ export class Buff_Improvements extends IBuff {
         this.impPlanCurrNum   = 0;
         var producerParams    = GlobalVars.configs[PlayerTowersClass[this.teamNum].CfgUid].GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
         this.towerProduceList = producerParams.CanProduceList;
-
-        // var that = this;
-        // подписываемся на событие о постройке юнитов
-        // this.onProducedHandler = GlobalVars.teams[teamNum].settlement.Units.UnitProduced.connect(function (sender, UnitProducedEventArgs) {
-        //     try {
-        //         // проверяем, что построил нужный юнит
-        //         if (UnitProducedEventArgs.ProducerUnit.Id != GlobalVars.teams[that.teamNum].tower.unit.Id) {
-        //             return;
-        //         }
-
-        //         // добавляем бафф
-        //         that.TryBuyBuff(UnitProducedEventArgs.Unit.Cfg.Uid);
-
-        //         // удаляем юнита
-        //         var deleteParams          = new DeleteUnitParameters();
-        //         deleteParams.UnitToDelete = UnitProducedEventArgs.Unit;
-        //         GlobalVars.teams[that.teamNum].settlement.Units.DeleteUnit(deleteParams);
-        //     } catch (ex) {
-        //         log.exception(ex);
-        //     }
-        // });
 
         // сохраняем ссылку для всех
         Buff_Improvements.TowersBuffImprRef[this.teamNum] = this;
@@ -1111,11 +1088,10 @@ export class Buff_Improvements extends IBuff {
                 for (var buffClassIdx of Buff_Improvements.ImprovementPlans[this.impPlanCurrNum]) {
                     this.towerProduceList.Add(GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[buffClassIdx].CfgUid]);
                 }
-                
                 // разрешаем постройку
-                // var commandsMind       = GlobalVars.teams[this.teamNum].tower.unit.CommandsMind;
-                // var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
-                // if (disallowedCommands.ContainsKey(UnitCommand.Produce)) disallowedCommands.Remove(UnitCommand.Produce);
+                var commandsMind       = GlobalVars.teams[this.teamNum].tower.unit.CommandsMind;
+                var disallowedCommands = ScriptUtils.GetValue(commandsMind, "DisallowedCommands");
+                if (disallowedCommands.ContainsKey(UnitCommand.Produce)) disallowedCommands.Remove(UnitCommand.Produce);
 
                 break;
             }
@@ -1189,20 +1165,31 @@ export class Buff_Improvements extends IBuff {
                 towerProduceList.Add(GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[buffClassIdx].CfgUid]);
             }
         }
+
+        // подписываемся на события постройки у башни
+        for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+            if (!GlobalVars.teams[teamNum].inGame ||
+                GlobalVars.teams[teamNum].tower.unit.IsDead) {
+                continue;
+            }
+
+            PlayerTowersClass[teamNum].produceCallbacks.push(this.ProduceCallback);
+        }
     }
 
-    public OnEveryTick(gameTickNum: number): void {
-        if (GlobalVars.teams[this.teamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig && GlobalVars.teams[this.teamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig != null) {
-            this.TryBuyBuff(GlobalVars.teams[this.teamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig.Uid);
-            delete GlobalVars.teams[this.teamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig;
+    public static ProduceCallback(u: any) {
+        // ищем номер команды 
+        var teamNum : number;
+        for (teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+            if (GlobalVars.teams[teamNum].settlement.Uid == u.Owner.Uid) {
+                break;
+            }
         }
+        // добавляем бафф
+        Buff_Improvements.TowersBuffImprRef[teamNum].TryBuyBuff(u.OrdersMind.ActiveOrder.ProductUnitConfig.Uid);
     }
 
     public OnDead(gameTickNum: number) {
-        // отписываемся от события
-        if (this.onProducedHandler) {
-            this.onProducedHandler.disconnect();
-        }
         // выводим игроку его баффы
         // var str         = "Вами были куплены следующие баффы:\n";
         // var spentGold   = 0;
