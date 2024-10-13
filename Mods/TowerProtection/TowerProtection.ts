@@ -257,24 +257,26 @@ export class TowerProtection extends HordePluginBase {
 
         // инициализируем строковые декорации игроков
 
-        this.teamsStringDecorationObj = new Array<number>(GlobalVars.teams.length);
-        for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-            if (!GlobalVars.teams[teamNum].inGame) {
-                continue;
+        if (!this.teamsStringDecorationObj) {
+            this.teamsStringDecorationObj = new Array<number>(GlobalVars.teams.length);
+            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+                if (!GlobalVars.teams[teamNum].inGame) {
+                    continue;
+                }
+
+                var strDecObj = spawnString(
+                    GlobalVars.ActiveScena,
+                    GlobalVars.teams[teamNum].nickname + ":\n",
+                    createPoint(32*(GlobalVars.teams[teamNum].towerCell.X - 20), 32*(GlobalVars.teams[teamNum].towerCell.Y - 20)),
+                    100000000);
+                strDecObj.Height = 18;
+                //strDecObj.Color = GlobalVars.teams[teamNum].color;
+                strDecObj.DrawLayer = DrawLayer.Birds;
+                strDecObj.Font = FontUtils.DefaultFont;        // Шрифт Северного Ветра (нельзя изменить высоту букв)
+                //strDecObj.Font = FontUtils.DefaultVectorFont;  // Шрифт, что используется в чате
+
+                this.teamsStringDecorationObj[teamNum] = strDecObj;
             }
-
-            var strDecObj = spawnString(
-                GlobalVars.ActiveScena,
-                GlobalVars.teams[teamNum].nickname + ":\n",
-                createPoint(32*(GlobalVars.teams[teamNum].towerCell.X - 20), 32*(GlobalVars.teams[teamNum].towerCell.Y - 20)),
-                100000000);
-            strDecObj.Height = 18;
-            //strDecObj.Color = GlobalVars.teams[teamNum].color;
-            strDecObj.DrawLayer = DrawLayer.Birds;
-            strDecObj.Font = FontUtils.DefaultFont;        // Шрифт Северного Ветра (нельзя изменить высоту букв)
-            //strDecObj.Font = FontUtils.DefaultVectorFont;  // Шрифт, что используется в чате
-
-            this.teamsStringDecorationObj[teamNum] = strDecObj;
         }
 
         GlobalVars.SetGameState(GameState.ChoiseDifficult);
@@ -413,6 +415,7 @@ export class TowerProtection extends HordePluginBase {
             replaceParams.PreserveOrders      = false; // Нужно ли передать приказы?
             replaceParams.Silent              = true;  // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
             GlobalVars.teams[teamNum].tower   = new PlayerTowersClass[teamNum](GlobalVars.teams[teamNum].tower.unit.Owner.Units.ReplaceUnit(replaceParams), teamNum);
+            this.log.info("спавним для teamNum ", teamNum, " towerclassname = ", PlayerTowersClass[teamNum].name);
 
             GlobalVars.units.push(GlobalVars.teams[teamNum].tower);
             GlobalVars.buffs.push(new Buff_Improvements(teamNum));

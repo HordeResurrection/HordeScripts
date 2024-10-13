@@ -16,6 +16,7 @@ import { spawnDecoration } from "library/game-logic/decoration-spawn";
 import { printObjectItems } from "library/common/introspection";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
 import { Rectangle } from "../Types/Geometry";
+import { IProducerUnit } from "../Types/IProducerUnit";
 
 // export class Buff_Reroll extends IBuff {
 //     static CfgUid         : string = "#" + CFGPrefix + "_Buff_Reroll";
@@ -1168,12 +1169,19 @@ export class Buff_Improvements extends IBuff {
 
         // подписываемся на события постройки у башни
         for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-            if (!GlobalVars.teams[teamNum].inGame ||
-                GlobalVars.teams[teamNum].tower.unit.IsDead) {
-                continue;
-            }
+            // if (!GlobalVars.teams[teamNum].inGame ||
+            //     GlobalVars.teams[teamNum].tower.unit.IsDead) {
+            //     continue;
+            // }
 
+            //log.info("Подписываемся на produceCallbacks у teamNum = ", teamNum, " cfgUid ", PlayerTowersClass[teamNum].CfgUid, " classname ", PlayerTowersClass[teamNum].name);
+            //var _teamNum = teamNum;
             PlayerTowersClass[teamNum].produceCallbacks.push(this.ProduceCallback);
+            // PlayerTowersClass[teamNum].produceCallbacks.push(function (u: any) {
+            //     log.info("Я колбэк от teamNum = ", _teamNum);
+            // });
+
+            //log.info("teamNum ", teamNum, " PlayerTowersClass[teamNum].produceCallbacks = ", PlayerTowersClass[teamNum].produceCallbacks.length);
         }
     }
 
@@ -1185,6 +1193,7 @@ export class Buff_Improvements extends IBuff {
                 break;
             }
         }
+        //log.info("пытаемся добавить бафф для teamNum = ", teamNum);
         // добавляем бафф
         Buff_Improvements.TowersBuffImprRef[teamNum].TryBuyBuff(u.OrdersMind.ActiveOrder.ProductUnitConfig.Uid);
     }
