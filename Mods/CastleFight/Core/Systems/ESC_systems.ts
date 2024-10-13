@@ -3,13 +3,12 @@ import { generateCellInSpiral } from "library/common/position-tools";
 import { createHordeColor, createResourcesAmount } from "library/common/primitives";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
-import { UnitCommand, UnitDirection, UnitFlags, DiplomacyStatus } from "library/game-logic/horde-types";
-import { AssignOrderMode } from "library/mastermind/virtual-input";
-import { COMPONENT_TYPE, UnitComponent, BuffableComponent, BUFF_TYPE, SettlementComponent, IncomeIncreaseEvent, IncomeIncreaseComponent, IncomeEvent, IncomeLimitedPeriodicalComponent, Entity, AttackingAlongPathComponent, SpawnBuildingComponent, ReviveComponent, UpgradableBuildingComponent, UpgradableBuildingEvent, BuffEvent, BuffComponent, UnitProducedEvent } from "../Components/ESC_components";
-import { Cell, distance_Chebyshev, UnitGiveOrderToNearEmptyCell, UnitDisallowCommands, spawnUnits } from "../Utils";
+import { UnitDirection, UnitFlags, DiplomacyStatus } from "library/game-logic/horde-types";
+import { COMPONENT_TYPE, UnitComponent, BuffableComponent, BUFF_TYPE, SettlementComponent, IncomeIncreaseEvent, IncomeEvent, IncomeLimitedPeriodicalComponent, Entity, SpawnBuildingComponent, ReviveComponent, UpgradableBuildingComponent, BuffComponent, UnitProducedEvent, BuffCfgUidSuffix } from "../Components/ESC_components";
+import { CreateUnitConfig, UnitDisallowCommands, spawnUnits } from "../Utils";
 import { GameState, World } from "../World";
 import { createPF } from "library/common/primitives";
-import { log } from "library/common/logging";
+import { OpCfgUidToCfg, OpCfgUidToEntity } from "../Configs/IConfig";
 
 const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 
@@ -17,7 +16,7 @@ export function DiplomacySystem(world: World, gameTickNum: number) {
     // проверяем, что игра закончилась
 
     var isGameEnd = true;
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.settlements[settlementId]) {
             continue;
         }
@@ -33,7 +32,7 @@ export function DiplomacySystem(world: World, gameTickNum: number) {
 
     // при уничтожении замка объявляем альянс всем врагам для видимости
 
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.settlements[settlementId] ||
             world.settlements[settlementId].Existence.IsTotalDefeat ||
             world.settlements[settlementId].Existence.IsVictory ||
@@ -42,7 +41,7 @@ export function DiplomacySystem(world: World, gameTickNum: number) {
         }
 
         // объявляем альянс всем врагам для видимости
-        for (var enemySettlementId = 0; enemySettlementId < world.settlementsCount; enemySettlementId++) {
+        for (var enemySettlementId = 0; enemySettlementId < world.scena.settlementsCount; enemySettlementId++) {
             if (!world.settlements[enemySettlementId] || 
                 !world.settlements_settlements_warFlag[settlementId][enemySettlementId]) {
                 continue;
@@ -57,7 +56,7 @@ export function DiplomacySystem(world: World, gameTickNum: number) {
 
     // присуждаем поражение альянсам
 
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.settlements[settlementId] ||
             world.settlements[settlementId].Existence.IsTotalDefeat ||
             world.settlements[settlementId].Existence.IsVictory) {
@@ -67,7 +66,7 @@ export function DiplomacySystem(world: World, gameTickNum: number) {
         // проверяем, что у всего альянса замки уничтожены
 
         var isDefeat = true;
-        for (var allySettlementId = 0; allySettlementId < world.settlementsCount; allySettlementId++) {
+        for (var allySettlementId = 0; allySettlementId < world.scena.settlementsCount; allySettlementId++) {
             // проверка, что есть мир и замок стоит
             if (!world.settlements[allySettlementId] ||
                 world.settlements_settlements_warFlag[settlementId][allySettlementId] ||
@@ -84,7 +83,7 @@ export function DiplomacySystem(world: World, gameTickNum: number) {
         }
 
         // присуждаем поражение всему альянсу
-        for (var allySettlementId = 0; allySettlementId < world.settlementsCount; allySettlementId++) {
+        for (var allySettlementId = 0; allySettlementId < world.scena.settlementsCount; allySettlementId++) {
             // проверка, что поселение в игре и есть мир
             if (!world.settlements[allySettlementId] ||
                 world.settlements_settlements_warFlag[settlementId][allySettlementId]) {
@@ -98,7 +97,7 @@ export function DiplomacySystem(world: World, gameTickNum: number) {
 
     // присуждаем победу последнему альянсу
 
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.settlements[settlementId] ||
             world.settlements[settlementId].Existence.IsTotalDefeat ||
             world.settlements[settlementId].Existence.IsVictory) {
@@ -108,7 +107,7 @@ export function DiplomacySystem(world: World, gameTickNum: number) {
         // проверяем, что у всех врагов поражение
 
         var isVictory = true;
-        for (var enemySettlementId = 0; enemySettlementId < world.settlementsCount; enemySettlementId++) {
+        for (var enemySettlementId = 0; enemySettlementId < world.scena.settlementsCount; enemySettlementId++) {
             // проверка, что поселение в игре, есть война, поселение проиграло
             if (!world.settlements[enemySettlementId] ||
                 !world.settlements_settlements_warFlag[settlementId][enemySettlementId] ||
@@ -125,7 +124,7 @@ export function DiplomacySystem(world: World, gameTickNum: number) {
 
         // присуждаем победу всему альянсу
 
-        for (var allySettlementId = 0; allySettlementId < world.settlementsCount; allySettlementId++) {
+        for (var allySettlementId = 0; allySettlementId < world.scena.settlementsCount; allySettlementId++) {
             // проверка, что поселение в игре и есть мир
             if (!world.settlements[allySettlementId] ||
                 world.settlements_settlements_warFlag[settlementId][allySettlementId]) {
@@ -145,15 +144,15 @@ export function DiplomacySystem(world: World, gameTickNum: number) {
 export function WordClearSystem(world: World, gameTickNum: number) {
     // если сейчас идет очистка мира, то удаляем кастомные конфиги
     if (world.state == GameState.CLEAR) {
-        for (var cfgId in world.configs) {
-            HordeContentApi.RemoveConfig(world.configs[cfgId]);
-            delete world.configs[cfgId];
+        for (var cfgId in OpCfgUidToCfg) {
+            HordeContentApi.RemoveConfig(OpCfgUidToCfg[cfgId]);
+            delete OpCfgUidToCfg[cfgId];
         }
     }
 
     var killUnitsCount = 0;
 
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.settlements[settlementId]) {
             continue;
         }
@@ -223,7 +222,7 @@ export function WordClearSystem(world: World, gameTickNum: number) {
 
 export function IncomeSystem(world: World, gameTickNum: number) {
     // учитываем события увеличения инкома
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.IsSettlementInGame(settlementId)) {
             continue;
         }
@@ -275,7 +274,7 @@ export function IncomeSystem(world: World, gameTickNum: number) {
             for (var i = 0; i < world.settlements_entities[settlementId].length; i++) {
                 var entity = world.settlements_entities[settlementId][i];
                 if (entity.components.has(COMPONENT_TYPE.INCOME_INCREASE_COMPONENT)) {
-                    var incomeIncreaseComponent = entity.components.get(COMPONENT_TYPE.INCOME_INCREASE_COMPONENT) as IncomeIncreaseComponent;
+                    //var incomeIncreaseComponent = entity.components.get(COMPONENT_TYPE.INCOME_INCREASE_COMPONENT) as IncomeIncreaseComponent;
                     increaseCount++;
                     if (increaseCount == 1) {
                         increaseCoeff += 0.25;
@@ -389,7 +388,7 @@ export function IncomeSystem(world: World, gameTickNum: number) {
 }
 
 export function SpawnBuildingSystem(world: World, gameTickNum: number) {
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.IsSettlementInGame(settlementId)) {
             continue;
         }
@@ -409,9 +408,9 @@ export function SpawnBuildingSystem(world: World, gameTickNum: number) {
                 if (unitComponent.unit.OrdersMind.ActiveAct.GetType().Name == "ActProduce") {
                     var buildingCfg = unitComponent.unit.OrdersMind.ActiveOrder.ProductUnitConfig;
                     // проверяем, если здание хочет сбросить таймер спавна
-                    if (buildingCfg.Uid == world.configs["reset_spawn"].Uid) {
+                    if (buildingCfg.Uid == SpawnBuildingComponent.resetSpawnCfgUid) {
                         // отменяем постройку
-                        unitComponent.unit.OrdersMind.CancelOrders(true);
+                        unitComponent.unit.OrdersMind.CancelOrdersSafe(true);
                         // сбрасываем спавн
                         spawnBuildingComponent.spawnTact = gameTickNum + spawnBuildingComponent.spawnPeriodTact;
                     }
@@ -424,11 +423,11 @@ export function SpawnBuildingSystem(world: World, gameTickNum: number) {
                 else if (spawnBuildingComponent.spawnTact < gameTickNum) {
                     spawnBuildingComponent.spawnTact += spawnBuildingComponent.spawnPeriodTact;
                     
-                    var emergePoint = world.configs[unitComponent.cfgId].BuildingConfig.EmergePoint;
+                    var emergePoint = OpCfgUidToCfg[unitComponent.cfgUid].BuildingConfig.EmergePoint;
 
                     // спавним юнитов
                     var generator     = generateCellInSpiral(unitComponent.unit.Cell.X + emergePoint.X, unitComponent.unit.Cell.Y + emergePoint.Y);
-                    var spawnedUnits  = spawnUnits(world.settlements[settlementId], world.configs[spawnBuildingComponent.spawnUnitConfigId], world.spawn_count_coeff, UnitDirection.Down, generator);
+                    var spawnedUnits  = spawnUnits(world.settlements[settlementId], OpCfgUidToCfg[spawnBuildingComponent.spawnUnitConfigUid], world.spawn_count_coeff, UnitDirection.Down, generator);
                     for (var spawnedUnit of spawnedUnits) {
                         UnitDisallowCommands(spawnedUnit);
                         world.RegisterUnitEntity(spawnedUnit);
@@ -440,7 +439,7 @@ export function SpawnBuildingSystem(world: World, gameTickNum: number) {
 }
 
 export function ReviveSystem(world: World, gameTickNum: number) {
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.IsSettlementInGame(settlementId)) {
             continue;
         }
@@ -463,7 +462,7 @@ export function ReviveSystem(world: World, gameTickNum: number) {
                     if (reviveComponent.tick < gameTickNum) {
                         reviveComponent.waitingToRevive = false;
                         var generator      = generateCellInSpiral(reviveComponent.cell.X, reviveComponent.cell.Y);
-                        unitComponent.unit = spawnUnits(world.settlements[settlementId], world.configs[unitComponent.cfgId], 1, UnitDirection.Down, generator)[0];
+                        unitComponent.unit = spawnUnits(world.settlements[settlementId], OpCfgUidToCfg[unitComponent.cfgUid], 1, UnitDirection.Down, generator)[0];
                     }
                 }
                 // регистрируем смерть и запускаем обратный отсчет до воскрешения
@@ -477,7 +476,7 @@ export function ReviveSystem(world: World, gameTickNum: number) {
 }
 
 export function UpgradableBuildingSystem(world: World, gameTickNum: number) {
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.IsSettlementInGame(settlementId)) {
             continue;
         }
@@ -498,17 +497,17 @@ export function UpgradableBuildingSystem(world: World, gameTickNum: number) {
                     var buildingCfg = unitComponent.unit.OrdersMind.ActiveOrder.ProductUnitConfig;
                     
                     // проверяем, что здание строит улучшение
-                    for (var upgradeId = 0; upgradeId < upgradableBuildingComponent.upgradeUnitCfgIds.length; upgradeId++) {
-                        var upgradeUnitCfgId = upgradableBuildingComponent.upgradeUnitCfgIds[upgradeId];
+                    for (var upgradeId = 0; upgradeId < upgradableBuildingComponent.upgradesCfgUid.length; upgradeId++) {
+                        var iconUpgradeCfgId = UpgradableBuildingComponent.GetUpgradeCfgUid(upgradableBuildingComponent.upgradesCfgUid[upgradeId]);
                         
-                        if (buildingCfg.Uid != world.configs[upgradeUnitCfgId].Uid) {
+                        if (buildingCfg.Uid != OpCfgUidToCfg[iconUpgradeCfgId].Uid) {
                             continue;
                         }
 
                         // заменяем постройку на улучшенную
                         let replaceParams = new ReplaceUnitParameters();
                         replaceParams.OldUnit = unitComponent.unit;
-                        replaceParams.NewUnitConfig = world.configs[upgradableBuildingComponent.upgradeCfgIds[upgradeId]];
+                        replaceParams.NewUnitConfig = OpCfgUidToCfg[upgradableBuildingComponent.upgradesCfgUid[upgradeId]];
                         replaceParams.Cell = null;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
                         replaceParams.PreserveHealthLevel = false;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
                         replaceParams.PreserveOrders = false;        // Нужно ли передать приказы?
@@ -530,7 +529,7 @@ export function UpgradableBuildingSystem(world: World, gameTickNum: number) {
 }
 
 export function BuffSystem(world: World, gameTickNum: number) {
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.IsSettlementInGame(settlementId)) {
             continue;
         }
@@ -553,10 +552,10 @@ export function BuffSystem(world: World, gameTickNum: number) {
             var target_CfgUid = unitComponent.unit.OrdersMind.ActiveOrder.Target.Cfg.Uid;
 
             // проверяем, что цель можно баффать
-            if (!world.cfgUid_entity.has(target_CfgUid)) {
+            if (!OpCfgUidToEntity.has(target_CfgUid)) {
                 continue;
             }
-            var targetBaseEntity = world.cfgUid_entity.get(target_CfgUid) as Entity;
+            var targetBaseEntity = OpCfgUidToEntity.get(target_CfgUid) as Entity;
             if (!targetBaseEntity.components.has(COMPONENT_TYPE.BUFFABLE_COMPONENT)) {
                 continue;
             }
@@ -594,61 +593,61 @@ export function BuffSystem(world: World, gameTickNum: number) {
                 unitComponent.unit.Delete();
             }
 
-            var target_entity = world.settlements_entities[target_settlementId][target_entityId] as Entity;
-            var target_unitComponent = target_entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
+            var target_entity            = world.settlements_entities[target_settlementId][target_entityId] as Entity;
+            var target_unitComponent     = target_entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
             var target_buffableComponent = target_entity.components.get(COMPONENT_TYPE.BUFFABLE_COMPONENT) as BuffableComponent;
 
             // бафаем цель
 
             // обновляем конфиг баффнутого юнита
-            var cloneCFG  = HordeContentApi.CloneConfig(world.configs[target_unitComponent.cfgId]);
-            var spawnCount = 1;
+            var buffUnitCfg    = CreateUnitConfig(target_unitComponent.cfgUid, target_unitComponent.cfgUid + BuffCfgUidSuffix[buffComponent.buffType]);
+            var spawnCount     = 1;
             switch (buffComponent.buffType) {
                 case BUFF_TYPE.ATTACK:
-                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + "\n{атака}");
-                    ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 150, 0, 0));
-                    ScriptUtils.SetValue(cloneCFG.MainArmament.ShotParams, "Damage", Math.min(1000, 5*cloneCFG.MainArmament.ShotParams.Damage));
-                    ScriptUtils.SetValue(cloneCFG, "Sight", Math.min(13, cloneCFG.Sight + 2));
-                    if (cloneCFG.MainArmament.Range > 1) {
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "EmitBulletsCountMin", Math.min(5, cloneCFG.MainArmament.EmitBulletsCountMin + 2));
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "EmitBulletsCountMax", Math.min(5, cloneCFG.MainArmament.EmitBulletsCountMax + 2));
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "Range", Math.min(13, cloneCFG.MainArmament.Range + 2));
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ForestRange", Math.min(13, cloneCFG.MainArmament.ForestRange + 2));
-                        ScriptUtils.SetValue(cloneCFG, "OrderDistance", Math.min(13, cloneCFG.OrderDistance + 2));
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "BaseAccuracy", 0);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "MaxDistanceDispersion", 300);
+                    ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{атака}");
+                    ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 150, 0, 0));
+                    ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", Math.min(1000, 5*buffUnitCfg.MainArmament.ShotParams.Damage));
+                    ScriptUtils.SetValue(buffUnitCfg, "Sight", Math.min(13, buffUnitCfg.Sight + 2));
+                    if (buffUnitCfg.MainArmament.Range > 1) {
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "EmitBulletsCountMin", Math.min(5, buffUnitCfg.MainArmament.EmitBulletsCountMin + 2));
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "EmitBulletsCountMax", Math.min(5, buffUnitCfg.MainArmament.EmitBulletsCountMax + 2));
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "Range", Math.min(13, buffUnitCfg.MainArmament.Range + 2));
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "ForestRange", Math.min(13, buffUnitCfg.MainArmament.ForestRange + 2));
+                        ScriptUtils.SetValue(buffUnitCfg, "OrderDistance", Math.min(13, buffUnitCfg.OrderDistance + 2));
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "BaseAccuracy", 0);
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "MaxDistanceDispersion", 300);
                     }
                     break;
                 case BUFF_TYPE.ACCURACY:
-                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + "\n{меткость}");
-                    ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 148, 0, 211));
+                    ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{меткость}");
+                    ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 148, 0, 211));
                     //ScriptUtils.SetValue(cloneCFG, "Sight", 3*cloneCFG.Sight);
-                    ScriptUtils.SetValue(cloneCFG, "Sight", Math.min(14, cloneCFG.Sight + 4));
-                    if (cloneCFG.MainArmament.Range > 1) {
-                        ScriptUtils.SetValue(cloneCFG, "ReloadTime", 2*cloneCFG.ReloadTime);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ReloadTime", 2*cloneCFG.MainArmament.ReloadTime);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "Range", 2*cloneCFG.MainArmament.Range);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "ForestRange", 2*cloneCFG.MainArmament.ForestRange);
-                        ScriptUtils.SetValue(cloneCFG, "OrderDistance", 2*cloneCFG.OrderDistance);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament, "DisableDispersion", true);
-                        ScriptUtils.SetValue(cloneCFG.MainArmament.ShotParams, "AdditiveBulletSpeed", createPF(30, 0));
+                    ScriptUtils.SetValue(buffUnitCfg, "Sight", Math.min(14, buffUnitCfg.Sight + 4));
+                    if (buffUnitCfg.MainArmament.Range > 1) {
+                        ScriptUtils.SetValue(buffUnitCfg, "ReloadTime", 2*buffUnitCfg.ReloadTime);
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "ReloadTime", 2*buffUnitCfg.MainArmament.ReloadTime);
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "Range", 2*buffUnitCfg.MainArmament.Range);
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "ForestRange", 2*buffUnitCfg.MainArmament.ForestRange);
+                        ScriptUtils.SetValue(buffUnitCfg, "OrderDistance", 2*buffUnitCfg.OrderDistance);
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "DisableDispersion", true);
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "AdditiveBulletSpeed", createPF(30, 0));
                     }
                     break;
                 case BUFF_TYPE.HEALTH:
-                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + "\n{здоровье}");
-                    ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 0, 150, 0));
-                    ScriptUtils.SetValue(cloneCFG, "MaxHealth", Math.min(200000, 10*cloneCFG.MaxHealth));
+                    ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{здоровье}");
+                    ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 0, 150, 0));
+                    ScriptUtils.SetValue(buffUnitCfg, "MaxHealth", Math.min(200000, 10*buffUnitCfg.MaxHealth));
                     break;
                 case BUFF_TYPE.DEFFENSE:
-                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + "\n{защита}");
-                    ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 255, 215, 0));
-                    ScriptUtils.SetValue(cloneCFG, "MaxHealth", 2*cloneCFG.MaxHealth);
-                    ScriptUtils.SetValue(cloneCFG, "Shield", Math.max(390, cloneCFG.Shield));
-                    ScriptUtils.SetValue(cloneCFG, "Flags", mergeFlags(UnitFlags, cloneCFG.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
+                    ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{защита}");
+                    ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 255, 215, 0));
+                    ScriptUtils.SetValue(buffUnitCfg, "MaxHealth", 2*buffUnitCfg.MaxHealth);
+                    ScriptUtils.SetValue(buffUnitCfg, "Shield", Math.max(390, buffUnitCfg.Shield));
+                    ScriptUtils.SetValue(buffUnitCfg, "Flags", mergeFlags(UnitFlags, buffUnitCfg.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
                     break;
                 case BUFF_TYPE.CLONING:
-                    ScriptUtils.SetValue(cloneCFG, "Name", cloneCFG.Name + "\n{клонирования}");
-                    ScriptUtils.SetValue(cloneCFG, "TintColor", createHordeColor(150, 255, 255, 255));
+                    ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{клонирования}");
+                    ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 255, 255, 255));
                     spawnCount = 12;
                     break;
             }
@@ -656,7 +655,7 @@ export function BuffSystem(world: World, gameTickNum: number) {
             // создаем дополнительных баффнутых юнитов
             if (spawnCount > 1) {
                 var generator    = generateCellInSpiral(target_unitComponent.unit.Cell.X, target_unitComponent.unit.Cell.Y);
-                var spawnedUnits = spawnUnits(world.settlements[target_settlementId], cloneCFG, spawnCount - 1, UnitDirection.Down, generator);
+                var spawnedUnits = spawnUnits(world.settlements[target_settlementId], buffUnitCfg, spawnCount - 1, UnitDirection.Down, generator);
                 for (var spawnedUnit of spawnedUnits) {
                     var newEntity              = world.RegisterUnitEntity(spawnedUnit, target_entity);
                     // устанавливаем информацию о баффе и о бафнутом конфиге
@@ -674,7 +673,7 @@ export function BuffSystem(world: World, gameTickNum: number) {
             if (target_unitComponent.unit.IsAlive) {
                 let replaceParams = new ReplaceUnitParameters();
                 replaceParams.OldUnit = target_unitComponent.unit;
-                replaceParams.NewUnitConfig = cloneCFG;
+                replaceParams.NewUnitConfig = buffUnitCfg;
                 replaceParams.Cell = null;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
                 replaceParams.PreserveHealthLevel = false;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
                 replaceParams.PreserveOrders = false;        // Нужно ли передать приказы?
@@ -682,20 +681,20 @@ export function BuffSystem(world: World, gameTickNum: number) {
                 target_unitComponent.unit = target_unitComponent.unit.Owner.Units.ReplaceUnit(replaceParams);
                 // записываем инфу о баффе (конфиг записывает только для 1-ого, чтобы корректно удалился он)
                 target_buffableComponent.buffType = buffComponent.buffType;
-                target_buffableComponent.buffCfg  = cloneCFG;
+                target_buffableComponent.buffCfg  = buffUnitCfg;
                 // запрещаем команды
                 UnitDisallowCommands(target_unitComponent.unit);
                 // создаем эффект появления
                 spawnDecoration(world.realScena, HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), target_unitComponent.unit.Position);
             } else {
                 var generator    = generateCellInSpiral(target_unitComponent.unit.Cell.X, target_unitComponent.unit.Cell.Y);
-                var spawnedUnits = spawnUnits(world.settlements[target_settlementId], cloneCFG, 1, UnitDirection.Down, generator);
+                var spawnedUnits = spawnUnits(world.settlements[target_settlementId], buffUnitCfg, 1, UnitDirection.Down, generator);
                 for (var spawnedUnit of spawnedUnits) {
                     var newEntity              = world.RegisterUnitEntity(spawnedUnit, target_entity);
                     // устанавливаем информацию о баффе и о бафнутом конфиге
                     var buffableComponent      = newEntity.components.get(COMPONENT_TYPE.BUFFABLE_COMPONENT) as BuffableComponent;
                     buffableComponent.buffType = buffComponent.buffType;
-                    buffableComponent.buffCfg  = cloneCFG;
+                    buffableComponent.buffCfg  = buffUnitCfg;
                     // запрещаем команды
                     UnitDisallowCommands(spawnedUnit);
                     // создаем эффект появления
@@ -707,7 +706,7 @@ export function BuffSystem(world: World, gameTickNum: number) {
 }
 
 export function UnitProducedSystem(world: World, gameTickNum: number) {
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.IsSettlementInGame(settlementId)) {
             continue;
         }
@@ -726,7 +725,7 @@ export function UnitProducedSystem(world: World, gameTickNum: number) {
             }
 
             // проверяем, что у нового юнита есть сущность
-            if (world.cfgUid_entity.has(unitProducedEvent.producedUnit.Cfg.Uid)) {
+            if (OpCfgUidToEntity.has(unitProducedEvent.producedUnit.Cfg.Uid)) {
                 world.RegisterUnitEntity(unitProducedEvent.producedUnit);
             }
 
@@ -758,7 +757,7 @@ export function UnitProducedSystem(world: World, gameTickNum: number) {
 //                     var productUnitCfg = unitComponent.unit.OrdersMind.ActiveOrder.ProductUnitConfig;
                     
 //                     for (var heroNum = 0; heroNum < heroAltarComponent.heroesCfgIdxs.length; heroNum++) {
-//                         if (world.configs[heroAltarComponent.heroesCfgIdxs[heroNum]].Uid == productUnitCfg.Uid) {
+//                         if (OpCfgUidToCfg[heroAltarComponent.heroesCfgIdxs[heroNum]].Uid == productUnitCfg.Uid) {
 //                             heroAltarComponent.selectedHeroNum = heroNum;
 //                             break;
 //                         }
@@ -776,12 +775,12 @@ export function UnitProducedSystem(world: World, gameTickNum: number) {
 //                     ScriptUtils.GetValue(unitComponent.unit, "Model").ProfessionsData.Remove(UnitProfession.UnitProducer)
 
 //                     // регистрируем героя
-//                     world.configs["hero_" + settlementId] = HordeContentApi.CloneConfig(world.configs[heroAltarComponent.heroesCfgIdxs[heroAltarComponent.selectedHeroNum]]);
+//                     OpCfgUidToCfg["hero_" + settlementId] = HordeContentApi.CloneConfig(OpCfgUidToCfg[heroAltarComponent.heroesCfgIdxs[heroAltarComponent.selectedHeroNum]]);
 //                     // делаем подходящий цвет
 //                     log.info("делаем подходящий цвет героя");
                     
 //                     // точка спавна относительно юнита
-//                     var emergePoint = world.configs[unitComponent.cfgId].BuildingConfig.EmergePoint;
+//                     var emergePoint = OpCfgUidToCfg[unitComponent.cfgId].BuildingConfig.EmergePoint;
 
 //                     // регистрируем героя
 //                     var heroEntity = new Entity();

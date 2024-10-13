@@ -1,6 +1,9 @@
 import { printObjectItems } from "library/common/introspection";
 import { log } from "library/common/logging";
-import { Cell } from "../Utils";
+import { Cell, CfgAddUnitProducer, CreateUnitConfig } from "../Utils";
+import { OpCfgUidToCfg as OpCfgUidToCfg, OpCfgUidToEntity } from "../Configs/IConfig";
+import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
+import { TileType, UnitFlags } from "library/game-logic/horde-types";
 
 export class Entity {
     /** компоненты */
@@ -38,6 +41,17 @@ export class Entity {
             if (depth > 0) {
                 printObjectItems(this.components.get(componentType), depth - 1);
             }
+        }
+    }
+
+    /** настройка конфига под сущность */
+    public InitConfig(cfg : any) {
+        for (var componentNum = 0; componentNum < COMPONENT_TYPE.SIZE; componentNum++) {
+            var componentType : COMPONENT_TYPE = componentNum;
+            if (!this.components.has(componentType)) {
+                continue;
+            }
+            this.components.get(componentType)?.InitConfig(cfg);
         }
     }
 };
@@ -78,43 +92,114 @@ export class IComponent {
     public Clone() : IComponent {
         return new IComponent(this.id);
     }
+
+    /** настройка конфига под сущность */
+    public InitConfig(cfg : any) {}
 };
 
 export class UnitComponent extends IComponent {
     /** ссылка на юнита */
     unit: any;
     /** ссылка на конфиг */
-    cfgId: string;
+    cfgUid: string;
 
-    public constructor(unit:any, cfgId: string) {
+    public constructor(unit:any, cfgUid: string) {
         super(COMPONENT_TYPE.UNIT_COMPONENT);
-        this.unit = unit;
-        this.cfgId = cfgId;
+        this.unit   = unit;
+        this.cfgUid = cfgUid;
     }
 
     public Clone(): UnitComponent {
-        return new UnitComponent(this.unit, this.cfgId);
+        return new UnitComponent(this.unit, this.cfgUid);
     }
 };
 
 export class SpawnBuildingComponent extends IComponent {
     /** ид конфига юнита */
-    spawnUnitConfigId: string;
+    spawnUnitConfigUid: string;
     /** такт с которого нужно спавнить юнитов */
     spawnTact: number;
     /** частота спавна в тактах */
-    spawnPeriodTact: number
+    spawnPeriodTact: number;
+    /** количество юнитов, которые спавнятся */
+    spawnCount: number = 1;
 
-    public constructor(spawnUnitConfigId: string, spawnTact: number, spawnPeriodTact: number) {
+    /** юнит для сброса таймера спавна */
+    public static resetSpawnCfgUid = "#CastleFight_Reset_spawn";
+
+    public constructor(spawnUnitConfigUid: string, spawnTact: number, spawnPeriodTact: number, spawnCount: number) {
         super(COMPONENT_TYPE.SPAWN_BUILDING_COMPONENT);
 
-        this.spawnUnitConfigId = spawnUnitConfigId;
-        this.spawnTact         = spawnTact;
-        this.spawnPeriodTact   = spawnPeriodTact;
+        this.spawnUnitConfigUid = spawnUnitConfigUid;
+        this.spawnTact          = spawnTact;
+        this.spawnPeriodTact    = spawnPeriodTact;
+        this.spawnCount         = spawnCount;
     }
 
     public Clone(): SpawnBuildingComponent {
-        return new SpawnBuildingComponent(this.spawnUnitConfigId, this.spawnTact, this.spawnPeriodTact);
+        return new SpawnBuildingComponent(this.spawnUnitConfigUid, this.spawnTact, this.spawnPeriodTact, this.spawnCount);
+    }
+
+    public InitConfig(cfg : any) {
+        super.InitConfig(cfg);
+
+        // даем профессию найма юнитов
+        CfgAddUnitProducer(cfg);
+
+        // добавляем сброс таймера спавна
+        this.InitResetSpawnCfg();
+        var producerParams = cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        var produceList    = producerParams.CanProduceList;
+        produceList.Add(OpCfgUidToCfg[SpawnBuildingComponent.resetSpawnCfgUid]);
+
+        // добавляем описание спавнующего юнита
+        var spawnUnitCfg = OpCfgUidToCfg[this.spawnUnitConfigUid];
+        ScriptUtils.SetValue(cfg, "Description", cfg.Description + (cfg.Description == "" ? "" : "\n") + "Тренирует: " + 
+            spawnUnitCfg.Name + "\n" +
+            "  здоровье " + spawnUnitCfg.MaxHealth + "\n" +
+            "  броня " + spawnUnitCfg.Shield + "\n" +
+            (
+                spawnUnitCfg.MainArmament
+                ? "  атака " + spawnUnitCfg.MainArmament.ShotParams.Damage + "\n" +
+                  "  радиус атаки " + spawnUnitCfg.MainArmament.Range + "\n"
+                : ""
+            ) +
+            "  скорость бега " + spawnUnitCfg.Speeds.Item(TileType.Grass) + "\n"
+            + (spawnUnitCfg.Flags.HasFlag(UnitFlags.FireResistant) || spawnUnitCfg.Flags.HasFlag(UnitFlags.MagicResistant)
+                ? "  иммунитет к " + (spawnUnitCfg.Flags.HasFlag(UnitFlags.FireResistant) ? "огню " : "") + 
+                    (spawnUnitCfg.Flags.HasFlag(UnitFlags.MagicResistant) ? "магии " : "") + "\n"
+                : "")
+            + "  радиус видимости " + spawnUnitCfg.Sight
+            );
+    }
+
+    public InitResetSpawnCfg() {
+        if (OpCfgUidToCfg[SpawnBuildingComponent.resetSpawnCfgUid] != undefined) {
+            return;
+        }
+
+        // создаем конфиг
+        OpCfgUidToCfg[SpawnBuildingComponent.resetSpawnCfgUid] = CreateUnitConfig("#UnitConfig_Slavyane_Swordmen", SpawnBuildingComponent.resetSpawnCfgUid);
+        
+        var cfg = OpCfgUidToCfg[SpawnBuildingComponent.resetSpawnCfgUid];
+
+        // имя
+        ScriptUtils.SetValue(cfg, "Name", "Перезапустить найм");
+        // описание
+        ScriptUtils.SetValue(cfg, "Description", "Перезапустить найм юнитов. Юниты будут наняты через обычное время с перезапуска.");
+        // время постройки
+        ScriptUtils.SetValue(cfg, "ProductionTime", 500);
+        // убираем требования
+        cfg.TechConfig.Requirements.Clear();
+        // убираем производство людей
+        ScriptUtils.SetValue(cfg, "ProducedPeople", 0);
+        // убираем налоги
+        ScriptUtils.SetValue(cfg, "SalarySlots", 0);
+        // делаем 0-ую стоимость
+        ScriptUtils.SetValue(cfg.CostResources, "Gold",   0);
+        ScriptUtils.SetValue(cfg.CostResources, "Metal",  0);
+        ScriptUtils.SetValue(cfg.CostResources, "Lumber", 0);
+        ScriptUtils.SetValue(cfg.CostResources, "People", 0);
     }
 }
 
@@ -166,6 +251,16 @@ export class IncomeEvent extends IComponent {
     public Clone(): IncomeEvent {
         return new IncomeEvent(this.metal, this.gold, this.lumber, this.people);
     }
+
+    public InitConfig(cfg : any) {
+        super.InitConfig(cfg);
+
+        ScriptUtils.SetValue(cfg, "Description", cfg.Description + "\nРазово дает " +
+            (this.metal > 0  ? this.metal  + " железа" : "") +
+            (this.gold > 0   ? this.gold   + " золота" : "") +
+            (this.lumber > 0 ? this.lumber + " дерева" : "") +
+            (this.people > 0 ? this.people + " людей"  : "") + "\n");
+    }
 }
 
 /** событие разового увеличение пассивного дохода поселения */
@@ -187,6 +282,15 @@ export class IncomeIncreaseEvent extends IComponent {
 
     public Clone(): IncomeIncreaseEvent {
         return new IncomeIncreaseEvent(this.metal, this.gold, this.lumber);
+    }
+
+    public InitConfig(cfg : any) {
+        super.InitConfig(cfg);
+
+        ScriptUtils.SetValue(cfg, "Description", cfg.Description + "\nУвеличивает доход на " +
+            (this.metal > 0  ? this.metal  + " железа" : "") +
+            (this.gold > 0   ? this.gold   + " золота" : "") +
+            (this.lumber > 0 ? this.lumber + " дерева" : "") + "\n");
     }
 }
 
@@ -306,19 +410,91 @@ export class ReviveComponent extends IComponent {
 
 export class UpgradableBuildingComponent extends IComponent {
     /** список ид конфигов, в которые здание можно улучшить */
-    upgradeCfgIds: Array<string>;
-    /** список ид конфигов, которые нужно построить чтобы получить соответствующие улучшение */
-    upgradeUnitCfgIds: Array<string>;
+    upgradesCfgUid: Array<string>;
 
-    public constructor(upgradeCfgIds: Array<string>, upgradeUnitCfgIds: Array<string>) {
+    public constructor(upgradesCfgUid: Array<string>) {
         super(COMPONENT_TYPE.UPGRADABLE_BUILDING_COMPONENT);
 
-        this.upgradeCfgIds = upgradeCfgIds;
-        this.upgradeUnitCfgIds = upgradeUnitCfgIds;
+        this.upgradesCfgUid     = upgradesCfgUid;
+        //this.upgradesUnitCfgUid = upgradesUnitCfgUid;
     }
 
     public Clone(): UpgradableBuildingComponent {
-        return new UpgradableBuildingComponent(this.upgradeCfgIds, this.upgradeUnitCfgIds);
+        return new UpgradableBuildingComponent(this.upgradesCfgUid);
+    }
+
+    public InitConfig(cfg : any) {
+        super.InitConfig(cfg);
+
+        // даем профессию найма юнитов
+        CfgAddUnitProducer(cfg);
+
+        // добавляем в постройку дерево улучшений
+        var producerParams = cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        var produceList    = producerParams.CanProduceList;
+        ScriptUtils.SetValue(cfg, "Description", cfg.Description + (cfg.Description == "" ? "" : "\n\n") + "Можно улучшить до:");
+        for (var i = 0; i < this.upgradesCfgUid.length; i++) {
+            produceList.Add(this._GenerateImproveIconCfg(this.upgradesCfgUid[i]));
+            this._GenerateRecursivereImprovementTree(cfg, this.upgradesCfgUid[i], "    ");
+        }
+    }
+
+    /** суффикс к улучшаемому зданию, чтобы получить иконку */
+    private static upgradeIconSuffix = "_upgradeIcon";
+    /** вернет cfg который нужно построить, чтобы улучишить до cfgUid */
+    public static GetUpgradeCfgUid (cfgUid : string) {
+        return cfgUid + this.upgradeIconSuffix;
+    }
+
+    private _GenerateRecursivereImprovementTree(cfg: any, currentCfgUid: string, shiftStr: string) {
+        var currentCfg = OpCfgUidToCfg[currentCfgUid];
+        ScriptUtils.SetValue(cfg, "Description", cfg.Description + "\n" + shiftStr + currentCfg.Name);
+
+        var current_Entity = OpCfgUidToEntity.get(currentCfgUid);
+        if (!current_Entity) { 
+            return;
+        }
+        if (!current_Entity.components.has(COMPONENT_TYPE.UPGRADABLE_BUILDING_COMPONENT)) {
+            return;
+        }
+        var current_upgradableBuildingComponent = current_Entity.components.get(COMPONENT_TYPE.UPGRADABLE_BUILDING_COMPONENT) as UpgradableBuildingComponent;
+        for (var i = 0; i < current_upgradableBuildingComponent.upgradesCfgUid.length; i++) {
+            this._GenerateRecursivereImprovementTree(cfg, current_upgradableBuildingComponent.upgradesCfgUid[i], shiftStr + "    ");
+        }
+    }
+
+    private _GenerateImproveIconCfg(cfgUid : string) : any {
+        var iconCfgUid = UpgradableBuildingComponent.GetUpgradeCfgUid(cfgUid);
+        var iconCfg    = OpCfgUidToCfg[iconCfgUid];
+        if (iconCfg == undefined) {
+            // создаем конфиг
+            if (OpCfgUidToEntity.has(cfgUid)) {
+                var entity = OpCfgUidToEntity.get(cfgUid) as Entity;
+                if (entity.components.has(COMPONENT_TYPE.SPAWN_BUILDING_COMPONENT)) {
+                    // если данный конфиг спавнит юнитов, то иконку делаем на основе юнита
+                    var SpawnBuildingComponent = entity.components.get(COMPONENT_TYPE.SPAWN_BUILDING_COMPONENT) as SpawnBuildingComponent;
+                    OpCfgUidToCfg[iconCfgUid]  = CreateUnitConfig(SpawnBuildingComponent.spawnUnitConfigUid, iconCfgUid);
+                } else {
+                    OpCfgUidToCfg[iconCfgUid] = CreateUnitConfig(cfgUid, iconCfgUid);
+                }
+            } else {
+                OpCfgUidToCfg[iconCfgUid] = CreateUnitConfig(cfgUid, iconCfgUid);
+            }
+            iconCfg = OpCfgUidToCfg[iconCfgUid];
+
+            // настраиваем конфиг иконки
+            ScriptUtils.SetValue(iconCfg, "Name", "Улучшить до " + OpCfgUidToCfg[cfgUid].Name);
+            ScriptUtils.SetValue(iconCfg, "Description", OpCfgUidToCfg[cfgUid].Description);
+            ScriptUtils.SetValue(iconCfg, "ProductionTime", 250);
+            ScriptUtils.SetValue(iconCfg, "MaxHealth", 1); // чтобы время постройки было ровно как надо
+            ScriptUtils.SetValue(iconCfg.CostResources, "Gold",   OpCfgUidToCfg[cfgUid].CostResources.Gold);
+            ScriptUtils.SetValue(iconCfg.CostResources, "Metal",  OpCfgUidToCfg[cfgUid].CostResources.Metal);
+            ScriptUtils.SetValue(iconCfg.CostResources, "Lumber", OpCfgUidToCfg[cfgUid].CostResources.Lumber);
+            ScriptUtils.SetValue(iconCfg.CostResources, "People", OpCfgUidToCfg[cfgUid].CostResources.People);
+            iconCfg.TechConfig.Requirements.Clear();
+        }
+
+        return iconCfg;
     }
 };
 
@@ -333,6 +509,17 @@ export enum BUFF_TYPE {
 
     SIZE
 };
+
+/** суффик в имени конфига для баффнутого юнита */
+export var BuffCfgUidSuffix = [
+    "",
+    "_buffAttack",
+    "_buffAccuracy",
+    "_buffHealth",
+    "_buffDeffense",
+    "_buffCloning",
+    ""
+];
 
 /** тип оптимальной цели */
 export enum BuffOptTargetType {
@@ -440,6 +627,19 @@ export class HeroAltarComponent extends IComponent {
 
     public Clone() : HeroAltarComponent {
         return new HeroAltarComponent(this.heroesCfgIdxs, this.selectedHeroNum);
+    }
+
+    public InitConfig(cfg : any) {
+        super.InitConfig(cfg);
+
+        // даем профессию найма юнитов
+        CfgAddUnitProducer(cfg);
+
+        var producerParams = cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        var produceList    = producerParams.CanProduceList;
+        for (var heroCfgId of this.heroesCfgIdxs) {
+            produceList.Add(OpCfgUidToCfg[heroCfgId]);
+        }
     }
 };
 

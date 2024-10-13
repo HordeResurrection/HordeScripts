@@ -1,7 +1,7 @@
 import { generateCellInSpiral } from "library/common/position-tools";
 import { createBox, createPoint } from "library/common/primitives";
-import { PointCommandArgs, UnitCommand } from "library/game-logic/horde-types";
-import { getUnitProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
+import { PointCommandArgs, TileType, UnitCommand } from "library/game-logic/horde-types";
+import { getUnitProfessionParams, UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 
 const SpawnUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
 
@@ -29,7 +29,16 @@ export function getCurrentTime () {
     return new Date().getTime();
 }
 
-/** добавить профессию найма юнитов */
+export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
+    // при наличии конфига удаляем его
+    if (HordeContentApi.HasUnitConfig(newConfigUid)) {
+        //HordeContentApi.RemoveConfig(HordeContentApi.GetUnitConfig(newConfigUid));
+        return HordeContentApi.GetUnitConfig(newConfigUid);
+    }
+    return HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig(baseConfigUid), newConfigUid);
+}
+
+/** добавить профессию найма юнитов, если была добавлена, то установит точки выхода и очистит список построек */
 export function CfgAddUnitProducer(Cfg: any) {
     // даем профессию найм войнов при отсутствии
     if (!getUnitProfessionParams(Cfg, UnitProfession.UnitProducer)) {
@@ -37,18 +46,25 @@ export function CfgAddUnitProducer(Cfg: any) {
         var prof_unitProducer = getUnitProfessionParams(donorCfg, UnitProfession.UnitProducer);
         Cfg.ProfessionParams.Item.set(UnitProfession.UnitProducer, prof_unitProducer);
         
+        // добавляем точки выхода
         if (Cfg.BuildingConfig.EmergePoint == null) {
             ScriptUtils.SetValue(Cfg.BuildingConfig, "EmergePoint", createPoint(0, 0));
         }
         if (Cfg.BuildingConfig.EmergePoint2 == null) {
             ScriptUtils.SetValue(Cfg.BuildingConfig, "EmergePoint2", createPoint(0, 0));
         }
+
+        // очищаем список
+        var producerParams = Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        var produceList    = producerParams.CanProduceList;
+        produceList.Clear();
+
         HordeContentApi.RemoveConfig(donorCfg);
     }
 }
 
 /** установить скорость */
-export function CfgSetSpeed(cfg: any, speeds: Map<TileType, number>) {
+export function CfgSetSpeed(cfg: any, speeds: Map<typeof TileType, number>) {
     var tileTypes = speeds.keys();
     for (var tileType = tileTypes.next(); !tileType.done; tileType = tileTypes.next()) {
         cfg.Speeds.Item.set(tileType.value, speeds.get(tileType.value));
