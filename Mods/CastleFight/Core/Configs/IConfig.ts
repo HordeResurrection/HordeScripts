@@ -27,6 +27,8 @@ export class IConfig {
 
         // убираем требования
         OpCfgUidToCfg[this.CfgUid].TechConfig.Requirements.Clear();
+        // описание
+        ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Description", "");
         // убираем производство людей
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "ProducedPeople", 0);
         // убираем налоги

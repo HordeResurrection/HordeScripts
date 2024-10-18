@@ -2,16 +2,16 @@ import { OpCfgUidToCfg } from "../IConfig";
 import { Config_Barrack_1_1 } from "./Config_Barrack_1_1";
 import { Config_Barrack_1_2 } from "./Config_Barrack_1_2";
 import { IBarrack } from "./IBarrack";
-import { IBarrackUnit } from "./IBarrackUnit";
+import { IAttackingUnit } from "../IAttacingUnit";
 
-export class Config_Unit_1 extends IBarrackUnit {
+export class Config_Unit_1 extends IAttackingUnit {
     public static CfgUid      : string = "#CastleFight_Unit_1";
     public static BaseCfgUid  : string = "#UnitConfig_Slavyane_Archer";
 
     constructor() { super(); }
 
     public static InitConfig() {
-        IBarrackUnit.InitConfig.call(this);
+        IAttackingUnit.InitConfig.call(this);
 
         // здоровье
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "MaxHealth", 800);
@@ -25,7 +25,7 @@ export class Config_Barrack_1 extends IBarrack {
     public static CfgUid      : string = "#CastleFight_Barrack_1";
     public static BaseCfgUid  : string = "#UnitConfig_Slavyane_Sawmill";
 
-    public static spawnedUnit        : typeof IBarrackUnit = Config_Unit_1;
+    public static spawnedUnit        : typeof IAttackingUnit = Config_Unit_1;
     public static improvesToBarracks : Array<typeof IBarrack> = [Config_Barrack_1_1, Config_Barrack_1_2];
 
     constructor() { super(); }

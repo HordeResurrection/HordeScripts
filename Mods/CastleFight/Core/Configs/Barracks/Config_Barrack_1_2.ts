@@ -1,17 +1,17 @@
 import { createHordeColor } from "library/common/primitives";
 import { OpCfgUidToCfg } from "../IConfig";
 import { IBarrack } from "./IBarrack";
-import { IBarrackUnit } from "./IBarrackUnit";
+import { IAttackingUnit } from "../IAttacingUnit";
 import { Config_Barrack_1_2_1 } from "./Config_Barrack_1_2_1";
 
-export class Config_Unit_1_2 extends IBarrackUnit {
+export class Config_Unit_1_2 extends IAttackingUnit {
     public static CfgUid      : string = "#CastleFight_Unit_1_2";
     public static BaseCfgUid  : string = "#UnitConfig_Slavyane_Crossbowman";
 
     constructor() { super(); }
 
     public static InitConfig() {
-        IBarrackUnit.InitConfig.call(this);
+        IAttackingUnit.InitConfig.call(this);
 
         // здоровье
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "MaxHealth", 1000);
@@ -26,7 +26,7 @@ export class Config_Barrack_1_2 extends IBarrack {
     public static CfgUid      : string = "#CastleFight_Barrack_1_2";
     public static BaseCfgUid  : string = "#UnitConfig_Slavyane_Sawmill";
 
-    public static spawnedUnit        : typeof IBarrackUnit = Config_Unit_1_2;
+    public static spawnedUnit        : typeof IAttackingUnit = Config_Unit_1_2;
     public static improvesToBarracks : Array<typeof IBarrack> = [Config_Barrack_1_2_1];
 
     constructor() { super(); }

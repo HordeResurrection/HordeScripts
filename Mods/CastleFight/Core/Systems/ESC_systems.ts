@@ -3,12 +3,13 @@ import { generateCellInSpiral } from "library/common/position-tools";
 import { createHordeColor, createResourcesAmount } from "library/common/primitives";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
-import { UnitDirection, UnitFlags, DiplomacyStatus } from "library/game-logic/horde-types";
-import { COMPONENT_TYPE, UnitComponent, BuffableComponent, BUFF_TYPE, SettlementComponent, IncomeIncreaseEvent, IncomeEvent, IncomeLimitedPeriodicalComponent, Entity, SpawnBuildingComponent, ReviveComponent, UpgradableBuildingComponent, BuffComponent, UnitProducedEvent, BuffCfgUidSuffix } from "../Components/ESC_components";
+import { UnitDirection, UnitFlags, DiplomacyStatus, UnitSpecification } from "library/game-logic/horde-types";
+import { COMPONENT_TYPE, UnitComponent, BuffableComponent, BUFF_TYPE, SettlementComponent, IncomeIncreaseEvent, IncomeEvent, IncomeLimitedPeriodicalComponent, Entity, SpawnBuildingComponent, ReviveComponent, UpgradableBuildingComponent, BuffComponent, UnitProducedEvent, BuffableComponent, SpawnEvent } from "../Components/ESC_components";
 import { CreateUnitConfig, UnitDisallowCommands, spawnUnits } from "../Utils";
 import { GameState, World } from "../World";
 import { createPF } from "library/common/primitives";
 import { OpCfgUidToCfg, OpCfgUidToEntity } from "../Configs/IConfig";
+import { log } from "library/common/logging";
 
 const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 
@@ -387,7 +388,7 @@ export function IncomeSystem(world: World, gameTickNum: number) {
     }
 }
 
-export function SpawnBuildingSystem(world: World, gameTickNum: number) {
+export function SpawnSystem(world: World, gameTickNum: number) {
     for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.IsSettlementInGame(settlementId)) {
             continue;
@@ -395,42 +396,67 @@ export function SpawnBuildingSystem(world: World, gameTickNum: number) {
 
         for (var i = 0; i < world.settlements_entities[settlementId].length; i++) {
             var entity = world.settlements_entities[settlementId][i] as Entity;
-            if (entity.components.has(COMPONENT_TYPE.UNIT_COMPONENT) && entity.components.has(COMPONENT_TYPE.SPAWN_BUILDING_COMPONENT)) {
-                var unitComponent          = entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
-                // проверка, что юнит жив
-                if (!unitComponent.unit || unitComponent.unit.IsDead) {
-                    continue;
-                }
+            if (entity.components.has(COMPONENT_TYPE.UNIT_COMPONENT)) {
+                if (entity.components.has(COMPONENT_TYPE.SPAWN_BUILDING_COMPONENT)) {
+                    var unitComponent          = entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
+                    // проверка, что юнит жив
+                    if (!unitComponent.unit || unitComponent.unit.IsDead) {
+                        continue;
+                    }
 
-                var spawnBuildingComponent = entity.components.get(COMPONENT_TYPE.SPAWN_BUILDING_COMPONENT) as SpawnBuildingComponent;
+                    var spawnBuildingComponent = entity.components.get(COMPONENT_TYPE.SPAWN_BUILDING_COMPONENT) as SpawnBuildingComponent;
 
-                // проверяем, что здание что-то строит
-                if (unitComponent.unit.OrdersMind.ActiveAct.GetType().Name == "ActProduce") {
-                    var buildingCfg = unitComponent.unit.OrdersMind.ActiveOrder.ProductUnitConfig;
-                    // проверяем, если здание хочет сбросить таймер спавна
-                    if (buildingCfg.Uid == SpawnBuildingComponent.resetSpawnCfgUid) {
-                        // отменяем постройку
-                        unitComponent.unit.OrdersMind.CancelOrdersSafe(true);
-                        // сбрасываем спавн
+                    // проверяем, что здание что-то строит
+                    if (unitComponent.unit.OrdersMind.ActiveAct.GetType().Name == "ActProduce") {
+                        var buildingCfg = unitComponent.unit.OrdersMind.ActiveOrder.ProductUnitConfig;
+                        // проверяем, если здание хочет сбросить таймер спавна
+                        if (buildingCfg.Uid == SpawnBuildingComponent.resetSpawnCfgUid) {
+                            // отменяем постройку
+                            unitComponent.unit.OrdersMind.CancelOrdersSafe(true);
+                            // сбрасываем спавн
+                            spawnBuildingComponent.spawnTact = gameTickNum + spawnBuildingComponent.spawnPeriodTact;
+                        }
+                    }
+                    // проверяем, что зданию нужно задать таймер спавна
+                    if (spawnBuildingComponent.spawnTact < 0) {
                         spawnBuildingComponent.spawnTact = gameTickNum + spawnBuildingComponent.spawnPeriodTact;
                     }
-                }
-                // проверяем, что зданию нужно задать таймер спавна
-                if (spawnBuildingComponent.spawnTact < 0) {
-                    spawnBuildingComponent.spawnTact = gameTickNum + spawnBuildingComponent.spawnPeriodTact;
-                }
-                // проверяем, что пора спавнить юнитов
-                else if (spawnBuildingComponent.spawnTact < gameTickNum) {
-                    spawnBuildingComponent.spawnTact += spawnBuildingComponent.spawnPeriodTact;
-                    
-                    var emergePoint = OpCfgUidToCfg[unitComponent.cfgUid].BuildingConfig.EmergePoint;
+                    // проверяем, что пора спавнить юнитов
+                    else if (spawnBuildingComponent.spawnTact < gameTickNum) {
+                        spawnBuildingComponent.spawnTact += spawnBuildingComponent.spawnPeriodTact;
+                        
+                        var emergePoint = OpCfgUidToCfg[unitComponent.cfgUid].BuildingConfig.EmergePoint;
 
-                    // спавним юнитов
-                    var generator     = generateCellInSpiral(unitComponent.unit.Cell.X + emergePoint.X, unitComponent.unit.Cell.Y + emergePoint.Y);
-                    var spawnedUnits  = spawnUnits(world.settlements[settlementId], OpCfgUidToCfg[spawnBuildingComponent.spawnUnitConfigUid], world.spawn_count_coeff, UnitDirection.Down, generator);
-                    for (var spawnedUnit of spawnedUnits) {
-                        UnitDisallowCommands(spawnedUnit);
-                        world.RegisterUnitEntity(spawnedUnit);
+                        // спавним юнитов
+                        var generator     = generateCellInSpiral(unitComponent.unit.Cell.X + emergePoint.X, unitComponent.unit.Cell.Y + emergePoint.Y);
+                        var spawnedUnits  = spawnUnits(world.settlements[settlementId], OpCfgUidToCfg[spawnBuildingComponent.spawnUnitConfigUid], spawnBuildingComponent.spawnCount, UnitDirection.Down, generator);
+                        for (var spawnedUnit of spawnedUnits) {
+                            UnitDisallowCommands(spawnedUnit);
+                            world.RegisterUnitEntity(spawnedUnit);
+                        }
+                    }
+                } else if (entity.components.has(COMPONENT_TYPE.SPAWN_EVENT)) {
+                    var unitComponent          = entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
+                    // проверка, что юнит жив
+                    if (!unitComponent.unit || unitComponent.unit.IsDead) {
+                        continue;
+                    }
+
+                    var spawnEvent = entity.components.get(COMPONENT_TYPE.SPAWN_EVENT) as SpawnEvent;
+
+                    // проверяем, что пора спавнить юнитов
+                    if (spawnEvent.spawnTact < gameTickNum) {
+                        // спавним юнитов
+                        var generator     = generateCellInSpiral(unitComponent.unit.Cell.X, unitComponent.unit.Cell.Y);
+                        var spawnedUnits  = spawnUnits(world.settlements[settlementId], OpCfgUidToCfg[spawnEvent.spawnUnitConfigUid], spawnEvent.spawnCount, UnitDirection.Down, generator);
+                        for (var spawnedUnit of spawnedUnits) {
+                            UnitDisallowCommands(spawnedUnit);
+                            var spawnedEntity = world.RegisterUnitEntity(spawnedUnit);
+                            spawnedEntity.components.delete(COMPONENT_TYPE.SPAWN_EVENT);
+                        }
+
+                        // удаляем событие
+                        entity.components.delete(COMPONENT_TYPE.SPAWN_EVENT);
                     }
                 }
             }
@@ -600,28 +626,42 @@ export function BuffSystem(world: World, gameTickNum: number) {
             // бафаем цель
 
             // обновляем конфиг баффнутого юнита
-            var buffUnitCfg    = CreateUnitConfig(target_unitComponent.cfgUid, target_unitComponent.cfgUid + BuffCfgUidSuffix[buffComponent.buffType]);
+            var buffUnitCfg    = CreateUnitConfig(target_unitComponent.cfgUid, target_unitComponent.cfgUid + BuffableComponent.BuffCfgUidSuffix[buffComponent.buffType]);
             var spawnCount     = 1;
             switch (buffComponent.buffType) {
                 case BUFF_TYPE.ATTACK:
                     ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{атака}");
                     ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 150, 0, 0));
-                    ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", Math.min(1000, 5*buffUnitCfg.MainArmament.ShotParams.Damage));
-                    ScriptUtils.SetValue(buffUnitCfg, "Sight", Math.min(13, buffUnitCfg.Sight + 2));
-                    if (buffUnitCfg.MainArmament.Range > 1) {
+                    // техника или маг
+                    if (buffUnitCfg.Specification.HasFlag(UnitSpecification.Machine) || 
+                        buffUnitCfg.Specification.HasFlag(UnitSpecification.Mage)) {
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", Math.min(1000, 5*buffUnitCfg.MainArmament.ShotParams.Damage));
+                    }
+                    // дальник
+                    else if (buffUnitCfg.MainArmament.Range > 1) {
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", Math.min(1000, 5*buffUnitCfg.MainArmament.ShotParams.Damage));
                         ScriptUtils.SetValue(buffUnitCfg.MainArmament, "EmitBulletsCountMin", Math.min(5, buffUnitCfg.MainArmament.EmitBulletsCountMin + 2));
                         ScriptUtils.SetValue(buffUnitCfg.MainArmament, "EmitBulletsCountMax", Math.min(5, buffUnitCfg.MainArmament.EmitBulletsCountMax + 2));
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "Range", Math.min(13, buffUnitCfg.MainArmament.Range + 2));
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "ForestRange", Math.min(13, buffUnitCfg.MainArmament.ForestRange + 2));
-                        ScriptUtils.SetValue(buffUnitCfg, "OrderDistance", Math.min(13, buffUnitCfg.OrderDistance + 2));
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "BaseAccuracy", 0);
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "MaxDistanceDispersion", 300);
                     }
+                    // ближник
+                    else {
+                        ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", 5*buffUnitCfg.MainArmament.ShotParams.Damage);
+                    }
+                    // ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", Math.min(1000, 5*buffUnitCfg.MainArmament.ShotParams.Damage));
+                    // ScriptUtils.SetValue(buffUnitCfg, "Sight", Math.min(13, buffUnitCfg.Sight + 2));
+                    // if (buffUnitCfg.MainArmament.Range > 1) {
+                    //     ScriptUtils.SetValue(buffUnitCfg.MainArmament, "EmitBulletsCountMin", Math.min(5, buffUnitCfg.MainArmament.EmitBulletsCountMin + 2));
+                    //     ScriptUtils.SetValue(buffUnitCfg.MainArmament, "EmitBulletsCountMax", Math.min(5, buffUnitCfg.MainArmament.EmitBulletsCountMax + 2));
+                    //     ScriptUtils.SetValue(buffUnitCfg.MainArmament, "Range", Math.min(13, buffUnitCfg.MainArmament.Range + 2));
+                    //     ScriptUtils.SetValue(buffUnitCfg.MainArmament, "ForestRange", Math.min(13, buffUnitCfg.MainArmament.ForestRange + 2));
+                    //     ScriptUtils.SetValue(buffUnitCfg, "OrderDistance", Math.min(13, buffUnitCfg.OrderDistance + 2));
+                    //     ScriptUtils.SetValue(buffUnitCfg.MainArmament, "BaseAccuracy", 0);
+                    //     ScriptUtils.SetValue(buffUnitCfg.MainArmament, "MaxDistanceDispersion", 300);
+                    // }
                     break;
                 case BUFF_TYPE.ACCURACY:
                     ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{меткость}");
                     ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 148, 0, 211));
-                    //ScriptUtils.SetValue(cloneCFG, "Sight", 3*cloneCFG.Sight);
                     ScriptUtils.SetValue(buffUnitCfg, "Sight", Math.min(14, buffUnitCfg.Sight + 4));
                     if (buffUnitCfg.MainArmament.Range > 1) {
                         ScriptUtils.SetValue(buffUnitCfg, "ReloadTime", 2*buffUnitCfg.ReloadTime);
@@ -636,7 +676,7 @@ export function BuffSystem(world: World, gameTickNum: number) {
                 case BUFF_TYPE.HEALTH:
                     ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{здоровье}");
                     ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 0, 150, 0));
-                    ScriptUtils.SetValue(buffUnitCfg, "MaxHealth", Math.min(200000, 10*buffUnitCfg.MaxHealth));
+                    ScriptUtils.SetValue(buffUnitCfg, "MaxHealth", 5*buffUnitCfg.MaxHealth);
                     break;
                 case BUFF_TYPE.DEFFENSE:
                     ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{защита}");
@@ -646,7 +686,7 @@ export function BuffSystem(world: World, gameTickNum: number) {
                     ScriptUtils.SetValue(buffUnitCfg, "Flags", mergeFlags(UnitFlags, buffUnitCfg.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
                     break;
                 case BUFF_TYPE.CLONING:
-                    ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{клонирования}");
+                    ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{клонирован}");
                     ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 255, 255, 255));
                     spawnCount = 12;
                     break;

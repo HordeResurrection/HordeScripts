@@ -1,6 +1,6 @@
 import HordePluginBase from "plugins/base-plugin";
 import { BalanceFindingSystem } from "./Systems/BalanceFindingSystem";
-import { WordClearSystem, IncomeSystem, SpawnBuildingSystem, ReviveSystem, BuffSystem, UnitProducedSystem, DiplomacySystem, UpgradableBuildingSystem } from "./Systems/ESC_systems";
+import { WordClearSystem, IncomeSystem, SpawnSystem, ReviveSystem, BuffSystem, UnitProducedSystem, DiplomacySystem, UpgradableBuildingSystem } from "./Systems/ESC_systems";
 import { Cell, MetricType } from "./Utils";
 import { AI_System } from "./Systems/AISystem";
 import { AttackingAlongPathSystem_stage1, AttackingAlongPathSystem_stage2 } from "./Systems/AttackingAlongPathSystem";
@@ -45,7 +45,7 @@ export class CastleFightPlugin extends HordePluginBase {
                     
                     world.RegisterSystem(WordClearSystem, "WordClearSystem");
                     world.RegisterSystem(IncomeSystem, "IncomeSystem");
-                    world.RegisterSystem(SpawnBuildingSystem, "SpawnBuildingSystem");
+                    world.RegisterSystem(SpawnSystem, "SpawnSystem");
                     world.RegisterSystem(AttackingAlongPathSystem_stage1, "AttackingAlongPathSystem_stage1");
                     world.RegisterSystem(AttackingAlongPathSystem_stage2, "AttackingAlongPathSystem_stage2");
                     world.RegisterSystem(ReviveSystem, "ReviveSystem");

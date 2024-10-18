@@ -22,7 +22,7 @@ export class Config_Holy_spirit_health extends IConfig {
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Name", "Святой дух здоровья");
         // описание
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Description", "Тот кого ударит данный дух, получит его силу.\n" +
-            "Увеличение здоровья в 10 раз (макс 200 000)"
+            "Здоровье х5"
         );
         // здоровье
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "MaxHealth", 1);

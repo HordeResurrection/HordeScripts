@@ -22,8 +22,8 @@ export class Config_Holy_spirit_defense extends IConfig {
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Name", "Святой дух защиты");
         // описание
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Description", "Тот кого ударит данный дух, получит его силу.\n" +
-            "Увеличение защиты до max(390, текущая защита)\n" +
-            "Увеличение здоровья в 2 раза\n" +
+            "Здоровье х2\n" +
+            "Защита max(390, текущая защита)\n" +
             "Имунн к огню, магии"
         );
         // здоровье

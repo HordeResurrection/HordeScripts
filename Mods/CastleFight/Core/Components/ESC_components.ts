@@ -77,6 +77,7 @@ export enum COMPONENT_TYPE {
     INCOME_EVENT,
     INCOME_INCREASE_EVENT,
     UNIT_PRODUCED_EVENT,
+    SPAWN_EVENT,
 
     SIZE
 }; 
@@ -154,23 +155,9 @@ export class SpawnBuildingComponent extends IComponent {
 
         // добавляем описание спавнующего юнита
         var spawnUnitCfg = OpCfgUidToCfg[this.spawnUnitConfigUid];
-        ScriptUtils.SetValue(cfg, "Description", cfg.Description + (cfg.Description == "" ? "" : "\n") + "Тренирует: " + 
-            spawnUnitCfg.Name + "\n" +
-            "  здоровье " + spawnUnitCfg.MaxHealth + "\n" +
-            "  броня " + spawnUnitCfg.Shield + "\n" +
-            (
-                spawnUnitCfg.MainArmament
-                ? "  атака " + spawnUnitCfg.MainArmament.ShotParams.Damage + "\n" +
-                  "  радиус атаки " + spawnUnitCfg.MainArmament.Range + "\n"
-                : ""
-            ) +
-            "  скорость бега " + spawnUnitCfg.Speeds.Item(TileType.Grass) + "\n"
-            + (spawnUnitCfg.Flags.HasFlag(UnitFlags.FireResistant) || spawnUnitCfg.Flags.HasFlag(UnitFlags.MagicResistant)
-                ? "  иммунитет к " + (spawnUnitCfg.Flags.HasFlag(UnitFlags.FireResistant) ? "огню " : "") + 
-                    (spawnUnitCfg.Flags.HasFlag(UnitFlags.MagicResistant) ? "магии " : "") + "\n"
-                : "")
-            + "  радиус видимости " + spawnUnitCfg.Sight
-            );
+        ScriptUtils.SetValue(cfg, "Description", cfg.Description + (cfg.Description == "" ? "" : "\n") +
+            "Тренирует: " + spawnUnitCfg.Name + "\n" +
+            spawnUnitCfg.Description);
     }
 
     public InitResetSpawnCfg() {
@@ -255,7 +242,7 @@ export class IncomeEvent extends IComponent {
     public InitConfig(cfg : any) {
         super.InitConfig(cfg);
 
-        ScriptUtils.SetValue(cfg, "Description", cfg.Description + "\nРазово дает " +
+        ScriptUtils.SetValue(cfg, "Description", cfg.Description + (cfg.Description == "" ? "" : "\n") + "Разово дает " +
             (this.metal > 0  ? this.metal  + " железа" : "") +
             (this.gold > 0   ? this.gold   + " золота" : "") +
             (this.lumber > 0 ? this.lumber + " дерева" : "") +
@@ -287,7 +274,7 @@ export class IncomeIncreaseEvent extends IComponent {
     public InitConfig(cfg : any) {
         super.InitConfig(cfg);
 
-        ScriptUtils.SetValue(cfg, "Description", cfg.Description + "\nУвеличивает доход на " +
+        ScriptUtils.SetValue(cfg, "Description", cfg.Description + (cfg.Description == "" ? "" : "\n") + "Увеличивает доход на " +
             (this.metal > 0  ? this.metal  + " железа" : "") +
             (this.gold > 0   ? this.gold   + " золота" : "") +
             (this.lumber > 0 ? this.lumber + " дерева" : "") + "\n");
@@ -510,17 +497,6 @@ export enum BUFF_TYPE {
     SIZE
 };
 
-/** суффик в имени конфига для баффнутого юнита */
-export var BuffCfgUidSuffix = [
-    "",
-    "_buffAttack",
-    "_buffAccuracy",
-    "_buffHealth",
-    "_buffDeffense",
-    "_buffCloning",
-    ""
-];
-
 /** тип оптимальной цели */
 export enum BuffOptTargetType {
     Melle = 0,
@@ -528,15 +504,6 @@ export enum BuffOptTargetType {
     All
 };
 
-/** оптимальная цель баффа */
-export var BuffsOptTarget = [
-    BuffOptTargetType.All,
-    BuffOptTargetType.Range,
-    BuffOptTargetType.Range,
-    BuffOptTargetType.All,
-    BuffOptTargetType.All,
-    BuffOptTargetType.All
-];
 
 /** Компонент с информацией о текущем бафе, его наличие означает, что юнита можно баффать */
 export class BuffableComponent extends IComponent {
@@ -546,6 +513,27 @@ export class BuffableComponent extends IComponent {
     buffCfg: any;
     /** маска доступных баффов */
     buffMask: Array<boolean>;
+
+    /** оптимальная цель баффа */
+    public static BuffsOptTarget = [
+        BuffOptTargetType.All,
+        BuffOptTargetType.Melle,
+        BuffOptTargetType.Range,
+        BuffOptTargetType.All,
+        BuffOptTargetType.All,
+        BuffOptTargetType.All
+    ];
+
+    /** суффик в имени конфига для баффнутого юнита */
+    public static BuffCfgUidSuffix = [
+        "",
+        "_buffAttack",
+        "_buffAccuracy",
+        "_buffHealth",
+        "_buffDeffense",
+        "_buffCloning",
+        ""
+    ];
 
     public constructor(buffMask?: Array<boolean>, buffType?: BUFF_TYPE, buffCfg?: any) {
         super(COMPONENT_TYPE.BUFFABLE_COMPONENT);
@@ -660,3 +648,24 @@ export class UnitProducedEvent extends IComponent {
         return new UnitProducedEvent(this.producerUnit, this.producedUnit);
     }
 };
+
+export class SpawnEvent extends IComponent {
+    /** ид конфига юнита */
+    spawnUnitConfigUid: string;
+    /** такт с которого нужно спавнить юнитов */
+    spawnTact: number;
+    /** количество юнитов, которые спавнятся */
+    spawnCount: number = 1;
+    
+    constructor(spawnUnitConfigUid: string, spawnTact: number, spawnCount: number) {
+        super(COMPONENT_TYPE.SPAWN_EVENT);
+
+        this.spawnUnitConfigUid = spawnUnitConfigUid;
+        this.spawnTact          = spawnTact;
+        this.spawnCount         = spawnCount;
+    }
+
+    public Clone() : SpawnEvent {
+        return new SpawnEvent(this.spawnUnitConfigUid, this.spawnTact, this.spawnCount);
+    }
+}

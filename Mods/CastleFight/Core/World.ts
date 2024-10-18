@@ -51,10 +51,6 @@ export class World {
 
     /** для каждого поселения хранит обработчик построенных юнитов */
     unitProducedCallbacks: Array<any>;
-
-    /** параметры */
-    castle_health_coeff: number;
-    spawn_count_coeff: number;
     
     public constructor ( )
     {
@@ -64,8 +60,6 @@ export class World {
         this.systems_name          = new Array<string>();
         this.systems_executionTime = new Array<number>();
 
-        this.castle_health_coeff = 1;
-        this.spawn_count_coeff = 1;
     }
 
     public Init() {

@@ -1,9 +1,9 @@
 import { TileType, UnitFlags, UnitSpecification } from "library/game-logic/horde-types";
-import { COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent } from "../../Components/ESC_components";
-import { CfgSetSpeed } from "../../Utils";
-import { IConfig, OpCfgUidToCfg } from "../IConfig";
+import { COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent } from "../Components/ESC_components";
+import { CfgSetSpeed } from "../Utils";
+import { IConfig, OpCfgUidToCfg } from "./IConfig";
 
-export class IBarrackUnit extends IConfig {
+export class IAttackingUnit extends IConfig {
     constructor() { super(); }
 
     public static InitEntity() {
@@ -12,6 +12,9 @@ export class IBarrackUnit extends IConfig {
         this.Entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, this.CfgUid));
         this.Entity.components.set(COMPONENT_TYPE.ATTACKING_ALONG_PATH_COMPONENT, new AttackingAlongPathComponent());
         this.Entity.components.set(COMPONENT_TYPE.BUFFABLE_COMPONENT, new BuffableComponent());
+
+        // в данный момент конфиги зафиксированы, можно сделать постинициализацию
+        this._PostInitConfig();
     }
 
     public static InitConfig() {
@@ -48,18 +51,34 @@ export class IBarrackUnit extends IConfig {
         }
     }
 
-    public static InitSettings() {
+    private static _PostInitConfig() {
         // Ближники
-        // увеличиваем хп в 1.5 раза
-        // обзор ставим 8
         if (OpCfgUidToCfg[this.CfgUid].MainArmament.Range == 1) {
             ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "MaxHealth", Math.floor(1.5 * OpCfgUidToCfg[this.CfgUid].MaxHealth));
             ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Sight", 6);
         }
         // Дальники
-        // обзор делаем 4
         else {
             ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Sight", 4);
         }
+
+        // описание юнитов
+        ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Description",  OpCfgUidToCfg[this.CfgUid].Description +
+            (OpCfgUidToCfg[this.CfgUid].Description == "" ? "" : "\n") +
+            "  здоровье " + OpCfgUidToCfg[this.CfgUid].MaxHealth + "\n" +
+            "  броня " + OpCfgUidToCfg[this.CfgUid].Shield + "\n" +
+            (
+                OpCfgUidToCfg[this.CfgUid].MainArmament
+                ? "  атака " + OpCfgUidToCfg[this.CfgUid].MainArmament.ShotParams.Damage + "\n" +
+                "  радиус атаки " + OpCfgUidToCfg[this.CfgUid].MainArmament.Range + "\n"
+                : ""
+            ) +
+            "  скорость бега " + OpCfgUidToCfg[this.CfgUid].Speeds.Item(TileType.Grass) + "\n"
+            + (OpCfgUidToCfg[this.CfgUid].Flags.HasFlag(UnitFlags.FireResistant) || OpCfgUidToCfg[this.CfgUid].Flags.HasFlag(UnitFlags.MagicResistant)
+                ? "  иммунитет к " + (OpCfgUidToCfg[this.CfgUid].Flags.HasFlag(UnitFlags.FireResistant) ? "огню " : "") + 
+                    (OpCfgUidToCfg[this.CfgUid].Flags.HasFlag(UnitFlags.MagicResistant) ? "магии " : "") + "\n"
+                : "")
+            + "  радиус видимости " + OpCfgUidToCfg[this.CfgUid].Sight
+            );
     }
 }

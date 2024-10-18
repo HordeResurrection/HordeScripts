@@ -1,5 +1,5 @@
-import { Entity, COMPONENT_TYPE, UnitComponent, BUFF_TYPE, BuffableComponent } from "../Components/ESC_components";
-import { OpCfgUidToCfg, IConfig, OpCfgUidToEntity } from "./IConfig";
+import { COMPONENT_TYPE, UnitComponent, BUFF_TYPE, BuffableComponent } from "../Components/ESC_components";
+import { OpCfgUidToCfg, IConfig } from "./IConfig";
 
 export class Config_Tower extends IConfig {
     public static CfgUid      : string = "#CastleFight_Tower";
@@ -10,9 +10,13 @@ export class Config_Tower extends IConfig {
     public static InitEntity() {
         IConfig.InitEntity.call(this);
 
-        var entity : Entity = new Entity();
-        entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, this.CfgUid));
-        OpCfgUidToEntity.set(this.CfgUid, entity);
+        this.Entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, this.CfgUid));
+        var buffMask = new Array<boolean>(BUFF_TYPE.SIZE);
+        for (var i = 0; i < BUFF_TYPE.SIZE; i++) {
+            buffMask[i] = true;
+        }
+        buffMask[BUFF_TYPE.CLONING] = false;
+        this.Entity.components.set(COMPONENT_TYPE.BUFFABLE_COMPONENT, new BuffableComponent(buffMask));
     }
 
     public static InitConfig() {
@@ -33,16 +37,5 @@ export class Config_Tower extends IConfig {
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid].CostResources, "Metal",  0);
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid].CostResources, "Lumber", 200);
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid].CostResources, "People", 0);
-        {
-            var entity : Entity = new Entity();
-            entity.components.set(COMPONENT_TYPE.UNIT_COMPONENT, new UnitComponent(null, this.CfgUid));
-            var buffMask = new Array<boolean>(BUFF_TYPE.SIZE);
-            for (var i = 0; i < BUFF_TYPE.SIZE; i++) {
-                buffMask[i] = true;
-            }
-            buffMask[BUFF_TYPE.CLONING] = false;
-            entity.components.set(COMPONENT_TYPE.BUFFABLE_COMPONENT, new BuffableComponent(buffMask));
-            OpCfgUidToEntity.set(this.CfgUid, entity);
-        }
     }
 }

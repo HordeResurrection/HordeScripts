@@ -21,11 +21,16 @@ export class Config_Holy_spirit_attack extends IConfig {
         // имя
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Name", "Святой дух атаки");
         // описание
+        // ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Description", "Тот кого ударит данный дух, получит его силу\n" +
+        //     "Увеличение урона в 5 раз (макс 1 000)\n" +
+        //     "Для дальнего боя:\n" +
+        //     "Увеличение дальности атаки, видимости на 2 (макс 13)\n" +
+        //     "Увеличение снарядов на 2 (макс 5)"
+        // );
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Description", "Тот кого ударит данный дух, получит его силу\n" +
-            "Увеличение урона в 5 раз (макс 1 000)\n" +
-            "Для дальнего боя:\n" +
-            "Увеличение дальности атаки, видимости на 2 (макс 13)\n" +
-            "Увеличение снарядов на 2 (макс 5)"
+            "Ближники: урон х5\n" +
+            "Дальники: урон х5 (макс 1000), число снарядов +2 (макс 5)\n" +
+            "Маги и техника: урон x5 (макс 1000)\n"
         );
         // здоровье
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "MaxHealth", 1);

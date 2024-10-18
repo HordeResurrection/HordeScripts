@@ -1,7 +1,7 @@
 import { log } from "library/common/logging";
 import { World } from "../World";
 import { PointCommandArgs, ProduceAtCommandArgs, ProduceCommandArgs, UnitCommand } from "library/game-logic/horde-types";
-import { BuffComponent, BuffOptTargetType, BuffsOptTarget, COMPONENT_TYPE, Entity, ReviveComponent, SpawnBuildingComponent, UnitComponent, UnitProducedEvent, UpgradableBuildingComponent } from "../Components/ESC_components";
+import { BuffableComponent, BuffComponent, BuffOptTargetType, COMPONENT_TYPE, Entity, ReviveComponent, SpawnBuildingComponent, UnitComponent, UnitProducedEvent, UpgradableBuildingComponent } from "../Components/ESC_components";
 import { createPoint, createResourcesAmount } from "library/common/primitives";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
@@ -768,7 +768,7 @@ class RandomBot extends IBot {
             }
 
             var buffComponent     = spirits_entity[i].components.get(COMPONENT_TYPE.BUFF_COMPONENT) as BuffComponent;
-            var buffOptTargetType = BuffsOptTarget[buffComponent.buffType];
+            var buffOptTargetType = BuffableComponent.BuffsOptTarget[buffComponent.buffType];
 
             for (var j = 0; j < 4; j++) {
                 var targetId      = this.rnd.RandomNumber(0, Math.floor(0.4*possibleTargetsEntityId.length));

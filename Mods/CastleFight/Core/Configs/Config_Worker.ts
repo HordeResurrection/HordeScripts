@@ -7,6 +7,7 @@ import { Config_Barrack_1 } from "./Barracks/Config_Barrack_1";
 import { Config_Barrack_2 } from "./Barracks/Config_Barrack_2";
 import { Config_Church } from "./Church/Config_Church";
 import { IConfig, OpCfgUidToCfg } from "./IConfig";
+import { Config_MercenaryCamp } from "./Mercenary/Config_MercenaryCamp";
 
 
 export class Config_Worker extends IConfig {
@@ -50,6 +51,7 @@ export class Config_Worker extends IConfig {
             produceList.Add(OpCfgUidToCfg[Config_Barrack_1.CfgUid]);
             produceList.Add(OpCfgUidToCfg[Config_Barrack_2.CfgUid]);
             produceList.Add(OpCfgUidToCfg[Config_Church.CfgUid]);
+            produceList.Add(OpCfgUidToCfg[Config_MercenaryCamp.CfgUid]);
         }
     }
 }

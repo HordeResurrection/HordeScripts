@@ -1,9 +1,9 @@
 import { COMPONENT_TYPE, UnitComponent, SpawnBuildingComponent, UpgradableBuildingComponent } from "../../Components/ESC_components";
 import { IConfig, OpCfgUidToCfg } from "../IConfig";
-import { IBarrackUnit } from "./IBarrackUnit";
+import { IAttackingUnit } from "../IAttacingUnit";
 
 export class IBarrack extends IConfig {
-    public static spawnedUnit        : typeof IBarrackUnit;
+    public static spawnedUnit        : typeof IAttackingUnit;
     public static spawnPeriod        : number = 1500;
     public static improvesToBarracks : Array<typeof IBarrack>;
     public static spawnCount         : number = 1;
@@ -28,8 +28,6 @@ export class IBarrack extends IConfig {
     public static InitConfig() {
         IConfig.InitConfig.call(this);
 
-        // описание
-        ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Description", "");
         // стоимость обычного улучшаемого здания
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid].CostResources, "Gold",   100);
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid].CostResources, "Metal",  0);
