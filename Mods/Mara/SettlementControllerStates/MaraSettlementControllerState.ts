@@ -1,12 +1,12 @@
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 import { TargetExpandData } from "../Common/Settlement/TargetExpandData";
 import { FsmState } from "Mara/Common/FsmState";
-import { MaraResources } from "../Common/Resources/MaraResources";
+import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraPoint } from "../Common/MaraPoint";
-import { MaraResourceMap } from "../Common/Resources/MaraResourceMap";
-import { MaraResourceType } from "../Common/Resources/MaraResourceType";
+import { MaraMap } from "../Common/MapAnalysis/MaraMap";
+import { MaraResourceType } from "../Common/MapAnalysis/MaraResourceType";
 import { MaraUtils } from "../MaraUtils";
-import { MaraResourceCluster } from "../Common/Resources/MaraResourceCluster";
+import { MaraResourceCluster } from "../Common/MapAnalysis/MaraResourceCluster";
 
 export abstract class MaraSettlementControllerState extends FsmState {
     protected readonly settlementController: MaraSettlementController;
@@ -98,7 +98,7 @@ export abstract class MaraSettlementControllerState extends FsmState {
         let requiredMetal = requiredResources.Metal;
         let requiredWood = requiredResources.Wood;
 
-        MaraResourceMap.ResourceClusters.forEach((value) => {
+        MaraMap.ResourceClusters.forEach((value) => {
             if (requiredGold > 0) {
                 let freeGold = this.getUnoccupiedMinerals(value.GoldCells);
                 
@@ -167,7 +167,7 @@ export abstract class MaraSettlementControllerState extends FsmState {
                 continue;
             }
             else {
-                freeMinerals += MaraResourceMap.GetCellMineralsAmount(cell.X, cell.Y);
+                freeMinerals += MaraMap.GetCellMineralsAmount(cell.X, cell.Y);
             }
         }
 

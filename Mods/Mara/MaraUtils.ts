@@ -1,7 +1,7 @@
 import { Mara, MaraLogLevel } from "Mara/Mara";
 import { MaraSquad } from "Mara/Subcontrollers/Squads/MaraSquad";
 import { createBox, createPoint } from "library/common/primitives";
-import { UnitFlags, UnitCommand, AllContent, UnitConfig, UnitQueryFlag, UnitSpecification } from "library/game-logic/horde-types";
+import { UnitFlags, UnitCommand, AllContent, UnitConfig, UnitQueryFlag, UnitSpecification, DrawLayer, FontUtils, GeometryCanvas, Stride_Color, Stride_Vector2 } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
 import { MaraProductionRequest } from "./Common/MaraProductionRequest";
@@ -14,12 +14,14 @@ import { AllowedCompositionItem } from "./Common/AllowedCompositionItem";
 import { NonUniformRandomSelectItem } from "./Common/NonUniformRandomSelectItem";
 import { UnitComposition } from "./Common/UnitComposition";
 import { MaraRect } from "./Common/MaraRect";
+import { spawnGeometry, spawnString } from "library/game-logic/decoration-spawn";
 
 const DEFAULT_UNIT_SEARCH_RADIUS = 3;
 
 const TileType = HCL.HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType;
 const AlmostDefeatCondition = HCL.HordeClassLibrary.World.Settlements.Existence.AlmostDefeatCondition;
 const ResourceType = HCL.HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
+const GeometryPresets = HCL.HordeClassLibrary.World.Geometry.GeometryPresets;
 
 export const BuildTrackerType = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Intellect.Requests.Trackers.UnitProducing.BuildTracker", "HordeResurrection.Intellect"));
 
@@ -500,6 +502,68 @@ export class MaraUtils {
             ) {
                 action({X: col, Y: row});
             }
+        }
+    }
+
+    static WaveOverCells(
+        cells: MaraPoint[], 
+        waveContinueCondition: (cell: MaraPoint, neighbourCell: MaraPoint) => boolean,
+        onFrontFinish: (cells: MaraPoint[]) => void,
+        onWaveFinish: (cells: MaraPoint[]) => void
+    ): void {
+        let cellsIndex = new Set(cells.map((cell) => cell.ToString()));
+        let processedCells = new Set<string>();
+        
+        for (let initialCell of cells) {
+            if (!waveContinueCondition(initialCell, initialCell)) {
+                continue;
+            }
+            
+            let nextCells: Array<MaraPoint> = [initialCell];
+            let waveCells: Array<MaraPoint> = [];
+    
+            while (nextCells.length > 0) {
+                let currentCells = [...nextCells];
+                nextCells = [];
+                let curIterationCells: MaraPoint[] = [];
+    
+                for (let cell of currentCells) {
+                    let cellStr = cell.ToString();
+                    
+                    if (processedCells.has(cellStr)) {
+                        continue;
+                    }
+    
+                    processedCells.add(cellStr);
+    
+                    if (cellsIndex.has(cellStr)) {
+                        curIterationCells.push(cell);
+    
+                        MaraUtils.ForEachCell(
+                            cell, 
+                            1, 
+                            (nextCell) => {
+                                let point = new MaraPoint(nextCell.X, nextCell.Y);
+    
+                                if (
+                                    cellsIndex.has(point.ToString()) && 
+                                    !processedCells.has(point.ToString()) &&
+                                    point.X == cell.X || point.Y == cell.Y
+                                ) {
+                                    if (waveContinueCondition(cell, point)) {
+                                        nextCells.push(point);
+                                    }
+                                }
+                            }
+                        );
+                    }
+                }
+    
+                onFrontFinish(curIterationCells);
+                waveCells.push(...curIterationCells);
+            }
+    
+            onWaveFinish(waveCells);
         }
     }
     //#endregion
@@ -1000,6 +1064,116 @@ export class MaraUtils {
         return Math.max(xDiff, yDiff);
     }
 
+    static EuclidDistance(cell1: any, cell2: any): number {
+        return Math.sqrt(
+            (cell1.X - cell2.X) ** 2 +
+            (cell1.Y - cell2.Y) ** 2
+        )
+    }
+
+    static FindExtremum<Type>(
+        items: Array<Type>, 
+        compareFunc: (a: Type, b: Type) => number
+    ): Type | null {
+        if (items.length == 0) {
+            return null;
+        }
+    
+        let result = items[0];
+    
+        for (let item of items) {
+            let compareResult = compareFunc(item, result);
+    
+            if (compareResult > 0) {
+                result = item;
+            }
+        }
+    
+        return result;
+    }
+
+    // Bresenham algorithm to pixelize straight lines are used here
+    // see https://ru.wikipedia.org/wiki/Алгоритм_Брезенхэма for details
+    private static bresenhamLine(start: MaraPoint, end: MaraPoint): Array<MaraPoint> {
+        let xDelta = Math.abs(end.X - start.X);
+        let yDelta = Math.abs(end.Y - start.Y);
+        
+        let error = 0;
+        let errDelta = yDelta + 1;
+        
+        let y = start.Y;
+        let yDir = Math.sign(end.Y - start.Y);
+
+        let result: Array<MaraPoint> = [];
+
+        for (let x = start.X; x <= end.X; x ++) {
+            result.push(new MaraPoint(x, y));
+
+            error = error + errDelta;
+
+            if (error >= xDelta + 1) {
+                y += yDir;
+                error -= xDelta + 1;
+            }
+        }
+
+        return result;
+    }
+
+    static MakeLine(point1: MaraPoint, point2: MaraPoint): Array<MaraPoint> {
+        if (point1.X == point2.X) {
+            let result: Array<MaraPoint> = [];
+            let yDelta = Math.sign(point2.Y - point1.Y);
+            
+            for (let y = point1.Y; y != point2.Y; y += yDelta) {
+                result.push(new MaraPoint(point1.X, y));
+            }
+
+            result.push(new MaraPoint(point1.X, point2.Y));
+
+            return result;
+        }
+        else {
+            let result: Array<MaraPoint> = [];
+
+            if (Math.abs(point1.X - point2.X) < Math.abs(point1.Y - point2.Y)) {
+                let cells = MaraUtils.MakeLine(new MaraPoint(point1.Y, point1.X), new MaraPoint(point2.Y, point2.X));
+                result = cells.map((cell) => new MaraPoint(cell.Y, cell.X));
+            }
+            else {
+                if (point2.X > point1.X) {
+                    result = MaraUtils.bresenhamLine(point1, point2);
+                }
+                else {
+                    result = MaraUtils.bresenhamLine(point2, point1);
+                }
+            }
+
+            // update result so that all cells are strictly connected via sides, not diagonals
+            // let newCells: Array<MaraPoint> = [];
+
+            // for (let i = 0; i < result.length - 1; i ++) {
+            //     let curCell = result[i];
+            //     let nextCell = result[i + 1];
+
+            //     if (
+            //         curCell.X != nextCell.X && 
+            //         curCell.Y != nextCell.Y
+            //     ) {
+            //         let xDelta = Math.sign(nextCell.X - curCell.X);
+
+            //         newCells.push(
+            //             new MaraPoint(curCell.X + xDelta, curCell.Y)
+            //         );
+            //     }
+            // }
+
+            // result.push(...newCells);
+
+            return result;
+        }
+    }
+
     static IsPointsEqual(point1: any, point2: any): boolean {
         return point1.X == point2.X && point1.Y == point2.Y;
     }
@@ -1041,6 +1215,37 @@ export class MaraUtils {
         catch (e) {
             return null;
         }
+    }
+    //#endregion
+
+    //#region Debug Utils
+    static TextOnMap(text: string, cell: MaraPoint, color: any): void {
+        let position = GeometryPresets.CellToCenterPosition(createPoint(cell.X, cell.Y));
+        let ticksToLive = 2000;
+        let decorationString = spawnString(ActiveScena, text, position, ticksToLive);
+    
+        decorationString.Color = color;
+        decorationString.Height = 18;
+        decorationString.DrawLayer = DrawLayer.Birds;
+        decorationString.Font = FontUtils.DefaultVectorFont;
+    }
+
+    static DrawLineOnScena(from: MaraPoint, to: MaraPoint) {
+        const thickness = 2.0;
+        
+        // Caaaanvas wings of death.
+        // Prepare to meet your fate.
+        let geometryCanvas = new GeometryCanvas();
+
+        let fromPosition = GeometryPresets.CellToCenterPosition(createPoint(from.X, from.Y));
+        let toPosition = GeometryPresets.CellToCenterPosition(createPoint(to.X, to.Y));
+        let color = new Stride_Color(0xff, 0x00, 0x00);
+        geometryCanvas.DrawLine(new Stride_Vector2(fromPosition.X, fromPosition.Y), new Stride_Vector2(toPosition.X, toPosition.Y), color, thickness, false);
+
+        let geometryBuffer = geometryCanvas.GetBuffers();
+
+        let ticksToLive = 2000;
+        spawnGeometry(ActiveScena, geometryBuffer, createPoint(0, 0), ticksToLive);
     }
     //#endregion
 }

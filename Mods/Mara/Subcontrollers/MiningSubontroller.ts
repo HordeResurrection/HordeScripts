@@ -1,13 +1,13 @@
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
-import { MaraResourceMap } from "../Common/Resources/MaraResourceMap";
-import { MaraResourceType } from "../Common/Resources/MaraResourceType";
-import { MaraResources } from "../Common/Resources/MaraResources";
+import { MaraMap } from "../Common/MapAnalysis/MaraMap";
+import { MaraResourceType } from "../Common/MapAnalysis/MaraResourceType";
+import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraPoint } from "../Common/MaraPoint";
 import { MaraUtils, ResourceType } from "../MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 import { eNext, enumerate } from "library/dotnet/dotnet-utils";
-import { MaraResourceCluster } from "../Common/Resources/MaraResourceCluster";
+import { MaraResourceCluster } from "../Common/MapAnalysis/MaraResourceCluster";
 
 class MineData {
     public Mine: any = null;
@@ -69,7 +69,7 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
 
         for (let sawmillData of this.Sawmills) {
-            MaraResourceMap.ResourceClusters.forEach(
+            MaraMap.ResourceClusters.forEach(
                 (value) => {
                     if (
                         MaraUtils.ChebyshevDistance(value.Center, sawmillData.Sawmill.CellCenter) < 
@@ -101,8 +101,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
         for (let row = topLeft.Y; row <= bottomRight.Y; row++) {
             for (let col = topLeft.X; col <= bottomRight.X; col++) {
-                let mineralType = MaraResourceMap.GetCellMineralType(col, row);
-                let mineralAmount = MaraResourceMap.GetCellMineralsAmount(col, row);
+                let mineralType = MaraMap.GetCellMineralType(col, row);
+                let mineralAmount = MaraMap.GetCellMineralsAmount(col, row);
 
                 if (mineralType == ResourceType.Metal) {
                     result.Metal += mineralAmount;
@@ -316,8 +316,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
     private findWoodCell(sawmill: any): MaraPoint | null {
         let cell = MaraUtils.FindClosestCell(
             sawmill.CellCenter,
-            this.settlementController.Settings.ResourceMining.WoodcuttingRadius + MaraResourceMap.CLUSTER_SIZE / 2,
-            (cell) => {return MaraResourceMap.GetCellTreesCount(cell.X, cell.Y) > 0;}
+            this.settlementController.Settings.ResourceMining.WoodcuttingRadius + MaraMap.RESOURCE_CLUSTER_SIZE / 2,
+            (cell) => {return MaraMap.GetCellTreesCount(cell.X, cell.Y) > 0;}
         )
         
         return cell;

@@ -1,7 +1,7 @@
 import { log } from "library/common/logging";
 import { MaraSettlementController } from "./MaraSettlementController";
 import { MaraUtils } from "./MaraUtils";
-import { MaraResourceMap } from "./Common/Resources/MaraResourceMap";
+import { MaraMap } from "./Common/MapAnalysis/MaraMap";
 import { PathFinder } from "library/game-logic/path-find";
 
 export enum MaraLogLevel {
@@ -41,7 +41,7 @@ export class Mara {
     static Tick(tickNumber: number): void {
         try {
             if (Mara.CanRun) {
-                MaraResourceMap.Tick();
+                MaraMap.Tick();
                 
                 if (tickNumber < 10) { //doing nothing for first 10 ticks since not all core objects could be properly inited
                     return;
@@ -77,7 +77,7 @@ export class Mara {
             Mara.controllers = [];
 
             Mara.Debug(`Building resource map...`);
-            MaraResourceMap.Init();
+            MaraMap.Init();
             Mara.Debug(`Done!`);
 
             let tickOffset = 0;

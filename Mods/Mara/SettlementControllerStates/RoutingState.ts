@@ -1,7 +1,7 @@
-import { MaraResourceMap } from "../Common/Resources/MaraResourceMap";
-import { MaraResourceType } from "../Common/Resources/MaraResourceType";
+import { MaraMap } from "../Common/MapAnalysis/MaraMap";
+import { MaraResourceType } from "../Common/MapAnalysis/MaraResourceType";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
-import { MaraResources } from "../Common/Resources/MaraResources";
+import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraUtils } from "../MaraUtils";
 import { NonUniformRandomSelectItem } from "../Common/NonUniformRandomSelectItem";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
@@ -251,7 +251,7 @@ export class RoutingState extends MaraSettlementControllerState {
     private isExpandNeeded(): NeedExpandResult {
         let leftResources = new Set<MaraResourceType>();
         
-        MaraResourceMap.ResourceClusters.forEach((value) => {
+        MaraMap.ResourceClusters.forEach((value) => {
             if (value.GoldAmount > 0) {
                 leftResources.add(MaraResourceType.Gold);
             }

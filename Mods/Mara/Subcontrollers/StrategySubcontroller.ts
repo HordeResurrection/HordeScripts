@@ -9,7 +9,7 @@ import { Mara } from "../Mara";
 import { SettlementGlobalStrategy } from "../Common/Settlement/SettlementControllerGlobalStrategy";
 import { UnitFlags } from "library/game-logic/horde-types";
 import { UnitComposition } from "../Common/UnitComposition";
-import { MaraResourceCluster } from "../Common/Resources/MaraResourceCluster";
+import { MaraResourceCluster } from "../Common/MapAnalysis/MaraResourceCluster";
 import { AllowedCompositionItem } from "../Common/AllowedCompositionItem";
 import { MaraRect } from "../Common/MaraRect";
 

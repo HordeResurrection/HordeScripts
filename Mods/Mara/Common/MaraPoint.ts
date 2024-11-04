@@ -15,4 +15,16 @@ export class MaraPoint {
     public EqualsTo(other: MaraPoint): boolean {
         return this.X == other.X && this.Y == other.Y;
     }
+
+    public Rotate90DegreesCcw(): MaraPoint {
+        return new MaraPoint(-this.Y, this.X);
+    }
+
+    public Shift(shiftVector: MaraPoint): MaraPoint {
+        return new MaraPoint(this.X + shiftVector.X, this.Y + shiftVector.Y);
+    }
+
+    public Copy(): MaraPoint {
+        return new MaraPoint(this.X, this.Y);
+    }
 }
