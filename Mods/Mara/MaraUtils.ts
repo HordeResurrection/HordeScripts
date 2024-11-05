@@ -1230,7 +1230,7 @@ export class MaraUtils {
         decorationString.Font = FontUtils.DefaultVectorFont;
     }
 
-    static DrawLineOnScena(from: MaraPoint, to: MaraPoint) {
+    static DrawLineOnScena(from: MaraPoint, to: MaraPoint, lineColor?: any): void {
         const thickness = 2.0;
         
         // Caaaanvas wings of death.
@@ -1239,13 +1239,28 @@ export class MaraUtils {
 
         let fromPosition = GeometryPresets.CellToCenterPosition(createPoint(from.X, from.Y));
         let toPosition = GeometryPresets.CellToCenterPosition(createPoint(to.X, to.Y));
-        let color = new Stride_Color(0xff, 0x00, 0x00);
+        
+        let color: any;
+
+        if (!lineColor) {
+            color = new Stride_Color(0xff, 0x00, 0x00);
+        }
+        else {
+            color = new Stride_Color(lineColor.R, lineColor.G, lineColor.B);
+        }
+        
         geometryCanvas.DrawLine(new Stride_Vector2(fromPosition.X, fromPosition.Y), new Stride_Vector2(toPosition.X, toPosition.Y), color, thickness, false);
 
         let geometryBuffer = geometryCanvas.GetBuffers();
 
         let ticksToLive = 2000;
         spawnGeometry(ActiveScena, geometryBuffer, createPoint(0, 0), ticksToLive);
+    }
+
+    static DrawPath(path:Array<MaraPoint>, color: any): void {
+        for (let i = 0; i < path.length - 1; i ++) {
+            this.DrawLineOnScena(path[i], path[i + 1], color);
+        }
     }
     //#endregion
 }

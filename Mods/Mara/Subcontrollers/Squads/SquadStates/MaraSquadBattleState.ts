@@ -77,7 +77,7 @@ export class MaraSquadBattleState extends MaraSquadState {
         this.updateThreats();
 
         if (this.enemyUnits.length == 0) {
-            this.squad.Attack(this.squad.CurrentTargetCell);
+            this.squad.Attack(this.squad.CurrentPath!);
             this.squad.SetState(new MaraSquadAttackState(this.squad));
             return;
         }
@@ -89,7 +89,7 @@ export class MaraSquadBattleState extends MaraSquadState {
     OnExit(): void {}
     
     Tick(tickNumber: number): void {
-        if (this.squad.MovementTargetCell != null) {
+        if (this.squad.MovementPath != null) {
             this.squad.SetState(new MaraSquadMoveState(this.squad));
             return;
         }
@@ -107,7 +107,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                 this.enemyUnits.length == 0 || 
                 !this.squad.CanAttackAtLeastOneUnit(this.enemyUnits)
             ) {
-                this.squad.Attack(this.squad.CurrentTargetCell);
+                this.squad.Attack(this.squad.CurrentPath!);
                 this.squad.SetState(new MaraSquadAttackState(this.squad));
                 return;
             }

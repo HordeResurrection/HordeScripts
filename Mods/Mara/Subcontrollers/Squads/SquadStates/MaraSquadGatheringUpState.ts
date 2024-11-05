@@ -4,7 +4,7 @@ import { MaraSquadState } from "./MaraSquadState";
 
 export abstract class MaraSquadGatheringUpState extends MaraSquadState {
     OnEntry(): void {
-        if (this.squad.CurrentTargetCell) {
+        if (this.squad.CurrentMovementPoint) {
             let closestToTargetUnit: any = null;
             let minDistance = Infinity;
 
@@ -49,6 +49,6 @@ export abstract class MaraSquadGatheringUpState extends MaraSquadState {
     private distanceToTargetCell(unit: any): number {
         let pathLength = MaraUtils.GetUnitPathLength(unit);
 
-        return pathLength ?? MaraUtils.ChebyshevDistance(unit.Cell, this.squad.CurrentTargetCell);
+        return pathLength ?? MaraUtils.ChebyshevDistance(unit.Cell, this.squad.CurrentMovementPoint);
     }
 }

@@ -8,19 +8,19 @@ import { MaraSquadState } from "./MaraSquadState";
 
 export class MaraSquadIdleState extends MaraSquadState {
     OnEntry(): void {
-        this.squad.CurrentTargetCell = this.squad.GetLocation().Point;
+        this.squad.CurrentMovementPoint = this.squad.GetLocation().Point;
         this.distributeUnits();
     }
     
     OnExit(): void {}
 
     Tick(tickNumber: number): void {
-        if (this.squad.MovementTargetCell != null) {
+        if (this.squad.MovementPath != null) {
             this.squad.SetState(new MaraSquadMoveState(this.squad));
             return;
         }
 
-        if (this.squad.AttackTargetCell != null) {
+        if (this.squad.AttackPath != null) {
             this.squad.SetState(new MaraSquadAttackState(this.squad));
             return;
         }
@@ -72,16 +72,15 @@ export class MaraSquadIdleState extends MaraSquadState {
 
         searchRadius /= 2; // since spreads above represent diameters
             
-        let forestCells = MaraUtils.FindCells(this.squad.CurrentTargetCell, searchRadius, MaraUtils.ForestCellFilter);
+        let forestCells = MaraUtils.FindCells(this.squad.CurrentMovementPoint!, searchRadius, MaraUtils.ForestCellFilter);
         let cellIndex = 0;
 
         for (let unit of unitsToDistribute) {
             if (cellIndex >= forestCells.length) {
-                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, this.squad.CurrentTargetCell);
+                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, this.squad.CurrentMovementPoint!);
             }
             else {
                 while (cellIndex < forestCells.length) {
-                    //if (MaraUtils.IsPathExists(unit.Cell, forestCells[cellIndex], unit.Cfg, Mara.Pathfinder)) {
                     if (MaraUtils.IsCellReachable(forestCells[cellIndex], unit)) {
                         MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, forestCells[cellIndex]);
                         break;

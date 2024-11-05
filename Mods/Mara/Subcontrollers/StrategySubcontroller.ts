@@ -12,6 +12,7 @@ import { UnitComposition } from "../Common/UnitComposition";
 import { MaraResourceCluster } from "../Common/MapAnalysis/MaraResourceCluster";
 import { AllowedCompositionItem } from "../Common/AllowedCompositionItem";
 import { MaraRect } from "../Common/MaraRect";
+import { MaraMap } from "../Common/MapAnalysis/MaraMap";
 
 export class StrategySubcontroller extends MaraSubcontroller {
     EnemySettlements: Array<any> = []; //but actually Settlement
@@ -349,6 +350,17 @@ export class StrategySubcontroller extends MaraSubcontroller {
         }
         else {
             return null;
+        }
+    }
+
+    GetPath(from: MaraPoint, to: MaraPoint): Array<MaraPoint> {
+        let possiblePaths = MaraMap.GetPaths(from, to);
+
+        if (possiblePaths.length == 0) {
+            return [to];
+        }
+        else {
+            return MaraUtils.RandomSelect(this.settlementController.MasterMind, possiblePaths)!;
         }
     }
 

@@ -3,6 +3,7 @@ import { TacticalSubcontroller } from "../TacticalSubcontroller";
 import { MaraSquad } from "./MaraSquad";
 import { MaraSquadIdleState } from "./SquadStates/MaraSquadIdleState";
 import { MaraSquadState } from "./SquadStates/MaraSquadState";
+import { MaraPoint } from "../../Common/MaraPoint";
 
 export class MaraControllableSquad extends MaraSquad {
     static IdSequence: number = 0;
@@ -30,9 +31,10 @@ export class MaraControllableSquad extends MaraSquad {
 
     id: number;
 
-    AttackTargetCell: any; //but actually cell
-    MovementTargetCell: any; //but actually cell
-    CurrentTargetCell: any; //but actually cell
+    AttackPath: Array<MaraPoint> | null;
+    MovementPath: Array<MaraPoint> | null;
+    CurrentPath: Array<MaraPoint> | null;
+    CurrentMovementPoint: MaraPoint | null;
     MovementPrecision: number;
 
     constructor(units:Array<any>, controller: TacticalSubcontroller){
@@ -61,16 +63,70 @@ export class MaraControllableSquad extends MaraSquad {
         this.state.Tick(tickNumber);
     }
 
-    Attack(targetLocation: any, precision?: number): void {
-        this.AttackTargetCell = targetLocation;
-        this.MovementTargetCell = null;
+    Attack(path: Array<MaraPoint>, precision?: number): void {
+        this.AttackPath = path;
+        this.MovementPath = null;
         this.MovementPrecision = precision ? precision : this.controller.SquadsSettings.DefaultMovementPrecision;
     }
 
-    Move(location: any, precision?: number): void {
-        this.MovementTargetCell = location;
-        this.AttackTargetCell = null;
+    Move(path: Array<MaraPoint>, precision?: number): void {
+        this.MovementPath = path;
+        this.AttackPath = null;
         this.MovementPrecision = precision ? precision : this.controller.SquadsSettings.DefaultMovementPrecision;
+    }
+
+    SelectNextMovementPoint(): MaraPoint | null {
+        if (!this.CurrentPath) {
+            return null;
+        }
+
+        let location = this.GetLocation();
+
+        let startIndex = 0;
+
+        for (let i = 0; i < this.CurrentPath.length; i ++) {
+            let distance = MaraUtils.ChebyshevDistance(this.CurrentPath[i], location.Point);
+
+            if (distance <= this.MovementPrecision) {
+                startIndex = i + 1;
+                break;
+            }
+        }
+
+        let closestPointIndex: number | null = null;
+        let closestDistance = Infinity;
+
+        for (let i = startIndex; i < this.CurrentPath.length; i ++) {
+            let distance = MaraUtils.ChebyshevDistance(this.CurrentPath[i], location.Point);
+            
+            if (distance <= closestDistance) {
+                closestPointIndex = i;
+                closestDistance = distance;
+            }
+        }
+
+        if (closestPointIndex == null) {
+            return null;
+        }
+
+        if (closestPointIndex >= this.CurrentPath.length - 1) {
+            return this.CurrentPath[closestPointIndex];
+        }
+
+        let closestPoint = this.CurrentPath[closestPointIndex];
+        let nextPoint = this.CurrentPath[closestPointIndex + 1];
+
+        let straigthDistance = MaraUtils.ChebyshevDistance(location.Point, nextPoint);
+        let closestPointDistance = 
+            MaraUtils.ChebyshevDistance(location.Point, closestPoint) + 
+            MaraUtils.ChebyshevDistance(closestPoint, nextPoint);
+
+        if (straigthDistance <= closestPointDistance) {
+            return nextPoint;
+        }
+        else {
+            return closestPoint;
+        }
     }
 
     SetState(newState: MaraSquadState): void {

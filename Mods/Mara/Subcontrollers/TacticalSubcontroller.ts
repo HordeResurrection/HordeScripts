@@ -6,6 +6,7 @@ import { MaraControllableSquad } from "./Squads/MaraControllableSquad";
 import { TileType } from "library/game-logic/horde-types";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { MaraRect } from "../Common/MaraRect";
+import { MaraPoint } from "../Common/MaraPoint";
 
 export class TacticalSubcontroller extends MaraSubcontroller {
     private offensiveSquads: Array<MaraControllableSquad> = [];
@@ -16,6 +17,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     private unitsInSquads: Map<string, any> = new Map<string, any>();
 
     private currentTarget: any; //but actually Unit
+    private attackPath: Array<MaraPoint>;
 
     constructor (parent: MaraSettlementController) {
         super(parent);
@@ -80,7 +82,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
                 }
 
                 if (squad.IsIdle() && squad.CombativityIndex >= 1) {
-                    squad.Attack(this.currentTarget.Cell);
+                    squad.Attack(this.attackPath);
                 }
             }
         }
@@ -115,6 +117,36 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     Attack(target): void {
         this.currentTarget = target;
         this.settlementController.Debug(`Selected '${this.currentTarget.Name}' as attack target`);
+
+        let settlementLocation = this.settlementController.GetSettlementLocation();
+
+        if (settlementLocation) {
+            let path = this.settlementController.StrategyController.GetPath(
+                settlementLocation.Center,
+                this.currentTarget.Cell
+            );
+
+            if (path.length > 1) {
+                this.attackPath = path.slice(1);
+            }
+            else {
+                this.attackPath = path;
+            }
+        }
+        else {
+            this.attackPath = [new MaraPoint(this.currentTarget.Cell.X, this.currentTarget.Cell.Y)];
+        }
+
+        this.settlementController.Debug(`Selected as attack path:`);
+        
+        for (let point of this.attackPath) {
+            this.settlementController.Debug(point.ToString());
+        }
+
+        if (this.settlementController.Settings.Squads.DebugSquads) {
+            MaraUtils.DrawPath(this.attackPath, this.settlementController.Settlement.SettlementColor);
+        }
+        
         this.issueAttackCommand();
     }
 
@@ -295,7 +327,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             }
         }
 
-        if (!MaraUtils.IsPointsEqual(squad.CurrentTargetCell, closestLocation!.Center)) {
+        if (!MaraUtils.IsPointsEqual(squad.CurrentMovementPoint, closestLocation!.Center)) {
             if (
                 !closestLocation!.BoundingRect.IsPointInside(squadLocation.Point)
             ) {
@@ -303,7 +335,8 @@ export class TacticalSubcontroller extends MaraSubcontroller {
                 let minDimension = Math.min(closestLocation!.BoundingRect.Width, closestLocation!.BoundingRect.Heigth);
                 let precision = Math.max(minDimension - spread, 0);
                 
-                squad.Move(closestLocation!.Center, precision / 2);
+                let movementPoint = new MaraPoint(closestLocation!.Center.X, closestLocation!.Center.Y);
+                squad.Move([movementPoint], precision / 2);
             }
         }
     }
@@ -530,8 +563,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.settlementController.Debug(`Issuing attack command`);
 
         for (let squad of this.offensiveSquads) {
-            this.settlementController.Debug(`Squad attacking`);
-            squad.Attack(this.currentTarget.Cell);
+            squad.Attack(this.attackPath);
         }
     }
 
@@ -626,7 +658,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             if (accumulatedStrength > attackerStrength) {
                 // if accumulated strength is less than attacker's, this won't fire and squads of the last batch shall do nothing
                 for (let squad of defendingSquadGroup) {
-                    squad.Attack(attackerLocation.Point);
+                    squad.Attack([attackerLocation.Point]);
                 }
                 
                 attackerIndex++;

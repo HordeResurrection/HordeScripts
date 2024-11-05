@@ -1,6 +1,6 @@
-import { MaraUtils } from "Mara/MaraUtils";
 import { MaraControllableSquad } from "../MaraControllableSquad";
 import { FsmState } from "../../../Common/FsmState";
+import { MaraUtils } from "../../../MaraUtils";
 
 export abstract class MaraSquadState extends FsmState {
     protected squad: MaraControllableSquad;
@@ -15,14 +15,24 @@ export abstract class MaraSquadState extends FsmState {
     }
 
     protected initiateMovement() {
-        this.squad.CurrentTargetCell = this.squad.MovementTargetCell;
-        this.squad.MovementTargetCell = null;
-        MaraUtils.IssueMoveCommand(this.squad.Units, this.squad.Controller.Player, this.squad.CurrentTargetCell);
+        this.squad.CurrentPath = this.squad.MovementPath;
+        this.squad.MovementPath = null;
+
+        this.squad.CurrentMovementPoint = this.squad.SelectNextMovementPoint();
+
+        if (this.squad.CurrentMovementPoint) {
+            MaraUtils.IssueMoveCommand(this.squad.Units, this.squad.Controller.Player, this.squad.CurrentMovementPoint);
+        }
     }
 
     protected initiateAttack() {
-        this.squad.CurrentTargetCell = this.squad.AttackTargetCell;
-        this.squad.AttackTargetCell = null;
-        MaraUtils.IssueMoveCommand(this.squad.Units, this.squad.Controller.Player, this.squad.CurrentTargetCell);
+        this.squad.CurrentPath = this.squad.AttackPath;
+        this.squad.AttackPath = null;
+
+        this.squad.CurrentMovementPoint = this.squad.SelectNextMovementPoint();
+
+        if (this.squad.CurrentMovementPoint) {
+            MaraUtils.IssueMoveCommand(this.squad.Units, this.squad.Controller.Player, this.squad.CurrentMovementPoint);
+        }
     }
 }
