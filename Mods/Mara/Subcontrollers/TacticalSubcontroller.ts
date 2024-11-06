@@ -327,7 +327,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             }
         }
 
-        if (!MaraUtils.IsPointsEqual(squad.CurrentMovementPoint, closestLocation!.Center)) {
+        if (!squad.CurrentMovementPoint || !MaraUtils.IsPointsEqual(squad.CurrentMovementPoint, closestLocation!.Center)) {
             if (
                 !closestLocation!.BoundingRect.IsPointInside(squadLocation.Point)
             ) {

@@ -76,8 +76,13 @@ export class MaraControllableSquad extends MaraSquad {
     }
 
     SelectNextMovementPoint(): MaraPoint | null {
+        this.debug(`selecting next movement point...`);
         if (!this.CurrentPath) {
+            this.debug(`current path is not defined`);
             return null;
+        }
+        else {
+            this.debug(`current path is ${this.CurrentPath.map((p) => p.ToString()).join(", ")}`);
         }
 
         let location = this.GetLocation();
@@ -89,9 +94,10 @@ export class MaraControllableSquad extends MaraSquad {
 
             if (distance <= this.MovementPrecision) {
                 startIndex = i + 1;
-                break;
             }
         }
+
+        this.debug(`start index = ${startIndex}`);
 
         let closestPointIndex: number | null = null;
         let closestDistance = Infinity;
@@ -106,10 +112,14 @@ export class MaraControllableSquad extends MaraSquad {
         }
 
         if (closestPointIndex == null) {
+            this.debug(`closest point not found`);
             return null;
         }
 
+        this.debug(`closest point index = ${closestPointIndex}`);
+
         if (closestPointIndex >= this.CurrentPath.length - 1) {
+            this.debug(`next point = ${this.CurrentPath[closestPointIndex]}`);
             return this.CurrentPath[closestPointIndex];
         }
 
@@ -121,10 +131,12 @@ export class MaraControllableSquad extends MaraSquad {
             MaraUtils.ChebyshevDistance(location.Point, closestPoint) + 
             MaraUtils.ChebyshevDistance(closestPoint, nextPoint);
 
-        if (straigthDistance <= closestPointDistance) {
+        if (straigthDistance < closestPointDistance) {
+            this.debug(`next point = ${nextPoint.ToString()}`);
             return nextPoint;
         }
         else {
+            this.debug(`next point = ${closestPoint.ToString()}`);
             return closestPoint;
         }
     }

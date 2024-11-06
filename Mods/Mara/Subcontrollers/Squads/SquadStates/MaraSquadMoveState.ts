@@ -22,6 +22,11 @@ export class MaraSquadMoveState extends MaraSquadState {
             this.squad.SetState(new MaraSquadAttackState(this.squad));
             return;
         }
+
+        if (!this.squad.CurrentMovementPoint) {
+            this.squad.SetState(new MaraSquadIdleState(this.squad));
+            return;
+        }
         
         let location = this.squad.GetLocation();
         let distance = MaraUtils.ChebyshevDistance(

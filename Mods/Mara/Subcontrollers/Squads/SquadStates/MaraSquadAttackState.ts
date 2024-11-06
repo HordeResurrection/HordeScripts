@@ -30,6 +30,11 @@ export class MaraSquadAttackState extends MaraSquadState {
             return;
         }
 
+        if (!this.squad.CurrentMovementPoint) {
+            this.squad.SetState(new MaraSquadIdleState(this.squad));
+            return;
+        }
+
         let location = this.squad.GetLocation();
 
         if (tickNumber % (5 * 50) == 0) { //5 sec
@@ -60,8 +65,7 @@ export class MaraSquadAttackState extends MaraSquadState {
             this.squad.CurrentMovementPoint = this.squad.SelectNextMovementPoint();
 
             if (
-                !this.squad.CurrentMovementPoint ||
-                this.squad.CurrentMovementPoint == this.squad.CurrentPath![this.squad.CurrentPath!.length - 1]
+                !this.squad.CurrentMovementPoint
             ) {
                 this.squad.SetState(new MaraSquadIdleState(this.squad));
             }
