@@ -76,9 +76,7 @@ export class Mara {
             Mara.IsNetworkMode = MaraUtils.IsNetworkMode();
             Mara.controllers = [];
 
-            Mara.Debug(`Building resource map...`);
             MaraMap.Init();
-            Mara.Debug(`Done!`);
 
             let tickOffset = 0;
 
