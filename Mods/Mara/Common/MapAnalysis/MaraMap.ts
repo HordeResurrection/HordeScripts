@@ -155,6 +155,17 @@ export class MaraMap {
         return paths;
     }
 
+    static GetTileType(cell: MaraPoint): any {
+        let tileType = MaraMap.tileTypeCache.Get(cell);
+
+        if (!tileType) {
+            tileType = MaraUtils.GetTileType(cell);
+            MaraMap.tileTypeCache.Set(cell, tileType);
+        }
+        
+        return tileType;
+    }
+
     private static buildMap(): void {
         let grid = MaraMap.makeMapGrid();
 
@@ -225,7 +236,7 @@ export class MaraMap {
             MaraUtils.WaveOverCells(
                 area, 
                 (cell: MaraPoint, neighbour: MaraPoint) => {
-                    return !MaraMap.isWalkableCell(cell) && MaraMap.getTileType(cell) == MaraMap.getTileType(neighbour);
+                    return !MaraMap.isWalkableCell(cell) && MaraMap.GetTileType(cell) == MaraMap.GetTileType(neighbour);
                 },
                 (cells) => {},
                 (cells) => {
@@ -603,19 +614,8 @@ export class MaraMap {
             return false;
         }
         
-        let tileType = MaraMap.getTileType(cell);
+        let tileType = MaraMap.GetTileType(cell);
         return !(tileType == TileType.Water || tileType == TileType.Mounts);
-    }
-
-    private static getTileType(cell: MaraPoint): any {
-        let tileType = MaraMap.tileTypeCache.Get(cell);
-
-        if (!tileType) {
-            tileType = MaraUtils.GetTileType(cell);
-            MaraMap.tileTypeCache.Set(cell, tileType);
-        }
-        
-        return tileType;
     }
 
     private static isWalkabilityConditionsSatisfied(

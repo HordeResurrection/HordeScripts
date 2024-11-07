@@ -5,6 +5,8 @@ import { MaraSquadBattleState } from "./MaraSquadBattleState";
 import { MaraSquadIdleGatheringUpState } from "./MaraSquadIdleGatheringUpState";
 import { MaraSquadMoveState } from "./MaraSquadMoveState";
 import { MaraSquadState } from "./MaraSquadState";
+import { MaraPoint } from "../../../Common/MaraPoint";
+import { MaraMap } from "../../../Common/MapAnalysis/MaraMap";
 
 export class MaraSquadIdleState extends MaraSquadState {
     OnEntry(): void {
@@ -47,7 +49,8 @@ export class MaraSquadIdleState extends MaraSquadState {
         let unitsToDistribute: any[] = [];
 
         for (let unit of this.squad.Units) {
-            let tileType = MaraUtils.GetTileType(unit.Cell);
+            let point = new MaraPoint(unit.Cell.X, unit.Cell.Y);
+            let tileType = MaraMap.GetTileType(point);
             
             if (tileType != TileType.Forest) { //run, Forest, run!!
                 let moveType = unit.Cfg.MoveType.ToString();
@@ -72,7 +75,7 @@ export class MaraSquadIdleState extends MaraSquadState {
 
         searchRadius /= 2; // since spreads above represent diameters
             
-        let forestCells = MaraUtils.FindCells(this.squad.CurrentMovementPoint!, searchRadius, MaraUtils.ForestCellFilter);
+        let forestCells = MaraUtils.FindCells(this.squad.CurrentMovementPoint!, searchRadius, this.forestCellFilter);
         let cellIndex = 0;
 
         for (let unit of unitsToDistribute) {
@@ -91,6 +94,24 @@ export class MaraSquadIdleState extends MaraSquadState {
 
                 cellIndex++;
             }
+        }
+    }
+
+    private forestCellFilter(cell: any): boolean {
+        let point = new MaraPoint(cell.X, cell.Y);
+        let tileType = MaraMap.GetTileType(point);
+
+        if (tileType != TileType.Forest) {
+            return false;
+        }
+        
+        let unit = MaraUtils.GetUnit(cell);
+
+        if (unit) {
+            return false;
+        }
+        else {
+            return true;
         }
     }
 }

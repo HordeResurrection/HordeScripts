@@ -7,6 +7,7 @@ import { TileType } from "library/game-logic/horde-types";
 import { MaraSquadPullbackState } from "./MaraSquadPullbackState";
 import { MaraCellDataHolder } from "../../../Common/MaraCellDataHolder";
 import { MaraPoint } from "../../../Common/MaraPoint";
+import { MaraMap } from "../../../Common/MapAnalysis/MaraMap";
 
 class MaraThreatMap extends MaraCellDataHolder {
     constructor () {
@@ -227,10 +228,10 @@ export class MaraSquadBattleState extends MaraSquadState {
 
                 for (let row = enemy.Cell.Y; row < maxRow; row++) {
                     for (let col = enemy.Cell.X; col < maxCol; col++) {
-                        let analyzedCell = {X: col, Y: row};
+                        let analyzedCell = new MaraPoint(col, row);
                         let atttackRadius = 0;
 
-                        if (MaraUtils.GetTileType(analyzedCell) == TileType.Forest) {
+                        if (MaraMap.GetTileType(analyzedCell) == TileType.Forest) {
                             atttackRadius = Math.min(forestAttackRange, forestVisionRange);
                         }
                         else {
@@ -342,10 +343,10 @@ export class MaraSquadBattleState extends MaraSquadState {
     
                 for (let row = optimalEnemy.Cell.Y; row < maxRow; row++) {
                     for (let col = optimalEnemy.Cell.X; col < maxCol; col++) {
-                        let analyzedCell = {X: col, Y: row};
+                        let analyzedCell = new MaraPoint(col, row);
                         let atttackRadius = 0;
     
-                        if (MaraUtils.GetTileType(analyzedCell) == TileType.Forest) {
+                        if (MaraMap.GetTileType(analyzedCell) == TileType.Forest) {
                             atttackRadius = Math.min(forestAttackRange, forestVisionRange);
                         }
                         else {

@@ -18,7 +18,6 @@ import { spawnGeometry, spawnString } from "library/game-logic/decoration-spawn"
 
 const DEFAULT_UNIT_SEARCH_RADIUS = 3;
 
-const TileType = HCL.HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType;
 const AlmostDefeatCondition = HCL.HordeClassLibrary.World.Settlements.Existence.AlmostDefeatCondition;
 const ResourceType = HCL.HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
 const GeometryPresets = HCL.HordeClassLibrary.World.Geometry.GeometryPresets;
@@ -472,18 +471,6 @@ export class MaraUtils {
         }
 
         return null;
-    }
-
-    static ForestCellFilter(cell: any): boolean {
-        let unit = DotnetHolder.UnitsMap.GetUpperUnit(cell.X, cell.Y);
-
-        if (unit) {
-            return false;
-        }
-
-        let tileType = MaraUtils.GetTileType({X: cell.X, Y: cell.Y});
-
-        return tileType == TileType.Forest;
     }
 
     static ForEachCell(center: any, radius: any, action: (cell: any) => void): void {
