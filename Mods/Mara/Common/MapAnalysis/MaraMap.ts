@@ -54,7 +54,7 @@ export class MaraMap {
     
     private static tileTypeCache: TileTypeCache = new TileTypeCache();
     
-    private static DEBUG_MAP = true;
+    private static DEBUG_MAP = false;
     private static mapNodes: Array<MaraMapNode> = [];
 
     private static resourceMapMonitor: any;
