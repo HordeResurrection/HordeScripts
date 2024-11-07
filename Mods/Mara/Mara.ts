@@ -79,9 +79,10 @@ export class Mara {
             MaraMap.Init();
 
             let tickOffset = 0;
+            let processedSettlements: Array<any> = [];
 
             for (let item of MaraUtils.GetAllPlayers()) {
-                Mara.AttachToPlayer(item.index, tickOffset);
+                Mara.AttachToPlayer(item.index, processedSettlements, tickOffset);
                 tickOffset++;
             }
         }
@@ -94,11 +95,16 @@ export class Mara {
         Mara.Info(`Mara successfully engaged. Have fun! ^^`);
     };
 
-    static AttachToPlayer(playerId: string, tickOffset: number = 0): void {
+    static AttachToPlayer(playerId: string, processedSettlements: Array<any>, tickOffset: number = 0): void {
         Mara.Debug(`Begin attach to player ${playerId}`);
         let settlementData = MaraUtils.GetSettlementData(playerId);
 
         if (!settlementData) {
+            return;
+        }
+
+        if (processedSettlements.find((v) => v == settlementData.Settlement)) {
+            Mara.Info(`Skipping player ${playerId}: settlement is already bound to another controller`);
             return;
         }
 
@@ -120,6 +126,8 @@ export class Mara {
         );
         
         Mara.controllers.push(controller);
+        processedSettlements.push(settlementData.Settlement);
+        
         Mara.Info(`Successfully attached to player ${playerId}`);
     };
 
