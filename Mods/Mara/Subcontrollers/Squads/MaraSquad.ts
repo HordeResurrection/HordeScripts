@@ -100,8 +100,8 @@ export class MaraSquad {
                 let spread = Math.max(verticalSpread, horizontalSpread);
 
                 let spreadCenter = new MaraPoint(
-                    leftmostUnit.Cell.X + spread / 2,
-                    uppermostUnit.Cell.Y + spread / 2
+                    leftmostUnit.Cell.X + Math.round(horizontalSpread / 2),
+                    uppermostUnit.Cell.Y + Math.round(verticalSpread / 2)
                 )
 
                 let point = new MaraPoint(
