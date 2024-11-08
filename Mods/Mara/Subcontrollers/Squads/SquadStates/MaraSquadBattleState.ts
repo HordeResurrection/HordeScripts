@@ -148,11 +148,12 @@ export class MaraSquadBattleState extends MaraSquadState {
 
     private updateThreats(): void {
         let location = this.squad.GetLocation();
-        
+
         let enemies = MaraUtils.GetSettlementUnitsAroundPoint(
             location.Point, 
             this.squad.Controller.SquadsSettings.EnemySearchRadius, 
-            this.squad.Controller.EnemySettlements
+            this.squad.Controller.EnemySettlements,
+            (unit) => {return MaraUtils.ChebyshevDistance(unit.Cell, location.Point) <= this.squad.Controller.SquadsSettings.EnemySearchRadius}
         );
 
         this.enemySquads = MaraUtils.GetSettlementsSquadsFromUnits(
