@@ -28,7 +28,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
     
     constructor (parent: MaraSettlementController) {
         super(parent);
-        this.buildEnemyList();
+        this.updateEnemiesList();
         this.globalStrategy.Init(this.settlementController);
     }
 
@@ -49,6 +49,10 @@ export class StrategySubcontroller extends MaraSubcontroller {
             return;
         }
 
+        if (tickNumber % 50 == 0) {
+            this.updateEnemiesList();
+        }
+
         if (!this.currentEnemy) {
             return;
         }
@@ -63,6 +67,10 @@ export class StrategySubcontroller extends MaraSubcontroller {
     GetSettlementAttackArmyComposition(): UnitComposition {
         if (!this.currentEnemy) {
             this.SelectEnemy();
+
+            if (!this.CurrentEnemy) {
+                return new Map<string, number>();
+            }
         }
 
         let ratio = MaraUtils.RandomSelect<number>(
@@ -617,10 +625,16 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return this.makeCombatUnitComposition(allowedOffensiveCfgItems, requiredStrength);
     }
 
-    private buildEnemyList(): void {
+    private updateEnemiesList(): void {
         let diplomacy = this.settlementController.Settlement.Diplomacy;
         let settlements = MaraUtils.GetAllSettlements();
         this.EnemySettlements = settlements.filter((value) => {return diplomacy.IsWarStatus(value)})
+
+        if (this.currentEnemy) {
+            if (!this.EnemySettlements.find((v) => v == this.currentEnemy)) {
+                this.ResetEnemy();
+            }
+        }
     }
 
     private calcSettlementStrength(settlement: any): number {

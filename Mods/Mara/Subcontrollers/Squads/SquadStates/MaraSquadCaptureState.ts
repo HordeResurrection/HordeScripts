@@ -30,7 +30,7 @@ export class MaraSquadCaptureState extends MaraSquadState {
         let units = MaraUtils.GetSettlementUnitsAroundPoint(
             this.squad.GetLocation().Point, 
             this.squad.Controller.SquadsSettings.EnemySearchRadius,
-            [],
+            undefined,
             (unit) => {return unit.BattleMind.CanBeCapturedNow() && !MaraUtils.IsBuildingConfig(unit.Cfg)},
             true
         );

@@ -226,7 +226,7 @@ export class MaraUtils {
     static GetSettlementUnitsAroundPoint(
         point: any,
         radius: number,
-        settelements: Array<any>,
+        settelements?: Array<any>,
         unitFilter?: (unit: any) => boolean,
         includeUnalive?: boolean
     ): Array<any> {
@@ -240,14 +240,14 @@ export class MaraUtils {
     
     static GetSettlementUnitsInArea(
         rect: MaraRect,
-        settelements: Array<any>,
+        settelements?: Array<any>,
         unitFilter?: (unit: any) => boolean,
         includeUnalive?: boolean
     ): Array<any> {
         let units = MaraUtils.GetUnitsInArea(rect, unitFilter);
         units = units.filter((unit) => {
             return (
-                (settelements.length == 0 || settelements.indexOf(unit.Owner) > -1) && 
+                (!settelements || settelements.indexOf(unit.Owner) > -1) && 
                 (unit.IsAlive || includeUnalive) && 
                 unit.Cfg.HasNotFlags(UnitFlags.Passive)
             );

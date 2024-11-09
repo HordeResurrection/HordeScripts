@@ -170,7 +170,7 @@ export class MaraControllableSquad extends MaraSquad {
         let units = MaraUtils.GetSettlementUnitsAroundPoint(
             this.GetLocation().Point, 
             this.Controller.SquadsSettings.EnemySearchRadius,
-            [],
+            undefined,
             (unit) => true,
             true
         );

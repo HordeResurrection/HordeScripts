@@ -18,7 +18,13 @@ export class BuildingUpState extends ProductionState {
         
         if (!enemy) {
             enemy = this.settlementController.StrategyController.SelectEnemy();
-            this.settlementController.Debug(`Selected '${enemy.TownName}' as an enemy.`);
+
+            if (enemy) {
+                this.settlementController.Debug(`Selected '${enemy.TownName}' as an enemy.`);
+            }
+            else {
+                this.settlementController.Debug(`No enemies left to build-up against`);
+            }
         }
 
         if (enemy) {
