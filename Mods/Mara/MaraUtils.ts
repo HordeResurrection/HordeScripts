@@ -171,7 +171,10 @@ export class MaraUtils {
             }
 
             let squad = MaraUtils.constructMaraSquad(unit, processedUnitIds, settlements, radius, unitFilter);
-            result.push(squad);
+
+            if (squad.Units.length > 0) {
+                result.push(squad);
+            }
         }
 
         return result;
