@@ -3,6 +3,8 @@ import { MaraSettlementController } from "./MaraSettlementController";
 import { MaraUtils } from "./MaraUtils";
 import { MaraMap } from "./Common/MapAnalysis/MaraMap";
 import { PathFinder } from "library/game-logic/path-find";
+import { broadcastMessage } from "library/common/messages";
+import { createHordeColor } from "library/common/primitives";
 
 export enum MaraLogLevel {
     Debug = 0,
@@ -61,6 +63,7 @@ export class Mara {
         }
         catch (ex) {
             log.exception(ex);
+            broadcastMessage(`(Мара) Обнаружена ошибка. Мара остановлена.`, createHordeColor(255, 255, 0, 0));
             Mara.CanRun = false;
         }
     };
@@ -88,6 +91,7 @@ export class Mara {
         }
         catch (ex) {
             log.exception(ex);
+            broadcastMessage(`(Мара) Обнаружена ошибка. Мара остановлена.`, createHordeColor(255, 255, 0, 0));
             Mara.CanRun = false;
             return;
         }
