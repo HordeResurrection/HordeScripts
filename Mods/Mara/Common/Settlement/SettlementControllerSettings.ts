@@ -38,7 +38,7 @@ class SquadsSettings {
     public KiteTimeout: number = 8 * 50; // 8 sec
     public KiteThresholdPositionChangeDistance: number = 5;
 
-    public DebugSquads: boolean = true;
+    public DebugSquads: boolean = false;
 }
 
 class ControllerStatesSettings {
