@@ -477,18 +477,18 @@ export class MaraUtils {
     }
 
     static ForEachCell(center: any, radius: any, action: (cell: any) => void): void {
-        let endRow = Math.min(center.Y + radius, DotnetHolder.RealScena.Size.Height);
-        let endCol = Math.min(center.X + radius, DotnetHolder.RealScena.Size.Width);
+        let endRow = Math.min(center.Y + radius, DotnetHolder.RealScena.Size.Height - 1);
+        let endCol = Math.min(center.X + radius, DotnetHolder.RealScena.Size.Width - 1);
         
         for (
             let row = Math.max(center.Y - radius, 0);
             row <= endRow;
-            row++
+            row ++
         ) {
             for (
                 let col = Math.max(center.X - radius, 0);
                 col <= endCol;
-                col++
+                col ++
             ) {
                 action({X: col, Y: row});
             }
