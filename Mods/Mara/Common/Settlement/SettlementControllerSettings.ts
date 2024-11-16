@@ -16,14 +16,15 @@ class UnitSearchSettings {
 class TimeoutsSettings {
     public RebuildEstimationThreshold: number = 2 * 60 * 50;
     
-    public MaxBuildUpProduction: number = 3 * 60 * 50;
-    public MinBuildUpProduction: number = 1 * 60 * 50;
+    public MaxBuildUpProduction: number = 2 * 60 * 50;
+    public MinBuildUpProduction: number = 0.5 * 60 * 50;
 
     public UnitProductionEstimationThreshold: number = 2 * 60 * 50;
     public Exterminate: number = 5 * 60 * 50;
+    public Develop: number = 2 * 60 * 50;
     
-    public ExpandBuild: number = 3 * 60 * 50;
-    public ExpandPrepare: number = 2 * 60 * 50;
+    public ExpandBuild: number = 1.5 * 60 * 50;
+    public ExpandPrepare: number = 5 * 60 * 50;
     
     public UnfinishedConstructionThreshold: number = 2 * 60 * 50;
 }

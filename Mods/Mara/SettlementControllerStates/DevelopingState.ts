@@ -56,6 +56,10 @@ export class DevelopingState extends ProductionState {
         return false;
     }
 
+    protected getProductionTimeout(): number {
+        return this.settlementController.Settings.Timeouts.Develop;
+    }
+
     private getShortestUnavailableChain(economyComposition: UnitComposition, produceableCfgIds: Array<string>): Array<string> | null {
         let globalStrategy = this.settlementController.StrategyController.GlobalStrategy;
         let allRequiredCfgIdItems = [...globalStrategy.DefensiveBuildingsCfgIds, ...globalStrategy.OffensiveCfgIds];
