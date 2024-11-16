@@ -14,10 +14,11 @@ import { AllowedCompositionItem } from "../Common/AllowedCompositionItem";
 import { MaraRect } from "../Common/MaraRect";
 import { MaraMap } from "../Common/MapAnalysis/MaraMap";
 import { NonUniformRandomSelectItem } from "../Common/NonUniformRandomSelectItem";
+import { MaraPath } from "../Common/MapAnalysis/MaraPath";
 
 class PathSelectItem implements NonUniformRandomSelectItem {
     Weight: number;
-    Path: Array<MaraPoint>;
+    Path: MaraPath;
 }
 
 export class StrategySubcontroller extends MaraSubcontroller {
@@ -374,22 +375,22 @@ export class StrategySubcontroller extends MaraSubcontroller {
             return [to];
         }
         else {
-            let longestPath = MaraUtils.FindExtremum(possiblePaths, (a, b) => a.length - b.length);
-            let longestPathLen = longestPath!.length + 1;
+            let longestPath = MaraUtils.FindExtremum(possiblePaths, (a, b) => a.Length - b.Length);
+            let longestPathLen = longestPath!.Length + 1;
 
             let candidates: Array<PathSelectItem> = [];
 
             for (let path of possiblePaths) {
                 let pathSelectItem = new PathSelectItem();
                 pathSelectItem.Path = path;
-                pathSelectItem.Weight = longestPathLen - path.length;
+                pathSelectItem.Weight = longestPathLen - path.Length;
 
                 candidates.push(pathSelectItem);
             }
 
             let selectedCandidate = MaraUtils.NonUniformRandomSelect(this.settlementController.MasterMind, candidates);
 
-            return selectedCandidate!.Path;
+            return selectedCandidate!.Path.Nodes;
         }
     }
 

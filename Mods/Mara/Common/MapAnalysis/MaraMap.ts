@@ -11,6 +11,7 @@ import { MaraRegionIndex } from "./MaraRegionIndex";
 import { MaraMapNode } from "./MaraMapNode";
 import { MaraMapNodeType } from "./MaraMapNodeType";
 import { createHordeColor } from "library/common/primitives";
+import { MaraPath } from "./MaraPath";
 
 class TileTypeCache extends MaraCellDataHolder {
     constructor () {
@@ -109,7 +110,7 @@ export class MaraMap {
         MaraMap.clusterData.Set(cell, cluster);
     }
 
-    static GetPaths(from: MaraPoint, to: MaraPoint): Array<Array<MaraPoint>> {
+    static GetPaths(from: MaraPoint, to: MaraPoint): Array<MaraPath> {
         MaraMap.mapNodes.forEach((n) => n.Weigth = 1);
         let fromNode = MaraMap.mapNodes.find((n) => n.Region.HasCell(from));
 
@@ -123,7 +124,7 @@ export class MaraMap {
             return [];
         }
         
-        let paths: Array<Array<MaraPoint>> = [];
+        let paths: Array<MaraPath> = [];
         
         const WEIGTH_INCREMENT = 100;
 
@@ -143,12 +144,12 @@ export class MaraMap {
                 let cleanPath = path.filter((n) => n != fromNode && n != toNode);
                 let gateCenters = cleanPath.map((v) => v.Region.Center);
                 
-                let resultPath: Array<MaraPoint> = [];
-                resultPath.push(from);
-                resultPath.push(...gateCenters);
-                resultPath.push(to);
+                let resultNodes: Array<MaraPoint> = [];
+                resultNodes.push(from);
+                resultNodes.push(...gateCenters);
+                resultNodes.push(to);
 
-                paths.push(resultPath);
+                paths.push(new MaraPath(resultNodes));
             }
         }
 
