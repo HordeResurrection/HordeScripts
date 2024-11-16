@@ -119,11 +119,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.settlementController.Debug(`Selected '${this.currentTarget.Name}' as attack target`);
 
         let settlementLocation = this.settlementController.GetSettlementLocation();
+        let targetPoint = new MaraPoint(this.currentTarget.Cell.X, this.currentTarget.Cell.Y);
 
         if (settlementLocation) {
             let path = this.settlementController.StrategyController.GetPath(
                 settlementLocation.Center,
-                this.currentTarget.Cell
+                targetPoint
             );
 
             if (path.length > 1) {
