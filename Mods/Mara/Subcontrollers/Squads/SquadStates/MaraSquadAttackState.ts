@@ -14,7 +14,7 @@ export class MaraSquadAttackState extends MaraSquadState {
     OnExit(): void {}
 
     Tick(tickNumber: number): void {
-        let nearbyUnits = this.squad.GetNearbyUnits();
+        let nearbyUnits = this.squad.GetNearbyUnits(); //!!
         
         if (this.isEnemyNearby(nearbyUnits)) {
             let enemyUnits = nearbyUnits.filter(u => this.isEnemyUnit(u));
@@ -35,7 +35,7 @@ export class MaraSquadAttackState extends MaraSquadState {
             return;
         }
 
-        let location = this.squad.GetLocation();
+        let location = this.squad.GetLocation(); //!!
 
         if (tickNumber % (5 * 50) == 0) { //5 sec
             if (location.Spread > this.squad.MinSpread * this.squad.Controller.SquadsSettings.MaxSpreadMultiplier) {
@@ -50,7 +50,7 @@ export class MaraSquadAttackState extends MaraSquadState {
         }
 
         if (this.isCapturableUnitsNearby(nearbyUnits)) {
-            if (this.atLeastOneCapturingUnitInSquad()) {
+            if (this.atLeastOneCapturingUnitInSquad()) { //!!
                 this.squad.SetState(new MaraSquadCaptureState(this.squad));
                 return;
             }

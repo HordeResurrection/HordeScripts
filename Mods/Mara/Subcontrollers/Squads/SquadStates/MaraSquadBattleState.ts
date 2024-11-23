@@ -168,7 +168,7 @@ export class MaraSquadBattleState extends MaraSquadState {
             this.enemyUnits.push(...squad.Units);
         }
 
-        this.updateThreatMap();
+        this.updateThreatMap(); //!!
     }
 
     private updateThreatMap(): void {
@@ -215,7 +215,7 @@ export class MaraSquadBattleState extends MaraSquadState {
             let forestVisionRange = unit.Cfg.ForestVision;
             
             for (let enemy of this.enemyUnits) {
-                if (!unit.BattleMind.CanAttackTarget(enemy) || !enemy.IsAlive) {
+                if (!unit.BattleMind.CanAttackTarget(enemy) || !enemy.IsAlive) { //!!
                     continue;
                 }
 
@@ -224,7 +224,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                     forestVisionRange = Infinity;
                 }
                 
-                let maxCol = enemy.Cell.X + enemy.Rect.Width;
+                let maxCol = enemy.Cell.X + enemy.Rect.Width; //!!
                 let maxRow = enemy.Cell.Y + enemy.Rect.Height;
 
                 for (let row = enemy.Cell.Y; row < maxRow; row++) {
@@ -259,7 +259,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                                 optimalTargetData = targetData;
                             }
                             else if (targetData.heuristic < optimalTargetData.heuristic) {
-                                if (MaraUtils.IsCellReachable(cell, unit)) {
+                                if (MaraUtils.IsCellReachable(cell, unit)) { //!!
                                     optimalTargetData = targetData;
                                 }
                             }

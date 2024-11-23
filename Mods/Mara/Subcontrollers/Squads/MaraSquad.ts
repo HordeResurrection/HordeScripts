@@ -46,7 +46,7 @@ export class MaraSquad {
         this.cleanup();
     }
 
-    GetLocation(): MaraSquadLocation {
+    GetLocation(): MaraSquadLocation { //!!
         if (!this.location) {
             this.cleanup();
             
