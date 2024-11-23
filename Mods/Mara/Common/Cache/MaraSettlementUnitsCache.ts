@@ -78,6 +78,7 @@ export class MaraSettlementUnitsCache {
         else {
             let handler = this.unitPositionChangedHandlers.get(unitId);
             handler.disconnect();
+            this.unitPositionChangedHandlers.delete(unitId);
 
             let cacheItem = this.cacheItemIndex.get(unitId)!;
             this.bush.remove(cacheItem, MaraUnitCacheItem.IsEqual);
