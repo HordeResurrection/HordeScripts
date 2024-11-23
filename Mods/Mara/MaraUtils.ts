@@ -126,12 +126,6 @@ export class MaraUtils {
         return settlement.Existence.IsTotalDefeat || settlement.Existence.IsAlmostDefeat;
     }
 
-    static IsNetworkMode(): boolean {
-        let NetworkController = HordeEngine.HordeResurrection.Engine.Logic.Main.NetworkController;
-        
-        return NetworkController.NetWorker != null;
-    }
-
     static MakeAllowedCfgItems(cfgIds: string[], currentComposition: UnitComposition, settlement: any): AllowedCompositionItem[] {
         let allowedCfgItems = new Array<AllowedCompositionItem>();
         

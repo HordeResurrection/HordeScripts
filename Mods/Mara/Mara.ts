@@ -23,7 +23,6 @@ export enum MaraLogLevel {
 export class Mara {
     static LogLevel: MaraLogLevel = MaraLogLevel.Debug;
     static CanRun = true;
-    static IsNetworkMode = true;
     
     private static controllers: Array<MaraSettlementController> = [];
     private static pathfinder: any;
@@ -76,7 +75,6 @@ export class Mara {
 
         try {            
             Mara.CanRun = true;
-            Mara.IsNetworkMode = MaraUtils.IsNetworkMode();
             Mara.controllers = [];
 
             MaraMap.Init();
