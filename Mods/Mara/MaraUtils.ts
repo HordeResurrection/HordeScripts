@@ -15,6 +15,7 @@ import { NonUniformRandomSelectItem } from "./Common/NonUniformRandomSelectItem"
 import { UnitComposition } from "./Common/UnitComposition";
 import { MaraRect } from "./Common/MaraRect";
 import { spawnGeometry, spawnString } from "library/game-logic/decoration-spawn";
+import { MaraCache } from "./Common/Cache/MaraCache";
 
 const DEFAULT_UNIT_SEARCH_RADIUS = 3;
 
@@ -92,9 +93,10 @@ export class MaraUtils {
     static GetAllSettlements(): Array<any> {
         let result: Array<any> = [];
 
-        for (let player of Players) {
-            result.push(player.GetRealPlayer().GetRealSettlement());
-        }
+        ForEach(
+            DotnetHolder.RealScena.Settlements,
+            (s) => result.push(s)
+        );
         
         return result;
     }
@@ -238,10 +240,17 @@ export class MaraUtils {
         unitFilter?: (unit: any) => boolean,
         includeUnalive?: boolean
     ): Array<any> {
-        let units = MaraUtils.GetUnitsInArea(rect, unitFilter);
+        let units: Array<any>;
+
+        if (settelements) {
+            units = MaraCache.GetSettlementsUnitsInArea(rect, settelements, unitFilter);
+        }
+        else {
+            units = MaraCache.GetAllUnitsInArea(rect, unitFilter);
+        }
+
         units = units.filter((unit) => {
             return (
-                (!settelements || settelements.indexOf(unit.Owner) > -1) && 
                 (unit.IsAlive || includeUnalive) && 
                 unit.Cfg.HasNotFlags(UnitFlags.Passive)
             );
@@ -251,17 +260,7 @@ export class MaraUtils {
     }
 
     static GetAllSettlementUnits(settlement: any): Array<any> {
-        let units = enumerate(settlement.Units);
-        let unit;
-        let result: Array<any> = [];
-        
-        while ((unit = eNext(units)) !== undefined) {
-            if (unit.IsAlive) {
-                result.push(unit);
-            }
-        }
-
-        return result;
+        return MaraCache.GetAllSettlementUnits(settlement);
     }
 
     static GetUnitsAroundPoint(point: any, radius: number, unitFilter?: (unit: any) => boolean): Array<any> {
@@ -272,47 +271,23 @@ export class MaraUtils {
     }
     
     static GetUnitsInArea(rect: MaraRect, unitFilter?: (unit: any) => boolean): Array<any> {
-        let box = createBox(
-            Math.round(rect.TopLeft.X), 
-            Math.round(rect.TopLeft.Y), 
-            0, 
-            Math.round(rect.BottomRight.X), 
-            Math.round(rect.BottomRight.Y), 
-            2
-        );
-
-        let unitsInBox = ScriptUtils.Invoke(DotnetHolder.RealScena.UnitsMap.UnitsTree, "GetUnitsInBox", box);
-        let count = ScriptUtils.GetValue(unitsInBox, "Count");
-        let units = ScriptUtils.GetValue(unitsInBox, "Units");
-
-        let unitsIds = new Set<number>();
-        let result = new Array<any>();
-
-        for (let index = 0; index < count; ++index) {
-            let unit = units[index];
-
-            if (unit == null) {
-                continue;
-            }
-
-            if (unitsIds.has(unit.Id)) {
-                continue;
-            }
-
-            if (unitFilter && !unitFilter(unit)) {
-                continue;
-            }
-
-            unitsIds.add(unit.Id);
-            result.push(unit);
-        }
-
-        return result;
+        return MaraCache.GetAllUnitsInArea(rect, unitFilter);
     }
 
     static GetUnit(cell: any): any {
-        let unitsMap = DotnetHolder.UnitsMap;
-        return unitsMap.GetUpperUnit(cell.X, cell.Y);
+        let point = new MaraPoint(cell.X, cell.Y);
+        let rect = new MaraRect(point, point);
+        
+        let units = MaraCache.GetAllUnitsInArea(rect);
+
+        if (units.length > 0) {
+            let upperUnit = MaraUtils.FindExtremum(units, (a, b) => {return a.MapLayer - b.MapLayer})!;
+            
+            return upperUnit;
+        }
+        else {
+            return null;
+        }
     }
     //#endregion
     
@@ -436,12 +411,10 @@ export class MaraUtils {
 
     // finds a free cell nearest to given
     static FindFreeCell(point: any): any {
-        let unitsMap = DotnetHolder.UnitsMap;
-        
         let generator = generateCellInSpiral(point.X, point.Y);
         let cell: any;
         for (cell = generator.next(); !cell.done; cell = generator.next()) {
-            let unit = unitsMap.GetUpperUnit(cell.value.X, cell.value.Y);
+            let unit = MaraUtils.GetUnit(cell.value);
             
             if (!unit) {
                 let resultCell = cell.value;

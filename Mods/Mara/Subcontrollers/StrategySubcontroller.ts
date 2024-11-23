@@ -15,6 +15,7 @@ import { MaraRect } from "../Common/MaraRect";
 import { MaraMap } from "../Common/MapAnalysis/MaraMap";
 import { NonUniformRandomSelectItem } from "../Common/NonUniformRandomSelectItem";
 import { MaraPath } from "../Common/MapAnalysis/MaraPath";
+import { MaraCache } from "../Common/Cache/MaraCache";
 
 class PathSelectItem implements NonUniformRandomSelectItem {
     Weight: number;
@@ -628,8 +629,12 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
     private updateEnemiesList(): void {
         let diplomacy = this.settlementController.Settlement.Diplomacy;
-        let settlements = MaraUtils.GetAllSettlements();
-        this.EnemySettlements = settlements.filter((value) => {return diplomacy.IsWarStatus(value)})
+        let settlements = MaraCache.AllSettlements;
+        this.EnemySettlements = settlements.filter(
+            (value) => {
+                return diplomacy.IsWarStatus(value) && MaraCache.GetAllSettlementUnits(value).length > 0
+            }
+        );
 
         if (this.currentEnemy) {
             if (!this.EnemySettlements.find((v) => v == this.currentEnemy)) {
