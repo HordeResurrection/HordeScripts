@@ -535,7 +535,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
             let distance = MaraUtils.ChebyshevDistance(cluster.Center, settlementLocation.Center);
 
-            let units = MaraUtils.GetUnitsAroundPoint(
+            let units = MaraUtils.GetUnitsAroundPoint( //!!
                 cluster.Center,
                 cluster.Size, //radius = cluster radius * 2
                 (unit) => {
