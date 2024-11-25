@@ -626,70 +626,65 @@ export function BuffSystem(world: World, gameTickNum: number) {
             // бафаем цель
 
             // обновляем конфиг баффнутого юнита
-            var buffUnitCfg    = CreateUnitConfig(target_unitComponent.cfgUid, target_unitComponent.cfgUid + BuffableComponent.BuffCfgUidSuffix[buffComponent.buffType]);
             var spawnCount     = 1;
-            switch (buffComponent.buffType) {
-                case BUFF_TYPE.ATTACK:
-                    ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{атака}");
-                    ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 150, 0, 0));
-                    // техника или маг
-                    if (buffUnitCfg.Specification.HasFlag(UnitSpecification.Machine) || 
-                        buffUnitCfg.Specification.HasFlag(UnitSpecification.Mage)) {
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", Math.min(1000, 5*buffUnitCfg.MainArmament.ShotParams.Damage));
-                    }
-                    // дальник
-                    else if (buffUnitCfg.MainArmament.Range > 1) {
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", Math.min(1000, 5*buffUnitCfg.MainArmament.ShotParams.Damage));
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "EmitBulletsCountMin", Math.min(5, buffUnitCfg.MainArmament.EmitBulletsCountMin + 2));
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "EmitBulletsCountMax", Math.min(5, buffUnitCfg.MainArmament.EmitBulletsCountMax + 2));
-                    }
-                    // ближник
-                    else {
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", 5*buffUnitCfg.MainArmament.ShotParams.Damage);
-                    }
-                    // ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", Math.min(1000, 5*buffUnitCfg.MainArmament.ShotParams.Damage));
-                    // ScriptUtils.SetValue(buffUnitCfg, "Sight", Math.min(13, buffUnitCfg.Sight + 2));
-                    // if (buffUnitCfg.MainArmament.Range > 1) {
-                    //     ScriptUtils.SetValue(buffUnitCfg.MainArmament, "EmitBulletsCountMin", Math.min(5, buffUnitCfg.MainArmament.EmitBulletsCountMin + 2));
-                    //     ScriptUtils.SetValue(buffUnitCfg.MainArmament, "EmitBulletsCountMax", Math.min(5, buffUnitCfg.MainArmament.EmitBulletsCountMax + 2));
-                    //     ScriptUtils.SetValue(buffUnitCfg.MainArmament, "Range", Math.min(13, buffUnitCfg.MainArmament.Range + 2));
-                    //     ScriptUtils.SetValue(buffUnitCfg.MainArmament, "ForestRange", Math.min(13, buffUnitCfg.MainArmament.ForestRange + 2));
-                    //     ScriptUtils.SetValue(buffUnitCfg, "OrderDistance", Math.min(13, buffUnitCfg.OrderDistance + 2));
-                    //     ScriptUtils.SetValue(buffUnitCfg.MainArmament, "BaseAccuracy", 0);
-                    //     ScriptUtils.SetValue(buffUnitCfg.MainArmament, "MaxDistanceDispersion", 300);
-                    // }
-                    break;
-                case BUFF_TYPE.ACCURACY:
-                    ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{меткость}");
-                    ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 148, 0, 211));
-                    ScriptUtils.SetValue(buffUnitCfg, "Sight", Math.min(14, buffUnitCfg.Sight + 4));
-                    if (buffUnitCfg.MainArmament.Range > 1) {
-                        ScriptUtils.SetValue(buffUnitCfg, "ReloadTime", 2*buffUnitCfg.ReloadTime);
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "ReloadTime", 2*buffUnitCfg.MainArmament.ReloadTime);
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "Range", 2*buffUnitCfg.MainArmament.Range);
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "ForestRange", 2*buffUnitCfg.MainArmament.ForestRange);
-                        ScriptUtils.SetValue(buffUnitCfg, "OrderDistance", 2*buffUnitCfg.OrderDistance);
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament, "DisableDispersion", true);
-                        ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "AdditiveBulletSpeed", createPF(30, 0));
-                    }
-                    break;
-                case BUFF_TYPE.HEALTH:
-                    ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{здоровье}");
-                    ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 0, 150, 0));
-                    ScriptUtils.SetValue(buffUnitCfg, "MaxHealth", 5*buffUnitCfg.MaxHealth);
-                    break;
-                case BUFF_TYPE.DEFFENSE:
-                    ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{защита}");
-                    ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 255, 215, 0));
-                    ScriptUtils.SetValue(buffUnitCfg, "MaxHealth", 2*buffUnitCfg.MaxHealth);
-                    ScriptUtils.SetValue(buffUnitCfg, "Shield", Math.max(390, buffUnitCfg.Shield));
-                    ScriptUtils.SetValue(buffUnitCfg, "Flags", mergeFlags(UnitFlags, buffUnitCfg.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
-                    break;
-                case BUFF_TYPE.CLONING:
-                    ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{клонирован}");
-                    ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 255, 255, 255));
-                    spawnCount = 12;
-                    break;
+            var buffUnitCfg : any;
+            var buffUnitCfgUid : string = target_unitComponent.cfgUid + BuffableComponent.BuffCfgUidSuffix[buffComponent.buffType];
+            if (HordeContentApi.HasUnitConfig(buffUnitCfgUid)) {
+                buffUnitCfg = HordeContentApi.GetUnitConfig(buffUnitCfgUid);
+            } else {
+                buffUnitCfg    = CreateUnitConfig(target_unitComponent.cfgUid, buffUnitCfgUid);
+                switch (buffComponent.buffType) {
+                    case BUFF_TYPE.ATTACK:
+                        ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{атака}");
+                        ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 150, 0, 0));
+                        // техника или маг
+                        if (buffUnitCfg.Specification.HasFlag(UnitSpecification.Machine) || 
+                            buffUnitCfg.Specification.HasFlag(UnitSpecification.Mage)) {
+                            ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", Math.min(1000, 5*buffUnitCfg.MainArmament.ShotParams.Damage));
+                        }
+                        // дальник
+                        else if (buffUnitCfg.MainArmament.Range > 1) {
+                            ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", Math.min(1000, 5*buffUnitCfg.MainArmament.ShotParams.Damage));
+                            ScriptUtils.SetValue(buffUnitCfg.MainArmament, "EmitBulletsCountMin", Math.min(5, buffUnitCfg.MainArmament.EmitBulletsCountMin + 2));
+                            ScriptUtils.SetValue(buffUnitCfg.MainArmament, "EmitBulletsCountMax", Math.min(5, buffUnitCfg.MainArmament.EmitBulletsCountMax + 2));
+                        }
+                        // ближник
+                        else {
+                            ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "Damage", 5*buffUnitCfg.MainArmament.ShotParams.Damage);
+                        }
+                        break;
+                    case BUFF_TYPE.ACCURACY:
+                        ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{меткость}");
+                        ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 148, 0, 211));
+                        ScriptUtils.SetValue(buffUnitCfg, "Sight", Math.min(14, buffUnitCfg.Sight + 4));
+                        if (buffUnitCfg.MainArmament.Range > 1) {
+                            ScriptUtils.SetValue(buffUnitCfg, "ReloadTime", 2*buffUnitCfg.ReloadTime);
+                            ScriptUtils.SetValue(buffUnitCfg.MainArmament, "ReloadTime", 2*buffUnitCfg.MainArmament.ReloadTime);
+                            ScriptUtils.SetValue(buffUnitCfg.MainArmament, "Range", 2*buffUnitCfg.MainArmament.Range);
+                            ScriptUtils.SetValue(buffUnitCfg.MainArmament, "ForestRange", 2*buffUnitCfg.MainArmament.ForestRange);
+                            ScriptUtils.SetValue(buffUnitCfg, "OrderDistance", 2*buffUnitCfg.OrderDistance);
+                            ScriptUtils.SetValue(buffUnitCfg.MainArmament, "DisableDispersion", true);
+                            ScriptUtils.SetValue(buffUnitCfg.MainArmament.ShotParams, "AdditiveBulletSpeed", createPF(30, 0));
+                        }
+                        break;
+                    case BUFF_TYPE.HEALTH:
+                        ScriptUtils.SetValue(buffUnitCfg, "Name",      buffUnitCfg.Name + "\n{здоровье}");
+                        ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 0, 150, 0));
+                        ScriptUtils.SetValue(buffUnitCfg, "MaxHealth", 5*buffUnitCfg.MaxHealth);
+                        break;
+                    case BUFF_TYPE.DEFFENSE:
+                        ScriptUtils.SetValue(buffUnitCfg, "Name",      buffUnitCfg.Name + "\n{защита}");
+                        ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 255, 215, 0));
+                        ScriptUtils.SetValue(buffUnitCfg, "MaxHealth", 2*buffUnitCfg.MaxHealth);
+                        ScriptUtils.SetValue(buffUnitCfg, "Shield",    Math.max(390, buffUnitCfg.Shield));
+                        ScriptUtils.SetValue(buffUnitCfg, "Flags",     mergeFlags(UnitFlags, buffUnitCfg.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
+                        break;
+                    case BUFF_TYPE.CLONING:
+                        ScriptUtils.SetValue(buffUnitCfg, "Name", buffUnitCfg.Name + "\n{клонирован}");
+                        ScriptUtils.SetValue(buffUnitCfg, "TintColor", createHordeColor(150, 255, 255, 255));
+                        spawnCount = 12;
+                        break;
+                }
             }
             
             // создаем дополнительных баффнутых юнитов

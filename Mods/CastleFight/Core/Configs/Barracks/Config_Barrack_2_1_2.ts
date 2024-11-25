@@ -6,6 +6,7 @@ import { IAttackingUnit } from "../IAttacingUnit";
 export class Config_Unit_2_1_2 extends IAttackingUnit {
     public static CfgUid      : string = "#CastleFight_Unit_2_1_2";
     public static BaseCfgUid  : string = "#UnitConfig_Slavyane_Beamman";
+    public static speedCoeff  : number = 1.5;
 
     constructor() { super(); }
 

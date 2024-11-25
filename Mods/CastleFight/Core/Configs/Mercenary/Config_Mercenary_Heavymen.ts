@@ -19,14 +19,17 @@ export class Config_Mercenary_Heavymen extends IAttackingUnit {
     public static InitConfig() {
         IAttackingUnit.InitConfig.call(this);
 
-        ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Name", "Нанять " + this.spawnCount + " батыров");
+        ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Name", "Батыр");
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "MaxHealth", 1500);
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Shield", 200);
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid].MainArmament.ShotParams, "Damage", 500);
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid].CostResources, "Gold", 400);
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "ProductionTime", 250);
-        ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Description", OpCfgUidToCfg[this.CfgUid].Description
+        ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Description", 
+            OpCfgUidToCfg[this.CfgUid].Description
             + (OpCfgUidToCfg[this.CfgUid].Description == "" ? "" : "\n")
-            + "Теймуровцы не верят в нашу веру, поэтому святые духи на них не действуют.");
+            + "Теймуровцы не верят в нашу веру, поэтому святые духи на них не действуют.\n"
+            + "Нанять " + this.spawnCount + " батыров:\n"
+        );
     }
 }

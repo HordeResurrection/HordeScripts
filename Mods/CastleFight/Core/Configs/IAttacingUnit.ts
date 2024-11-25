@@ -4,6 +4,8 @@ import { CfgSetSpeed } from "../Utils";
 import { IConfig, OpCfgUidToCfg } from "./IConfig";
 
 export class IAttackingUnit extends IConfig {
+    public static speedCoeff : number = 1.0;
+
     constructor() { super(); }
 
     public static InitEntity() {
@@ -20,34 +22,38 @@ export class IAttackingUnit extends IConfig {
     public static InitConfig() {
         IConfig.InitConfig.call(this);
 
-        // устанавливаем скорость бега для техники и пеших
-
-        var infantrySpeed = new Map<typeof TileType, number>();
-        infantrySpeed.set(TileType.Grass, 10);
-        infantrySpeed.set(TileType.Forest, 6);
-        infantrySpeed.set(TileType.Water, 0);
-        infantrySpeed.set(TileType.Marsh, 7);
-        infantrySpeed.set(TileType.Sand, 8);
-        infantrySpeed.set(TileType.Mounts, 0);
-        infantrySpeed.set(TileType.Road, 13);
-        infantrySpeed.set(TileType.Ice, 10);
-
-        var machineSpeed = new Map<typeof TileType, number>();
-        machineSpeed.set(TileType.Grass, 10);
-        machineSpeed.set(TileType.Water, 0);
-        machineSpeed.set(TileType.Marsh, 7);
-        machineSpeed.set(TileType.Sand, 8);
-        machineSpeed.set(TileType.Mounts, 0);
-        machineSpeed.set(TileType.Road, 13);
-        machineSpeed.set(TileType.Ice, 10);
-
-        if (!OpCfgUidToCfg[this.CfgUid].Flags.HasFlag(UnitFlags.Building) &&
-            !OpCfgUidToCfg[this.CfgUid].Specification.HasFlag(UnitSpecification.Rider)) {
-            if (OpCfgUidToCfg[this.CfgUid].Specification.HasFlag(UnitSpecification.Machine)) {
-                CfgSetSpeed(OpCfgUidToCfg[this.CfgUid], machineSpeed);
+        // устанавливаем скорость бега
+        var speedMap = new Map<typeof TileType, number>();
+        if (!OpCfgUidToCfg[this.CfgUid].Flags.HasFlag(UnitFlags.Building)) {
+            if (OpCfgUidToCfg[this.CfgUid].Specification.HasFlag(UnitSpecification.Rider)) {
+                speedMap.set(TileType.Grass,  Math.round(this.speedCoeff * 20));
+                speedMap.set(TileType.Forest, Math.round(this.speedCoeff * 0));
+                speedMap.set(TileType.Water,  Math.round(this.speedCoeff * 0));
+                speedMap.set(TileType.Marsh,  Math.round(this.speedCoeff * 17));
+                speedMap.set(TileType.Sand,   Math.round(this.speedCoeff * 17));
+                speedMap.set(TileType.Mounts, Math.round(this.speedCoeff * 0));
+                speedMap.set(TileType.Road,   Math.round(this.speedCoeff * 21));
+                speedMap.set(TileType.Ice,    Math.round(this.speedCoeff * 15));
+            } else if (OpCfgUidToCfg[this.CfgUid].Specification.HasFlag(UnitSpecification.Machine)) {
+                speedMap.set(TileType.Grass,  Math.round(this.speedCoeff * 10));
+                speedMap.set(TileType.Water,  Math.round(this.speedCoeff * 0));
+                speedMap.set(TileType.Marsh,  Math.round(this.speedCoeff * 7));
+                speedMap.set(TileType.Sand,   Math.round(this.speedCoeff * 8));
+                speedMap.set(TileType.Mounts, Math.round(this.speedCoeff * 0));
+                speedMap.set(TileType.Road,   Math.round(this.speedCoeff * 13));
+                speedMap.set(TileType.Ice,    Math.round(this.speedCoeff * 10));
             } else {
-                CfgSetSpeed(OpCfgUidToCfg[this.CfgUid], infantrySpeed);
+                speedMap.set(TileType.Grass,  Math.round(this.speedCoeff * 10));
+                speedMap.set(TileType.Forest, Math.round(this.speedCoeff * 6));
+                speedMap.set(TileType.Water,  Math.round(this.speedCoeff * 0));
+                speedMap.set(TileType.Marsh,  Math.round(this.speedCoeff * 7));
+                speedMap.set(TileType.Sand,   Math.round(this.speedCoeff * 8));
+                speedMap.set(TileType.Mounts, Math.round(this.speedCoeff * 0));
+                speedMap.set(TileType.Road,   Math.round(this.speedCoeff * 13));
+                speedMap.set(TileType.Ice,    Math.round(this.speedCoeff * 10));
             }
+
+            CfgSetSpeed(OpCfgUidToCfg[this.CfgUid], speedMap);
         }
     }
 

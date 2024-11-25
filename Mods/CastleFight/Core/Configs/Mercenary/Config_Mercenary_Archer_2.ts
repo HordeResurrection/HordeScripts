@@ -19,7 +19,7 @@ export class Config_Mercenary_Archer_2 extends IAttackingUnit {
     public static InitConfig() {
         IAttackingUnit.InitConfig.call(this);
 
-        ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Name", "Нанять " + this.spawnCount + " огнестрельщиков");
+        ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Name", "Огнестрельщик");
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "MaxHealth", 1500);
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Shield", 0);
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid].MainArmament.ShotParams, "Damage", 400);
@@ -27,8 +27,11 @@ export class Config_Mercenary_Archer_2 extends IAttackingUnit {
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid].MainArmament, "EmitBulletsCountMax", 4);
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid].CostResources, "Gold", 400);
         ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "ProductionTime", 250);
-        ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Description", OpCfgUidToCfg[this.CfgUid].Description
+        ScriptUtils.SetValue(OpCfgUidToCfg[this.CfgUid], "Description", 
+            OpCfgUidToCfg[this.CfgUid].Description
             + (OpCfgUidToCfg[this.CfgUid].Description == "" ? "" : "\n")
-            + "Теймуровцы не верят в нашу веру, поэтому святые духи на них не действуют.");
+            + "Теймуровцы не верят в нашу веру, поэтому святые духи на них не действуют.\n"
+            + "Нанять " + this.spawnCount + " огнестрельщиков:\n"
+        );
     }
 }
