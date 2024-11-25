@@ -2,26 +2,39 @@ import { MaraPoint } from "../MaraPoint";
 import RBush from "./rbush.js"
 
 class MaraUnitCacheItem {
+    UnitBushItem: MaraUnitBushItem;
+    
+    Unit: any
+    UnitId: number;
+
+    constructor(unit: any) {
+        this.Unit = unit;
+        this.UnitId = unit.Id;
+    }
+}
+
+class MaraUnitBushItem {
     minX: number;
     minY: number;
     maxX: number;
     maxY: number;
 
-    Unit: any
-    UnitId: number;
-
-    constructor(unit: any) {
-        this.minX = unit.Cell.X;
-        this.minY = unit.Cell.Y;
-        this.maxX = this.minX + unit.Rect.Width - 1;
-        this.maxY = this.minY + unit.Rect.Height - 1;
-
-        this.Unit = unit;
-        this.UnitId = unit.Id;
+    UnitCacheItem: MaraUnitCacheItem;
+    
+    constructor(unitCacheItem: MaraUnitCacheItem) {
+        let cell = unitCacheItem.Unit.Cell;
+        let rect = unitCacheItem.Unit.Rect;
+        
+        this.minX = cell.X;
+        this.minY = cell.Y;
+        this.maxX = this.minX + rect.Width - 1;
+        this.maxY = this.minY + rect.Height - 1;
+        
+        this.UnitCacheItem = unitCacheItem;
     }
 
-    static IsEqual(a: MaraUnitCacheItem, b: MaraUnitCacheItem): boolean {
-        return a.UnitId == b.UnitId;
+    static IsEqual(a: MaraUnitBushItem, b: MaraUnitBushItem): boolean {
+        return a.UnitCacheItem.UnitId == b.UnitCacheItem.UnitId;
     }
 }
 
@@ -51,21 +64,21 @@ export class MaraSettlementUnitsCache {
         );
     }
 
-    public GetUnitsInArea(topLeft: MaraPoint, bottomRight: MaraPoint): Array<any> {
+    public GetUnitsInArea(topLeft: MaraPoint, bottomRight: MaraPoint): Array<any> { //!!
         let cacheItems = this.bush.search({
             minX: topLeft.X,
             minY: topLeft.Y,
             maxX: bottomRight.X,
             maxY: bottomRight.Y
-        }) as Array<MaraUnitCacheItem>;
+        }) as Array<MaraUnitBushItem>;
 
-        return cacheItems.map((item) => item.Unit);
+        return cacheItems.map((item) => item.UnitCacheItem.Unit);
     }
 
     public GetAllUnits(): Array<any> {
         let cacheItems = this.bush.all();
         
-        return cacheItems.map((item) => item.Unit);
+        return cacheItems.map((item) => item.UnitCacheItem.Unit);
     }
 
     private unitListChangedProcessor(sender, UnitsListChangedEventArgs): void {
@@ -81,7 +94,7 @@ export class MaraSettlementUnitsCache {
             this.unitPositionChangedHandlers.delete(unitId);
 
             let cacheItem = this.cacheItemIndex.get(unitId)!;
-            this.bush.remove(cacheItem, MaraUnitCacheItem.IsEqual);
+            this.bush.remove(cacheItem.UnitBushItem, MaraUnitBushItem.IsEqual);
             this.cacheItemIndex.delete(unitId);
         }
     }
@@ -95,18 +108,22 @@ export class MaraSettlementUnitsCache {
 
         this.unitPositionChangedHandlers.set(unit.Id, handler);
 
-        let newCacheItem = new MaraUnitCacheItem(unit);
-        this.bush.insert(newCacheItem);
-        this.cacheItemIndex.set(newCacheItem.UnitId, newCacheItem);
+        let cacheItem = new MaraUnitCacheItem(unit);
+        let bushItem = new MaraUnitBushItem(cacheItem);
+        cacheItem.UnitBushItem = bushItem;
+
+        this.bush.insert(bushItem);
+        this.cacheItemIndex.set(cacheItem.UnitId, cacheItem);
     }
 
     private unitPositionChangedProcessor(sender, args): void {
-        let oldCacheItem = this.cacheItemIndex.get(args.TriggeredUnit.Id)!;
-        this.bush.remove(oldCacheItem, MaraUnitCacheItem.IsEqual);
-        this.cacheItemIndex.delete(oldCacheItem.UnitId);
+        let cacheItem = this.cacheItemIndex.get(args.TriggeredUnit.Id)!;
+        
+        let oldBushItem = cacheItem.UnitBushItem;
+        this.bush.remove(oldBushItem, MaraUnitBushItem.IsEqual);
 
-        let newCacheItem = new MaraUnitCacheItem(args.TriggeredUnit);
-        this.bush.insert(newCacheItem);
-        this.cacheItemIndex.set(newCacheItem.UnitId, newCacheItem);
+        let newBushItem = new MaraUnitBushItem(cacheItem);
+        this.bush.insert(newBushItem);
+        cacheItem.UnitBushItem = newBushItem;
     }
 }
