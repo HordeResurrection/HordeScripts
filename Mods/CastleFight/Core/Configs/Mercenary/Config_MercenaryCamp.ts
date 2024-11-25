@@ -1,11 +1,12 @@
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
-import { COMPONENT_TYPE, UnitComponent } from "../../Components/ESC_components";
 import { IConfig, OpCfgUidToCfg } from "../IConfig";
 import { Config_Mercenary_Swordmen } from "./Config_Mercenary_Swordmen";
 import { Config_Mercenary_Archer } from "./Config_Mercenary_Archer";
 import { Config_Mercenary_Archer_2 } from "./Config_Mercenary_Archer_2";
 import { Config_Mercenary_Heavymen } from "./Config_Mercenary_Heavymen";
 import { Config_Mercenary_Raider } from "./Config_Mercenary_Raider";
+import { COMPONENT_TYPE } from "../../Components/IComponent";
+import { UnitComponent } from "../../Components/UnitComponent";
 
 export class Config_MercenaryCamp extends IConfig {
     public static CfgUid      : string = "#CastleFight_MercenaryCamp";

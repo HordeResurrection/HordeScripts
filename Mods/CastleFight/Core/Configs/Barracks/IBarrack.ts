@@ -1,6 +1,9 @@
-import { COMPONENT_TYPE, UnitComponent, SpawnBuildingComponent, UpgradableBuildingComponent } from "../../Components/ESC_components";
 import { IConfig, OpCfgUidToCfg } from "../IConfig";
 import { IAttackingUnit } from "../IAttacingUnit";
+import { COMPONENT_TYPE } from "../../Components/IComponent";
+import { SpawnBuildingComponent } from "../../Components/SpawnBuildingComponent";
+import { UnitComponent } from "../../Components/UnitComponent";
+import { UpgradableBuildingComponent } from "../../Components/UpgradableBuildingComponent";
 
 export class IBarrack extends IConfig {
     public static spawnedUnit        : typeof IAttackingUnit;

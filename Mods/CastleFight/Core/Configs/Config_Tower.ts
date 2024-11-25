@@ -1,4 +1,6 @@
-import { COMPONENT_TYPE, UnitComponent, BUFF_TYPE, BuffableComponent } from "../Components/ESC_components";
+import { BUFF_TYPE, BuffableComponent } from "../Components/BuffableComponent";
+import { COMPONENT_TYPE } from "../Components/IComponent";
+import { UnitComponent } from "../Components/UnitComponent";
 import { OpCfgUidToCfg, IConfig } from "./IConfig";
 
 export class Config_Tower extends IConfig {

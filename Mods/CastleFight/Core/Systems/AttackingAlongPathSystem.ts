@@ -1,10 +1,13 @@
 import { UnitCommand, UnitSpecification } from "library/game-logic/horde-types";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
-import { Entity, COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent } from "../Components/ESC_components";
 import { Cell, distance_Chebyshev, UnitGiveOrderToCell, UnitGiveOrderToNearEmptyCell } from "../Utils";
 import { World } from "../World";
 import { OpCfgUidToCfg } from "../Configs/IConfig";
 import { Config_Castle } from "../Configs/Config_Castle";
+import { AttackingAlongPathComponent } from "../Components/AttackingAlongPathComponent";
+import { COMPONENT_TYPE } from "../Components/IComponent";
+import { UnitComponent } from "../Components/UnitComponent";
+import { Entity } from "../Entity";
 
 class CellOfEnemyAttackingCastle {
     cell: Cell;

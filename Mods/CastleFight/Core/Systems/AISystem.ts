@@ -1,7 +1,6 @@
 import { log } from "library/common/logging";
 import { World } from "../World";
 import { PointCommandArgs, ProduceAtCommandArgs, ProduceCommandArgs, UnitCommand } from "library/game-logic/horde-types";
-import { BuffableComponent, BuffComponent, BuffOptTargetType, COMPONENT_TYPE, Entity, ReviveComponent, SpawnBuildingComponent, UnitComponent, UnitProducedEvent, UpgradableBuildingComponent } from "../Components/ESC_components";
 import { createPoint, createResourcesAmount } from "library/common/primitives";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
@@ -10,6 +9,15 @@ import { Cell, distance_Chebyshev } from "../Utils";
 import { OpCfgUidToCfg, OpCfgUidToEntity } from "../Configs/IConfig";
 import { Config_Church } from "../Configs/Church/Config_Church";
 import { Config_Worker } from "../Configs/Config_Worker";
+import { BuffOptTargetType, BuffableComponent } from "../Components/BuffableComponent";
+import { BuffComponent } from "../Components/BuffComponent";
+import { COMPONENT_TYPE } from "../Components/IComponent";
+import { ReviveComponent } from "../Components/ReviveComponent";
+import { SpawnBuildingComponent } from "../Components/SpawnBuildingComponent";
+import { UnitComponent } from "../Components/UnitComponent";
+import { UnitProducedEvent } from "../Components/UnitProducedEvent";
+import { UpgradableBuildingComponent } from "../Components/UpgradableBuildingComponent";
+import { Entity } from "../Entity";
 
 export const ResourcesAmount = HCL.HordeClassLibrary.World.Simple.ResourcesAmount;
 

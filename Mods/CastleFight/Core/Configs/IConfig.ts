@@ -1,8 +1,7 @@
 import { UnitFlags } from "library/game-logic/horde-types";
 import { CreateUnitConfig } from "../Utils";
 import { getUnitProfessionParams, UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
-import { Entity } from "../Components/ESC_components";
-import { createPoint } from "library/common/primitives";
+import { Entity } from "../Entity";
 
 /** все конфиги */
 export var OpCfgUidToCfg    : any = {};

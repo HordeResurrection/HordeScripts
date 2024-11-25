@@ -1,7 +1,10 @@
 import { TileType, UnitFlags, UnitSpecification } from "library/game-logic/horde-types";
-import { COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffableComponent } from "../Components/ESC_components";
 import { CfgSetSpeed } from "../Utils";
 import { IConfig, OpCfgUidToCfg } from "./IConfig";
+import { AttackingAlongPathComponent } from "../Components/AttackingAlongPathComponent";
+import { BuffableComponent } from "../Components/BuffableComponent";
+import { COMPONENT_TYPE } from "../Components/IComponent";
+import { UnitComponent } from "../Components/UnitComponent";
 
 export class IAttackingUnit extends IConfig {
     public static speedCoeff : number = 1.0;

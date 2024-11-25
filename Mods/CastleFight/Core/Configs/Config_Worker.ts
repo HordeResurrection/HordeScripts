@@ -1,13 +1,15 @@
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { UnitCommand, UnitFlags } from "library/game-logic/horde-types";
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
-import { COMPONENT_TYPE, UnitComponent, ReviveComponent } from "../Components/ESC_components";
 import { Cell } from "../Utils";
 import { Config_Barrack_1 } from "./Barracks/Config_Barrack_1";
 import { Config_Barrack_2 } from "./Barracks/Config_Barrack_2";
 import { Config_Church } from "./Church/Config_Church";
 import { IConfig, OpCfgUidToCfg } from "./IConfig";
 import { Config_MercenaryCamp } from "./Mercenary/Config_MercenaryCamp";
+import { COMPONENT_TYPE } from "../Components/IComponent";
+import { ReviveComponent } from "../Components/ReviveComponent";
+import { UnitComponent } from "../Components/UnitComponent";
 
 
 export class Config_Worker extends IConfig {

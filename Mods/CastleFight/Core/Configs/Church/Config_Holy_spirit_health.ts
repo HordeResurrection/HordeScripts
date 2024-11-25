@@ -1,6 +1,9 @@
 import { createHordeColor } from "library/common/primitives";
-import { COMPONENT_TYPE, UnitComponent, BuffComponent, BUFF_TYPE } from "../../Components/ESC_components";
 import { IConfig, OpCfgUidToCfg } from "../IConfig";
+import { BUFF_TYPE } from "../../Components/BuffableComponent";
+import { BuffComponent } from "../../Components/BuffComponent";
+import { COMPONENT_TYPE } from "../../Components/IComponent";
+import { UnitComponent } from "../../Components/UnitComponent";
 
 export class Config_Holy_spirit_health extends IConfig {
     public static CfgUid      : string = "#CastleFight_Holy_spirit_health";

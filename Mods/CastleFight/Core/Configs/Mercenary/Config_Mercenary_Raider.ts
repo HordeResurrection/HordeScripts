@@ -1,11 +1,12 @@
-import { COMPONENT_TYPE, SpawnEvent } from "../../Components/ESC_components";
+import { COMPONENT_TYPE } from "../../Components/IComponent";
+import { SpawnEvent } from "../../Components/SpawnEvent";
 import { IAttackingUnit } from "../IAttacingUnit";
 import { OpCfgUidToCfg } from "../IConfig";
 
 export class Config_Mercenary_Raider extends IAttackingUnit {
     public static CfgUid      : string = "#CastleFight_Mercenary_Raider";
     public static BaseCfgUid  : string = "#UnitConfig_Barbarian_Raider";
-    public static spawnCount  : number = 20;
+    public static spawnCount  : number = 30;
 
     constructor() { super(); }
 

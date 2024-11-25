@@ -1,5 +1,4 @@
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
-import { COMPONENT_TYPE, UnitComponent } from "../../Components/ESC_components";
 import { CfgAddUnitProducer } from "../../Utils";
 import { IConfig, OpCfgUidToCfg } from "../IConfig";
 import { Config_Holy_spirit_accuracy } from "./Config_Holy_spirit_accuracy";
@@ -7,6 +6,8 @@ import { Config_Holy_spirit_attack } from "./Config_Holy_spirit_attack";
 import { Config_Holy_spirit_defense } from "./Config_Holy_spirit_defense";
 import { Config_Holy_spirit_health } from "./Config_Holy_spirit_health";
 import { Config_Holy_spirit_cloning } from "./Config_Holy_spirit_cloning";
+import { COMPONENT_TYPE } from "../../Components/IComponent";
+import { UnitComponent } from "../../Components/UnitComponent";
 
 export class Config_Church extends IConfig {
     public static CfgUid      : string = "#CastleFight_Church";
