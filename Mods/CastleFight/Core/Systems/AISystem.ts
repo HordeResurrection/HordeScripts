@@ -80,7 +80,7 @@ enum BotBuildState {
 }
 
 class IBot {
-    static LogLevel: BotLogLevel = BotLogLevel.Debug;
+    static LogLevel: BotLogLevel = BotLogLevel.Error;
     static TestBuildingCfg: any  = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Test_Building");
 
     static Buildings            : Array<BotBuildingType>;
