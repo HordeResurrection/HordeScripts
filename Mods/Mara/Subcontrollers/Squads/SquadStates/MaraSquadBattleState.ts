@@ -10,6 +10,7 @@ import { MaraPoint } from "../../../Common/MaraPoint";
 import { MaraMap } from "../../../Common/MapAnalysis/MaraMap";
 import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
 import { MaraUnitConfigCache } from "../../../Common/Cache/MaraUnitConfigCache";
+import { Mara } from "../../../Mara";
 
 class MaraThreatMap extends MaraCellDataHolder {
     constructor () {
@@ -103,7 +104,7 @@ export class MaraSquadBattleState extends MaraSquadState {
             }
         }
 
-        if (tickNumber % 50 == 0) {
+        if (tickNumber % 10 == 0) {
             this.updateThreats();
             
             if (
@@ -121,9 +122,9 @@ export class MaraSquadBattleState extends MaraSquadState {
             }
 
             // Temporarily (?) disable proper micro because of it being slow as hell
-            //this.distributeTargets();
+            this.distributeTargets();
             //this.distributeTargets_lite();
-            this.distributeTargets_liter();
+            //this.distributeTargets_liter();
         }
     }
 
@@ -214,12 +215,15 @@ export class MaraSquadBattleState extends MaraSquadState {
     }
 
     private distributeTargets(): void {
+        this.squad.Debug(`distrubuting targets. enemies:`);
+        
+        for (let enemy of this.enemyUnits) {
+            this.squad.Debug(enemy.Unit.ToString());
+        }
+        
         this.reservedCells = new MaraReservedCellData();
         
         for (let unit of this.squad.Units) {
-            let optimalTargetData: any = null;
-            this.cellHeuristics = new MaraCellHeuristics();
-
             let mainAttackRange = MaraUnitConfigCache.GetConfigProperty(
                 unit.UnitCfgId,
                 (cfg) => cfg.MainArmament.Range as number,
@@ -243,13 +247,16 @@ export class MaraSquadBattleState extends MaraSquadState {
                 (cfg) => cfg.ForestVision as number,
                 "ForestVision"
             ) as number;
+
+            let optimalTargetData: any = null;
+            this.cellHeuristics = new MaraCellHeuristics();
             
             for (let enemy of this.enemyUnits) {
                 if (!MaraUnitConfigCache.GetCanAttack(unit.UnitCfgId, enemy.UnitCfgId) || !enemy.Unit.IsAlive) {
                     continue;
                 }
 
-                if (this.squad.Controller.Settlement.Vision.CanSeeUnit(enemy)) {
+                if (this.squad.Controller.Settlement.Vision.CanSeeUnit(enemy.Unit)) {
                     mainVisionRange = Infinity;
                     forestVisionRange = Infinity;
                 }
@@ -257,8 +264,8 @@ export class MaraSquadBattleState extends MaraSquadState {
                 let maxCol = enemy.UnitRect.BottomRight.X;
                 let maxRow = enemy.UnitRect.BottomRight.Y;
 
-                for (let row = enemy.UnitCell.Y; row < maxRow; row ++) {
-                    for (let col = enemy.UnitCell.X; col < maxCol; col ++) {
+                for (let row = enemy.UnitCell.Y; row <= maxRow; row ++) {
+                    for (let col = enemy.UnitCell.X; col <= maxCol; col ++) {
                         let analyzedCell = new MaraPoint(col, row);
                         let atttackRadius = 0;
 
@@ -306,16 +313,16 @@ export class MaraSquadBattleState extends MaraSquadState {
             }
 
             if (optimalTargetData) {
-                let attackCell = optimalTargetData.target.Cell;
+                let attackCell = optimalTargetData.target.UnitCell;
                 
                 if (optimalTargetData.heuristic < Infinity) {
                     if (MaraUtils.ChebyshevDistance(unit.UnitCell, optimalTargetData.cell) > 0) {
                         MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, optimalTargetData.cell);
-                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell, false);
+                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell, false, false);
                         this.reservedCells.Set(optimalTargetData.cell, true);
                     }
                     else {
-                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell);
+                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell, true, false);
                     }
                 }
                 else {
@@ -359,7 +366,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                 "ForestVision"
             ) as number;
 
-            let optimalEnemy: any = null;
+            let optimalEnemy: MaraUnitCacheItem | null = null;
             let shortestDistance = Infinity;
             
             for (let enemy of this.enemyUnits) {
@@ -373,7 +380,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                     if (distance < shortestDistance) {
                         optimalEnemy = enemy;
                     }
-                    else if (enemy.Unit.Health < optimalEnemy.Health) {
+                    else if (enemy.Unit.Health < optimalEnemy!.Unit.Health) {
                         optimalEnemy = enemy;
                     }
                     
@@ -382,16 +389,16 @@ export class MaraSquadBattleState extends MaraSquadState {
             }
 
             if (optimalEnemy) {
-                if (this.squad.Controller.Settlement.Vision.CanSeeUnit(optimalEnemy)) {
+                if (this.squad.Controller.Settlement.Vision.CanSeeUnit(optimalEnemy.Unit)) {
                     mainVisionRange = Infinity;
                     forestVisionRange = Infinity;
                 }
                 
-                let maxCol = optimalEnemy.Cell.X + optimalEnemy.Rect.Width;
-                let maxRow = optimalEnemy.Cell.Y + optimalEnemy.Rect.Height;
+                let maxCol = optimalEnemy.UnitRect.BottomRight.X;
+                let maxRow = optimalEnemy.UnitRect.BottomRight.Y;
     
-                for (let row = optimalEnemy.Cell.Y; row < maxRow; row++) {
-                    for (let col = optimalEnemy.Cell.X; col < maxCol; col++) {
+                for (let row = optimalEnemy.UnitRect.TopLeft.Y; row <= maxRow; row++) {
+                    for (let col = optimalEnemy.UnitRect.TopLeft.X; col <= maxCol; col++) {
                         let analyzedCell = new MaraPoint(col, row);
                         let atttackRadius = 0;
     
@@ -427,7 +434,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                                 }
                             }
                             else if (targetData.heuristic == optimalTargetData.heuristic) {
-                                if (targetData.target.Health < optimalTargetData.target.Health) {
+                                if (targetData.target.Unit.Health < optimalTargetData.target.Health) {
                                     if (MaraUtils.IsCellReachable(cell, unit)) {
                                         optimalTargetData = targetData;
                                     }
