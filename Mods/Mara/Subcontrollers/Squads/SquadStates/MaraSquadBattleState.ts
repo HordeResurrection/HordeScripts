@@ -122,8 +122,8 @@ export class MaraSquadBattleState extends MaraSquadState {
             }
 
             // Temporarily (?) disable proper micro because of it being slow as hell
-            this.distributeTargets();
-            //this.distributeTargets_lite();
+            //this.distributeTargets();
+            this.distributeTargets_lite();
             //this.distributeTargets_liter();
         }
     }
@@ -446,12 +446,12 @@ export class MaraSquadBattleState extends MaraSquadState {
             }
 
             if (optimalTargetData) {
-                let attackCell = optimalTargetData.target.Cell;
+                let attackCell = optimalTargetData.target.UnitCell;
                 
                 if (optimalTargetData.heuristic < Infinity) {
                     if (MaraUtils.ChebyshevDistance(unit.UnitCell, optimalTargetData.cell) > 0) {
                         MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, optimalTargetData.cell);
-                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell, false);
+                        MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell, false, false);
                         this.reservedCells.Set(optimalTargetData.cell, true);
                     }
                     else {
