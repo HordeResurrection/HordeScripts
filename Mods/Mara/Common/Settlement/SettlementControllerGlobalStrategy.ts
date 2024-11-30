@@ -27,7 +27,8 @@ export class SettlementGlobalStrategy {
 
         let availableCfgIds = MaraUtils.GetAllConfigIds(
             settlementController.Settlement, 
-            (config) => true
+            (config) => true,
+            "allConfigs"
         );
         
         let availableOffensiveCfgs = availableCfgIds.filter(

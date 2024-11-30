@@ -60,7 +60,12 @@ export class DefendingState extends MaraSettlementControllerState {
         return MaraUtils.GetSettlementsSquadsFromUnits(
             attackers, 
             this.settlementController.StrategyController.EnemySettlements,
-            (unit) => {return MaraUtils.ChebyshevDistance(unit.Cell, point) <= radius}
+            (unit) => {
+                return MaraUtils.ChebyshevDistance(
+                    unit.UnitCell,
+                    point
+                ) <= radius
+            }
         );
     }
 
@@ -70,7 +75,7 @@ export class DefendingState extends MaraSettlementControllerState {
         return MaraUtils.GetSettlementsSquadsFromUnits(
             attackers, 
             this.settlementController.StrategyController.EnemySettlements,
-            (unit) => {return rect.IsPointInside(unit.Cell)}
+            (unit) => {return rect.IsPointInside(unit.UnitCell)}
         );
     }
 

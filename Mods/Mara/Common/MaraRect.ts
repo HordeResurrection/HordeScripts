@@ -3,10 +3,16 @@ import { MaraPoint } from "./MaraPoint";
 export class MaraRect {
     TopLeft: MaraPoint;
     BottomRight: MaraPoint;
+    Center: MaraPoint;
 
     constructor(topLeft: MaraPoint, bottomRight: MaraPoint) {
         this.TopLeft = topLeft;
         this.BottomRight = bottomRight;
+
+        this.Center = new MaraPoint(
+            Math.round( (bottomRight.X - topLeft.X) / 2 ),
+            Math.round( (bottomRight.Y - topLeft.Y) / 2 )
+        );
     }
 
     // because multiple constructors are not allowed

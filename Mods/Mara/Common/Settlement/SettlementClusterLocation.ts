@@ -1,10 +1,11 @@
+import { MaraPoint } from "../MaraPoint";
 import { MaraRect } from "../MaraRect";
 
 export class SettlementClusterLocation {
-    Center: any;
+    Center: MaraPoint;
     BoundingRect: MaraRect;
 
-    constructor(center: any, boundingRect: MaraRect) {
+    constructor(center: MaraPoint, boundingRect: MaraRect) {
         this.Center = center;
         this.BoundingRect = boundingRect;
     }

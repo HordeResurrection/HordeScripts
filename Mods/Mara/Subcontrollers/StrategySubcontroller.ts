@@ -4,10 +4,8 @@ import { MaraPoint } from "../Common/MaraPoint";
 import { MaraUtils, AlmostDefeatCondition } from "Mara/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSquad } from "./Squads/MaraSquad";
-import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { Mara } from "../Mara";
 import { SettlementGlobalStrategy } from "../Common/Settlement/SettlementControllerGlobalStrategy";
-import { UnitFlags } from "library/game-logic/horde-types";
 import { UnitComposition } from "../Common/UnitComposition";
 import { MaraResourceCluster } from "../Common/MapAnalysis/MaraResourceCluster";
 import { AllowedCompositionItem } from "../Common/AllowedCompositionItem";
@@ -15,7 +13,8 @@ import { MaraRect } from "../Common/MaraRect";
 import { MaraMap } from "../Common/MapAnalysis/MaraMap";
 import { NonUniformRandomSelectItem } from "../Common/NonUniformRandomSelectItem";
 import { MaraPath } from "../Common/MapAnalysis/MaraPath";
-import { MaraCache } from "../Common/Cache/MaraCache";
+import { MaraUnitCache } from "../Common/Cache/MaraUnitCache";
+import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
 
 class PathSelectItem implements NonUniformRandomSelectItem {
     Weight: number;
@@ -170,7 +169,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
             expandLocation, 
             this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius,
             [this.settlementController.Settlement],
-            (unit) => {return MaraUtils.IsCombatConfig(unit.Cfg) && MaraUtils.IsBuildingConfig(unit.Cfg)}
+            (unit) => {return MaraUtils.IsCombatConfigId(unit.UnitCfgId) && MaraUtils.IsBuildingConfigId(unit.UnitCfgId)}
         );
 
         let currentStrength = 0;
@@ -262,22 +261,22 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
     GetOffensiveTarget(
         enemySettlement: any //but actually Settlement
-    ): any { //but actually Unit
+    ): MaraUnitCacheItem | undefined {
         if (MaraUtils.IsSettlementDefeated(enemySettlement)) {
-            return null;
+            return undefined;
         }
 
         let defeatCondition = enemySettlement.RulesOverseer.GetExistenceRule().AlmostDefeatCondition;
         let allUnits = MaraUtils.GetAllSettlementUnits(enemySettlement);
-        let candidates: Array<any> = [];
+        let candidates: Array<MaraUnitCacheItem> = [];
 
         if (defeatCondition == AlmostDefeatCondition.LossProducingBuildings) {
             candidates = allUnits.filter(
                 (unit) => {
                     return (
-                        MaraUtils.IsProducerConfig(unit.Cfg) && 
-                        MaraUtils.IsBuildingConfig(unit.Cfg) ||
-                        MaraUtils.IsMineConfig(unit.Cfg)
+                        MaraUtils.IsProducerConfigId(unit.UnitCfgId) && 
+                        MaraUtils.IsBuildingConfigId(unit.UnitCfgId) ||
+                        MaraUtils.IsMineConfigId(unit.UnitCfgId)
                     );
                 }
             );
@@ -286,8 +285,8 @@ export class StrategySubcontroller extends MaraSubcontroller {
             candidates = allUnits.filter(
                 (unit) => {
                     return (
-                        MaraUtils.IsProducerConfig(unit.Cfg) ||
-                        MaraUtils.IsMineConfig(unit.Cfg)
+                        MaraUtils.IsProducerConfigId(unit.UnitCfgId) ||
+                        MaraUtils.IsMineConfigId(unit.UnitCfgId)
                     );
                 }
             );
@@ -296,9 +295,9 @@ export class StrategySubcontroller extends MaraSubcontroller {
             candidates = allUnits.filter(
                 (unit) => {
                     return (
-                        MaraUtils.IsProducerConfig(unit.Cfg) && 
-                        MaraUtils.IsBuildingConfig(unit.Cfg) ||
-                        MaraUtils.IsMineConfig(unit.Cfg)
+                        MaraUtils.IsProducerConfigId(unit.UnitCfgId) && 
+                        MaraUtils.IsBuildingConfigId(unit.UnitCfgId) ||
+                        MaraUtils.IsMineConfigId(unit.UnitCfgId)
                     );
                 }
             );
@@ -307,15 +306,15 @@ export class StrategySubcontroller extends MaraSubcontroller {
                 candidates = allUnits.filter(
                     (unit) => {
                         return (
-                            MaraUtils.IsProducerConfig(unit.Cfg) ||
-                            MaraUtils.IsMineConfig(unit.Cfg)
+                            MaraUtils.IsProducerConfigId(unit.UnitCfgId) ||
+                            MaraUtils.IsMineConfigId(unit.UnitCfgId)
                         );
                     }
                 );
 
                 if (candidates.length == 0) {
                     candidates = allUnits.filter(
-                        (unit) => {return unit.Cfg.HasNotFlags(UnitFlags.Passive);}
+                        (unit) => {return MaraUtils.IsActiveConfigId(unit.UnitCfgId)}
                     );
                 }
             }
@@ -354,7 +353,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return mostVulnerableCluster?.Units[0];
     }
 
-    GetExpandOffenseTarget(expandLocation: MaraPoint): any {
+    GetExpandOffenseTarget(expandLocation: MaraPoint): MaraUnitCacheItem | null {
         let enemyUnits = MaraUtils.GetSettlementUnitsAroundPoint(
             expandLocation, 
             this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius, 
@@ -467,22 +466,21 @@ export class StrategySubcontroller extends MaraSubcontroller {
         );
     }
 
-    GetEnemiesInArea(rect: MaraRect): Array<any> {
+    GetEnemiesInArea(rect: MaraRect): Array<MaraUnitCacheItem> {
         return MaraUtils.GetSettlementUnitsInArea(rect, this.EnemySettlements);
     }
 
-    GetEnemiesAroundPoint(point: MaraPoint, radius: number): Array<any> {
+    GetEnemiesAroundPoint(point: MaraPoint, radius: number): Array<MaraUnitCacheItem> {
         return MaraUtils.GetSettlementUnitsAroundPoint(point, radius, this.EnemySettlements);
     }
 
     GetCurrentDefensiveStrength(): number {
-        let units = enumerate(this.settlementController.Settlement.Units);
-        let unit;
+        let units = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
         let defensiveStrength = 0;
         
-        while ((unit = eNext(units)) !== undefined) {
-            if (MaraUtils.IsCombatConfig(unit.Cfg) && unit.IsAlive) {
-                if (MaraUtils.IsBuildingConfig(unit.Cfg)) {
+        for (let unit of units) {
+            if (MaraUtils.IsCombatConfigId(unit.UnitCfgId) && unit.Unit.IsAlive) {
+                if (MaraUtils.IsBuildingConfigId(unit.UnitCfgId)) {
                     defensiveStrength += MaraUtils.GetUnitStrength(unit);
                 }
             }
@@ -516,13 +514,13 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let produceableOffensiveCfgIds = this.getOffensiveCfgIds();
         let canAttack = produceableOffensiveCfgIds.length > 0;
 
-        let acceptableClusters:Array<any> = [];
+        let acceptableClusters: Array<any> = [];
 
         for (let cluster of candidates) {
             let isClusterReachable = false;
             let clusterCenter = MaraUtils.FindFreeCell(cluster.Center);
 
-            for (let harvesterCfg of harvesterConfigs) {
+            for (let harvesterCfg of harvesterConfigs) { //!! TODO: use MaraMap instead
                 if (MaraUtils.IsPathExists(settlementCenter!, clusterCenter, harvesterCfg, Mara.Pathfinder)) {
                     isClusterReachable = true;
                     break;
@@ -539,14 +537,14 @@ export class StrategySubcontroller extends MaraSubcontroller {
                 cluster.Center,
                 cluster.Size, //radius = cluster radius * 2
                 (unit) => {
-                    return unit.Owner != this.settlementController.Settlement
+                    return unit.UnitOwner != this.settlementController.Settlement
                 }
             );
 
             let totalEnemyStrength = 0;
 
             for (let unit of units) {
-                if (this.EnemySettlements.find((value) => {return value == unit.Owner})) {
+                if (this.EnemySettlements.find((value) => {return value == unit.UnitOwner})) {
                     totalEnemyStrength += MaraUtils.GetUnitStrength(unit);
                 }
                 else {
@@ -629,10 +627,10 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
     private updateEnemiesList(): void {
         let diplomacy = this.settlementController.Settlement.Diplomacy;
-        let settlements = MaraCache.AllSettlements;
+        let settlements = MaraUnitCache.AllSettlements;
         this.EnemySettlements = settlements.filter(
             (value) => {
-                return diplomacy.IsWarStatus(value) && MaraCache.GetAllSettlementUnits(value).length > 0
+                return diplomacy.IsWarStatus(value) && MaraUnitCache.GetAllSettlementUnits(value).length > 0
             }
         );
 
@@ -644,11 +642,10 @@ export class StrategySubcontroller extends MaraSubcontroller {
     }
 
     private calcSettlementStrength(settlement: any): number {
-        let units = enumerate(settlement.Units);
-        let unit;
+        let units = MaraUtils.GetAllSettlementUnits(settlement);
         let settlementStrength = 0;
         
-        while ((unit = eNext(units)) !== undefined) {
+        for (let unit of units) {
             settlementStrength += MaraUtils.GetUnitStrength(unit);
         }
 
@@ -660,7 +657,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let totalStrength = 0;
         
         for (let unit of allUnits) {
-            if (MaraUtils.IsCombatConfig(unit.Cfg) && unit.IsAlive) {
+            if (MaraUtils.IsCombatConfigId(unit.UnitCfgId) && unit.Unit.IsAlive) {
                 totalStrength += MaraUtils.GetUnitStrength(unit);
             }
         }
@@ -668,7 +665,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return totalStrength;
     }
 
-    private makeCombatUnitComposition(allowedConfigs: Array<AllowedCompositionItem>, requiredStrength: any): UnitComposition {
+    private makeCombatUnitComposition(allowedConfigs: Array<AllowedCompositionItem>, requiredStrength: number): UnitComposition {
         let unitComposition: UnitComposition = new Map<string, number>();
 
         if (allowedConfigs.length == 0) {
@@ -679,7 +676,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let maxStrength = 0;
 
         for (let item of allowedConfigs) {
-            let strength = MaraUtils.GetConfigStrength(item.UnitConfig);
+            let strength = MaraUtils.GetConfigIdStrength(item.UnitConfigId);
 
             if (strength > maxStrength) {
                 maxStrength = strength;
@@ -707,12 +704,12 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
             if (configItem!.MaxCount > 0) {
                 let leftStrength = strengthToProduce - currentStrength;
-                let unitStrength = MaraUtils.GetConfigStrength(configItem!.UnitConfig);
+                let unitStrength = MaraUtils.GetConfigIdStrength(configItem!.UnitConfigId);
                 let maxUnitCount = Math.min(Math.round(leftStrength / unitStrength), configItem!.MaxCount);
 
                 let unitCount = Math.max(Math.round(maxUnitCount / 2), 1);
                 
-                MaraUtils.AddToMapItem(unitComposition, configItem!.UnitConfig.Uid, unitCount);
+                MaraUtils.AddToMapItem(unitComposition, configItem!.UnitConfigId, unitCount);
                 configItem!.MaxCount -= unitCount;
                 currentStrength += unitCount * unitStrength;
                 totalUnitCount += unitCount;

@@ -1,11 +1,12 @@
 import { MaraUtils } from "Mara/MaraUtils";
 import { MaraSquadBattleState } from "./MaraSquadBattleState";
 import { MaraSquadState } from "./MaraSquadState";
+import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
 
 export abstract class MaraSquadGatheringUpState extends MaraSquadState {
     OnEntry(): void {
         if (this.squad.CurrentMovementPoint) {
-            let closestToTargetUnit: any = null;
+            let closestToTargetUnit: MaraUnitCacheItem | null = null;
             let minDistance = Infinity;
 
             for (let unit of this.squad.Units) {
@@ -18,7 +19,7 @@ export abstract class MaraSquadGatheringUpState extends MaraSquadState {
             }
 
             if (closestToTargetUnit) {
-                MaraUtils.IssueMoveCommand(this.squad.Units, this.squad.Controller.Player, closestToTargetUnit.Cell);
+                MaraUtils.IssueMoveCommand(this.squad.Units, this.squad.Controller.Player, closestToTargetUnit.UnitCell);
             }
         }
     }
@@ -46,9 +47,9 @@ export abstract class MaraSquadGatheringUpState extends MaraSquadState {
 
     protected abstract onGatheredUp(): void;
 
-    private distanceToTargetCell(unit: any): number {
+    private distanceToTargetCell(unit: MaraUnitCacheItem): number {
         let pathLength = MaraUtils.GetUnitPathLength(unit);
 
-        return pathLength ?? MaraUtils.ChebyshevDistance(unit.Cell, this.squad.CurrentMovementPoint);
+        return pathLength ?? MaraUtils.ChebyshevDistance(unit.UnitCell, this.squad.CurrentMovementPoint);
     }
 }

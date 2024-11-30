@@ -1,42 +1,7 @@
 import { MaraPoint } from "../MaraPoint";
+import { MaraUnitBushItem } from "./MaraUnitBushItem";
+import { MaraUnitCacheItem } from "./MaraUnitCacheItem";
 import RBush from "./rbush.js"
-
-class MaraUnitCacheItem {
-    UnitBushItem: MaraUnitBushItem;
-    
-    Unit: any
-    UnitId: number;
-
-    constructor(unit: any) {
-        this.Unit = unit;
-        this.UnitId = unit.Id;
-    }
-}
-
-class MaraUnitBushItem {
-    minX: number;
-    minY: number;
-    maxX: number;
-    maxY: number;
-
-    UnitCacheItem: MaraUnitCacheItem;
-    
-    constructor(unitCacheItem: MaraUnitCacheItem) {
-        let cell = unitCacheItem.Unit.Cell;
-        let rect = unitCacheItem.Unit.Rect;
-        
-        this.minX = cell.X;
-        this.minY = cell.Y;
-        this.maxX = this.minX + rect.Width - 1;
-        this.maxY = this.minY + rect.Height - 1;
-        
-        this.UnitCacheItem = unitCacheItem;
-    }
-
-    static IsEqual(a: MaraUnitBushItem, b: MaraUnitBushItem): boolean {
-        return a.UnitCacheItem.UnitId == b.UnitCacheItem.UnitId;
-    }
-}
 
 export class MaraSettlementUnitsCache {
     Settlement: any;
@@ -64,7 +29,7 @@ export class MaraSettlementUnitsCache {
         );
     }
 
-    public GetUnitsInArea(topLeft: MaraPoint, bottomRight: MaraPoint): Array<any> { //!!
+    public GetUnitsInArea(topLeft: MaraPoint, bottomRight: MaraPoint): Array<MaraUnitCacheItem> {
         let cacheItems = this.bush.search({
             minX: topLeft.X,
             minY: topLeft.Y,
@@ -72,13 +37,17 @@ export class MaraSettlementUnitsCache {
             maxY: bottomRight.Y
         }) as Array<MaraUnitBushItem>;
 
-        return cacheItems.map((item) => item.UnitCacheItem.Unit);
+        return cacheItems.map((item) => item.UnitCacheItem);
     }
 
-    public GetAllUnits(): Array<any> {
-        let cacheItems = this.bush.all();
+    public GetAllUnits(): Array<MaraUnitCacheItem> {
+        let cacheItems = Array.from(this.cacheItemIndex.values());
         
-        return cacheItems.map((item) => item.UnitCacheItem.Unit);
+        return cacheItems;
+    }
+
+    public GetUnitById(unitId: number): MaraUnitCacheItem | undefined {
+        return this.cacheItemIndex.get(unitId);
     }
 
     private unitListChangedProcessor(sender, UnitsListChangedEventArgs): void {

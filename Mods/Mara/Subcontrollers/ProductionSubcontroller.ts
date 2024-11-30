@@ -6,11 +6,12 @@ import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { UnitComposition } from "../Common/UnitComposition";
+import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
     private queuedRequests: Array<MaraProductionRequest> = [];
     private executingRequests: Array<MaraProductionRequest> = [];
-    private productionIndex: Map<string, Array<any>> | null = null;
+    private productionIndex: Map<string, Array<MaraUnitCacheItem>> | null = null;
 
     constructor (parent: MaraSettlementController) {
         super(parent);
@@ -47,7 +48,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                 request.Executor = freeProducer;
                 
                 if (MaraUtils.RequestMasterMindProduction(request, this.settlementController.MasterMind)) {
-                    this.settlementController.Debug(`Added ${request.ConfigId} to MM queue, producer: ${request.Executor.ToString()}`);
+                    this.settlementController.Debug(`Added ${request.ConfigId} to MM queue, producer: ${request.Executor!.Unit.ToString()}`);
                     addedRequests.push(request);
                     this.settlementController.ReservedUnitsData.ReserveUnit(freeProducer);
                 }
@@ -166,7 +167,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                 }
                 else {
                     let config = MaraUtils.GetUnitConfig(key);
-                    estimation.set(key, config.ProductionTime * value);
+                    estimation.set(key, config.ProductionTime * value); //!!
                 }
             }
             else {
@@ -192,7 +193,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             let cfgIds = new Set<string>();
             
             for (let producer of producers) {
-                cfgIds.add(producer.Cfg.Uid);
+                cfgIds.add(producer.UnitCfgId);
             }
 
             return Array.from(cfgIds);
@@ -215,7 +216,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         let existingCfgIds = new Set<string>();
 
         for (let unit of existingUnits) {
-            existingCfgIds.add(unit.Cfg.Uid);
+            existingCfgIds.add(unit.UnitCfgId);
         }
 
         for (let cfg of requiredConfigs) {
@@ -227,11 +228,11 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
     private cleanupUnfinishedBuildings(tickNumber: number) {
         let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
-        let unfinishedBuildings = allUnits.filter((u) => MaraUtils.IsBuildingConfig(u.Cfg) && u.EffectsMind.BuildingInProgress);
+        let unfinishedBuildings = allUnits.filter((u) => MaraUtils.IsBuildingConfigId(u.UnitCfgId) && u.Unit.EffectsMind.BuildingInProgress);
         
         for (let building of unfinishedBuildings) {
             // 2 is needed since units are processed every second tick in the core logic
-            let lastBuildingTick = building.OrdersMind.ActiveMotion.LastBuildTick * 2;
+            let lastBuildingTick = building.Unit.OrdersMind.ActiveMotion.LastBuildTick * 2;
 
             if (lastBuildingTick) {
                 if (tickNumber - lastBuildingTick > this.settlementController.Settings.Timeouts.UnfinishedConstructionThreshold) {
@@ -241,7 +242,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
     }
 
-    private getProducer(configId: string): any {
+    private getProducer(configId: string): MaraUnitCacheItem | null {
         if (!this.productionIndex) {
             this.updateProductionIndex();
         }
@@ -251,7 +252,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         if (producers) {
             for (let producer of producers) {
                 if (
-                    producer.OrdersMind.OrdersCount == 0 &&
+                    producer.Unit.OrdersMind.OrdersCount == 0 &&
                     !this.settlementController.ReservedUnitsData.IsUnitReserved(producer)
                 ) {
                     return producer;
@@ -260,7 +261,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
             for (let i = 0; i < this.settlementController.ReservedUnitsData.ReservableUnits.length; i++) {
                 for (let producer of producers) {
-                    if (this.settlementController.ReservedUnitsData.ReservableUnits[i].has(producer.Id)) {
+                    if (this.settlementController.ReservedUnitsData.ReservableUnits[i].has(producer.UnitId)) {
                         return producer;
                     }
                 }
@@ -271,22 +272,21 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     private updateProductionIndex(): void {
-        this.productionIndex = new Map<string, Array<any>>();
+        this.productionIndex = new Map<string, Array<MaraUnitCacheItem>>();
 
         let cfgCache = new Map<string, Array<string>>();
 
-        let units = enumerate(this.settlementController.Settlement.Units);
-        let unit;
+        let units = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
         
-        while ((unit = eNext(units)) !== undefined) {
-            let unitCfgId = unit.Cfg.Uid;
+        for (let unit of units) {
+            let unitCfgId = unit.UnitCfgId;
             
             if (!cfgCache.has(unitCfgId)) {
-                let producerParams = unit.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer, true);
-                let producedCfgIds:Array<string> = [];
+                let producerParams = unit.Unit.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer, true);
+                let producedCfgIds: Array<string> = [];
             
                 if (producerParams) {
-                    if (!unit.IsAlive || unit.EffectsMind.BuildingInProgress) {
+                    if (!unit.Unit.IsAlive || unit.Unit.EffectsMind.BuildingInProgress) {
                         continue;
                     }
                     

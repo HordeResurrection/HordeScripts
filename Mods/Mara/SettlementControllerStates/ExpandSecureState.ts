@@ -1,8 +1,9 @@
+import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 
 export class ExpandSecureState extends MaraSettlementControllerState {
-    private currentTarget: any; //but actually Unit
+    private currentTarget: MaraUnitCacheItem | null; //but actually Unit
     //private reinforcementsCfgIds: Array<string>;
     private timeoutTick: number | null;    
     
@@ -49,7 +50,7 @@ export class ExpandSecureState extends MaraSettlementControllerState {
         let combativityIndex = this.settlementController.TacticalController.OffenseCombativityIndex;
 
         if (combativityIndex >= this.settlementController.Settings.ControllerStates.ExterminatingLossRatioThreshold) {
-            if (!this.currentTarget || !this.currentTarget.IsAlive) {
+            if (!this.currentTarget || !this.currentTarget.Unit.IsAlive) {
                 if ( !this.selectTarget() ) {
                     this.proceedToBuildExpand();
                     return;

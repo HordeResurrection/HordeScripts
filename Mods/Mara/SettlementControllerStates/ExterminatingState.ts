@@ -1,8 +1,9 @@
+import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 
 export class ExterminatingState extends MaraSettlementControllerState {
-    private currentTarget: any; //but actually Unit
+    private currentTarget: MaraUnitCacheItem | null; //but actually Unit
     private reinforcementsCfgIds: Array<string>;
     private timeoutTick: number | null;    
     
@@ -112,11 +113,11 @@ export class ExterminatingState extends MaraSettlementControllerState {
             this.settlementController.ProductionController.RequestSingleCfgIdProduction(cfgId);
         }
     }
-    private isValidTarget(unit: any): boolean {
+    private isValidTarget(unit: MaraUnitCacheItem | null): boolean {
         return !(
             !unit || 
-            !unit.IsAlive ||
-            this.settlementController.StrategyController.CurrentEnemy != unit.Owner
+            !unit.Unit.IsAlive ||
+            this.settlementController.StrategyController.CurrentEnemy != unit.UnitOwner
         );
     }
 }

@@ -64,7 +64,7 @@ export abstract class MaraSettlementControllerState extends FsmState {
     private isFreeWoodcuttingCluster(cluster: MaraResourceCluster): boolean {
         for (let sawmillData of this.settlementController.MiningController.Sawmills) {
             if (
-                MaraUtils.ChebyshevDistance(cluster.Center, sawmillData.Sawmill.CellCenter) < 
+                MaraUtils.ChebyshevDistance(cluster.Center, sawmillData.Sawmill!.UnitRect.Center) < 
                     this.settlementController.Settings.ResourceMining.WoodcuttingRadius
             ) {
                 return false;
@@ -84,7 +84,7 @@ export abstract class MaraSettlementControllerState extends FsmState {
 
         let position = this.settlementController.MiningController.FindMinePosition(
             cluster, 
-            MaraUtils.GetUnitConfig(cfgId),
+            cfgId,
             resourceType
         );
 
@@ -163,7 +163,7 @@ export abstract class MaraSettlementControllerState extends FsmState {
         for (let cell of cells) {
             let unit = MaraUtils.GetUnit(cell);
 
-            if (unit?.Owner == this.settlementController.Settlement) {
+            if (unit?.UnitOwner == this.settlementController.Settlement) {
                 continue;
             }
             else {

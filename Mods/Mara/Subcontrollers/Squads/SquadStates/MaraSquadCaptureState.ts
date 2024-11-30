@@ -2,6 +2,7 @@ import { MaraUtils } from "Mara/MaraUtils";
 import { MaraSquadState } from "./MaraSquadState";
 import { MaraSquadBattleState } from "./MaraSquadBattleState";
 import { MaraSquadAttackState } from "./MaraSquadAttackState";
+import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
 
 export class MaraSquadCaptureState extends MaraSquadState {
     OnEntry(): void {
@@ -26,12 +27,12 @@ export class MaraSquadCaptureState extends MaraSquadState {
         }
     }
 
-    private getCapturableUnitsNearby(): Array<any> {
+    private getCapturableUnitsNearby(): Array<MaraUnitCacheItem> {
         let units = MaraUtils.GetSettlementUnitsAroundPoint(
             this.squad.GetLocation().Point, 
             this.squad.Controller.SquadsSettings.EnemySearchRadius,
             undefined,
-            (unit) => {return unit.BattleMind.CanBeCapturedNow() && !MaraUtils.IsBuildingConfig(unit.Cfg)},
+            (unit) => {return unit.Unit.BattleMind.CanBeCapturedNow() && !MaraUtils.IsBuildingConfigId(unit.UnitCfgId)},
             true
         );
 
@@ -45,10 +46,10 @@ export class MaraSquadCaptureState extends MaraSquadState {
             return false;
         }
         
-        let capturingUnits: Array<any> = [];
+        let capturingUnits: Array<MaraUnitCacheItem> = [];
 
         for (let unit of this.squad.Units) {
-            if (MaraUtils.IsCapturingConfig(unit.Cfg)) {
+            if (MaraUtils.IsCapturingConfigId(unit.UnitCfgId)) {
                 capturingUnits.push(unit);
             }
         }
@@ -62,8 +63,13 @@ export class MaraSquadCaptureState extends MaraSquadState {
         for (let unit of capturableUnits) {
             let capturingUnit = capturingUnits[capturingUnitIndex];
 
-            MaraUtils.IssueCaptureCommand([capturingUnit], this.squad.Controller.Player, unit.Cell);
-            capturingUnitIndex++;
+            MaraUtils.IssueCaptureCommand(
+                [capturingUnit], 
+                this.squad.Controller.Player, 
+                unit.UnitCell
+            );
+            
+            capturingUnitIndex ++;
 
             if (capturingUnitIndex >= capturingUnits.length) {
                 break;

@@ -4,6 +4,7 @@ import { MaraSquad } from "./MaraSquad";
 import { MaraSquadIdleState } from "./SquadStates/MaraSquadIdleState";
 import { MaraSquadState } from "./SquadStates/MaraSquadState";
 import { MaraPoint } from "../../Common/MaraPoint";
+import { MaraUnitCacheItem } from "../../Common/Cache/MaraUnitCacheItem";
 
 export class MaraControllableSquad extends MaraSquad {
     static IdSequence: number = 0;
@@ -37,7 +38,7 @@ export class MaraControllableSquad extends MaraSquad {
     CurrentMovementPoint: MaraPoint | null;
     MovementPrecision: number;
 
-    constructor(units:Array<any>, controller: TacticalSubcontroller){
+    constructor(units: Array<MaraUnitCacheItem>, controller: TacticalSubcontroller) {
         super(units);
 
         MaraControllableSquad.IdSequence ++;
@@ -47,7 +48,7 @@ export class MaraControllableSquad extends MaraSquad {
         this.initialStrength = Math.max(this.Strength, this.controller.SquadsSettings.MinStrength);
         this.recalcMinSpread();
 
-        let unitNames = this.Units.map((value) => value.ToString());
+        let unitNames = this.Units.map((value) => value.Unit.ToString());
         this.Debug(`Squad created. Units:\n${unitNames.join("\n")}`);
 
         this.SetState(new MaraSquadIdleState(this));
@@ -166,7 +167,7 @@ export class MaraControllableSquad extends MaraSquad {
         return enemies.length > 0;
     }
 
-    GetNearbyUnits(): Array<any> {
+    GetNearbyUnits(): Array<MaraUnitCacheItem> {
         let units = MaraUtils.GetSettlementUnitsAroundPoint(
             this.GetLocation().Point, 
             this.Controller.SquadsSettings.EnemySearchRadius,
@@ -178,7 +179,7 @@ export class MaraControllableSquad extends MaraSquad {
         return units;
     }
 
-    CanAttackAtLeastOneUnit(targetUnits: Array<any>): boolean {
+    CanAttackAtLeastOneUnit(targetUnits: Array<MaraUnitCacheItem>): boolean {
         for (let unit of this.Units) {
             for (let target of targetUnits) {
                 if (MaraUtils.CanAttack(unit, target)) {
@@ -206,9 +207,9 @@ export class MaraControllableSquad extends MaraSquad {
 
     protected cleanup(): void {
         let unitCount = this.Units.length;
-        this.Units = this.Units.filter((unit) => {return unit != null && unit.IsAlive});
+        this.Units = this.Units.filter((unit) => {return unit != null && unit.Unit.IsAlive});
         
-        if (this.Units.length !== unitCount) {
+        if (this.Units.length != unitCount) {
             this.recalcMinSpread();
         }
     }

@@ -7,6 +7,8 @@ import { MaraSquadMoveState } from "./MaraSquadMoveState";
 import { MaraSquadState } from "./MaraSquadState";
 import { MaraPoint } from "../../../Common/MaraPoint";
 import { MaraMap } from "../../../Common/MapAnalysis/MaraMap";
+import { MaraUnitConfigCache } from "../../../Common/Cache/MaraUnitConfigCache";
+import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
 
 export class MaraSquadIdleState extends MaraSquadState {
     OnEntry(): void {
@@ -46,21 +48,25 @@ export class MaraSquadIdleState extends MaraSquadState {
     }
 
     private distributeUnits(): void {
-        let unitsToDistribute: any[] = [];
+        let unitsToDistribute: Array<MaraUnitCacheItem> = [];
 
         for (let unit of this.squad.Units) {
-            let point = new MaraPoint(unit.Cell.X, unit.Cell.Y);
+            let point = unit.UnitCell;
             let tileType = MaraMap.GetTileType(point);
             
             if (tileType != TileType.Forest) { //run, Forest, run!!
-                let moveType = unit.Cfg.MoveType.ToString();
+                let moveType = MaraUnitConfigCache.GetConfigProperty(
+                    unit.UnitCfgId,
+                    (cfg) => cfg.MoveType.ToString(),
+                    "MoveType"
+                ) as string;
 
                 if (moveType == "PlainAndForest") {
                     unitsToDistribute.push(unit);
                 }
             }
             else {
-                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, unit.Cell);
+                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, point);
             }
         }
 

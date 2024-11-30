@@ -5,7 +5,8 @@ import { MaraMap } from "./Common/MapAnalysis/MaraMap";
 import { PathFinder } from "library/game-logic/path-find";
 import { broadcastMessage } from "library/common/messages";
 import { createHordeColor } from "library/common/primitives";
-import { MaraCache } from "./Common/Cache/MaraCache";
+import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
+import { MaraUnitConfigCache } from "./Common/Cache/MaraUnitConfigCache";
 
 export enum MaraLogLevel {
     Debug = 0,
@@ -79,7 +80,8 @@ export class Mara {
             Mara.controllers = [];
 
             MaraMap.Init();
-            MaraCache.Init();
+            MaraUnitCache.Init();
+            MaraUnitConfigCache.Init();
 
             let tickOffset = 0;
             let processedSettlements: Array<any> = [];

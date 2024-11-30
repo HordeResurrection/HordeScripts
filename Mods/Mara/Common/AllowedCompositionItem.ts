@@ -1,10 +1,10 @@
 
 export class AllowedCompositionItem {
-    UnitConfig: any;
+    UnitConfigId: string;
     MaxCount: number;
 
     constructor(cfg: any, maxCount: number) {
-        this.UnitConfig = cfg;
+        this.UnitConfigId = cfg.Uid;
         this.MaxCount = maxCount;
     }
 }

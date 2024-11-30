@@ -8,6 +8,8 @@ import { MaraSquadPullbackState } from "./MaraSquadPullbackState";
 import { MaraCellDataHolder } from "../../../Common/MaraCellDataHolder";
 import { MaraPoint } from "../../../Common/MaraPoint";
 import { MaraMap } from "../../../Common/MapAnalysis/MaraMap";
+import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
+import { MaraUnitConfigCache } from "../../../Common/Cache/MaraUnitConfigCache";
 
 class MaraThreatMap extends MaraCellDataHolder {
     constructor () {
@@ -65,7 +67,7 @@ class MaraReservedCellData extends MaraCellDataHolder {
 
 export class MaraSquadBattleState extends MaraSquadState {
     private enemySquads: Array<MaraSquad>;
-    private enemyUnits: Array<any>;
+    private enemyUnits: Array<MaraUnitCacheItem>;
     private threatMap: MaraThreatMap;
     private cellHeuristics: MaraCellHeuristics;
     private reservedCells: MaraReservedCellData;
@@ -153,13 +155,13 @@ export class MaraSquadBattleState extends MaraSquadState {
             location.Point, 
             this.squad.Controller.SquadsSettings.EnemySearchRadius, 
             this.squad.Controller.EnemySettlements,
-            (unit) => {return MaraUtils.ChebyshevDistance(unit.Cell, location.Point) <= this.squad.Controller.SquadsSettings.EnemySearchRadius}
+            (unit) => {return MaraUtils.ChebyshevDistance(unit.UnitCell, location.Point) <= this.squad.Controller.SquadsSettings.EnemySearchRadius}
         );
 
         this.enemySquads = MaraUtils.GetSettlementsSquadsFromUnits(
             enemies, 
             this.squad.Controller.EnemySettlements,
-            (unit) => {return MaraUtils.ChebyshevDistance(unit.Cell, location.Point) <= this.squad.Controller.SquadsSettings.EnemySearchRadius}
+            (unit) => {return MaraUtils.ChebyshevDistance(unit.UnitCell, location.Point) <= this.squad.Controller.SquadsSettings.EnemySearchRadius}
         );
 
         this.enemyUnits = [];
@@ -168,7 +170,7 @@ export class MaraSquadBattleState extends MaraSquadState {
             this.enemyUnits.push(...squad.Units);
         }
 
-        this.updateThreatMap(); //!!
+        this.updateThreatMap();
     }
 
     private updateThreatMap(): void {
@@ -179,8 +181,8 @@ export class MaraSquadBattleState extends MaraSquadState {
         }
     }
 
-    private addUnitThreatToMap(unit: any): void {
-        if (!unit.Cfg.MainArmament) {
+    private addUnitThreatToMap(unit: MaraUnitCacheItem): void {
+        if (!MaraUtils.IsArmedConfigId(unit.UnitCfgId)) {
             return;
         }
 
@@ -188,9 +190,19 @@ export class MaraSquadBattleState extends MaraSquadState {
         let target = MaraUtils.GetUnitTarget(unit);
 
         if (target) {
-            let unitDps = unit.Cfg.MainArmament.ShotParams.Damage;
+            let unitDps = MaraUnitConfigCache.GetConfigProperty(
+                unit.UnitCfgId,
+                (cfg) => cfg.MainArmament.ShotParams.Damage as number,
+                "Damage"
+            ) as number;
 
-            if (unit.Cfg.MainArmament.MaxDistanceDispersion > 0) {
+            let dispersion = MaraUnitConfigCache.GetConfigProperty(
+                unit.UnitCfgId,
+                (cfg) => cfg.MainArmament.MaxDistanceDispersion as number,
+                "MaxDistanceDispersion"
+            ) as number;
+
+            if (dispersion > 0) {
                 MaraUtils.ForEachCell(target.Cell, 1, (cell) => {
                     this.threatMap.Add(cell, unitDps);
                 });
@@ -208,14 +220,32 @@ export class MaraSquadBattleState extends MaraSquadState {
             let optimalTargetData: any = null;
             this.cellHeuristics = new MaraCellHeuristics();
 
-            let mainAttackRange = unit.Cfg.MainArmament.Range;
-            let forestAttackRange = unit.Cfg.MainArmament.ForestRange;
+            let mainAttackRange = MaraUnitConfigCache.GetConfigProperty(
+                unit.UnitCfgId,
+                (cfg) => cfg.MainArmament.Range as number,
+                "Range"
+            ) as number;
+
+            let forestAttackRange = MaraUnitConfigCache.GetConfigProperty(
+                unit.UnitCfgId,
+                (cfg) => cfg.MainArmament.ForestRange as number,
+                "ForestRange"
+            ) as number;
             
-            let mainVisionRange = unit.Cfg.Sight;
-            let forestVisionRange = unit.Cfg.ForestVision;
+            let mainVisionRange = MaraUnitConfigCache.GetConfigProperty(
+                unit.UnitCfgId,
+                (cfg) => cfg.Sight as number,
+                "Sight"
+            ) as number;
+
+            let forestVisionRange = MaraUnitConfigCache.GetConfigProperty(
+                unit.UnitCfgId,
+                (cfg) => cfg.ForestVision as number,
+                "ForestVision"
+            ) as number;
             
             for (let enemy of this.enemyUnits) {
-                if (!unit.BattleMind.CanAttackTarget(enemy) || !enemy.IsAlive) { //!!
+                if (!MaraUnitConfigCache.GetCanAttack(unit.UnitCfgId, enemy.UnitCfgId) || !enemy.Unit.IsAlive) {
                     continue;
                 }
 
@@ -224,11 +254,11 @@ export class MaraSquadBattleState extends MaraSquadState {
                     forestVisionRange = Infinity;
                 }
                 
-                let maxCol = enemy.Cell.X + enemy.Rect.Width; //!!
-                let maxRow = enemy.Cell.Y + enemy.Rect.Height;
+                let maxCol = enemy.UnitRect.BottomRight.X;
+                let maxRow = enemy.UnitRect.BottomRight.Y;
 
-                for (let row = enemy.Cell.Y; row < maxRow; row++) {
-                    for (let col = enemy.Cell.X; col < maxCol; col++) {
+                for (let row = enemy.UnitCell.Y; row < maxRow; row ++) {
+                    for (let col = enemy.UnitCell.X; col < maxCol; col ++) {
                         let analyzedCell = new MaraPoint(col, row);
                         let atttackRadius = 0;
 
@@ -239,10 +269,10 @@ export class MaraSquadBattleState extends MaraSquadState {
                             atttackRadius = Math.min(mainAttackRange, mainVisionRange);
                         }
 
-                        let analyzedCellDistance = MaraUtils.ChebyshevDistance(unit.Cell, analyzedCell);
+                        let analyzedCellDistance = MaraUtils.ChebyshevDistance(unit.UnitCell, analyzedCell);
 
                         MaraUtils.ForEachCell(analyzedCell, atttackRadius, (cell) => {
-                            if (MaraUtils.ChebyshevDistance(unit.Cell, cell) > analyzedCellDistance) {
+                            if (MaraUtils.ChebyshevDistance(unit.UnitCell, cell) > analyzedCellDistance) {
                                 return;
                             }
                             
@@ -264,7 +294,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                                 }
                             }
                             else if (targetData.heuristic == optimalTargetData.heuristic) {
-                                if (targetData.target.Health < optimalTargetData.target.Health) {
+                                if (targetData.target.Unit.Health < optimalTargetData.target.Health) {
                                     if (MaraUtils.IsCellReachable(cell, unit)) {
                                         optimalTargetData = targetData;
                                     }
@@ -279,7 +309,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                 let attackCell = optimalTargetData.target.Cell;
                 
                 if (optimalTargetData.heuristic < Infinity) {
-                    if (MaraUtils.ChebyshevDistance(unit.Cell, optimalTargetData.cell) > 0) {
+                    if (MaraUtils.ChebyshevDistance(unit.UnitCell, optimalTargetData.cell) > 0) {
                         MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, optimalTargetData.cell);
                         MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell, false);
                         this.reservedCells.Set(optimalTargetData.cell, true);
@@ -293,7 +323,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                 }
             }
             else {
-                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, unit.Cell);
+                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, unit.UnitCell);
             }
         }
     }
@@ -305,27 +335,45 @@ export class MaraSquadBattleState extends MaraSquadState {
             let optimalTargetData: any = null;
             this.cellHeuristics = new MaraCellHeuristics();
 
-            let mainAttackRange = unit.Cfg.MainArmament.Range;
-            let forestAttackRange = unit.Cfg.MainArmament.ForestRange;
+            let mainAttackRange = MaraUnitConfigCache.GetConfigProperty(
+                unit.UnitCfgId,
+                (cfg) => cfg.MainArmament.Range as number,
+                "Range"
+            ) as number;
+
+            let forestAttackRange = MaraUnitConfigCache.GetConfigProperty(
+                unit.UnitCfgId,
+                (cfg) => cfg.MainArmament.ForestRange as number,
+                "ForestRange"
+            ) as number;
             
-            let mainVisionRange = unit.Cfg.Sight;
-            let forestVisionRange = unit.Cfg.ForestVision;
+            let mainVisionRange = MaraUnitConfigCache.GetConfigProperty(
+                unit.UnitCfgId,
+                (cfg) => cfg.Sight as number,
+                "Sight"
+            ) as number;
+
+            let forestVisionRange = MaraUnitConfigCache.GetConfigProperty(
+                unit.UnitCfgId,
+                (cfg) => cfg.ForestVision as number,
+                "ForestVision"
+            ) as number;
 
             let optimalEnemy: any = null;
             let shortestDistance = Infinity;
             
             for (let enemy of this.enemyUnits) {
-                if (!unit.BattleMind.CanAttackTarget(enemy) || !enemy.IsAlive) {
+                if (!MaraUnitConfigCache.GetCanAttack(unit.UnitCfgId, enemy.UnitCfgId) || !enemy.Unit.IsAlive) {
                     continue;
                 }
 
-                let distance = MaraUtils.ChebyshevDistance(unit.Cell, enemy.Cell);
+                let distance = MaraUtils.ChebyshevDistance(unit.UnitCell, enemy.UnitCell);
 
                 if (distance <= shortestDistance) {
                     if (distance < shortestDistance) {
                         optimalEnemy = enemy;
                     }
-                    else if (enemy.Health < optimalEnemy.Health) {
+                    else if (enemy.Unit.Health < optimalEnemy.Health) {
                         optimalEnemy = enemy;
                     }
                     
@@ -354,10 +402,10 @@ export class MaraSquadBattleState extends MaraSquadState {
                             atttackRadius = Math.min(mainAttackRange, mainVisionRange);
                         }
 
-                        let analyzedCellDistance = MaraUtils.ChebyshevDistance(unit.Cell, analyzedCell);
+                        let analyzedCellDistance = MaraUtils.ChebyshevDistance(unit.UnitCell, analyzedCell);
     
                         MaraUtils.ForEachCell(analyzedCell, atttackRadius, (cell) => {
-                            if (MaraUtils.ChebyshevDistance(unit.Cell, cell) > analyzedCellDistance) {
+                            if (MaraUtils.ChebyshevDistance(unit.UnitCell, cell) > analyzedCellDistance) {
                                 return;
                             }
                             
@@ -394,7 +442,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                 let attackCell = optimalTargetData.target.Cell;
                 
                 if (optimalTargetData.heuristic < Infinity) {
-                    if (MaraUtils.ChebyshevDistance(unit.Cell, optimalTargetData.cell) > 0) {
+                    if (MaraUtils.ChebyshevDistance(unit.UnitCell, optimalTargetData.cell) > 0) {
                         MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, optimalTargetData.cell);
                         MaraUtils.IssueAttackCommand([unit], this.squad.Controller.Player, attackCell, false);
                         this.reservedCells.Set(optimalTargetData.cell, true);
@@ -408,7 +456,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                 }
             }
             else {
-                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, unit.Cell);
+                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, unit.UnitCell);
             }
         }
     }
@@ -421,10 +469,10 @@ export class MaraSquadBattleState extends MaraSquadState {
         }
     }
 
-    private calcCellHeuristic(targetCell: any, unit: any): number {
+    private calcCellHeuristic(targetCell: any, unit: MaraUnitCacheItem): number {
         let occupyingUnit = MaraUtils.GetUnit(targetCell);
         
-        if (occupyingUnit && occupyingUnit.Id != unit.Id) {
+        if (occupyingUnit && occupyingUnit.UnitId != unit.UnitId) {
             return Infinity;
         }
         
@@ -434,6 +482,6 @@ export class MaraSquadBattleState extends MaraSquadState {
 
         let threat = this.threatMap.Get(targetCell);
 
-        return threat + 6 * MaraUtils.ChebyshevDistance(unit.Cell, targetCell);
+        return threat + 6 * MaraUtils.ChebyshevDistance(unit.UnitCell, targetCell);
     }
 }

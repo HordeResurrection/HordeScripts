@@ -1,4 +1,5 @@
 import { MaraUtils, BuildTrackerType } from "../MaraUtils";
+import { MaraUnitCacheItem } from "./Cache/MaraUnitCacheItem";
 import { MaraPoint } from "./MaraPoint";
 
 export class MaraProductionRequest {
@@ -7,7 +8,7 @@ export class MaraProductionRequest {
     public Precision: number | null;
     public IsForce: boolean = false;
     public ProducedUnit: any = null;
-    public Executor: any = null;
+    public Executor: MaraUnitCacheItem | null = null;
 
     public get MasterMindRequest(): any {
         return this.masterMindRequest;
