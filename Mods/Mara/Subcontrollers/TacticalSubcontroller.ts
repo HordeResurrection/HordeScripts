@@ -7,6 +7,7 @@ import { MaraRect } from "../Common/MaraRect";
 import { MaraPoint } from "../Common/MaraPoint";
 import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
 import { MaraUnitConfigCache } from "../Common/Cache/MaraUnitConfigCache";
+import { TileType } from "library/game-logic/horde-types";
 
 export class TacticalSubcontroller extends MaraSubcontroller {
     private offensiveSquads: Array<MaraControllableSquad> = [];
@@ -464,10 +465,16 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     private getUnitMovementType(unit: MaraUnitCacheItem): string {
-        let speedsThresholds = this.settlementController.Settings.CombatSettings.UnitSpeedClusterizationThresholds;
-        let unitCfgId = unit.UnitCfgId;
+        return MaraUnitConfigCache.GetConfigProperty(
+            unit.UnitCfgId, 
+            (cfg) => TacticalSubcontroller.calcConfigMovementType(cfg, this.settlementController.Settings.CombatSettings.UnitSpeedClusterizationThresholds), "MovementType"
+        ) as string;
+    }
+
+    private static calcConfigMovementType(unitConfig: any, speedsThresholds: Array<number>): string {
+        let unitCfgId = unitConfig.Uid;
         
-        let unitSpeed = MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Grass as number, "GrassSpeed") as number;
+        let unitSpeed = MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Grass) as number, "GrassSpeed") as number;
         let speedGroupCode: number | null = null;
 
         for (let i = 0; i < speedsThresholds.length; i++) {
@@ -483,19 +490,19 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
         let moveType = "";
         
-        moveType += this.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Grass as number,  "GrassSpeed") as number);
-        moveType += this.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Forest as number, "ForestSpeed") as number);
-        moveType += this.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Water as number,  "WaterSpeed") as number);
-        moveType += this.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Marsh as number,  "MarshSpeed") as number);
-        moveType += this.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Sand as number,   "SandSpeed") as number);
-        moveType += this.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Mounts as number, "MountsSpeed") as number);
-        moveType += this.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Road as number,   "RoadSpeed") as number);
-        moveType += this.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Ice as number,    "IceSpeed") as number);
-
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Grass) as number,  "GrassSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Forest) as number, "ForestSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Water) as number,  "WaterSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Marsh) as number,  "MarshSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Sand) as number,   "SandSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Mounts) as number, "MountsSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Road) as number,   "RoadSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Ice) as number,    "IceSpeed") as number);
+        
         return `${moveType}:${speedGroupCode}`;
     }
 
-    private speedToMoveTypeFlag(speed: number): string {
+    private static speedToMoveTypeFlag(speed: number): string {
         if (speed > 0) {
             return "1";
         }

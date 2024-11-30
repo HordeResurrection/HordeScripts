@@ -1,6 +1,7 @@
 import { AllContent } from "library/game-logic/horde-types";
 import { MaraUtils } from "../../MaraUtils";
 import { ConfigPropertyType } from "./ConfigPropertyType";
+import { Mara } from "../../Mara";
 
 class MaraUnitConfigCacheItem {
     Uid: string;
@@ -16,14 +17,16 @@ class MaraUnitConfigCacheItem {
 
     GetConfigProperty(propertyCalculator: (config: any) => ConfigPropertyType, propertyName?: string): ConfigPropertyType {
         let propName = propertyName ?? propertyCalculator.name;
-        let property = this.configProperties.get(propName);
+        let propertyValue = this.configProperties.get(propName);
 
-        if (property != undefined) {
-            return property;
+        if (propertyValue != undefined) {
+            return propertyValue;
         }
         else {
             let propertyValue = propertyCalculator(this.Config);
             this.configProperties.set(propName, propertyValue);
+
+            Mara.Debug(`set ${propName} to ${propertyValue} for ${this.Config.Uid}`);
 
             return propertyValue;
         }
@@ -65,6 +68,8 @@ export class MaraUnitConfigCache {
 
     static SetCanAttack(sourceConfigId: string, targetConfigId: string, value: boolean): void {
         MaraUnitConfigCache.canAttackCache.set(sourceConfigId + targetConfigId, value);
+        
+        Mara.Debug(`set ${sourceConfigId} can attack ${targetConfigId} to ${value}`);
     }
 
     private static addConfig(unitConfig: any): MaraUnitConfigCacheItem {
