@@ -1,7 +1,6 @@
 import { AllContent } from "library/game-logic/horde-types";
 import { MaraUtils } from "../../MaraUtils";
 import { ConfigPropertyType } from "./ConfigPropertyType";
-import { Mara } from "../../Mara";
 
 class MaraUnitConfigCacheItem {
     Uid: string;
@@ -25,11 +24,6 @@ class MaraUnitConfigCacheItem {
         else {
             let propertyValue = propertyCalculator(this.Config);
             this.configProperties.set(propName, propertyValue);
-
-            Mara.Debug(`Set property ${propName} to ${propertyValue} for cfg ${this.Uid}`);
-            if (propName == "") {
-                Mara.Debug(new Error().stack!);
-            }
 
             return propertyValue;
         }
