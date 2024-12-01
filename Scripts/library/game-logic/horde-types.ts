@@ -4,7 +4,7 @@
 
 export const BattleController = HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController;
 export const AllContent = HCL.HordeClassLibrary.HordeContent.AllContent;
-export const WorldGlobals = HCL.HordeClassLibrary.World.Const.WorldGlobals;
+export const WorldConstants = HCL.HordeClassLibrary.World.Const.WorldConstants;
 
 
 // ===================================================

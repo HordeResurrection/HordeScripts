@@ -1,5 +1,5 @@
 import HordePluginBase from "./base-plugin";
-import { BattleController, WorldGlobals } from "library/game-logic/horde-types";
+import { BattleController, WorldConstants } from "library/game-logic/horde-types";
 import * as primitives from "library/common/primitives";
 import * as decorations from "library/game-logic/decoration-spawn";
 
@@ -79,8 +79,8 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
 
     private _createDecoration(attentionInfo: AttentionClickInfo) {
         let position = primitives.createPoint(
-            attentionInfo.cell.X * WorldGlobals.CellSize + WorldGlobals.HalfCellSize,
-            attentionInfo.cell.Y * WorldGlobals.CellSize + WorldGlobals.HalfCellSize);
+            attentionInfo.cell.X * WorldConstants.CellSize + WorldConstants.HalfCellSize,
+            attentionInfo.cell.Y * WorldConstants.CellSize + WorldConstants.HalfCellSize);
 
         let decoration = decorations.spawnDecoration(this.realScena, this.smokeDecorationCfg, position);
         decoration.TintColor = attentionInfo.player.GetRealSettlement().SettlementColor;
