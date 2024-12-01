@@ -393,7 +393,7 @@ class ExperienceSystemPlugin extends HordePluginBase {
 
     public onFirstRun() {
         if (ScriptUtils.GameVersionEqualsOrGreater('v0.71pre')) {
-            HCL.HordeClassLibrary.World.Const.UnitConstants.MaxExperience = ExperienceSystemGlobalData.MaxExp;
+            ActiveScena.Context.Parameters.Units.MaxExperience = ExperienceSystemGlobalData.MaxExp;
         }
     }
 
