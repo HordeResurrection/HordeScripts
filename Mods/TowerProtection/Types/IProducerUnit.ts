@@ -1,16 +1,14 @@
-import { setUnitStateWorker } from "library/game-logic/workers-tools";
 import { IUnit } from "./IUnit";
 import { GlobalVars } from "../GlobalData";
 import { UnitCommand, UnitState } from "library/game-logic/horde-types";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
-import { CfgAddUnitProducer } from "../Utils";
-import { log } from "library/common/logging";
+import { CfgAddUnitProducer, setUnitStateWorker } from "../Utils";
 
 export type CallbackFunctionType = (unit: any) => void;
 
 export class IProducerUnit extends IUnit {
     public static produceCallbacks : Array<CallbackFunctionType>;
-    public static TESTNUM : number = 0;
+    //public static TESTNUM : number = 0;
 
     constructor (unit: any, teamNum: number) {
         super(unit, teamNum);

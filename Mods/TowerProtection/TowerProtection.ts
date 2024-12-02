@@ -269,11 +269,17 @@ export class TowerProtection extends HordePluginBase {
                     GlobalVars.teams[teamNum].nickname + ":\n",
                     createPoint(32*(GlobalVars.teams[teamNum].towerCell.X - 20), 32*(GlobalVars.teams[teamNum].towerCell.Y - 20)),
                     100000000);
-                strDecObj.Height = 18;
+                strDecObj.Height = 20;
                 //strDecObj.Color = GlobalVars.teams[teamNum].color;
+                strDecObj.Color     = createHordeColor(
+                    255,
+                    Math.min(255, GlobalVars.teams[teamNum].color.R + 128),
+                    Math.min(255, GlobalVars.teams[teamNum].color.G + 128),
+                    Math.min(255, GlobalVars.teams[teamNum].color.B + 128)
+                );
                 strDecObj.DrawLayer = DrawLayer.Birds;
-                strDecObj.Font = FontUtils.DefaultFont;        // Шрифт Северного Ветра (нельзя изменить высоту букв)
-                //strDecObj.Font = FontUtils.DefaultVectorFont;  // Шрифт, что используется в чате
+                //strDecObj.Font = FontUtils.DefaultFont;        // Шрифт Северного Ветра (нельзя изменить высоту букв)
+                strDecObj.Font = FontUtils.DefaultVectorFont;  // Шрифт, что используется в чате
 
                 this.teamsStringDecorationObj[teamNum] = strDecObj;
             }

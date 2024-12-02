@@ -1,7 +1,7 @@
 import { log } from "library/common/logging";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { createPoint } from "library/common/primitives";
-import { PointCommandArgs } from "library/game-logic/horde-types";
+import { PointCommandArgs, ScriptUnitWorkerState } from "library/game-logic/horde-types";
 import { Cell } from "./Types/Geometry";
 import { getUnitProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { AOrderBaseT } from "plugins/print-selected-squad-orders";
@@ -112,4 +112,25 @@ export function CfgAddUnitProducer(Cfg: any) {
         // }
         HordeContentApi.RemoveConfig(donorCfg);
     }
+}
+
+export function setUnitStateWorker(plugin, unitCfg, unitState, workerFunc) {
+    //const workerName = `${plugin.name}_${unitState}Worker`
+    const workerName = `${unitCfg.Uid}_worker`
+
+    // Обертка для метода из плагина, чтобы работал "this"
+    const workerWrapper = (u) => workerFunc.call(plugin, u);
+
+    // Прокидываем доступ к функции-обработчику в .Net через глобальную переменную
+    UnitWorkersRegistry.Register(workerName, workerWrapper);
+
+    // Объект-обработчик
+    const workerObject = host.newObj(ScriptUnitWorkerState);
+    
+    // Установка функции-обработчика
+    ScriptUtils.SetValue(workerObject, "FuncName", workerName);
+
+    // Установка обработчика в конфиг
+    const stateWorkers = ScriptUtils.GetValue(unitCfg, "StateWorkers");
+    stateWorkers.Item.set(unitState, workerObject);
 }

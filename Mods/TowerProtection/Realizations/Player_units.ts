@@ -1,6 +1,6 @@
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 import { IUnit } from "../Types/IUnit";
-import { CfgAddUnitProducer, ChebyshevDistance, CreateUnitConfig } from "../Utils";
+import { CfgAddUnitProducer, ChebyshevDistance, CreateUnitConfig, setUnitStateWorker } from "../Utils";
 import { AttackPlansClass } from "./AttackPlans";
 import { CFGPrefix, GlobalVars, ReplaceUnitParameters } from "../GlobalData";
 import { UnitCommand, UnitMapLayer, UnitState } from "library/game-logic/horde-types";
@@ -8,7 +8,6 @@ import { createHordeColor, createPoint } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
 import { log } from "library/common/logging";
-import { setUnitStateWorker } from "library/game-logic/workers-tools";
 import { IProducerUnit } from "../Types/IProducerUnit";
 
 export class Player_TOWER_BASE extends IProducerUnit {
