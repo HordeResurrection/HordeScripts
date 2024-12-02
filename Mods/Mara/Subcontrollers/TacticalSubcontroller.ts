@@ -170,17 +170,19 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     Retreat(): void {
+        this.currentTarget = null;
         let retreatLocations = this.getRetreatLocations();
 
         if (retreatLocations.length > 0) {
             for (let squad of this.offensiveSquads) {
                 this.sendSquadToOneOfLocations(squad, retreatLocations);
-            }
-
-            if (this.offensiveSquads.length > 0) {
-                this.settlementController.Debug(`Retreating`);
+                squad.Debug(`retreating`);
             }
         }
+    }
+
+    StopAttack(): void {
+        this.currentTarget = null;
     }
 
     ComposeSquads(): void {

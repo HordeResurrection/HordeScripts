@@ -77,6 +77,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
 
     private celebrateVictory(): void {
         this.settlementController.Info(`No enemies left. We are victorious!`);
+        this.settlementController.TacticalController.StopAttack();
         this.settlementController.State = SettlementControllerStateFactory.MakeIdleState(this.settlementController);
     }
 
