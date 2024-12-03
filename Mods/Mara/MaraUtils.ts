@@ -956,12 +956,22 @@ export class MaraUtils {
         return MaraUtils.configHasProfession(unitConfig, UnitProfession.MetalStock);
     }
 
-    static IsDevelopmentBoosterConfigId(cfgId: string): boolean {
-        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.isDevelopmentBoosterConfig, "isDevelopmentBoosterConfig") as boolean;
+    static IsEconomyBoosterConfigId(cfgId: string): boolean {
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.isEconomyBoosterConfig, "isDevelopmentBoosterConfig") as boolean;
     }
 
-    private static isDevelopmentBoosterConfig(unitConfig: any): boolean {
+    private static isEconomyBoosterConfig(unitConfig: any): boolean {
         return unitConfig.Specification.HasFlag(UnitSpecification.MaxGrowthSpeedIncrease);
+    }
+
+    static IsHealerConfigId(cfgId: string): boolean {
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.isHealerConfig, "isHealerConfig") as boolean;
+    }
+
+    private static isHealerConfig(unitConfig: any): boolean {
+        // this is wrong, but we don't have a decent way to detect healing capabilities of a unit,
+        // so this'll have to do
+        return unitConfig.Specification.HasFlag(UnitSpecification.Church);
     }
 
     static GetAllSawmillConfigIds(settlement: any): Array<string> {
@@ -984,13 +994,20 @@ export class MaraUtils {
         return MaraUtils.GetAllConfigIds(settlement, MaraUtils.isMetalStockConfig, "isMetalStockConfig");
     }
 
+    static GetAllEconomyBoosterConfigIds(settlement: any): Array<string> {
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.isEconomyBoosterConfig, "isDevelopmentBoosterConfig");
+    }
+
+    static GetAllHealerConfigIds(settlement: any): Array<string> {
+        return MaraUtils.GetAllConfigIds(settlement, MaraUtils.isHealerConfig, "isHealerConfig");
+    }
+
     static GetAllConfigIds(settlement: any, configFilter: (config: any) => boolean, propertyName: string): Array<string> {
         let result: Array<string> = [];
 
-        ForEach(AllContent.UnitConfigs.Configs, kv => {
-            let cfgId = kv.Key;
-            let uCfg = kv.Value;
+        let allConfigs = MaraUnitConfigCache.GetAllConfigs();
 
+        allConfigs.forEach((uCfg, cfgId) => {
             let propertyValue = MaraUnitConfigCache.GetConfigProperty(cfgId, configFilter, propertyName) as boolean;
             
             if (

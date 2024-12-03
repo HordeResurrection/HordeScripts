@@ -17,8 +17,11 @@ export class DevelopingState extends ProductionState {
         let reinforcementProducers: Array<string> = this.getReinforcementProducers(economyComposition);
         this.settlementController.Debug(`Reinforcements producers: ${reinforcementProducers.join(", ")}`);
 
-        let economyBoosters: Array<string> = this.getEconomyBoosters(economyComposition, produceableCfgIds);
-        this.settlementController.Debug(`Economy boosters: ${economyBoosters.join(", ")}`);
+        let economyBoosters: Array<string> = this.getEconomyBoosters(economyComposition);
+        this.settlementController.Debug(`Economy boosters & chain: ${economyBoosters.join(", ")}`);
+
+        let healers: Array<string> = this.getHealers(economyComposition);
+        this.settlementController.Debug(`Healers & chain: ${healers.join(", ")}`);
 
         let selectedCfgIds: Array<string> | null = null;
  
@@ -27,9 +30,10 @@ export class DevelopingState extends ProductionState {
         }
         else if (
             reinforcementProducers.length > 0 || 
-            economyBoosters.length > 0
+            economyBoosters.length > 0 ||
+            healers.length > 0
         ) {
-            let cfgIdSet = [reinforcementProducers, economyBoosters];
+            let cfgIdSet = [reinforcementProducers, economyBoosters, healers];
             cfgIdSet.filter((item) => item.length > 0);
             
             selectedCfgIds = MaraUtils.RandomSelect(this.settlementController.MasterMind, cfgIdSet);
@@ -155,13 +159,11 @@ export class DevelopingState extends ProductionState {
         return reinforcementProducers;
     }
 
-    private getEconomyBoosters(economyComposition: UnitComposition, produceableCfgIds: Array<string>) {
-        let economyBoosters: Array<string> = [];
-
+    private getEconomyBoosters(economyComposition: UnitComposition) {
         let developmentBoosterCount = 0;
 
         economyComposition.forEach((value, key) => {
-            if (MaraUtils.IsDevelopmentBoosterConfigId(key)) {
+            if (MaraUtils.IsEconomyBoosterConfigId(key)) {
                 developmentBoosterCount += value;
             }
         });
@@ -171,14 +173,54 @@ export class DevelopingState extends ProductionState {
         let maxDevelopmentBoosters = peopleLevels.Item(peopleLevels.Count - 1).GrowthBuildings;
 
         if (developmentBoosterCount < maxDevelopmentBoosters) {
-            let produceableEconomyBoosters = produceableCfgIds.filter((value) => MaraUtils.IsDevelopmentBoosterConfigId(value));
-            let economyBooster = MaraUtils.RandomSelect(this.settlementController.MasterMind, produceableEconomyBoosters);
+            let possibleEconomyBoosters = MaraUtils.GetAllEconomyBoosterConfigIds(this.settlementController.Settlement);
+            let economyBooster = MaraUtils.RandomSelect(this.settlementController.MasterMind, possibleEconomyBoosters);
 
             if (economyBooster) {
-                economyBoosters.push(economyBooster);
+                return this.addTechChain(economyBooster, economyComposition);
             }
         }
 
-        return economyBoosters;
+        return [];
+    }
+
+    private getHealers(economyComposition: UnitComposition): Array<string> {
+        let atLeastOneHealerPresent = false;
+        
+        economyComposition.forEach((value, key) => {
+            if (MaraUtils.IsHealerConfigId(key) && MaraUtils.IsBuildingConfigId(key)) {
+                atLeastOneHealerPresent = true;
+            }
+        });
+
+        if (atLeastOneHealerPresent) {
+            return [];
+        }
+
+        let possbleHealers = MaraUtils.GetAllHealerConfigIds(this.settlementController.Settlement);
+
+        if (possbleHealers.length > 0) {
+            let cfgId = MaraUtils.RandomSelect(this.settlementController.MasterMind, possbleHealers)!
+            
+            return this.addTechChain(cfgId, economyComposition);
+        }
+        else {
+            return [];
+        }
+    }
+
+    private addTechChain(cfgId: string, economyComposition: UnitComposition): Array<string> {
+        let result = [cfgId];
+        
+        let chain = MaraUtils.GetCfgIdProductionChain(cfgId, this.settlementController.Settlement);
+        let chainCfgIds = chain.map((value) => value.Uid);
+
+        for (let chainCfgId of chainCfgIds) {
+            if (!economyComposition.has(chainCfgId)) {
+                result.push(chainCfgId);
+            }
+        }
+
+        return result;
     }
 }

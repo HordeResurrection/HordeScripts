@@ -44,6 +44,16 @@ export class MaraUnitConfigCache {
         });
     }
 
+    static GetAllConfigs(): Map<string, any> {
+        let result = new Map<string, any>();
+
+        MaraUnitConfigCache.configCache.forEach((value, key) =>{
+            result.set(key, value.Config);
+        });
+
+        return result;
+    }
+
     static GetConfigProperty(
         configId: string,
         propertyCalculator: (config: any) => ConfigPropertyType,
