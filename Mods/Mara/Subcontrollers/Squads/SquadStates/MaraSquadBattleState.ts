@@ -104,7 +104,8 @@ export class MaraSquadBattleState extends MaraSquadState {
             }
         }
 
-        if (tickNumber % 10 == 0) {
+        //if (tickNumber % 10 == 0) { // also micro
+        if (tickNumber % 50 == 0) {
             this.updateThreats();
             
             if (
@@ -123,8 +124,8 @@ export class MaraSquadBattleState extends MaraSquadState {
 
             // Temporarily (?) disable proper micro because of it being slow as hell
             //this.distributeTargets();
-            this.distributeTargets_lite();
-            //this.distributeTargets_liter();
+            //this.distributeTargets_lite();
+            this.distributeTargets_liter();
         }
     }
 
