@@ -74,11 +74,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         
         if (this.currentTarget!.Unit.IsAlive) {
             let pullbackLocations = this.getPullbackLocations();
+            let healingLocations = pullbackLocations.filter((l) => l.HasHealers);
 
             for (let squad of this.offensiveSquads) {
                 if (pullbackLocations.length > 0) {
                     if (squad.CombativityIndex < this.settlementController.Settings.Squads.MinCombativityIndex) {
-                        this.sendSquadToOneOfLocations(squad, pullbackLocations);
+                        this.sendSquadToOneOfLocations(squad, pullbackLocations, healingLocations);
                     }
                 }
 
@@ -105,11 +106,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
     IdleTick(): void {
         let retreatLocations = this.getRetreatLocations();
+        let healingLocations = retreatLocations.filter((l) => l.HasHealers);
 
         if (retreatLocations.length > 0) {
             for (let squad of this.allSquads) {
                 if (squad.IsIdle()) {
-                    this.sendSquadToOneOfLocations(squad, retreatLocations);
+                    this.sendSquadToOneOfLocations(squad, retreatLocations, healingLocations);
                 }
             }
         }
@@ -172,11 +174,11 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     Retreat(): void {
         this.currentTarget = null;
         let retreatLocations = this.getRetreatLocations();
+        let healingLocations = retreatLocations.filter((l) => l.HasHealers);
 
         if (retreatLocations.length > 0) {
             for (let squad of this.offensiveSquads) {
-                this.sendSquadToOneOfLocations(squad, retreatLocations);
-                squad.Debug(`retreating`);
+                this.sendSquadToOneOfLocations(squad, retreatLocations, healingLocations);
             }
         }
     }
@@ -311,24 +313,40 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         return weakestSquad;
     }
 
-    private sendSquadToOneOfLocations(squad: MaraControllableSquad, locations: Array<SettlementClusterLocation>): void {
+    private sendSquadToOneOfLocations(
+        squad: MaraControllableSquad, 
+        allLocations: Array<SettlementClusterLocation>,
+        healerLocations: Array<SettlementClusterLocation>
+    ): void {
+        let squadHealthLevel = squad.GetHealthLevel();
+        let locations: Array<SettlementClusterLocation>;
+
+        if (squadHealthLevel <= 0.5) {
+            locations = healerLocations.length > 0 ? healerLocations : allLocations;
+        }
+        else {
+            locations = allLocations;
+        }
+        
         if (locations.length == 0) {
             return;
         }
 
-        let closestLocation: SettlementClusterLocation | null = null;
-        let minDistance = Infinity;
+        this.sendSquadToClosestLocation(squad, locations);
+    }
 
+    private sendSquadToClosestLocation(squad: MaraControllableSquad, locations: Array<SettlementClusterLocation>): void {
         let squadLocation = squad.GetLocation();
 
-        for (let location of locations) {
-            let distance = MaraUtils.ChebyshevDistance(squadLocation.Point, location.Center);
-
-            if (distance < minDistance) {
-                closestLocation = location;
-                minDistance = distance;
+        let closestLocation = MaraUtils.FindExtremum(
+            locations,
+            (current, next) => {
+                return (
+                    MaraUtils.ChebyshevDistance(squadLocation.Point, current.Center) -
+                    MaraUtils.ChebyshevDistance(squadLocation.Point, next.Center)
+                );
             }
-        }
+        );
 
         if (!squad.CurrentMovementPoint || !MaraUtils.IsPointsEqual(squad.CurrentMovementPoint, closestLocation!.Center)) {
             if (
@@ -628,6 +646,26 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             );
 
             result.push(expandLocation);
+        }
+
+        let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        let healers = allUnits.filter((u) => MaraUtils.IsHealerConfigId(u.UnitCfgId));
+
+        for (let healer of healers) {
+            const HEALING_RADIUS = 3; //TODO: calculate this properly based on a unit config
+            
+            let healingRect = new MaraRect(
+                healer.UnitRect.TopLeft.Shift(new MaraPoint(-HEALING_RADIUS, -HEALING_RADIUS)),
+                healer.UnitRect.BottomRight.Shift(new MaraPoint(HEALING_RADIUS, HEALING_RADIUS))
+            );
+            
+            let healerLocation = new SettlementClusterLocation(
+                healer.UnitRect.Center,
+                healingRect,
+                true
+            );
+
+            result.push(healerLocation);
         }
 
         return result;

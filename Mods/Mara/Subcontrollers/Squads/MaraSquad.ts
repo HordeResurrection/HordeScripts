@@ -141,6 +141,18 @@ export class MaraSquad {
         this.onUnitsAdded();
     }
 
+    GetHealthLevel(): number {
+        let totalHealth = 0;
+        let maxHealth = 0;
+
+        for (let unit of this.Units) {
+            maxHealth += MaraUtils.GetConfigIdMaxHealth(unit.UnitCfgId);
+            totalHealth += unit.Unit.Health;
+        }
+
+        return totalHealth / maxHealth;
+    }
+
     protected onUnitsAdded(): void {
         //do nothing
     }

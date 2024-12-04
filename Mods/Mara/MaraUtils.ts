@@ -1076,7 +1076,7 @@ export class MaraUtils {
 
     static FindExtremum<Type>(
         items: Array<Type>, 
-        compareFunc: (a: Type, b: Type) => number
+        compareFunc: (currentExtremum: Type, candidate: Type) => number
     ): Type | null {
         if (items.length == 0) {
             return null;
