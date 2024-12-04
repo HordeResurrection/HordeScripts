@@ -340,7 +340,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
         let closestLocation = MaraUtils.FindExtremum(
             locations,
-            (current, next) => {
+            (next, current) => {
                 return (
                     MaraUtils.ChebyshevDistance(squadLocation.Point, current.Center) -
                     MaraUtils.ChebyshevDistance(squadLocation.Point, next.Center)
@@ -349,9 +349,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         );
 
         if (!squad.CurrentMovementPoint || !MaraUtils.IsPointsEqual(squad.CurrentMovementPoint, closestLocation!.Center)) {
-            if (
-                !closestLocation!.BoundingRect.IsPointInside(squadLocation.Point)
-            ) {
+            if (!closestLocation!.BoundingRect.IsPointInside(squadLocation.Point)) {
                 let spread = squad.MinSpread * 3;
                 let minDimension = Math.min(closestLocation!.BoundingRect.Width, closestLocation!.BoundingRect.Heigth);
                 let precision = Math.max(minDimension - spread, 0);
@@ -688,15 +686,35 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         let accumulatedStrength = 0;
         let defendingSquadGroup: Array<MaraControllableSquad> = [];
 
-        let settlementLocation = this.settlementController.GetSettlementLocation();
+        let retreatLocations = this.getRetreatLocations();
 
-        if (!settlementLocation) { //everything is lost :(
+        if (retreatLocations.length == 0) { //everything is lost :(
             return;
         }
 
         for (let squad of this.allSquads) {
-            if (!settlementLocation.BoundingRect.IsPointInside(squad.GetLocation().Point)) {
+            let isRetreatedSquad = false;
+
+            for (let location of retreatLocations) {
+                if (location.BoundingRect.IsPointInside(squad.GetLocation().Point)) {
+                    isRetreatedSquad = true;
+                    break;
+                }
+            }
+
+            if (!isRetreatedSquad) {
                 continue;
+            }
+            else {
+                if (
+                    !this.defensiveSquads.find((s) => s == squad) && 
+                    !this.militiaSquads.find((s) => s == squad)
+                ) {
+                    this.defensiveSquads.push(squad);
+                    
+                    this.offensiveSquads = this.offensiveSquads.filter((s) => s != squad);
+                    this.reinforcementSquads = this.reinforcementSquads.filter((s) => s != squad);
+                }
             }
             
             defendingSquadGroup.push(squad);
