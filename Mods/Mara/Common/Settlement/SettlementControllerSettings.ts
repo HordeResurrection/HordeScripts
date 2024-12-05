@@ -5,7 +5,7 @@ export class MaraSettlementControllerSettings {
     public Squads: SquadsSettings = new SquadsSettings();
     public ControllerStates: ControllerStatesSettings = new ControllerStatesSettings();
     public ResourceMining: ResourceMiningSettings = new ResourceMiningSettings();
-    public CombatSettings: CombatSettings = new CombatSettings();
+    public Combat: CombatSettings = new CombatSettings();
 }
 
 class UnitSearchSettings {

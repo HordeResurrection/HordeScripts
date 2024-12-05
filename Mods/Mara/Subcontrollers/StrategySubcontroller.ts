@@ -76,13 +76,13 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
         let ratio = MaraUtils.RandomSelect<number>(
             this.settlementController.MasterMind,
-            this.settlementController.Settings.CombatSettings.OffensiveToDefensiveRatios
+            this.settlementController.Settings.Combat.OffensiveToDefensiveRatios
         ) ?? 1;
 
         this.settlementController.AttackToDefenseUnitRatio = ratio;
         this.settlementController.Debug(`Calculated attack to defense ratio: ${ratio}`);
         
-        let requiredStrength = this.settlementController.Settings.CombatSettings.AttackStrengthToEnemyStrengthRatio * 
+        let requiredStrength = this.settlementController.Settings.Combat.AttackStrengthToEnemyStrengthRatio * 
             Math.max(
                 this.calcSettlementStrength(this.currentEnemy), 
                 this.settlementController.Settings.ControllerStates.MinAttackStrength
@@ -148,7 +148,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         }
         
         if (requiredStrength > 0) {
-            requiredStrength *= this.settlementController.Settings.CombatSettings.AttackStrengthToEnemyStrengthRatio;
+            requiredStrength *= this.settlementController.Settings.Combat.AttackStrengthToEnemyStrengthRatio;
             this.settlementController.Debug(`Required Strength to secure expand: ${requiredStrength}`);
 
             let composition = this.getOffensiveUnitComposition(requiredStrength);
@@ -178,7 +178,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
             currentStrength += MaraUtils.GetUnitStrength(unit);
         }
         
-        let requiredStrength = Math.max(this.settlementController.Settings.CombatSettings.ExpandDefenseStrength - currentStrength, 0);
+        let requiredStrength = Math.max(this.settlementController.Settings.Combat.ExpandDefenseStrength - currentStrength, 0);
 
         if (requiredStrength > 0) {
             this.settlementController.Debug(`Required Strength to guard expand: ${requiredStrength}`);
@@ -685,7 +685,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
         let strengthToProduce = Math.min(
             requiredStrength, 
-            maxStrength * this.settlementController.Settings.CombatSettings.MaxCompositionUnitCount
+            maxStrength * this.settlementController.Settings.Combat.MaxCompositionUnitCount
         );
 
         let currentStrength = 0;
@@ -693,7 +693,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
         while (
             currentStrength < strengthToProduce &&
-            totalUnitCount < this.settlementController.Settings.CombatSettings.MaxCompositionUnitCount
+            totalUnitCount < this.settlementController.Settings.Combat.MaxCompositionUnitCount
         ) {
             if (allowedConfigs.length == 0) {
                 this.settlementController.Debug(`Unable to compose required strength: unit limits reached`);

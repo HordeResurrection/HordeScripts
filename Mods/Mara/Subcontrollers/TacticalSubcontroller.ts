@@ -485,7 +485,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     private getUnitMovementType(unit: MaraUnitCacheItem): string {
         return MaraUnitConfigCache.GetConfigProperty(
             unit.UnitCfgId, 
-            (cfg) => TacticalSubcontroller.calcConfigMovementType(cfg, this.settlementController.Settings.CombatSettings.UnitSpeedClusterizationThresholds), "MovementType"
+            (cfg) => TacticalSubcontroller.calcConfigMovementType(cfg, this.settlementController.Settings.Combat.UnitSpeedClusterizationThresholds), "MovementType"
         ) as string;
     }
 
