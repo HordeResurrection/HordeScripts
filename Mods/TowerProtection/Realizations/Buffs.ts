@@ -114,7 +114,7 @@ export class Buff_DigMoat extends IBuff {
 
         // не работает
 
-        //ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", [createPoint(16, 22), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[1], true]);
+        //GlobalVars.ActiveScena.LandscapeMap.ChangeTileConfig(createPoint(16, 22), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[1]);
 
         // не работает 
 
@@ -137,7 +137,7 @@ export class Buff_DigMoat extends IBuff {
     private _SetTile(cell: any, tileCfg: any) {
         this.prevTilesCfg.push(GlobalVars.ActiveScena.GetRealScena().LandscapeMap.Item.get(cell).Cfg);
         this.prevTilesCell.push(cell);
-        ScriptUtils.Invoke(GlobalVars.ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", cell, tileCfg, true);
+        GlobalVars.ActiveScena.LandscapeMap.ChangeTileConfig(cell, tileCfg);
     }
 
     static InitConfig() {
@@ -155,9 +155,9 @@ export class Buff_DigMoat extends IBuff {
 
     public OnDead(gameTickNum: number) {
         // убираем изменения ланшафта
-        var landscapeMap = GlobalVars.ActiveScena.GetRealScena().LandscapeMap;
+        var landscapeMap = GlobalVars.ActiveScena.LandscapeMap;
         for (var tileNum = 0; tileNum < this.prevTilesCfg.length; tileNum++) {
-            ScriptUtils.Invoke(landscapeMap, "ChangeTileByConfig", this.prevTilesCell[tileNum], this.prevTilesCfg[tileNum], true);
+            landscapeMap.ChangeTileConfig(this.prevTilesCell[tileNum], this.prevTilesCfg[tileNum]);
         }
     }
 };
