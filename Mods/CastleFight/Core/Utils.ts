@@ -178,9 +178,9 @@ export class Rectangle {
 
 export function GetUnitsInArea(rect: Rectangle): Array<any> {
     let box = createBox(rect.xs, rect.ys, 0, rect.xe, rect.ye, 2);
-    let unitsInBox = ScriptUtils.Invoke(ActiveScena.GetRealScena().UnitsMap.UnitsTree, "GetUnitsInBox", box);
-    let count = ScriptUtils.GetValue(unitsInBox, "Count");
-    let units = ScriptUtils.GetValue(unitsInBox, "Units");
+    let unitsInBox = ActiveScena.UnitsMap.UnitsTree.GetUnitsInBox(box);
+    let count = unitsInBox.Count;
+    let units = unitsInBox.Units;
 
     let unitsIds = new Set<number>();
     let result = new Array<any>();

@@ -277,9 +277,9 @@ export class MaraUtils {
             2
         );
 
-        let unitsInBox = ScriptUtils.Invoke(DotnetHolder.RealScena.UnitsMap.UnitsTree, "GetUnitsInBox", box);
-        let count = ScriptUtils.GetValue(unitsInBox, "Count");
-        let units = ScriptUtils.GetValue(unitsInBox, "Units");
+        let unitsInBox = DotnetHolder.RealScena.UnitsMap.UnitsTree.GetUnitsInBox(box);
+        let count = unitsInBox.Count;
+        let units = unitsInBox.Units;
 
         let unitsIds = new Set<number>();
         let result = new Array<any>();
