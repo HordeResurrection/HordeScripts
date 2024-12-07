@@ -35,7 +35,7 @@ export class Example_SettlementWorks extends HordeExampleBase {
         let units = realSettlement.Units;
         this.log.info(`Количество юнитов:`, units.Count);
         // Здесь можно получать юнитов только по идентификатору, а по координатам см. через сцену.
-        let unit = ScriptUtils.Invoke(units, "GetById", 0);
+        let unit = units.GetById(0);
         if (unit) {
             this.log.info(`У ${realPlayer.Nickname} обнаружен юнит с id=0: ${unit}`);
         }
