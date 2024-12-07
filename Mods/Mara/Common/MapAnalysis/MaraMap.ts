@@ -55,7 +55,7 @@ export class MaraMap {
     
     private static tileTypeCache: TileTypeCache = new TileTypeCache();
     
-    private static DEBUG_MAP = false;
+    private static DEBUG_MAP = true;
     private static mapNodes: Array<MaraMapNode> = [];
 
     private static resourceMapMonitor: any;
@@ -111,7 +111,6 @@ export class MaraMap {
     }
 
     static GetPaths(from: MaraPoint, to: MaraPoint): Array<MaraPath> {
-        MaraMap.mapNodes.forEach((n) => n.Weigth = 1);
         let fromNode = MaraMap.mapNodes.find((n) => n.Region.HasCell(from));
 
         if (!fromNode) {
@@ -125,6 +124,10 @@ export class MaraMap {
         }
         
         let paths: Array<MaraPath> = [];
+        
+        MaraMap.mapNodes.forEach((n) => {
+            n.Weigth = n.Type != MaraMapNodeType.Unwalkable ? 1 : Infinity;
+        });
         
         const WEIGTH_INCREMENT = 100;
 
@@ -171,17 +174,21 @@ export class MaraMap {
         let grid = MaraMap.makeMapGrid();
 
         let unwalkableRegions = MaraMap.detectUnwalkableRegions(grid);
-
+        
         let unwalkableRegionCellsIndex = new MaraCellIndex();
-        unwalkableRegions.forEach((region) => unwalkableRegionCellsIndex.SetMany(region.Cells));
+        let regionIndex = new MaraRegionIndex();
+
+        for (let region of unwalkableRegions) {
+            regionIndex.SetMany(region.Cells, region);
+            unwalkableRegionCellsIndex.SetMany(region.Cells)
+            MaraMap.mapNodes.push(new MaraMapNode(region, [], MaraMapNodeType.Unwalkable));
+        }
 
         let gateEnds = MaraMap.detectGateEnds(unwalkableRegions);
         let gateData = MaraMap.makeGates(gateEnds, unwalkableRegions);
 
         let gates = gateData[0];
         let gateCellsIndex = gateData[1];
-        
-        let regionIndex = new MaraRegionIndex();
         
         for (let gate of gates) {
             regionIndex.SetMany(gate.Cells, gate);
@@ -668,11 +675,16 @@ export class MaraMap {
 
             let color: any;
 
-            if (node.Type == MaraMapNodeType.Gate) {
-                color = createHordeColor(255, 255, 0, 0);
-            }
-            else {
-                color = createHordeColor(255, 128, 128, 128);
+            switch (node.Type) {
+                case MaraMapNodeType.Gate:
+                    color = createHordeColor(255, 0, 0, 255);
+                    break;
+                case MaraMapNodeType.Unwalkable:
+                    color = createHordeColor(255, 255, 0, 0);
+                    break;
+                default:
+                    color = createHordeColor(255, 128, 128, 128);
+                    break;
             }
 
             for (let cell of node.Region.Cells) {
