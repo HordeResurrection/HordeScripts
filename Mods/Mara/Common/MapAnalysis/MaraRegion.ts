@@ -28,10 +28,23 @@ export class MaraRegion {
         this.addCells(cells);
     }
 
+    public DelCells(cells: Array<MaraPoint>) {
+        for (let cell of cells) {
+            this.cellsIndex.Del(cell);
+            this.cells = this.cells.filter((c) => !c.EqualsTo(cell));
+        }
+
+        this.recalcCenter();
+    }
+
     private addCells(cells: Array<MaraPoint>): void {
         this.cells.push(...cells);
         this.cellsIndex.SetMany(cells);
 
+        this.recalcCenter();
+    }
+
+    private recalcCenter(): void {
         let avgX = 0;
         let avgY = 0;
 

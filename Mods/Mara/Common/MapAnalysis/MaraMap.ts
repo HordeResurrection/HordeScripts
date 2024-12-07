@@ -55,8 +55,9 @@ export class MaraMap {
     
     private static tileTypeCache: TileTypeCache = new TileTypeCache();
     
-    private static DEBUG_MAP = true;
+    private static DEBUG_MAP = false;
     private static mapNodes: Array<MaraMapNode> = [];
+    private static nodeIndex: MaraRegionIndex;
 
     private static resourceMapMonitor: any;
     private static resourceData: Array<Array<any>> = [];
@@ -128,7 +129,7 @@ export class MaraMap {
         MaraMap.mapNodes.forEach((n) => {
             n.Weigth = n.Type != MaraMapNodeType.Unwalkable ? 1 : Infinity;
         });
-        
+
         const WEIGTH_INCREMENT = 100;
 
         while (true) {
@@ -170,6 +171,48 @@ export class MaraMap {
         return tileType;
     }
 
+    static AddNode(nodeCells: Array<MaraPoint>, nodeType: MaraMapNodeType): void {
+        let overlappedNodes: Array<MaraMapNode> = [];
+
+        for (let cell of nodeCells) {
+            let node = MaraMap.nodeIndex.Get(cell);
+
+            if (!overlappedNodes.find((v) => v == node)) {
+                overlappedNodes.push(node);
+            }
+        }
+
+        for (let node of overlappedNodes) {
+            node.Region.DelCells(nodeCells);
+        }
+
+        for (let node of overlappedNodes) {
+            for (let neighbour of node.Neighbours) {
+                neighbour.Neighbours = neighbour.Neighbours.filter((n) => n != node);
+            }
+
+            node.Neighbours = [];
+        }
+
+        overlappedNodes = overlappedNodes.filter((n) => n.Region.Cells.length > 0);
+
+        let newNode = new MaraMapNode(
+            new MaraRegion(nodeCells),
+            [],
+            nodeType
+        );
+
+        MaraMap.mapNodes.push(newNode);
+        MaraMap.nodeIndex.SetMany(nodeCells, newNode);
+        MaraMap.mapNodes = MaraMap.mapNodes.filter((n) => n.Region.Cells.length > 0);
+
+        MaraMap.linkMapNodes([newNode, ...overlappedNodes], MaraMap.nodeIndex);
+
+        if (MaraMap.DEBUG_MAP) {
+            MaraMap.drawMap();
+        }
+    }
+
     private static buildMap(): void {
         let grid = MaraMap.makeMapGrid();
 
@@ -202,8 +245,20 @@ export class MaraMap {
             MaraMap.mapNodes.push(new MaraMapNode(region, [], MaraMapNodeType.Walkable));
         }
 
-        MaraMap.linkMapNodes(MaraMap.mapNodes, regionIndex);
+        MaraMap.nodeIndex = new MaraRegionIndex();
+
+        for (let node of MaraMap.mapNodes) {
+            MaraMap.nodeIndex.SetMany(node.Region.Cells, node);
+        }
+
+        MaraMap.linkMapNodes(MaraMap.mapNodes, MaraMap.nodeIndex);
+        
         MaraMap.cleanupMapNodes();
+        MaraMap.nodeIndex.Clear();
+        
+        for (let node of MaraMap.mapNodes) {
+            MaraMap.nodeIndex.SetMany(node.Region.Cells, node);
+        }
     }
 
     private static makeMapGrid(): Array<Array<MaraPoint>> {
@@ -542,7 +597,7 @@ export class MaraMap {
         return regions;
     }
 
-    private static linkMapNodes(mapNodes: Array<MaraMapNode>, regionIndex: MaraRegionIndex): void {
+    private static linkMapNodes(mapNodes: Array<MaraMapNode>, nodeIndex: MaraRegionIndex): void {
         for (let node of mapNodes) {
             for (let cell of node.Region.Cells) {
                 
@@ -552,11 +607,10 @@ export class MaraMap {
                     shiftVector = shiftVector.Rotate90DegreesCcw();
 
                     let neighbourCell = cell.Shift(shiftVector);
-                    let region = regionIndex.Get(neighbourCell);
+                    let neighbourNode = nodeIndex.Get(neighbourCell);
 
-                    if (region && region != node.Region) {
-                        let neighbourNode = mapNodes.find((v) => v.Region == region);
-                        MaraMap.linkNodes(node, neighbourNode!);
+                    if (neighbourNode && neighbourNode != node) {
+                        MaraMap.linkNodes(node, neighbourNode);
                     }
                 }
             }

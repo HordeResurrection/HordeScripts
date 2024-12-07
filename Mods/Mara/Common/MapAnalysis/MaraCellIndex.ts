@@ -12,6 +12,11 @@ export class MaraCellIndex extends MaraCellDataHolder {
         this.data[index] = value;
     }
 
+    Del(cell: any) {
+        let index = this.makeIndex(cell);
+        delete this.data[index];
+    }
+
     SetMany(cells: Array<MaraPoint>) {
         cells.forEach((v) => this.Set(v, true));
     }
