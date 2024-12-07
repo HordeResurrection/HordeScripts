@@ -1064,37 +1064,37 @@ export function AI_Init(world: World) {
 
     settlements_bot = new Array<IBot>(world.scena.settlementsCount);
 
-    // for (let player of Players) {
-    //     let realPlayer = player.GetRealPlayer();
-    //     if (!realPlayer.IsBot) {
-    //         continue;
-    //     }
-    //     var characterUid  = realPlayer.MasterMind.Character.Uid;
-    //     var settlement    = realPlayer.GetRealSettlement();
-    //     var settlementId  = settlement.Uid;
-    //     if (settlementId < world.scena.settlementsCount) {
-    //         if (!settlements_bot[settlementId]) {
-    //             if (characterUid == "#CastleFight_MindCharacter_Random_WithChurch") {
-    //                 settlements_bot[settlementId] = new RandomBot(settlementId);
-    //             } else if (characterUid == "#CastleFight_MindCharacter_Random_Melle") {
-    //                 settlements_bot[settlementId] = new RandomBotMelle(settlementId);
-    //             } else if (characterUid == "#CastleFight_MindCharacter_Random_Range") {
-    //                 settlements_bot[settlementId] = new RandomBotRange(settlementId);
-    //             } else  {
-    //                 settlements_bot[settlementId] = new RandomBotWithoutChurch(settlementId);
-    //             }
+    for (let player of Players) {
+        let realPlayer = player.GetRealPlayer();
+        if (!realPlayer.IsBot) {
+            continue;
+        }
+        var characterUid  = realPlayer.MasterMind.Character.Uid;
+        var settlement    = realPlayer.GetRealSettlement();
+        var settlementId  = settlement.Uid;
+        if (settlementId < world.scena.settlementsCount) {
+            if (!settlements_bot[settlementId]) {
+                if (characterUid == "#CastleFight_MindCharacter_Random_WithChurch") {
+                    settlements_bot[settlementId] = new RandomBot(settlementId);
+                } else if (characterUid == "#CastleFight_MindCharacter_Random_Melle") {
+                    settlements_bot[settlementId] = new RandomBotMelle(settlementId);
+                } else if (characterUid == "#CastleFight_MindCharacter_Random_Range") {
+                    settlements_bot[settlementId] = new RandomBotRange(settlementId);
+                } else  {
+                    settlements_bot[settlementId] = new RandomBotWithoutChurch(settlementId);
+                }
 
-    //             log.info("settlement = ", settlementId, " attach bot = ", settlements_bot[settlementId].name, " characterUid = ", characterUid);
-    //         }
-    //     }
-    // }
+                log.info("settlement = ", settlementId, " attach bot = ", settlements_bot[settlementId].name, " characterUid = ", characterUid);
+            }
+        }
+    }
 
-    settlements_bot[0] = new RandomBot(0);
-    settlements_bot[1] = new RandomBotMelle(1);
-    settlements_bot[2] = new RandomBotRange(2);
-    settlements_bot[3] = new RandomBotWithoutChurch(3);
-    settlements_bot[4] = new RandomBot(4);
-    settlements_bot[5] = new RandomBot(5);
+    // settlements_bot[0] = new RandomBot(0);
+    // settlements_bot[1] = new RandomBotMelle(1);
+    // settlements_bot[2] = new RandomBotRange(2);
+    // settlements_bot[3] = new RandomBotWithoutChurch(3);
+    // settlements_bot[4] = new RandomBot(4);
+    // settlements_bot[5] = new RandomBot(5);
 }
 
 export function AI_System(world: World, gameTickNum: number) {
