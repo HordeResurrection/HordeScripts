@@ -129,6 +129,7 @@ export class TowerProtection extends HordePluginBase {
                         new Rectangle(shiftX + 8, shiftY + 8, 32, 32),
                         teamNum
                     );
+                    GlobalVars.teams[teamNum].inGame = false;
                 }
             }
         } else {

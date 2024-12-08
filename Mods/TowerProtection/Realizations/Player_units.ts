@@ -56,7 +56,7 @@ export class Player_TOWER_BASE extends IProducerUnit {
         GlobalVars.configs[this.CfgUid].AllowedCommands.Remove(UnitCommand.Attack);
 
         // видимость и дальность атаки делаем = 13
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Sight", 13);
+        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Sight", 21);
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "OrderDistance", 13);
         GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "Range", 13);
     }
