@@ -129,8 +129,8 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
         let mineConfig = MaraUtils.GetUnitConfig(mineConfigId);
 
-        for (let row = rect.TopLeft.Y - mineHeigth; row <= rect.BottomRight.Y; row ++) {
-            for (let col = rect.TopLeft.X - mineWidth; col <= rect.BottomRight.X; col ++) {
+        for (let row = Math.max(rect.TopLeft.Y - mineHeigth, 0); row <= rect.BottomRight.Y; row ++) {
+            for (let col = Math.max(rect.TopLeft.X - mineWidth, 0); col <= rect.BottomRight.X; col ++) {
                 if (unitCanBePlacedByRealMap(mineConfig, col, row)) {
                     let position = new MaraPoint(col, row);
                     
