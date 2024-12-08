@@ -106,7 +106,7 @@ export class PlayerVirtualInput {
 		if (this.inputsList.Count == 0)
 			return;
 		
-		ScriptUtils.Invoke(this.player.VirtualInput, "AddLocalInputs", this.inputsList);
+		this.player.VirtualInput.AddLocalScriptInputs(this.inputsList);
 		this.inputsList.Clear();
 	}
 }
