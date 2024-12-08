@@ -974,6 +974,10 @@ export class MaraUtils {
         return unitConfig.Specification.HasFlag(UnitSpecification.Church);
     }
 
+    static IsWalkableConfig(unitConfig: any): boolean {
+        return unitConfig.BuildingConfig != null && unitConfig.HasFlags(UnitFlags.Walkable);
+    }
+
     static GetAllSawmillConfigIds(settlement: any): Array<string> {
         return MaraUtils.GetAllConfigIds(settlement, MaraUtils.isSawmillConfig, "isSawmillConfig");
     }

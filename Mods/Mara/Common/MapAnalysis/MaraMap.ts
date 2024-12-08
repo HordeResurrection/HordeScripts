@@ -55,16 +55,19 @@ export class MaraMap {
     
     private static tileTypeCache: TileTypeCache = new TileTypeCache();
     
-    private static DEBUG_MAP = false;
+    private static DEBUG_MAP = true;
     private static mapNodes: Array<MaraMapNode> = [];
     private static nodeIndex: MaraRegionIndex;
 
     private static resourceMapMonitor: any;
     private static resourceData: Array<Array<any>> = [];
     private static clusterData: ClusterData = new ClusterData();
+
+    private static unitBuildHandlers: Map<number, any>;
     
     public static Init(): void {
         MaraMap.resourceMapMonitor = MaraUtils.GetScena().ResourcesMap.CreateChangesObtainer("resource monitor");
+        MaraMap.unitBuildHandlers = new Map<number, any>();
         
         Mara.Debug(`Analyzing terrain...`);
         MaraMap.buildMap();
@@ -78,6 +81,10 @@ export class MaraMap {
         MaraMap.initResourceClusters();
 
         Mara.Debug(`Terrain analysis complete.`);
+
+        for (let settlement of MaraUtils.GetAllSettlements()) {
+            MaraMap.watchSettlement(settlement);
+        }
     }
 
     public static Tick(): void {
@@ -177,7 +184,7 @@ export class MaraMap {
         for (let cell of nodeCells) {
             let node = MaraMap.nodeIndex.Get(cell);
 
-            if (!overlappedNodes.find((v) => v == node)) {
+            if (node && !overlappedNodes.find((v) => v == node)) {
                 overlappedNodes.push(node);
             }
         }
@@ -823,5 +830,79 @@ export class MaraMap {
                 }
             }
         }
+    }
+
+    private static watchSettlement(settlement: any): void {
+        settlement.Units.UnitsListChanged.connect(
+            (sender, UnitsListChangedEventArgs) => {
+                MaraMap.unitListChangedProcessor(sender, UnitsListChangedEventArgs);
+            }
+        );
+    }
+
+    private static unitListChangedProcessor(sender, UnitsListChangedEventArgs): void {
+        let unit = UnitsListChangedEventArgs.Unit;
+
+        if (MaraUtils.IsWalkableConfig(unit.Cfg)) {
+            if (UnitsListChangedEventArgs.IsAdded) {
+                let handler = unit.EventsMind.BuildingComplete.connect(
+                    (sender, args) => {
+                        MaraMap.walkableBuildingBuiltProcessor(sender, args);
+                    }
+                );
+
+                MaraMap.unitBuildHandlers.set(unit.Id, handler);
+            }
+            else {
+                let unitId = unit.Id;
+                let handler = MaraMap.unitBuildHandlers.get(unitId);
+
+                if (handler) {
+                    handler.disconnect();
+                    MaraMap.unitBuildHandlers.delete(unitId);
+                }
+
+                let unitCells = MaraMap.getUnitCells(unit);
+                let walkableCellsCount = 0;
+
+                for (let cell of unitCells) {
+                    if (MaraMap.isWalkableCell(cell)) {
+                        walkableCellsCount ++;
+                    }
+                }
+
+                let nodeType = MaraMapNodeType.Unwalkable;
+
+                if (walkableCellsCount > unitCells.length / 2) {
+                    nodeType = MaraMapNodeType.Walkable;
+                }
+
+                MaraMap.AddNode(unitCells, nodeType);
+            }
+        }
+    }
+
+    private static walkableBuildingBuiltProcessor(sender, args): void {
+        let builtUnit = args.TriggeredUnit;
+        let unitCells = this.getUnitCells(builtUnit);
+
+        MaraMap.AddNode(unitCells, MaraMapNodeType.Gate);
+    }
+
+    private static getUnitCells(unit: any): Array<MaraPoint> {
+        let unitCells: Array<MaraPoint> = [];
+
+        let maxX = unit.Cell.X + MaraUtils.GetConfigIdWidth(unit.Cfg.Uid);
+        let maxY = unit.Cell.Y + MaraUtils.GetConfigIdHeight(unit.Cfg.Uid);
+
+        for (let x = unit.Cell.X; x < maxX; x ++) {
+            for (let y = unit.Cell.Y; y < maxY; y ++) {
+                unitCells.push(
+                    new MaraPoint(x, y)
+                );
+            }
+        }
+
+        return unitCells;
     }
 }
