@@ -72,15 +72,10 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
         let ordersMind = u.OrdersMind;
         this.log.info('= Orders', '(Count:', ordersMind.OrdersCount + ', BehaviorFlags:', ordersMind.BehaviorFlags.ToString() + ')');
         
-        let needCancel = ScriptUtils.GetValue(ordersMind, "NeedCancelActiveOrder");
+        let needCancel = ordersMind.NeedCancelActiveOrder;
         let activeOrder = ordersMind.ActiveOrder;
+        let notificationsStr = activeOrder.GetNotificationsInfoString();
         
-        let disableNotificationsTimer = ScriptUtils.GetValueAs(AOrderBaseT, activeOrder, "_timerDisableNotifications");
-        let notificationsStr = `Allow notifications: ${activeOrder.CanBeCanceledByNotification}`;
-        if (disableNotificationsTimer && disableNotificationsTimer.LeftTicks > 0) {
-            notificationsStr += ` (LeftTicks: ${disableNotificationsTimer.LeftTicks})`;  // Feature: потом эту строку можно будет перенести в ядро
-        }
-
         this.log.info(prefix + 'Current:', activeOrder);
         this.log.info(prefix + '  >', 'IsInstinct:', activeOrder.IsInstinct, '|', notificationsStr, '| NeedCancel:', needCancel);
         this.log.info(prefix + '  Act:', ordersMind.ActiveAct);
