@@ -29,6 +29,8 @@ export class MaraResourceCluster {
             }
         }
 
+        let mineralCellsCount = 0;
+
         while (nextCells.length > 0) {
             let currentCells = [...nextCells];
             nextCells = [];
@@ -71,17 +73,23 @@ export class MaraResourceCluster {
                 }
 
                 if (isMineralCell) {
-                    MaraUtils.ForEachCell(
-                        cell, 
-                        1, 
-                        (nextCell) => {
-                            let point = new MaraPoint(nextCell.X, nextCell.Y);
+                    mineralCellsCount ++;
 
-                            if (!MaraMap.ProcessedResourceCells.has(point.ToString())) {
-                                nextCells.push(point);
+                    if (mineralCellsCount < MaraMap.RESOURCE_CLUSTER_MAX_MINERAL_CELLS) {
+                        MaraUtils.ForEachCell(
+                            cell, 
+                            1, 
+                            (nextCell) => {
+                                let point = new MaraPoint(nextCell.X, nextCell.Y);
+    
+                                if (
+                                    !MaraMap.ProcessedResourceCells.has(point.ToString())
+                                ) {
+                                    nextCells.push(point);
+                                }
                             }
-                        }
-                    );
+                        );
+                    }
                 }
             }
         }

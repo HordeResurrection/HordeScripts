@@ -52,6 +52,7 @@ export class MaraMap {
     public static readonly REGION_SIZE = 20;
     public static readonly GATE_THRESHOLD = 10;
     public static readonly RESOURCE_CLUSTER_SIZE = 8;
+    public static readonly RESOURCE_CLUSTER_MAX_MINERAL_CELLS = 9;
     
     private static tileTypeCache: TileTypeCache = new TileTypeCache();
     
