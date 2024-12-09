@@ -59,6 +59,7 @@ export class MaraMap {
     private static mapNodes: Array<MaraMapNode> = [];
     private static nodeIndex: MaraRegionIndex;
 
+    private static DEBUG_RESORCES = true;
     private static resourceMapMonitor: any;
     private static resourceData: Array<Array<any>> = [];
     private static clusterData: ClusterData = new ClusterData();
@@ -79,6 +80,10 @@ export class MaraMap {
         Mara.Debug(`Building resource map...`);
         MaraMap.initCellResources();
         MaraMap.initResourceClusters();
+
+        if (MaraMap.DEBUG_RESORCES) {
+            MaraMap.drawResources();
+        }
 
         Mara.Debug(`Terrain analysis complete.`);
 
@@ -761,6 +766,32 @@ export class MaraMap {
 
             nodeIndex ++;
         }
+    }
+
+    private static drawResources(): void {
+        let clusterIndex = 0;
+
+        MaraMap.ResourceClusters.forEach((v) => {
+            let color = createHordeColor(255, 0, 255, 0);
+            
+            for (let woodCell of v.WoodCells) {
+                MaraUtils.TextOnMap(`${clusterIndex}`, woodCell, color);
+            }
+
+            color = createHordeColor(255, 128, 128, 128);
+
+            for (let metalCell of v.MetalCells) {
+                MaraUtils.TextOnMap(`${clusterIndex}`, metalCell, color);
+            }
+
+            color = createHordeColor(255, 255, 255, 0);
+
+            for (let goldCell of v.GoldCells) {
+                MaraUtils.TextOnMap(`${clusterIndex}`, goldCell, color);
+            }
+
+            clusterIndex ++;
+        });
     }
 
     private static dijkstraPath(from: MaraMapNode, to: MaraMapNode, nodes: Array<MaraMapNode>): Array<MaraMapNode> {
