@@ -608,16 +608,23 @@ export class MaraMap {
         for (let node of mapNodes) {
             for (let cell of node.Region.Cells) {
                 
-                let shiftVector = new MaraPoint(0, 1);
+                let shiftVectors = [
+                    new MaraPoint(0, 1),
+                    new MaraPoint(1, 1),
+                ];
+
 
                 for (let i = 0; i < 4; i ++) {
-                    shiftVector = shiftVector.Rotate90DegreesCcw();
+                    for (let i = 0; i < shiftVectors.length; i ++) {
+                        shiftVectors[i] = shiftVectors[i].Rotate90DegreesCcw();
 
-                    let neighbourCell = cell.Shift(shiftVector);
-                    let neighbourNode = nodeIndex.Get(neighbourCell);
+                        let vector = shiftVectors[i];
+                        let neighbourCell = cell.Shift(vector);
+                        let neighbourNode = nodeIndex.Get(neighbourCell);
 
-                    if (neighbourNode && neighbourNode != node) {
-                        MaraMap.linkNodes(node, neighbourNode);
+                        if (neighbourNode && neighbourNode != node) {
+                            MaraMap.linkNodes(node, neighbourNode);
+                        }
                     }
                 }
             }
