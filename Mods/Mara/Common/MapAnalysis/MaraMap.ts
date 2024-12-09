@@ -60,7 +60,7 @@ export class MaraMap {
     private static mapNodes: Array<MaraMapNode> = [];
     private static nodeIndex: MaraRegionIndex;
 
-    private static DEBUG_RESORCES = true;
+    private static DEBUG_RESOURCES = false;
     private static resourceMapMonitor: any;
     private static resourceData: Array<Array<any>> = [];
     private static clusterData: ClusterData = new ClusterData();
@@ -82,7 +82,7 @@ export class MaraMap {
         MaraMap.initCellResources();
         MaraMap.initResourceClusters();
 
-        if (MaraMap.DEBUG_RESORCES) {
+        if (MaraMap.DEBUG_RESOURCES) {
             MaraMap.drawResources();
         }
 
