@@ -127,6 +127,9 @@ export class MiningSubcontroller extends MaraSubcontroller {
         let mineHeigth = MaraUtils.GetConfigIdHeight(mineConfigId);
         let mineWidth = MaraUtils.GetConfigIdWidth(mineConfigId);
 
+        let scenaWidth = MaraUtils.GetScenaWidth();
+        let scenaHeigth = MaraUtils.GetScenaHeigth();
+
         let mineConfig = MaraUtils.GetUnitConfig(mineConfigId);
 
         for (let row = Math.max(rect.TopLeft.Y - mineHeigth, 0); row <= rect.BottomRight.Y; row ++) {
@@ -136,7 +139,10 @@ export class MiningSubcontroller extends MaraSubcontroller {
                     
                     let positionResources = this.GetRectResources(
                         position,
-                        new MaraPoint(col + mineWidth - 1, row + mineHeigth - 1)
+                        new MaraPoint(
+                            Math.min(col + mineWidth, scenaWidth) - 1, 
+                            Math.min(row + mineHeigth, scenaHeigth) - 1
+                        )
                     );
                     
                     if (optimalPositionResources) {
