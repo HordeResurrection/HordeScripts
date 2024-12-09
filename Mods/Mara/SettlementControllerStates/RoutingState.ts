@@ -106,12 +106,15 @@ export class RoutingState extends MaraSettlementControllerState {
     }
 
     private pickBuildUpOrDevelopment(buildUpProbability: number): void {
+        let realBuildUpProbability = buildUpProbability * (0.7 ** this.settlementController.ConsequtiveBuildUpCount);
         let pick = MaraUtils.Random(this.settlementController.MasterMind, 100);
 
-        if (pick < buildUpProbability) {
+        if (pick < realBuildUpProbability) {
+            this.settlementController.ConsequtiveBuildUpCount ++;
             this.settlementController.State = SettlementControllerStateFactory.MakeBuildingUpState(this.settlementController);
         }
         else {
+            this.settlementController.ConsequtiveBuildUpCount = 0;
             this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
         }
     }
