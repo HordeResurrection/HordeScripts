@@ -31,7 +31,7 @@ export function allExamples() {
     addExample(new Example_PlayerSelectedSquad());
 
     // - Примеры работы с игровой логикой
-    addExample(new Example_IterateBullets());  // В этом примере выполняется перечисление новых снарядов на сцене
+    addExample(new Example_IterateBullets());  // В этом примере выполняется перечисление добавленных и удаленных снарядов на сцене
     addExample(new Example_SpawnOneBullet());
     addExample(new Example_SpawnBulletsRain());
     addExample(new Example_SpawnUnit());

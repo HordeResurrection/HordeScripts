@@ -14,8 +14,6 @@ import HordeExampleBase from "./base-example";
 export class Example_IterateBullets extends HordeExampleBase {
 
     private bulletsRegistry : any;
-    private bulletsIdProvider : any;
-    private lastNextBulletId = 0;
     
     public constructor() {
         super("Iterate bullets");
@@ -23,45 +21,37 @@ export class Example_IterateBullets extends HordeExampleBase {
         let realScena = ActiveScena.GetRealScena();
 
         this.bulletsRegistry = realScena.Bullets;
-        this.bulletsIdProvider = this._getIdProvider();
     }
 
     public onFirstRun() {
         this.logMessageOnRun();
         
         this.log.info('Реестр снарядов:', this.bulletsRegistry);
-        this.log.info('IdProvider для снарядов:', this.bulletsIdProvider);
-    }
+        
+        let that = this;
 
-    public onEveryTick(gameTickNum: number) {
-    
-        // Следующий ID снаряда
-        let currentNextId = ScriptUtils.GetValue(this.bulletsIdProvider, "TotalIds");
-    
-        // Итерируем новые снаряды на сцене
-        let bullVar = host.newVar(BaseBullet);
-        for (let i = this.lastNextBulletId; i < currentNextId; i++) {
-            if(!this.bulletsRegistry.TryGet(i, bullVar.out))
-                continue;
-                let bull = bullVar.value;
-            this.log.info('- Новый снаряд:', '[' + bull.State + ']', bull);
-    
-            // Внимание! Здесь будут только те снаряды, которые имеются на сцене в данный момент.
-            // Т.е. здесь не найти снаряды, которые уже завершили своё движение. Это актуально для снарядов ближнего боя.
+        if (this.globalStorage.currentAddedHandler) {
+            this.globalStorage.currentAddedHandler.disconnect();
         }
-    
-        // Запоминаем на каком снаряде остановились в этот раз
-        this.lastNextBulletId = currentNextId;
-    }
-
-    /**
-     * Магия рефлексии для получения доступа к IdProvider 
-     */
-    private _getIdProvider() {
-        let BaseBulletT = ScriptUtils.GetTypeByName("HordeClassLibrary.World.Objects.Bullets.BaseBullet, HordeClassLibrary");
-        let ScenaObjectsRegistryT = ScriptUtils.GetTypeByName("HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaObjectsRegistry`1").MakeGenericType(BaseBulletT);
-        let propIdProvider = ScenaObjectsRegistryT.GetProperty("IdProvider", mergeFlags(BindingFlags, BindingFlags.Instance, BindingFlags.Public, BindingFlags.NonPublic));
-        let bulletsIdProvider = propIdProvider.GetValue(this.bulletsRegistry);
-        return bulletsIdProvider;
+        this.globalStorage.currentAddedHandler = this.bulletsRegistry.ItemAdded.connect(function(sender, args) {
+            try {
+                let bull = args.Item;
+                that.log.info('- Снаряд добавлен:', '[' + bull.State + ']', bull);
+            } catch (ex) {
+                that.log.exception(ex);
+            }
+        });
+        
+        if (this.globalStorage.currentRemovedHandler) {
+            this.globalStorage.currentRemovedHandler.disconnect();
+        }
+        this.globalStorage.currentRemovedHandler =this.bulletsRegistry.ItemRemoved.connect(function(sender, args) {
+            try {
+                let bull = args.Item;
+                that.log.info('- Снаряд удален:', '[' + bull.State + ']', bull);
+            } catch (ex) {
+                that.log.exception(ex);
+            }
+        });
     }
 }
