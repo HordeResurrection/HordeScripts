@@ -16,7 +16,7 @@ export class Example_GameWorks extends HordeExampleBase {
         this.logMessageOnRun();
         
         // Инфо по тактам
-        let BattleController = HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController;
+        const BattleController = HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController;
         this.log.info('Текущий такт:', BattleController.GameTimer.GameFramesCounter);
         this.log.info('Текущий FPS:', BattleController.GameTimer.CurrentFpsLimit);
 
@@ -27,20 +27,20 @@ export class Example_GameWorks extends HordeExampleBase {
             this.log.info('В данный момент идет одиночное сражение');
         }
 
-        // Реплей?
+        // Реплей? (недоступно при инициализации сцены, т.е. в onFirstRun)
         if (isReplayMode()) {
             this.log.info('В данный момент идет воспроизведение реплея (проверка 1)');
         }
 
         // Инфо по реплею (недоступно при инициализации сцены, т.е. в onFirstRun)
-        let BattleControllerT = ScriptUtils.GetTypeByName("HordeResurrection.Engine.Logic.Battle.BattleController, HordeResurrection.Engine")
-        let repl = ScriptUtils.GetValue(ReflectionUtils.GetStaticProperty(BattleControllerT, "ReplayModule").GetValue(BattleControllerT), "_mode");
-        if (repl.ToString() == "Play") {
+        const ReplayWorkMode = HordeEngine.HordeResurrection.Engine.Logic.Battle.ReplaySystem.ReplayWorkMode;
+        let replayWorkMode = BattleController.ReplayModuleWorkMode;
+        if (replayWorkMode == ReplayWorkMode.Play) {
             this.log.info('В данный момент идет воспроизведение реплея (проверка 2)');
-        } else if (repl.ToString() == "Record") {
+        } else if (replayWorkMode == ReplayWorkMode.Record) {
             this.log.info('В данный момент запущена запись реплея');
         } else {
-            this.log.info('В данный момент невозможно определить статус реплея:', '"' + repl + '"', '(Недоступно в момент инициализации сражения)');
+            this.log.info('В данный момент невозможно определить статус реплея:', '"' + replayWorkMode + '"', '(Недоступно в момент инициализации сражения)');
         }
     }
 }
