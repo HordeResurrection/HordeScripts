@@ -1,3 +1,4 @@
 
-export const ProduceRequestParameters = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Intellect.Requests.CreationArgs.ProduceRequestParameters", "HordeResurrection.Intellect"));
-export const ProduceRequest = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Intellect.Requests.ProduceRequest", "HordeResurrection.Intellect"));
+export const ProduceRequestParameters = HordeIntellect.HordeResurrection.Intellect.Requests.CreationArgs.ProduceRequestParameters;
+export const ProduceRequest = HordeIntellect.HordeResurrection.Intellect.Requests.ProduceRequest;
+export const BuildTrackerType = HordeIntellect.HordeResurrection.Intellect.Requests.Trackers.UnitProducing.BuildTracker;

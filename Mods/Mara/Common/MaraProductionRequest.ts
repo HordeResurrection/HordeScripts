@@ -1,4 +1,5 @@
-import { MaraUtils, BuildTrackerType } from "../MaraUtils";
+import { BuildTrackerType } from "library/mastermind/matermind-types";
+import { MaraUtils } from "../MaraUtils";
 import { MaraPoint } from "./MaraPoint";
 
 export class MaraProductionRequest {

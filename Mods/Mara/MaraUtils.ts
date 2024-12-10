@@ -21,8 +21,6 @@ const TileType = HCL.HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType
 const AlmostDefeatCondition = HCL.HordeClassLibrary.World.Settlements.Existence.AlmostDefeatCondition;
 const ResourceType = HCL.HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
 
-export const BuildTrackerType = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Intellect.Requests.Trackers.UnitProducing.BuildTracker", "HordeResurrection.Intellect"));
-
 export { AlmostDefeatCondition }
 export { ResourceType }
 
