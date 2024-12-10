@@ -5,8 +5,8 @@
  * Возвращает созданный снаряд.
  */
 export function spawnBullet(sourceUnit, targetUnit, sourceArmament, bullCfg, ShotParams, launchPos, targetPos, targetLayer) {
-    const csType = ScriptUtils.GetTypeByName("HordeClassLibrary.World.Objects.Bullets.BulletEmittingArgs, HordeClassLibrary");
-    let emittingArgs = ScriptUtils.CreateInstance(csType);
+    const BulletEmittingArgsT = HCL.HordeClassLibrary.World.Objects.Bullets.BulletEmittingArgs;
+    let emittingArgs = new BulletEmittingArgsT();
     ScriptUtils.SetValue(emittingArgs, "SourceUnit", sourceUnit);
     ScriptUtils.SetValue(emittingArgs, "TargetUnit", targetUnit);
     ScriptUtils.SetValue(emittingArgs, "SourceArmament", sourceArmament);
@@ -16,7 +16,7 @@ export function spawnBullet(sourceUnit, targetUnit, sourceArmament, bullCfg, Sho
     ScriptUtils.SetValue(emittingArgs, "TargetPosition", targetPos);
     ScriptUtils.SetValue(emittingArgs, "TargetLayer", targetLayer);
 
-    let emittingArgsVar = host.newVar(HCL.HordeClassLibrary.World.Objects.Bullets.BulletEmittingArgs);
+    let emittingArgsVar = host.newVar(BulletEmittingArgsT);
     emittingArgsVar.value = emittingArgs;
 
     let bull = bullCfg.CreateInstance(emittingArgsVar.ref);
