@@ -2,9 +2,6 @@ import { IDisposableT, IEnumeratorT } from "library/dotnet/dotnet-types";
 import HordePluginBase from "./base-plugin";
 
 
-export const AOrderBaseT = ScriptUtils.GetTypeByName("HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase", "HordeClassLibrary");
-
-
 /**
  * Плагин для отображения списка приказов выделенных юнитов
  */
