@@ -131,7 +131,7 @@ export class Example_CustomUnit extends HordeExampleBase {
  * Создаёт базовый обработчик движения.
  */
 function createBaseMoveWorker() {
-    return host.newObj(HCL.HordeClassLibrary.UnitComponents.Workers.BaseUnit.BaseUnitMove);
+    return new HCL.HordeClassLibrary.UnitComponents.Workers.BaseUnit.BaseUnitMove();
 }
 
 
@@ -141,7 +141,7 @@ function createBaseMoveWorker() {
 function createArmamament() {
 
     // Смещение арбалета по направлениям
-    let gunCoord = host.newObj(DictionaryT(UnitDirection, Point2D));
+    let gunCoord = new DictionaryT(UnitDirection, Point2D);
     gunCoord.Add(UnitDirection.Up, createPoint(3,-10));
     gunCoord.Add(UnitDirection.RightUp, createPoint(5, -5));
     gunCoord.Add(UnitDirection.Right, createPoint(8, -4));

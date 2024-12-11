@@ -90,7 +90,7 @@ export class Example_ImportDotNetTypes extends HordeExampleBase {
         
         let List = xHost.type('System.Collections.Generic.List');
         let DayOfWeek = xHost.type('System.DayOfWeek');
-        let week = host.newObj(List(DayOfWeek), 7);
+        let week = new List(DayOfWeek, 7);
         week.Add(DayOfWeek.Sunday);
         
         this.log.info("DayOfWeek:", week[0]);

@@ -54,7 +54,7 @@ export function setUnitStateWorker(plugin, unitCfg, unitState, workerFunc) {
     UnitWorkersRegistry.Register(workerName, workerWrapper);
 
     // Объект-обработчик
-    const workerObject = host.newObj(ScriptUnitWorkerState);
+    const workerObject = new ScriptUnitWorkerState();
     
     // Установка функции-обработчика
     ScriptUtils.SetValue(workerObject, "FuncName", workerName);
@@ -77,7 +77,7 @@ export function setUnitGetOrderWorker(plugin, unitCfg, workerFunc) {
     UnitWorkersRegistry.Register(workerName, workerWrapper);
 
     // Объект-обработчик
-    const workerObject = host.newObj(ScriptUnitWorkerGetOrder);
+    const workerObject = new ScriptUnitWorkerGetOrder();
     
     // Установка функции-обработчика
     ScriptUtils.SetValue(workerObject, "FuncName", workerName);
@@ -102,7 +102,7 @@ export function setUnitCanBePlacedWorker(plugin, unitCfg, func_canBePlacedByKnow
     UnitWorkersRegistry.Register(name_canBePlacedByRealMap, wrapper_canBePlacedByRealMap);
 
     // Объект-обработчик
-    const workerObject = host.newObj(ScriptUnitWorkerCanBePlaced);
+    const workerObject = new ScriptUnitWorkerCanBePlaced();
     ScriptUtils.SetValue(workerObject, "ByKnownMapFuncName", name_canBePlacedByKnownMap);
     ScriptUtils.SetValue(workerObject, "ByRealMapFuncName", name_canBePlacedByRealMap);
 

@@ -15,7 +15,7 @@ export class Example_CustomUnitCanBePlaced extends HordeExampleBase {
     public constructor() {
         super("Custom worker: CanBePlaced");
 
-        this.baseCanBePlacedWorker = host.newObj(HCL.HordeClassLibrary.UnitComponents.Workers.BaseBuilding.Special.BaseBuildingCanBePlaced);
+        this.baseCanBePlacedWorker = new HCL.HordeClassLibrary.UnitComponents.Workers.BaseBuilding.Special.BaseBuildingCanBePlaced();
     }
 
 

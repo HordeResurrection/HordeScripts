@@ -606,7 +606,7 @@ export class MaraUtils {
     private static productionGetter(cfg: any, settlement: any): any {
         let listType = xHost.type('System.Collections.Generic.List');
         let configType = UnitConfig;
-        let list = host.newObj(listType(configType), 0);
+        let list = new listType(configType, 0);
     
         settlement.TechTree.HypotheticalProducts.WhoCanProduce(cfg, list);
     

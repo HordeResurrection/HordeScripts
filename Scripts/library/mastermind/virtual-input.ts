@@ -22,14 +22,14 @@ export class PlayerVirtualInput {
 	public constructor(player) {
 		this.player = player;
 		this.isEnabled = this.player.IsLocal;
-		this.inputsList = host.newObj(ListT(AVirtualInputItem));;
+		this.inputsList = new ListT(AVirtualInputItem);
 	}
 
 	public selectUnits(cellStart, cellEnd, selectMode = VirtualSelectUnitsMode.Select) {
 		if (!this.isEnabled)
 			return null;
 	
-		let vii = host.newObj(VirtualSelectUnits, this.player, selectMode, cellStart, cellEnd);
+		let vii = new VirtualSelectUnits(this.player, selectMode, cellStart, cellEnd);
 		this.inputsList.Add(vii);
 		return vii;
 	}
@@ -40,10 +40,10 @@ export class PlayerVirtualInput {
 	
 		let csIds = host.newArr(UnitIdLabel, ids.length);
 		for(let i = 0; i < ids.length; i++) {
-			csIds[i] = host.newObj(UnitIdLabel, ids[i], this.player.GetRealSettlement().Uid);
+			csIds[i] = new UnitIdLabel(ids[i], this.player.GetRealSettlement().Uid);
 		}
 	
-		let vii = host.newObj(VirtualSelectUnitsById, this.player, selectMode, csIds);
+		let vii = new VirtualSelectUnitsById(this.player, selectMode, csIds);
 		this.inputsList.Add(vii);
 		return vii;
 	}
@@ -52,7 +52,7 @@ export class PlayerVirtualInput {
 		if (!this.isEnabled)
 			return null;
 	
-		let vii = host.newObj(VirtualSmartMouseClick, this.player, cell, assignMode);
+		let vii = new VirtualSmartMouseClick(this.player, cell, assignMode);
 		this.inputsList.Add(vii);
 		return vii;
 	}
@@ -61,7 +61,7 @@ export class PlayerVirtualInput {
 		if (!this.isEnabled)
 			return null;
 	
-		let vii = host.newObj(VirtualPointBasedCommand, this.player, cell, cmd, assignMode);
+		let vii = new VirtualPointBasedCommand(this.player, cell, cmd, assignMode);
 		vii.IgnoreUnits = ignoreUnits;
 		this.inputsList.Add(vii);
 		return vii;
@@ -71,7 +71,7 @@ export class PlayerVirtualInput {
 		if (!this.isEnabled)
 			return null;
 	
-		let vii = host.newObj(VirtualOneClickCommand, this.player, cmd, assignMode);
+		let vii = new VirtualOneClickCommand(this.player, cmd, assignMode);
 		this.inputsList.Add(vii);
 		return vii;
 	}
@@ -80,7 +80,7 @@ export class PlayerVirtualInput {
 		if (!this.isEnabled)
 			return null;
 	
-		let vii = host.newObj(VirtualProduceBuildingCommand, this.player);
+		let vii = new VirtualProduceBuildingCommand(this.player);
 		vii.CellStart = cellStart;
 		vii.CellEnd = cellEnd;
 		vii.ProductUnitConfigUid = productCfg;
@@ -94,7 +94,7 @@ export class PlayerVirtualInput {
 		if (!this.isEnabled)
 			return null;
 	
-		let vii = host.newObj(VirtualProduceUnitCommand, this.player);
+		let vii = new VirtualProduceUnitCommand(this.player);
 		vii.ProductUnitConfigUid = productCfg;
 		vii.Count = count;
 		vii.AssignOrderMode = assignMode;
