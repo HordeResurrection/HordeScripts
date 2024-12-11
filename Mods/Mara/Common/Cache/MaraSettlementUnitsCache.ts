@@ -26,6 +26,12 @@ export class MaraSettlementUnitsCache {
             }
         );
 
+        settlement.Units.UnitHealthChanged.connect(
+            (sender, args) => {
+                this.unitHealthChangedProcessor(sender, args);
+            }
+        );
+
         ForEach(settlement.Units, (unit) => {
                 this.subscribeToUnit(unit);
             }
@@ -77,13 +83,26 @@ export class MaraSettlementUnitsCache {
     }
 
     private unitPositionChangedProcessor(sender, args): void {
-        let cacheItem = this.cacheItemIndex.get(args.TriggeredUnit.Id)!;
-        
+        let cacheItem = this.cacheItemIndex.get(args.TriggeredUnit.Id);
+
+        if (!cacheItem) {
+            return;
+        }
+    
         let oldBushItem = cacheItem.UnitBushItem;
         this.bush.remove(oldBushItem, MaraUnitBushItem.IsEqual);
 
         let newBushItem = new MaraUnitBushItem(cacheItem);
         this.bush.insert(newBushItem);
         cacheItem.UnitBushItem = newBushItem;
+    }
+
+    private unitHealthChangedProcessor(sender, args): void {
+        let unit = args.TriggeredUnit;
+        let cacheItem = this.cacheItemIndex.get(unit.Id);
+        
+        if (cacheItem) {
+            cacheItem.UnitHealth = unit.Health;
+        }
     }
 }

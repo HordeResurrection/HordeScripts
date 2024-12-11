@@ -8,6 +8,7 @@ export class MaraUnitCacheItem {
     UnitCfgId: string;
     UnitOwner: any;
     UnitMapLayer: any;
+    UnitHealth: number;
 
     UnitRect: MaraRect;
 
@@ -36,5 +37,6 @@ export class MaraUnitCacheItem {
         this.UnitCfgId = unit.Cfg.Uid;
         this.UnitOwner = unit.Owner;
         this.UnitMapLayer = unit.MapLayer;
+        this.UnitHealth = unit.Health;
     }
 }

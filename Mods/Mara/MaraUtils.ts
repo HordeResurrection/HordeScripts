@@ -801,7 +801,7 @@ export class MaraUtils {
         let maxStrength = MaraUtils.GetConfigIdStrength(unit.UnitCfgId);
         let maxHealth = MaraUtils.GetConfigIdMaxHealth(unit.UnitCfgId);
 
-        return maxStrength * (unit.Unit.Health / maxHealth);
+        return maxStrength * (unit.UnitHealth / maxHealth);
     }
 
     static CanAttack(sourceUnit: MaraUnitCacheItem, targetUnit: MaraUnitCacheItem): boolean {

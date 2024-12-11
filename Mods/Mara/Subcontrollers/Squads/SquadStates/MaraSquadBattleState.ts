@@ -302,7 +302,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                                 }
                             }
                             else if (targetData.heuristic == optimalTargetData.heuristic) {
-                                if (targetData.target.Unit.Health < optimalTargetData.target.Health) {
+                                if (targetData.target.UnitHealth < optimalTargetData.target.UnitHealth) {
                                     if (MaraUtils.IsCellReachable(cell, unit)) {
                                         optimalTargetData = targetData;
                                     }
@@ -381,7 +381,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                     if (distance < shortestDistance) {
                         optimalEnemy = enemy;
                     }
-                    else if (enemy.Unit.Health < optimalEnemy!.Unit.Health) {
+                    else if (enemy.UnitHealth < optimalEnemy!.UnitHealth) {
                         optimalEnemy = enemy;
                     }
                     
@@ -435,7 +435,7 @@ export class MaraSquadBattleState extends MaraSquadState {
                                 }
                             }
                             else if (targetData.heuristic == optimalTargetData.heuristic) {
-                                if (targetData.target.Unit.Health < optimalTargetData.target.Health) {
+                                if (targetData.target.UnitHealth < optimalTargetData.target.UnitHealth) {
                                     if (MaraUtils.IsCellReachable(cell, unit)) {
                                         optimalTargetData = targetData;
                                     }

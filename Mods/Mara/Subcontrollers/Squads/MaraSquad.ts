@@ -147,7 +147,7 @@ export class MaraSquad {
 
         for (let unit of this.Units) {
             maxHealth += MaraUtils.GetConfigIdMaxHealth(unit.UnitCfgId);
-            totalHealth += unit.Unit.Health;
+            totalHealth += unit.UnitHealth;
         }
 
         return totalHealth / maxHealth;
