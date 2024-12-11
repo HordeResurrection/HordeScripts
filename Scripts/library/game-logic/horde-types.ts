@@ -166,8 +166,8 @@ export const GeometryVisualEffect = HCL.HordeClassLibrary.World.Objects.VisualEf
 // --- Графика
 
 export const DrawLayer = HCL.HordeClassLibrary.World.Simple.DrawLayer;
-export const FontUtils = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Game.UI.Utils.FontUtils", "HordeResurrection.Game"));
-export const GeometryCanvas = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Game.Render.GeometryCanvas.GeometryCanvas", "HordeResurrection.Game"));
+export const FontUtils = HordeGame.HordeResurrection.Game.UI.Utils.FontUtils;
+export const GeometryCanvas = HordeGame.HordeResurrection.Game.Render.GeometryCanvas.GeometryCanvas;
 
 
 // ===================================================

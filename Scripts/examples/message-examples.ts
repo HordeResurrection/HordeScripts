@@ -51,9 +51,9 @@ export class Example_HookSentChatMessages extends HordeExampleBase {
         this.logMessageOnRun();
         
         // Получаем UI-объект строки чата
-        let AllUIModules = ScriptUtils.GetTypeByName("HordeResurrection.Game.UI.AllUIModules, HordeResurrection.Game");
-        let battleUI = ReflectionUtils.GetStaticProperty(AllUIModules, "BattleUI").GetValue(AllUIModules);
-        let chatPanel = ScriptUtils.GetValue(battleUI, "ChatPanel");
+        const AllUIModules = HordeGame.HordeResurrection.Game.UI.AllUIModules;
+        const BattleUI = AllUIModules.BattleUI;
+        let chatPanel = ScriptUtils.GetValue(BattleUI, "ChatPanel");
         let chatInputLine = ScriptUtils.GetValue(chatPanel, "ChatInputLine");
 
         // Удаляем предыдущий обработчик сообщений, если был закреплен
