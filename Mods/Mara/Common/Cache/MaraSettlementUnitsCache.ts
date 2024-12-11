@@ -7,19 +7,22 @@ export class MaraSettlementUnitsCache {
     Settlement: any;
     
     private bush: RBush;
-    private unitPositionChangedHandlers: Map<number, any>;
     private cacheItemIndex: Map<number, MaraUnitCacheItem>;
 
     constructor(settlement: any) {
         this.Settlement = settlement;
         this.bush = new RBush();
         this.cacheItemIndex = new Map<number, MaraUnitCacheItem>();
-
-        this.unitPositionChangedHandlers = new Map<number, any>();
         
         settlement.Units.UnitsListChanged.connect(
             (sender, UnitsListChangedEventArgs) => {
                 this.unitListChangedProcessor(sender, UnitsListChangedEventArgs);
+            }
+        );
+
+        settlement.Units.UnitUnitMovedToCell.connect(
+            (sender, args) => {
+                this.unitPositionChangedProcessor(sender, args);
             }
         );
 
@@ -58,10 +61,6 @@ export class MaraSettlementUnitsCache {
             this.subscribeToUnit(unit);
         }
         else {
-            let handler = this.unitPositionChangedHandlers.get(unitId);
-            handler.disconnect();
-            this.unitPositionChangedHandlers.delete(unitId);
-
             let cacheItem = this.cacheItemIndex.get(unitId)!;
             this.bush.remove(cacheItem.UnitBushItem, MaraUnitBushItem.IsEqual);
             this.cacheItemIndex.delete(unitId);
@@ -69,14 +68,6 @@ export class MaraSettlementUnitsCache {
     }
 
     private subscribeToUnit(unit: any): void {
-        let handler = unit.EventsMind.UnitMovedToCell.connect(
-            (sender, args) => {
-                this.unitPositionChangedProcessor(sender, args);
-            }
-        );
-
-        this.unitPositionChangedHandlers.set(unit.Id, handler);
-
         let cacheItem = new MaraUnitCacheItem(unit);
         let bushItem = new MaraUnitBushItem(cacheItem);
         cacheItem.UnitBushItem = bushItem;
