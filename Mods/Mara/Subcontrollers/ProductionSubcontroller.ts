@@ -7,10 +7,16 @@ import { MaraSubcontroller } from "./MaraSubcontroller";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { UnitComposition } from "../Common/UnitComposition";
 import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
+import { MaraRepairRequest } from "../Common/MaraRepairRequest";
+import { SettlementClusterLocation } from "../Common/Settlement/SettlementClusterLocation";
+import { MaraRect } from "../Common/MaraRect";
+import { MaraUnitConfigCache } from "../Common/Cache/MaraUnitConfigCache";
+import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
     private queuedRequests: Array<MaraProductionRequest> = [];
     private executingRequests: Array<MaraProductionRequest> = [];
+    private repairRequests: Array<MaraRepairRequest> = [];
     private productionIndex: Map<string, Array<MaraUnitCacheItem>> | null = null;
 
     constructor (parent: MaraSettlementController) {
@@ -36,6 +42,13 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     Tick(tickNumber: number): void {
         if (tickNumber % 10 != 0) {
             return;
+        }
+
+        if (tickNumber % 50 == 0) {
+            this.cleanupUnfinishedBuildings(tickNumber);
+            this.cleanupRepairRequests()
+            
+            this.repairUnits();
         }
 
         this.productionIndex = null;
@@ -88,8 +101,6 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
             this.executingRequests = filteredRequests;
         }
-
-        this.cleanupUnfinishedBuildings(tickNumber);
     }
 
     RequestProduction(request: MaraProductionRequest): void {
@@ -226,7 +237,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
     }
 
-    private cleanupUnfinishedBuildings(tickNumber: number) {
+    private cleanupUnfinishedBuildings(tickNumber: number): void {
         let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
         let unfinishedBuildings = allUnits.filter((u) => MaraUtils.IsBuildingConfigId(u.UnitCfgId) && u.Unit.EffectsMind.BuildingInProgress);
         
@@ -240,6 +251,127 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                 }
             }
         }
+    }
+
+    private repairUnits(): void {
+        let repairZones = this.getRepairZones();
+        let unitsToRepair: Array<MaraUnitCacheItem> = this.getUnitsToRepair(repairZones);
+
+        let totalResources = this.settlementController.MiningController.GetTotalResources();
+        
+        for (let unit of unitsToRepair) {
+            let maxHealth = MaraUtils.GetConfigIdMaxHealth(unit.UnitCfgId);
+            let missingHealth = unit.Unit.Health - maxHealth;
+
+            let repairPrice = MaraUnitConfigCache.GetConfigProperty(
+                unit.UnitCfgId, 
+                (cfg) => {
+                    let cost = this.settlementController.Settlement.Production.GetOneRepairContributionCost(cfg, 1)
+                    return new MaraResources(cost.Lumber, cost.Metal, cost.Gold, cost.People)
+                },
+                "configIdRepairPrice"
+            ) as MaraResources;
+
+            let repairCost = repairPrice.Multiply(missingHealth);
+
+            if (totalResources.IsGreaterOrEquals(repairCost)) {
+                let repairer = this.getRepairer();
+
+                if (repairer) {
+                    let repairRequest = new MaraRepairRequest(unit, repairer);
+                    this.settlementController.ReservedUnitsData.ReserveUnit(repairer);
+                    MaraUtils.IssueRepairCommand([repairer], this.settlementController.Player, unit.UnitCell);
+
+                    this.repairRequests.push(repairRequest);
+                    this.settlementController.Debug(`Created repair request: ${repairRequest.ToString()}`);
+                }
+            }
+        }
+    }
+
+    private getRepairZones(): Array<SettlementClusterLocation> {
+        let result: Array<SettlementClusterLocation> = [];
+
+        let settlementLocation = this.settlementController.GetSettlementLocation();
+
+        if (settlementLocation) {
+            result.push(settlementLocation);
+        }
+        else {
+            return [];
+        }
+        
+        for (let expandPoint of this.settlementController.Expands) {
+            let expandRect = MaraRect.CreateFromPoint(
+                expandPoint, 
+                this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
+            );
+
+            let expandLocation = new SettlementClusterLocation(
+                expandPoint,
+                expandRect
+            );
+
+            result.push(expandLocation);
+        }
+
+        return result;
+    }
+
+    private getUnitsToRepair(repairZones: Array<SettlementClusterLocation>): Array<MaraUnitCacheItem> {
+        let result: Array<MaraUnitCacheItem> = [];
+
+        for (let zone of repairZones) {
+            let zoneReparableUnits = MaraUtils.GetSettlementUnitsInArea(
+                zone.BoundingRect,
+                [this.settlementController.Settlement],
+                (unit) => {
+                    return (
+                        MaraUtils.IsReparableConfigId(unit.UnitCfgId) &&
+                        !unit.Unit.EffectsMind.BuildingInProgress
+                    )
+                },
+                false
+            );
+
+            for (let unit of zoneReparableUnits) {
+                if (unit.Unit.Health < MaraUtils.GetConfigIdMaxHealth(unit.UnitCfgId)) {
+                    result.push(unit);
+                }
+            }
+        }
+
+        result = result.filter(
+            (u) => !this.repairRequests.find(
+                (r) => r.Target.UnitId == u.UnitId
+            )
+        );
+
+        return result;
+    }
+
+    private cleanupRepairRequests(): void {
+        let filteredRequests: Array<MaraRepairRequest> = [];
+
+        for (let request of this.repairRequests) {
+            if (
+                !request.Executor.Unit.IsAlive ||
+                !request.Target.Unit.IsAlive ||
+                request.Executor.Unit.OrdersMind.OrdersCount == 0
+            ) {
+                this.finalizeRepairRequest(request);
+            }
+            else {
+                filteredRequests.push(request);
+            }
+        }
+
+        this.repairRequests = filteredRequests;
+    }
+
+    private finalizeRepairRequest(request: MaraRepairRequest): void {
+        this.settlementController.Debug(`Finalized repair request: ${request.ToString()}`);
+        this.settlementController.ReservedUnitsData.FreeUnit(request.Executor);
     }
 
     private getProducer(configId: string): MaraUnitCacheItem | null {
@@ -264,6 +396,30 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                     if (this.settlementController.ReservedUnitsData.ReservableUnits[i].has(producer.UnitId)) {
                         return producer;
                     }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private getRepairer(): MaraUnitCacheItem | null {
+        let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        let allRepairers = allUnits.filter((u) => MaraUtils.IsRepairerConfigId(u.UnitCfgId) && u.Unit.IsAlive);
+
+        for (let repairer of allRepairers) {
+            if (
+                repairer.Unit.OrdersMind.OrdersCount == 0 &&
+                !this.settlementController.ReservedUnitsData.IsUnitReserved(repairer)
+            ) {
+                return repairer;
+            }
+        }
+
+        for (let i = 0; i < this.settlementController.ReservedUnitsData.ReservableUnits.length; i++) {
+            for (let repairer of allRepairers) {
+                if (this.settlementController.ReservedUnitsData.ReservableUnits[i].has(repairer.UnitId)) {
+                    return repairer;
                 }
             }
         }

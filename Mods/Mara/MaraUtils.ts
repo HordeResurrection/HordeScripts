@@ -18,6 +18,7 @@ import { spawnGeometry, spawnString } from "library/game-logic/decoration-spawn"
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
 import { MaraUnitConfigCache } from "./Common/Cache/MaraUnitConfigCache";
 import { MaraUnitCacheItem } from "./Common/Cache/MaraUnitCacheItem";
+import { MaraResources } from "./Common/MapAnalysis/MaraResources";
 
 const DEFAULT_UNIT_SEARCH_RADIUS = 3;
 
@@ -699,6 +700,10 @@ export class MaraUtils {
         MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.Mine, isReplaceMode);
     }
 
+    static IssueRepairCommand(units: Array<MaraUnitCacheItem>, player: any, location: any, isReplaceMode: boolean = true): void {
+        MaraUtils.issuePointBasedCommand(units, player, location, UnitCommand.Repair, isReplaceMode);
+    }
+
     static IssueSelfDestructCommand(units: Array<MaraUnitCacheItem>, player: any) {
         MaraUtils.issueOneClickCommand(units, player, UnitCommand.DestroySelf);
     }
@@ -978,6 +983,22 @@ export class MaraUtils {
         return unitConfig.BuildingConfig != null && unitConfig.HasFlags(UnitFlags.Walkable);
     }
 
+    static IsReparableConfigId(cfgId: string): boolean {
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.isReparableConfig, "isReparable") as boolean;
+    }
+
+    private static isReparableConfig(unitConfig: any): boolean {
+        return MaraUtils.configHasProfession(unitConfig, UnitProfession.Reparable);
+    }
+
+    static IsRepairerConfigId(cfgId: string): boolean {
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.isRepairerConfig, "isRepairer") as boolean;
+    }
+
+    private static isRepairerConfig(unitConfig: any): boolean {
+        return unitConfig.AllowedCommands.ContainsKey(UnitCommand.Repair);
+    }
+
     static GetAllSawmillConfigIds(settlement: any): Array<string> {
         return MaraUtils.GetAllConfigIds(settlement, MaraUtils.isSawmillConfig, "isSawmillConfig");
     }
@@ -1060,6 +1081,14 @@ export class MaraUtils {
 
     private static configWidth(unitConfig: any): number {
         return unitConfig.Size.Width;
+    }
+
+    static GetConfigIdRepairPrice(cfgId: string): MaraResources {
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configIdRepairPrice, "configIdRepairPrice") as MaraResources
+    }
+
+    private static configIdRepairPrice(unitConfig: any): MaraResources {
+
     }
     //#endregion
     
@@ -1266,7 +1295,7 @@ export class MaraUtils {
 
     static DrawPath(path:Array<MaraPoint>, color: any): void {
         for (let i = 0; i < path.length - 1; i ++) {
-            this.DrawLineOnScena(path[i], path[i + 1], color);
+            MaraUtils.DrawLineOnScena(path[i], path[i + 1], color);
         }
     }
     //#endregion

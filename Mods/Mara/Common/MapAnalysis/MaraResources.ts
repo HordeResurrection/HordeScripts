@@ -49,4 +49,33 @@ export class MaraResources {
     public ToString(): string {
         return `W: ${this.Wood}, M: ${this.Metal}, G: ${this.Gold}, P: ${this.People}`;
     }
+
+    public IsGreaterOrEquals(other: MaraResources): boolean {
+        let result = true;
+        
+        this.resources.forEach(
+            (amount, type) => {
+                let otherAmount = other.Resources.get(type)!;
+
+                if (otherAmount > amount) {
+                    result = false;
+                }
+            }
+        );
+
+        return result;
+    }
+
+    public Multiply(factor: number): MaraResources {
+        let result = new MaraResources(0, 0, 0, 0);
+        let newResources = result.resources;
+
+        this.resources.forEach(
+            (amount, type) => {
+                newResources.set(type, amount * factor);
+            }
+        );
+
+        return result;
+    }
 }
