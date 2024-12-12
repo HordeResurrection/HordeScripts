@@ -12,6 +12,7 @@ import { SettlementClusterLocation } from "../Common/Settlement/SettlementCluste
 import { MaraRect } from "../Common/MaraRect";
 import { MaraUnitConfigCache } from "../Common/Cache/MaraUnitConfigCache";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
+import { Mara } from "../Mara";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
     private queuedRequests: Array<MaraProductionRequest> = [];
@@ -45,12 +46,15 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
 
         if (tickNumber % 50 == 0) {
+            Mara.Profilers["ProductionSubcontroller.Maintenance"].Start();
             this.cleanupUnfinishedBuildings(tickNumber);
             this.cleanupRepairRequests()
             
             this.repairUnits();
+            Mara.Profilers["ProductionSubcontroller.Maintenance"].Stop();
         }
 
+        Mara.Profilers["ProductionSubcontroller.queuedRequests"].Start();
         this.productionIndex = null;
         let addedRequests: Array<MaraProductionRequest> = [];
 
@@ -81,7 +85,9 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
             this.executingRequests.push(...addedRequests);
         }
+        Mara.Profilers["ProductionSubcontroller.queuedRequests"].Stop();
 
+        Mara.Profilers["ProductionSubcontroller.executingRequests"].Start();
         if (this.executingRequests.length > 0) {
             let filteredRequests: Array<MaraProductionRequest> = [];
             
@@ -101,6 +107,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
             this.executingRequests = filteredRequests;
         }
+        Mara.Profilers["ProductionSubcontroller.executingRequests"].Stop();
     }
 
     RequestProduction(request: MaraProductionRequest): void {

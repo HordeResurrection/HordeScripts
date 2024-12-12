@@ -22,6 +22,7 @@ import { EconomySnapshotItem } from "./Common/Settlement/EconomySnapshotItem";
 import { MaraRect } from "./Common/MaraRect";
 import { MaraUnitCacheItem } from "./Common/Cache/MaraUnitCacheItem";
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
+import { MaraProfiler } from "./Common/MaraProfiler";
 
 class ReservedUnitsData {
     public ReservableUnits: Array<Map<number, MaraUnitCacheItem>>;
@@ -115,7 +116,7 @@ export class MaraSettlementController {
     public CanMineResources: boolean = true;
     public ConsequtiveBuildUpCount: number = 0;
     
-    private subcontrollers: Array<MaraSubcontroller> = [];
+    private subcontrollers: Array<{profiler: MaraProfiler, controller: MaraSubcontroller}> = [];
     private state: MaraSettlementControllerState;
     private nextState: MaraSettlementControllerState | null;
     private currentUnitComposition: UnitComposition | null;
@@ -138,16 +139,16 @@ export class MaraSettlementController {
         this.subcontrollers = [];
 
         this.MiningController = new MiningSubcontroller(this);
-        this.subcontrollers.push(this.MiningController);
+        this.subcontrollers.push({profiler: Mara.Profilers["MiningSubcontroller"], controller: this.MiningController});
 
         this.ProductionController = new ProductionSubcontroller(this);
-        this.subcontrollers.push(this.ProductionController);
+        this.subcontrollers.push({profiler: Mara.Profilers["ProductionSubcontroller"], controller: this.ProductionController});
 
         this.StrategyController = new StrategySubcontroller(this);
-        this.subcontrollers.push(this.StrategyController);
+        this.subcontrollers.push({profiler: Mara.Profilers["StrategySubcontroller"], controller: this.StrategyController});
 
         this.TacticalController = new TacticalSubcontroller(this);
-        this.subcontrollers.push(this.TacticalController);
+        this.subcontrollers.push({profiler: Mara.Profilers["TacticalSubcontroller"], controller: this.TacticalController});
 
         this.State = SettlementControllerStateFactory.MakeRoutingState(this);
     }
@@ -174,7 +175,9 @@ export class MaraSettlementController {
         }
 
         for (let subcontroller of this.subcontrollers) {
-            subcontroller.Tick(tickNumber);
+            subcontroller.profiler.Start();
+            subcontroller.controller.Tick(tickNumber);
+            subcontroller.profiler.Stop(false);
         }
         
         if (this.nextState) {
@@ -189,7 +192,9 @@ export class MaraSettlementController {
             this.state.OnEntry();
         }
 
+        Mara.Profilers[this.state.ProfilerName].Start();
         this.state.Tick(tickNumber);
+        Mara.Profilers[this.state.ProfilerName].Stop();
     }
 
     Log(level: MaraLogLevel, message: string): void {

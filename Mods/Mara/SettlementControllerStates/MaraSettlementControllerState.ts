@@ -10,6 +10,10 @@ import { MaraResourceCluster } from "../Common/MapAnalysis/MaraResourceCluster";
 
 export abstract class MaraSettlementControllerState extends FsmState {
     protected readonly settlementController: MaraSettlementController;
+
+    public get ProfilerName(): string {
+        return this.constructor.name;
+    }
     
     constructor(settlementController: MaraSettlementController) {
         super();

@@ -16,6 +16,11 @@ export class MaraProfiler {
         }
     }
 
+    public Reset() {
+        this.callCount = 0;
+        this.executionTime = 0;
+    }
+
     public Print(): void {
         Mara.Debug(`${this.message} took ${this.executionTime} ms, call count: ${this.callCount}`);
     }
@@ -35,8 +40,12 @@ export class MaraProfiler {
     }
 
     public Stop(print: boolean = false) {
-        this.executionTime += Date.now() - this.startTime;
-        this.callCount++;
+        let execTime = Date.now() - this.startTime;
+
+        if (execTime >= 10) {
+            this.executionTime += execTime;
+            this.callCount++;
+        }
 
         if (print) {
             this.Print();
