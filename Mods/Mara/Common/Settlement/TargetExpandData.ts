@@ -1,6 +1,6 @@
 import { MaraPoint } from "../MaraPoint";
-import { MaraResourceCluster } from "../Resources/MaraResourceCluster";
-import { MaraResourceType } from "../Resources/MaraResourceType";
+import { MaraResourceCluster } from "../MapAnalysis/MaraResourceCluster";
+import { MaraResourceType } from "../MapAnalysis/MaraResourceType";
 
 
 export class TargetExpandData {

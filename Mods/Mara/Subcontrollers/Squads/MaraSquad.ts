@@ -1,5 +1,6 @@
 import { MaraUtils } from "Mara/MaraUtils";
 import { MaraPoint } from "../../Common/MaraPoint";
+import { MaraUnitCacheItem } from "../../Common/Cache/MaraUnitCacheItem";
 
 export class MaraSquadLocation {
     Point: MaraPoint;
@@ -14,7 +15,7 @@ export class MaraSquadLocation {
 }
 
 export class MaraSquad {
-    Units: Array<any>; //but actually Unit
+    Units: Array<MaraUnitCacheItem>;
     protected location: MaraSquadLocation | null;
 
     public get Strength(): number {
@@ -29,12 +30,12 @@ export class MaraSquad {
         return strength;
     }
     
-    constructor(units:Array<any>) {
+    constructor(units: Array<MaraUnitCacheItem>) {
         this.Units = units;
     }
 
     protected cleanup(): void {
-        this.Units = this.Units.filter((unit) => {return unit != null && unit.IsAlive});
+        this.Units = this.Units.filter((unit) => {return unit.Unit.IsAlive});
     }
 
     Tick(tickNumber: number): void {
@@ -51,16 +52,16 @@ export class MaraSquad {
             this.cleanup();
             
             if (this.Units.length > 0) {
-                let uppermostUnit: any = null;
-                let lowermostUnit: any = null;
-                let leftmostUnit: any = null;
-                let rightmostUnit: any = null;
+                let uppermostUnit: MaraUnitCacheItem | null = null;
+                let lowermostUnit: MaraUnitCacheItem | null = null;
+                let leftmostUnit: MaraUnitCacheItem | null = null;
+                let rightmostUnit: MaraUnitCacheItem | null = null;
 
                 let avgPosition = {X: 0, Y: 0};
                 
                 for (let unit of this.Units) {
-                    avgPosition.X += unit.Cell.X;
-                    avgPosition.Y += unit.Cell.Y;
+                    avgPosition.X += unit.UnitCell.X;
+                    avgPosition.Y += unit.UnitCell.Y;
                     
                     if (uppermostUnit == null) {
                         uppermostUnit = unit;
@@ -78,31 +79,31 @@ export class MaraSquad {
                         rightmostUnit = unit;
                     }
 
-                    if (unit !== uppermostUnit && unit.Cell.Y < uppermostUnit.Cell.Y) {
+                    if (unit != uppermostUnit && unit.UnitRect.TopLeft.Y < uppermostUnit.UnitRect.TopLeft.Y) {
                         uppermostUnit = unit;
                     }
 
-                    if (unit !== lowermostUnit && unit.Cell.Y > lowermostUnit.Cell.Y) {
+                    if (unit != lowermostUnit && unit.UnitRect.BottomRight.Y > lowermostUnit.UnitRect.BottomRight.Y) {
                         lowermostUnit = unit;
                     }
 
-                    if (unit !== leftmostUnit && unit.Cell.X < leftmostUnit.Cell.X) {
+                    if (unit != leftmostUnit && unit.UnitRect.TopLeft.X < leftmostUnit.UnitRect.TopLeft.X) {
                         leftmostUnit = unit;
                     }
 
-                    if (unit !== rightmostUnit && unit.Cell.X > rightmostUnit.Cell.X) {
+                    if (unit != rightmostUnit && unit.UnitRect.BottomRight.X > rightmostUnit.UnitRect.BottomRight.X) {
                         rightmostUnit = unit;
                     }
                 }
 
-                let verticalSpread = lowermostUnit.Cell.Y - uppermostUnit.Cell.Y;
-                let horizontalSpread = rightmostUnit.Cell.X - leftmostUnit.Cell.X;
+                let verticalSpread = lowermostUnit!.UnitRect.BottomRight.Y - uppermostUnit!.UnitRect.TopLeft.Y;
+                let horizontalSpread = rightmostUnit!.UnitRect.BottomRight.X - leftmostUnit!.UnitRect.TopLeft.X;
                 let spread = Math.max(verticalSpread, horizontalSpread);
 
                 let spreadCenter = new MaraPoint(
-                    leftmostUnit.Cell.X + spread / 2,
-                    uppermostUnit.Cell.Y + spread / 2
-                )
+                    leftmostUnit!.UnitRect.TopLeft.X + Math.round(horizontalSpread / 2),
+                    uppermostUnit!.UnitRect.TopLeft.Y + Math.round(verticalSpread / 2)
+                );
 
                 let point = new MaraPoint(
                     Math.round(avgPosition.X / this.Units.length),
@@ -123,7 +124,7 @@ export class MaraSquad {
         this.cleanup();
 
         for (let unit of this.Units) {
-            if (!unit.OrdersMind.IsIdle()) {
+            if (!unit.Unit.OrdersMind.IsIdle()) {
                 return false;
             }
         }
@@ -131,13 +132,25 @@ export class MaraSquad {
         return true;
     }
 
-    AddUnits(units: Array<any>): void {
+    AddUnits(units: Array<MaraUnitCacheItem>): void {
         this.cleanup();
 
         this.Units.push(...units);
         this.location = null;
 
         this.onUnitsAdded();
+    }
+
+    GetHealthLevel(): number {
+        let totalHealth = 0;
+        let maxHealth = 0;
+
+        for (let unit of this.Units) {
+            maxHealth += MaraUtils.GetConfigIdMaxHealth(unit.UnitCfgId);
+            totalHealth += unit.UnitHealth;
+        }
+
+        return totalHealth / maxHealth;
     }
 
     protected onUnitsAdded(): void {

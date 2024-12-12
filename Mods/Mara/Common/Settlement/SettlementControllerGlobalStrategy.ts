@@ -27,7 +27,8 @@ export class SettlementGlobalStrategy {
 
         let availableCfgIds = MaraUtils.GetAllConfigIds(
             settlementController.Settlement, 
-            (config) => true
+            (config) => true,
+            "allConfigs"
         );
         
         let availableOffensiveCfgs = availableCfgIds.filter(
@@ -37,7 +38,7 @@ export class SettlementGlobalStrategy {
         let offensiveResults = this.initCfgIdsType(
             settlementController, 
             availableOffensiveCfgs, 
-            settlementController.Settings.CombatSettings.MaxUsedOffensiveCfgIdCount
+            settlementController.Settings.Combat.MaxUsedOffensiveCfgIdCount
         );
 
         this.OffensiveCfgIds = Array.from(offensiveResults.ConfigData.values());
@@ -50,7 +51,7 @@ export class SettlementGlobalStrategy {
         let defensiveResults = this.initCfgIdsType(
             settlementController, 
             availableDefensiveCfgIds, 
-            settlementController.Settings.CombatSettings.MaxUsedDefensiveCfgIdCount
+            settlementController.Settings.Combat.MaxUsedDefensiveCfgIdCount
         );
 
         this.DefensiveBuildingsCfgIds = Array.from(defensiveResults.ConfigData.values());

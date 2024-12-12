@@ -1,11 +1,11 @@
-import { MaraResourceType } from "../Common/Resources/MaraResourceType";
+import { MaraResourceType } from "../Common/MapAnalysis/MaraResourceType";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 import { MaraPoint } from "../Common/MaraPoint";
 import { MaraUtils } from "../MaraUtils";
 import { UnitComposition } from "../Common/UnitComposition";
 import { ProductionState } from "./ProductionState";
-import { MaraResourceCluster } from "../Common/Resources/MaraResourceCluster";
+import { MaraResourceCluster } from "../Common/MapAnalysis/MaraResourceCluster";
 
 export class ExpandBuildState extends ProductionState {
     private expandCenter: MaraPoint;
@@ -135,7 +135,7 @@ export class ExpandBuildState extends ProductionState {
 
         for (let item of allowedItems) {
             if (item.MaxCount > 0) {
-                allowedCfgIds.push(item.UnitConfig.Uid);
+                allowedCfgIds.push(item.UnitConfigId);
             }
         }
         
@@ -156,11 +156,9 @@ export class ExpandBuildState extends ProductionState {
             return [];
         }
         
-        let mineConfig = MaraUtils.GetUnitConfig(cfgId);
-        
         let minePosition: MaraPoint | null = this.settlementController.MiningController.FindMinePosition(
             cluster, 
-            mineConfig,
+            cfgId,
             resourceType
         );
 
@@ -170,10 +168,13 @@ export class ExpandBuildState extends ProductionState {
         }
 
         let mineRequest = this.makeProductionRequest(cfgId, minePosition, 0, true);
+
+        let mineConfigHeight = MaraUtils.GetConfigIdHeight(cfgId);
+        let mineConfigWidth = MaraUtils.GetConfigIdWidth(cfgId);
         
         let mineResources = this.settlementController.MiningController.GetRectResources(
             minePosition,
-            new MaraPoint(minePosition.X + mineConfig.Size.Width - 1, minePosition.Y + mineConfig.Size.Height - 1)
+            new MaraPoint(minePosition.X + mineConfigWidth - 1, minePosition.Y + mineConfigHeight - 1)
         );
 
         if (mineResources.Gold > 0) {
@@ -214,7 +215,7 @@ export class ExpandBuildState extends ProductionState {
             this.expandCenter, 
             this.settlementController.Settings.ResourceMining.MiningRadius,
             [this.settlementController.Settlement],
-            (unit) => {return MaraUtils.IsMetalStockConfig(unit.Cfg) && unit.IsAlive}
+            (unit) => {return MaraUtils.IsMetalStockConfigId(unit.UnitCfgId) && unit.Unit.IsAlive}
         );
 
         if (metalStocks.length == 0) {
@@ -238,7 +239,7 @@ export class ExpandBuildState extends ProductionState {
         let isSawmillPresent = false;
 
         for (let sawmillData of this.settlementController.MiningController.Sawmills) {
-            let distance = MaraUtils.ChebyshevDistance(sawmillData.Sawmill.CellCenter, this.expandCenter);
+            let distance = MaraUtils.ChebyshevDistance(sawmillData.Sawmill!.UnitRect.Center, this.expandCenter);
             
             if (distance < this.settlementController.Settings.ResourceMining.WoodcuttingRadius) {
                 isSawmillPresent = true;

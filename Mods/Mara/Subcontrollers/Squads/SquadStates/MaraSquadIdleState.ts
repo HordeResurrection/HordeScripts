@@ -5,23 +5,26 @@ import { MaraSquadBattleState } from "./MaraSquadBattleState";
 import { MaraSquadIdleGatheringUpState } from "./MaraSquadIdleGatheringUpState";
 import { MaraSquadMoveState } from "./MaraSquadMoveState";
 import { MaraSquadState } from "./MaraSquadState";
-//import { Mara } from "../../../Mara";
+import { MaraPoint } from "../../../Common/MaraPoint";
+import { MaraMap } from "../../../Common/MapAnalysis/MaraMap";
+import { MaraUnitConfigCache } from "../../../Common/Cache/MaraUnitConfigCache";
+import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
 
 export class MaraSquadIdleState extends MaraSquadState {
     OnEntry(): void {
-        this.squad.CurrentTargetCell = this.squad.GetLocation().Point;
+        this.squad.CurrentMovementPoint = this.squad.GetLocation().Point;
         this.distributeUnits();
     }
     
     OnExit(): void {}
 
     Tick(tickNumber: number): void {
-        if (this.squad.MovementTargetCell != null) {
+        if (this.squad.MovementPath != null) {
             this.squad.SetState(new MaraSquadMoveState(this.squad));
             return;
         }
 
-        if (this.squad.AttackTargetCell != null) {
+        if (this.squad.AttackPath != null) {
             this.squad.SetState(new MaraSquadAttackState(this.squad));
             return;
         }
@@ -45,20 +48,25 @@ export class MaraSquadIdleState extends MaraSquadState {
     }
 
     private distributeUnits(): void {
-        let unitsToDistribute:any[] = [];
+        let unitsToDistribute: Array<MaraUnitCacheItem> = [];
 
         for (let unit of this.squad.Units) {
-            let tileType = MaraUtils.GetTileType(unit.Cell);
+            let point = unit.UnitCell;
+            let tileType = MaraMap.GetTileType(point);
             
             if (tileType != TileType.Forest) { //run, Forest, run!!
-                let moveType = unit.Cfg.MoveType.ToString();
+                let moveType = MaraUnitConfigCache.GetConfigProperty(
+                    unit.UnitCfgId,
+                    (cfg) => cfg.MoveType.ToString(),
+                    "MoveType"
+                ) as string;
 
                 if (moveType == "PlainAndForest") {
                     unitsToDistribute.push(unit);
                 }
             }
             else {
-                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, unit.Cell);
+                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, point);
             }
         }
 
@@ -70,17 +78,18 @@ export class MaraSquadIdleState extends MaraSquadState {
             this.squad.MinSpread * (
                 this.squad.Controller.SquadsSettings.MaxSpreadMultiplier + this.squad.Controller.SquadsSettings.MinSpreadMultiplier
             ) / 2;
+
+        searchRadius /= 2; // since spreads above represent diameters
             
-        let forestCells = MaraUtils.FindCells(this.squad.CurrentTargetCell, searchRadius, MaraUtils.ForestCellFilter);
+        let forestCells = MaraUtils.FindCells(this.squad.CurrentMovementPoint!, searchRadius, this.forestCellFilter);
         let cellIndex = 0;
 
         for (let unit of unitsToDistribute) {
             if (cellIndex >= forestCells.length) {
-                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, this.squad.CurrentTargetCell);
+                MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, this.squad.CurrentMovementPoint!);
             }
             else {
                 while (cellIndex < forestCells.length) {
-                    //if (MaraUtils.IsPathExists(unit.Cell, forestCells[cellIndex], unit.Cfg, Mara.Pathfinder)) {
                     if (MaraUtils.IsCellReachable(forestCells[cellIndex], unit)) {
                         MaraUtils.IssueMoveCommand([unit], this.squad.Controller.Player, forestCells[cellIndex]);
                         break;
@@ -91,6 +100,24 @@ export class MaraSquadIdleState extends MaraSquadState {
 
                 cellIndex++;
             }
+        }
+    }
+
+    private forestCellFilter(cell: any): boolean {
+        let point = new MaraPoint(cell.X, cell.Y);
+        let tileType = MaraMap.GetTileType(point);
+
+        if (tileType != TileType.Forest) {
+            return false;
+        }
+        
+        let unit = MaraUtils.GetUnit(cell);
+
+        if (unit) {
+            return false;
+        }
+        else {
+            return true;
         }
     }
 }

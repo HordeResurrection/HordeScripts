@@ -1,5 +1,6 @@
-import { BuildTrackerType } from "library/mastermind/matermind-types";
+import { BuildTracker } from "library/mastermind/matermind-types";
 import { MaraUtils } from "../MaraUtils";
+import { MaraUnitCacheItem } from "./Cache/MaraUnitCacheItem";
 import { MaraPoint } from "./MaraPoint";
 
 export class MaraProductionRequest {
@@ -8,7 +9,7 @@ export class MaraProductionRequest {
     public Precision: number | null;
     public IsForce: boolean = false;
     public ProducedUnit: any = null;
-    public Executor: any = null;
+    public Executor: MaraUnitCacheItem | null = null;
 
     public get MasterMindRequest(): any {
         return this.masterMindRequest;
@@ -29,7 +30,7 @@ export class MaraProductionRequest {
                 let buildTracker;
 
                 try {
-                    buildTracker = MaraUtils.CastToType(tracker, BuildTrackerType);
+                    buildTracker = MaraUtils.CastToType(tracker, BuildTracker);
 
                     if (!buildTracker) {
                         return;

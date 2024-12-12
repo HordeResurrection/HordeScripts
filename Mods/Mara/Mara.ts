@@ -1,8 +1,12 @@
 import { log } from "library/common/logging";
 import { MaraSettlementController } from "./MaraSettlementController";
 import { MaraUtils } from "./MaraUtils";
-import { MaraResourceMap } from "./Common/Resources/MaraResourceMap";
+import { MaraMap } from "./Common/MapAnalysis/MaraMap";
 import { PathFinder } from "library/game-logic/path-find";
+import { broadcastMessage } from "library/common/messages";
+import { createHordeColor } from "library/common/primitives";
+import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
+import { MaraUnitConfigCache } from "./Common/Cache/MaraUnitConfigCache";
 
 export enum MaraLogLevel {
     Debug = 0,
@@ -21,7 +25,6 @@ export enum MaraLogLevel {
 export class Mara {
     static LogLevel: MaraLogLevel = MaraLogLevel.Debug;
     static CanRun = true;
-    static IsNetworkMode = true;
     
     private static controllers: Array<MaraSettlementController> = [];
     private static pathfinder: any;
@@ -41,7 +44,7 @@ export class Mara {
     static Tick(tickNumber: number): void {
         try {
             if (Mara.CanRun) {
-                MaraResourceMap.Tick();
+                MaraMap.Tick();
                 
                 if (tickNumber < 10) { //doing nothing for first 10 ticks since not all core objects could be properly inited
                     return;
@@ -61,6 +64,7 @@ export class Mara {
         }
         catch (ex) {
             log.exception(ex);
+            broadcastMessage(`(Мара) Обнаружена ошибка. Мара остановлена.`, createHordeColor(255, 255, 0, 0));
             Mara.CanRun = false;
         }
     };
@@ -73,22 +77,23 @@ export class Mara {
 
         try {            
             Mara.CanRun = true;
-            Mara.IsNetworkMode = MaraUtils.IsNetworkMode();
             Mara.controllers = [];
 
-            Mara.Debug(`Building resource map...`);
-            MaraResourceMap.Init();
-            Mara.Debug(`Done!`);
+            MaraMap.Init();
+            MaraUnitCache.Init();
+            MaraUnitConfigCache.Init();
 
             let tickOffset = 0;
+            let processedSettlements: Array<any> = [];
 
             for (let item of MaraUtils.GetAllPlayers()) {
-                Mara.AttachToPlayer(item.index, tickOffset);
-                tickOffset++;
+                Mara.AttachToPlayer(item.index, processedSettlements, tickOffset);
+                tickOffset ++;
             }
         }
         catch (ex) {
             log.exception(ex);
+            broadcastMessage(`(Мара) Обнаружена ошибка. Мара остановлена.`, createHordeColor(255, 255, 0, 0));
             Mara.CanRun = false;
             return;
         }
@@ -96,11 +101,16 @@ export class Mara {
         Mara.Info(`Mara successfully engaged. Have fun! ^^`);
     };
 
-    static AttachToPlayer(playerId: string, tickOffset: number = 0): void {
+    static AttachToPlayer(playerId: string, processedSettlements: Array<any>, tickOffset: number = 0): void {
         Mara.Debug(`Begin attach to player ${playerId}`);
         let settlementData = MaraUtils.GetSettlementData(playerId);
 
         if (!settlementData) {
+            return;
+        }
+
+        if (processedSettlements.find((v) => v == settlementData.Settlement)) {
+            Mara.Info(`Skipping player ${playerId}: settlement is already bound to another controller`);
             return;
         }
 
@@ -122,6 +132,8 @@ export class Mara {
         );
         
         Mara.controllers.push(controller);
+        processedSettlements.push(settlementData.Settlement);
+        
         Mara.Info(`Successfully attached to player ${playerId}`);
     };
 

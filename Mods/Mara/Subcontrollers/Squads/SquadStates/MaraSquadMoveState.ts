@@ -13,19 +13,24 @@ export class MaraSquadMoveState extends MaraSquadState {
     OnExit(): void {}
     
     Tick(tickNumber: number): void {
-        if (this.squad.MovementTargetCell != null) {
+        if (this.squad.MovementPath != null) {
             this.initiateMovement();
             return;
         }
 
-        if (this.squad.AttackTargetCell != null) {
+        if (this.squad.AttackPath != null) {
             this.squad.SetState(new MaraSquadAttackState(this.squad));
+            return;
+        }
+
+        if (!this.squad.CurrentMovementPoint) {
+            this.squad.SetState(new MaraSquadIdleState(this.squad));
             return;
         }
         
         let location = this.squad.GetLocation();
         let distance = MaraUtils.ChebyshevDistance(
-            this.squad.CurrentTargetCell, 
+            this.squad.CurrentMovementPoint, 
             location.Point
         );
         
@@ -39,7 +44,18 @@ export class MaraSquadMoveState extends MaraSquadState {
         }
 
         if (distance <= this.squad.MovementPrecision) {
-            this.squad.SetState(new MaraSquadIdleState(this.squad));
+            this.squad.CurrentMovementPoint = this.squad.SelectNextMovementPoint();
+
+            if (
+                !this.squad.CurrentMovementPoint ||
+                this.squad.CurrentMovementPoint == this.squad.CurrentPath![this.squad.CurrentPath!.length - 1]
+            ) {
+                this.squad.SetState(new MaraSquadIdleState(this.squad));
+            }
+            else {
+                MaraUtils.IssueMoveCommand(this.squad.Units, this.squad.Controller.Player, this.squad.CurrentMovementPoint);
+            }
+            
             return;
         }
     }

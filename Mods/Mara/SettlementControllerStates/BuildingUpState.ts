@@ -2,7 +2,7 @@ import { MaraUtils } from "Mara/MaraUtils";
 import { ProductionState } from "./ProductionState";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
-import { MaraResources } from "../Common/Resources/MaraResources";
+import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 
 export class BuildingUpState extends ProductionState {
     protected getProductionTimeout(): number | null {
@@ -18,7 +18,13 @@ export class BuildingUpState extends ProductionState {
         
         if (!enemy) {
             enemy = this.settlementController.StrategyController.SelectEnemy();
-            this.settlementController.Debug(`Selected '${enemy.TownName}' as an enemy.`);
+
+            if (enemy) {
+                this.settlementController.Debug(`Selected '${enemy.TownName}' as an enemy.`);
+            }
+            else {
+                this.settlementController.Debug(`No enemies left to build-up against`);
+            }
         }
 
         if (enemy) {

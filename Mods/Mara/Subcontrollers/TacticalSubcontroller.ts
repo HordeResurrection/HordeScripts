@@ -3,9 +3,11 @@ import { SettlementClusterLocation } from "../Common/Settlement/SettlementCluste
 import { MaraUtils } from "Mara/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraControllableSquad } from "./Squads/MaraControllableSquad";
-import { TileType } from "library/game-logic/horde-types";
-import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { MaraRect } from "../Common/MaraRect";
+import { MaraPoint } from "../Common/MaraPoint";
+import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
+import { MaraUnitConfigCache } from "../Common/Cache/MaraUnitConfigCache";
+import { TileType } from "library/game-logic/horde-types";
 
 export class TacticalSubcontroller extends MaraSubcontroller {
     private offensiveSquads: Array<MaraControllableSquad> = [];
@@ -13,9 +15,10 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     private militiaSquads: Array<MaraControllableSquad> = [];
     private reinforcementSquads: Array<MaraControllableSquad> = [];
     private initialOffensiveSquadCount: number;
-    private unitsInSquads: Map<string, any> = new Map<string, any>();
+    private unitsInSquads: Map<number, MaraUnitCacheItem> = new Map<number, MaraUnitCacheItem>();
 
-    private currentTarget: any; //but actually Unit
+    private currentTarget: MaraUnitCacheItem | null;
+    private attackPath: Array<MaraPoint>;
 
     constructor (parent: MaraSettlementController) {
         super(parent);
@@ -69,18 +72,19 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     AttackTick(): void {
         this.reinforceSquads();
         
-        if (this.currentTarget.IsAlive) {
+        if (this.currentTarget!.Unit.IsAlive) {
             let pullbackLocations = this.getPullbackLocations();
+            let healingLocations = pullbackLocations.filter((l) => l.HasHealers);
 
             for (let squad of this.offensiveSquads) {
                 if (pullbackLocations.length > 0) {
                     if (squad.CombativityIndex < this.settlementController.Settings.Squads.MinCombativityIndex) {
-                        this.sendSquadToOneOfLocations(squad, pullbackLocations);
+                        this.sendSquadToOneOfLocations(squad, pullbackLocations, healingLocations);
                     }
                 }
 
                 if (squad.IsIdle() && squad.CombativityIndex >= 1) {
-                    squad.Attack(this.currentTarget.Cell);
+                    squad.Attack(this.attackPath);
                 }
             }
         }
@@ -102,19 +106,51 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
     IdleTick(): void {
         let retreatLocations = this.getRetreatLocations();
+        let healingLocations = retreatLocations.filter((l) => l.HasHealers);
 
         if (retreatLocations.length > 0) {
             for (let squad of this.allSquads) {
                 if (squad.IsIdle()) {
-                    this.sendSquadToOneOfLocations(squad, retreatLocations);
+                    this.sendSquadToOneOfLocations(squad, retreatLocations, healingLocations);
                 }
             }
         }
     }
 
-    Attack(target): void {
+    Attack(target: MaraUnitCacheItem): void {
         this.currentTarget = target;
-        this.settlementController.Debug(`Selected '${this.currentTarget.Name}' as attack target`);
+        this.settlementController.Debug(`Selected '${this.currentTarget.Unit.Name}' as attack target`);
+
+        let settlementLocation = this.settlementController.GetSettlementLocation();
+        let targetPoint = this.currentTarget.UnitCell;
+
+        if (settlementLocation) {
+            let path = this.settlementController.StrategyController.GetPath(
+                settlementLocation.Center,
+                targetPoint
+            );
+
+            if (path.length > 1) {
+                this.attackPath = path.slice(1);
+            }
+            else {
+                this.attackPath = path;
+            }
+        }
+        else {
+            this.attackPath = [this.currentTarget.UnitCell];
+        }
+
+        this.settlementController.Debug(`Selected as attack path:`);
+        
+        for (let point of this.attackPath) {
+            this.settlementController.Debug(point.ToString());
+        }
+
+        if (this.settlementController.Settings.Squads.DebugSquads) {
+            MaraUtils.DrawPath(this.attackPath, this.settlementController.Settlement.SettlementColor);
+        }
+        
         this.issueAttackCommand();
     }
 
@@ -136,17 +172,19 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     Retreat(): void {
+        this.currentTarget = null;
         let retreatLocations = this.getRetreatLocations();
+        let healingLocations = retreatLocations.filter((l) => l.HasHealers);
 
         if (retreatLocations.length > 0) {
             for (let squad of this.offensiveSquads) {
-                this.sendSquadToOneOfLocations(squad, retreatLocations);
-            }
-
-            if (this.offensiveSquads.length > 0) {
-                this.settlementController.Debug(`Retreating`);
+                this.sendSquadToOneOfLocations(squad, retreatLocations, healingLocations);
             }
         }
+    }
+
+    StopAttack(): void {
+        this.currentTarget = null;
     }
 
     ComposeSquads(): void {
@@ -156,14 +194,13 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.defensiveSquads = [];
         this.reinforcementSquads = [];
         this.DismissMilitia();
-        this.unitsInSquads = new Map<string, any>();
+        this.unitsInSquads = new Map<number, MaraUnitCacheItem>();
 
-        let units = enumerate(this.settlementController.Settlement.Units);
-        let unit;
-        let combatUnits: Array<any> = [];
+        let units = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        let combatUnits: Array<MaraUnitCacheItem> = [];
         
-        while ((unit = eNext(units)) !== undefined) {
-            if (this.isCombatUnit(unit) && unit.IsAlive) {
+        for (let unit of units) {
+            if (this.isCombatUnit(unit) && unit.Unit.IsAlive) {
                 if (!this.isBuilding(unit)) {
                     combatUnits.push(unit);
                 }
@@ -179,9 +216,9 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
         let requiredDefensiveStrength = (1 - ratio) * (this.calcTotalUnitsStrength(combatUnits) + defensiveStrength);
         let unitIndex = 0;
-        let defensiveUnits: any[] = [];
+        let defensiveUnits: Array<MaraUnitCacheItem> = [];
         
-        for (unitIndex = 0; unitIndex < combatUnits.length; unitIndex++) {
+        for (unitIndex = 0; unitIndex < combatUnits.length; unitIndex ++) {
             if (defensiveStrength >= requiredDefensiveStrength) {
                 //unitIndex here will be equal to an index of the last defensive unit plus one
                 break;
@@ -216,6 +253,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.militiaSquads = [];
     }
 
+    DebugSquad(message: string) {
+        if (this.settlementController.Settings.Squads.DebugSquads) {
+            this.settlementController.Debug(message);
+        }
+    }
+
     private needRetreat(): boolean {
         let defensiveStrength = 0;
         this.defensiveSquads.forEach((squad) => {defensiveStrength += squad.Strength});
@@ -233,7 +276,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     private makeMilitia(): void {
         let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
         let militiaUnits = allUnits.filter((value) => {
-            return MaraUtils.IsArmedConfig(value.Cfg) && 
+            return MaraUtils.IsArmedConfigId(value.UnitCfgId) && 
             !this.isBuilding(value) &&
             !this.settlementController.ReservedUnitsData.IsUnitReserved(value)
         });
@@ -270,34 +313,49 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         return weakestSquad;
     }
 
-    private sendSquadToOneOfLocations(squad: MaraControllableSquad, locations: Array<SettlementClusterLocation>): void {
+    private sendSquadToOneOfLocations(
+        squad: MaraControllableSquad, 
+        allLocations: Array<SettlementClusterLocation>,
+        healerLocations: Array<SettlementClusterLocation>
+    ): void {
+        let squadHealthLevel = squad.GetHealthLevel();
+        let locations: Array<SettlementClusterLocation>;
+
+        if (squadHealthLevel <= 0.5) {
+            locations = healerLocations.length > 0 ? healerLocations : allLocations;
+        }
+        else {
+            locations = allLocations;
+        }
+        
         if (locations.length == 0) {
             return;
         }
 
-        let closestLocation: SettlementClusterLocation | null = null;
-        let minDistance = Infinity;
+        this.sendSquadToClosestLocation(squad, locations);
+    }
 
+    private sendSquadToClosestLocation(squad: MaraControllableSquad, locations: Array<SettlementClusterLocation>): void {
         let squadLocation = squad.GetLocation();
 
-        for (let location of locations) {
-            let distance = MaraUtils.ChebyshevDistance(squadLocation.Point, location.Center);
-
-            if (distance < minDistance) {
-                closestLocation = location;
-                minDistance = distance;
+        let closestLocation = MaraUtils.FindExtremum(
+            locations,
+            (next, current) => {
+                return (
+                    MaraUtils.ChebyshevDistance(squadLocation.Point, current.Center) -
+                    MaraUtils.ChebyshevDistance(squadLocation.Point, next.Center)
+                );
             }
-        }
+        );
 
-        if (!MaraUtils.IsPointsEqual(squad.CurrentTargetCell, closestLocation!.Center)) {
-            if (
-                !closestLocation!.BoundingRect.IsPointInside(squadLocation.Point)
-            ) {
+        if (!squad.CurrentMovementPoint || !MaraUtils.IsPointsEqual(squad.CurrentMovementPoint, closestLocation!.Center)) {
+            if (!closestLocation!.BoundingRect.IsPointInside(squadLocation.Point)) {
                 let spread = squad.MinSpread * 3;
                 let minDimension = Math.min(closestLocation!.BoundingRect.Width, closestLocation!.BoundingRect.Heigth);
                 let precision = Math.max(minDimension - spread, 0);
                 
-                squad.Move(closestLocation!.Center, precision);
+                let movementPoint = new MaraPoint(closestLocation!.Center.X, closestLocation!.Center.Y);
+                squad.Move([movementPoint], precision / 2);
             }
         }
     }
@@ -343,19 +401,18 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     private reinforceSquadsByFreeUnits(): void {
-        let units = enumerate(this.settlementController.Settlement.Units);
-        let unit;
-        let freeUnits: any[] = [];
+        let units = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        let freeUnits: Array<MaraUnitCacheItem> = [];
         
-        while ((unit = eNext(units)) !== undefined) {
+        for (let unit of units) {
             if (
-                !this.unitsInSquads.has(unit.Id) &&
+                !this.unitsInSquads.has(unit.UnitId) &&
                 this.isCombatUnit(unit) && 
                 !this.isBuilding(unit) && 
-                unit.IsAlive
+                unit.Unit.IsAlive
             ) {
                 freeUnits.push(unit);
-                this.settlementController.Debug(`Unit ${unit.ToString()} is marked for reinforcements`);
+                this.settlementController.Debug(`Unit ${unit.Unit.ToString()} is marked for reinforcements`);
             }
         }
 
@@ -371,9 +428,10 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
             if (weakestSquad != null) {
                 weakestSquad.AddUnits(cluster);
+                this.DebugSquad(`Reinforced squad ${weakestSquad.ToString()} by units ${cluster.map((value) => value.Unit.ToString()).join("\n")}`);
 
                 for (let unit of cluster) {
-                    this.unitsInSquads.set(unit.Id, unit);
+                    this.unitsInSquads.set(unit.UnitId, unit);
                 }
             }
             else {
@@ -395,6 +453,8 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             }
 
             weakestSquad.AddUnits(squad.Units);
+            this.DebugSquad(`Reinforced squad ${weakestSquad.ToString()} by units ${squad.Units.map((value) => value.Unit.ToString()).join("\n")}`);
+
             usedReinforcementSquads.push(squad);
         }
 
@@ -403,14 +463,14 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         );
     }
 
-    private calcTotalUnitsStrength(units: Array<any>): number {
+    private calcTotalUnitsStrength(units: Array<MaraUnitCacheItem>): number {
         let totalStrength = 0;
         units.forEach((value, index, array) => {totalStrength += MaraUtils.GetUnitStrength(value)});
         
         return totalStrength;
     }
 
-    private createSquadsFromUnits(units: Array<any>): Array<MaraControllableSquad> {
+    private createSquadsFromUnits(units: Array<MaraUnitCacheItem>): Array<MaraControllableSquad> {
         let unitClusters = this.clusterizeUnitsByMovementType(units);
         let result: Array<MaraControllableSquad> = [];
 
@@ -422,9 +482,17 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         return result;
     }
 
-    private getUnitMovementType(unit: any) {
-        let speedsThresholds = this.settlementController.Settings.CombatSettings.UnitSpeedClusterizationThresholds;
-        let unitSpeed = unit.Cfg.Speeds.Item(TileType.Grass);
+    private getUnitMovementType(unit: MaraUnitCacheItem): string {
+        return MaraUnitConfigCache.GetConfigProperty(
+            unit.UnitCfgId, 
+            (cfg) => TacticalSubcontroller.calcConfigMovementType(cfg, this.settlementController.Settings.Combat.UnitSpeedClusterizationThresholds), "MovementType"
+        ) as string;
+    }
+
+    private static calcConfigMovementType(unitConfig: any, speedsThresholds: Array<number>): string {
+        let unitCfgId = unitConfig.Uid;
+        
+        let unitSpeed = MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Grass) as number, "GrassSpeed") as number;
         let speedGroupCode: number | null = null;
 
         for (let i = 0; i < speedsThresholds.length; i++) {
@@ -439,19 +507,20 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         }
 
         let moveType = "";
-        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Grass);
-        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Forest);
-        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Water);
-        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Marsh);
-        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Sand);
-        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Mounts);
-        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Road);
-        moveType += this.speedToMoveTypeFlag(unit.Cfg.Speeds.Ice);
-
+        
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Grass) as number,  "GrassSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Forest) as number, "ForestSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Water) as number,  "WaterSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Marsh) as number,  "MarshSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Sand) as number,   "SandSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Mounts) as number, "MountsSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Road) as number,   "RoadSpeed") as number);
+        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Ice) as number,    "IceSpeed") as number);
+        
         return `${moveType}:${speedGroupCode}`;
     }
 
-    private speedToMoveTypeFlag(speed: number): string {
+    private static speedToMoveTypeFlag(speed: number): string {
         if (speed > 0) {
             return "1";
         }
@@ -460,18 +529,18 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         }
     }
 
-    private clusterizeUnitsByMovementType(units: Array<any>): Array<Array<any>> {
-        let clusters = new Map<string, Array<any>>();
+    private clusterizeUnitsByMovementType(units: Array<MaraUnitCacheItem>): Array<Array<MaraUnitCacheItem>> {
+        let clusters = new Map<string, Array<MaraUnitCacheItem>>();
 
         for (let unit of units) {
             let clusterKey = this.getUnitMovementType(unit);
-            let cluster: Array<any>;
+            let cluster: Array<MaraUnitCacheItem>;
             
             if (clusters.has(clusterKey)) {
                 cluster = clusters.get(clusterKey)!;
             }
             else {
-                cluster = new Array<any>();
+                cluster = new Array<MaraUnitCacheItem>();
             }
 
             cluster.push(unit);
@@ -481,15 +550,14 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         return Array.from(clusters.values());
     }
 
-    private createSquadsFromHomogeneousUnits(units: Array<any>): Array<MaraControllableSquad> {
-        let squadUnits: any[] = [];
+    private createSquadsFromHomogeneousUnits(units: Array<MaraUnitCacheItem>): Array<MaraControllableSquad> {
+        let squadUnits: Array<MaraUnitCacheItem> = [];
         let squads: Array<MaraControllableSquad> = [];
         let currentSquadStrength = 0;
 
         for (let unit of units) {
             currentSquadStrength += MaraUtils.GetUnitStrength(unit);
             squadUnits.push(unit);
-            this.settlementController.Debug(`Added unit ${unit.ToString()} into squad`);
 
             if (currentSquadStrength >= this.settlementController.Settings.Squads.MinStrength) {
                 let squad = this.createSquad(squadUnits);
@@ -508,11 +576,11 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         return squads;
     }
 
-    private createSquad(units: Array<any>): MaraControllableSquad {
+    private createSquad(units: Array<MaraUnitCacheItem>): MaraControllableSquad {
         let squad = new MaraControllableSquad(units, this);
         
         for (let unit of units) {
-            this.unitsInSquads.set(unit.Id, unit);
+            this.unitsInSquads.set(unit.UnitId, unit);
         }
 
         return squad;
@@ -522,8 +590,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.settlementController.Debug(`Issuing attack command`);
 
         for (let squad of this.offensiveSquads) {
-            this.settlementController.Debug(`Squad attacking`);
-            squad.Attack(this.currentTarget.Cell);
+            squad.Attack(this.attackPath);
         }
     }
 
@@ -535,11 +602,11 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.settlementController.HostileAttackingSquads = this.settlementController.HostileAttackingSquads.filter((squad) => {return squad.Units.length > 0});
 
         if (this.unitsInSquads != null) {
-            let filteredUnits = new Map<string, any>();
+            let filteredUnits = new Map<number, MaraUnitCacheItem>();
             
             this.unitsInSquads.forEach(
                 (value, key, map) => {
-                    if (value.IsAlive) {
+                    if (value.Unit.IsAlive) {
                         filteredUnits.set(key, value)
                     }
                 }
@@ -549,14 +616,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         }
     }
 
-    private isCombatUnit(unit: any): boolean {
-        return MaraUtils.IsCombatConfig(unit.Cfg);
+    private isCombatUnit(unit: MaraUnitCacheItem): boolean {
+        return MaraUtils.IsCombatConfigId(unit.UnitCfgId);
     }
 
-    private isBuilding(unit: any): boolean {
-        let config = unit.Cfg;
-
-        return config.BuildingConfig != null;
+    private isBuilding(unit: MaraUnitCacheItem): boolean {
+        return MaraUtils.IsBuildingConfigId(unit.UnitCfgId);
     }
 
     private getPullbackLocations(): Array<SettlementClusterLocation> {
@@ -581,6 +646,26 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             result.push(expandLocation);
         }
 
+        let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        let healers = allUnits.filter((u) => MaraUtils.IsHealerConfigId(u.UnitCfgId));
+
+        for (let healer of healers) {
+            const HEALING_RADIUS = 3; //TODO: calculate this properly based on a unit config
+            
+            let healingRect = new MaraRect(
+                healer.UnitRect.TopLeft.Shift(new MaraPoint(-HEALING_RADIUS, -HEALING_RADIUS)),
+                healer.UnitRect.BottomRight.Shift(new MaraPoint(HEALING_RADIUS, HEALING_RADIUS))
+            );
+            
+            let healerLocation = new SettlementClusterLocation(
+                healer.UnitRect.Center,
+                healingRect,
+                true
+            );
+
+            result.push(healerLocation);
+        }
+
         return result;
     }
 
@@ -601,15 +686,35 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         let accumulatedStrength = 0;
         let defendingSquadGroup: Array<MaraControllableSquad> = [];
 
-        let settlementLocation = this.settlementController.GetSettlementLocation();
+        let retreatLocations = this.getRetreatLocations();
 
-        if (!settlementLocation) { //everything is lost :(
+        if (retreatLocations.length == 0) { //everything is lost :(
             return;
         }
 
         for (let squad of this.allSquads) {
-            if (!settlementLocation.BoundingRect.IsPointInside(squad.GetLocation().Point)) {
+            let isRetreatedSquad = false;
+
+            for (let location of retreatLocations) {
+                if (location.BoundingRect.IsPointInside(squad.GetLocation().Point)) {
+                    isRetreatedSquad = true;
+                    break;
+                }
+            }
+
+            if (!isRetreatedSquad) {
                 continue;
+            }
+            else {
+                if (
+                    !this.defensiveSquads.find((s) => s == squad) && 
+                    !this.militiaSquads.find((s) => s == squad)
+                ) {
+                    this.defensiveSquads.push(squad);
+                    
+                    this.offensiveSquads = this.offensiveSquads.filter((s) => s != squad);
+                    this.reinforcementSquads = this.reinforcementSquads.filter((s) => s != squad);
+                }
             }
             
             defendingSquadGroup.push(squad);
@@ -618,7 +723,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             if (accumulatedStrength > attackerStrength) {
                 // if accumulated strength is less than attacker's, this won't fire and squads of the last batch shall do nothing
                 for (let squad of defendingSquadGroup) {
-                    squad.Attack(attackerLocation.Point);
+                    squad.Attack([attackerLocation.Point]);
                 }
                 
                 attackerIndex++;

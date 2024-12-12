@@ -5,28 +5,25 @@ import { MaraControllableSquad } from "../MaraControllableSquad";
 
 export class MaraSquadPullbackState extends MaraSquadState {
     private timeoutTick: number;
-    private prevTargetCell: any;
-    private newTargetCell: any;
+    private pullbackCell: any;
 
     constructor(squad: MaraControllableSquad, pullbackCell: any) {
         super(squad);
-        this.newTargetCell = pullbackCell;
+        this.pullbackCell = pullbackCell;
     }
     
     OnEntry(): void {
-        this.prevTargetCell = this.squad.CurrentTargetCell;
-        this.squad.MovementTargetCell = this.newTargetCell;
-        this.initiateMovement();
+        MaraUtils.IssueMoveCommand(this.squad.Units, this.squad.Controller.Player, this.pullbackCell);
     }
     
     OnExit(): void {
-        this.squad.CurrentTargetCell = this.prevTargetCell;
+
     }
     
     Tick(tickNumber: number): void {
         let location = this.squad.GetLocation();
         let distance = MaraUtils.ChebyshevDistance(
-            this.squad.CurrentTargetCell, 
+            this.pullbackCell, 
             location.Point
         );
         

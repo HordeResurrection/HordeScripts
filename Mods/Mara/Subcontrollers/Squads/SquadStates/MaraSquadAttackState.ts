@@ -5,6 +5,7 @@ import { MaraSquadState } from "./MaraSquadState";
 import { MaraSquadIdleState } from "./MaraSquadIdleState";
 import { MaraSquadAttackGatheringUpState } from "./MaraSquadAttackGatheringUpState";
 import { MaraSquadCaptureState } from "./MaraSquadCaptureState";
+import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
 
 export class MaraSquadAttackState extends MaraSquadState {
     OnEntry(): void {
@@ -17,12 +18,21 @@ export class MaraSquadAttackState extends MaraSquadState {
         let nearbyUnits = this.squad.GetNearbyUnits();
         
         if (this.isEnemyNearby(nearbyUnits)) {
-            this.squad.SetState(new MaraSquadBattleState(this.squad));
-            return;
+            let enemyUnits = nearbyUnits.filter(u => this.isEnemyUnit(u));
+
+            if (this.squad.CanAttackAtLeastOneUnit(enemyUnits)) {
+                this.squad.SetState(new MaraSquadBattleState(this.squad));
+                return;
+            }
         }
         
-        if (this.squad.MovementTargetCell != null) {
+        if (this.squad.MovementPath != null) {
             this.squad.SetState(new MaraSquadMoveState(this.squad));
+            return;
+        }
+
+        if (!this.squad.CurrentMovementPoint) {
+            this.squad.SetState(new MaraSquadIdleState(this.squad));
             return;
         }
 
@@ -35,7 +45,7 @@ export class MaraSquadAttackState extends MaraSquadState {
             }
         }
 
-        if (this.squad.AttackTargetCell != null) {
+        if (this.squad.AttackPath != null) {
             this.initiateAttack();
             return;
         }
@@ -48,22 +58,36 @@ export class MaraSquadAttackState extends MaraSquadState {
         }
         
         let distance = MaraUtils.ChebyshevDistance(
-            this.squad.CurrentTargetCell, 
+            this.squad.CurrentMovementPoint,
             location.Point
         );
 
         if (distance <= this.squad.MovementPrecision) {
-            this.squad.SetState(new MaraSquadIdleState(this.squad));
+            this.squad.CurrentMovementPoint = this.squad.SelectNextMovementPoint();
+
+            if (
+                !this.squad.CurrentMovementPoint
+            ) {
+                this.squad.SetState(new MaraSquadIdleState(this.squad));
+            }
+            else {
+                MaraUtils.IssueMoveCommand(this.squad.Units, this.squad.Controller.Player, this.squad.CurrentMovementPoint);
+            }
+
             return;
         }
     }
 
-    private isEnemyNearby(units: Array<any>): boolean {
+    private isEnemyUnit(unit: MaraUnitCacheItem): boolean {
+        return (
+            unit.Unit.IsAlive &&
+            this.squad.Controller.EnemySettlements.indexOf(unit.UnitOwner) > -1
+        );
+    }
+
+    private isEnemyNearby(units: Array<MaraUnitCacheItem>): boolean {
         for (let unit of units) {
-            if (
-                unit.IsAlive &&
-                this.squad.Controller.EnemySettlements.indexOf(unit.Owner) > -1
-            ) {
+            if (this.isEnemyUnit(unit)) {
                 return true;
             }
         }
@@ -71,17 +95,17 @@ export class MaraSquadAttackState extends MaraSquadState {
         return false;
     }
 
-    private isCapturableUnitsNearby(units: Array<any>): boolean {
+    private isCapturableUnitsNearby(units: Array<MaraUnitCacheItem>): boolean {
         return units.findIndex((unit) => {
-                return unit.BattleMind.CanBeCapturedNow() && 
-                !MaraUtils.IsBuildingConfig(unit.Cfg)
+                return unit.Unit.BattleMind.CanBeCapturedNow() && 
+                !MaraUtils.IsBuildingConfigId(unit.UnitCfgId)
             }
         ) >= 0;
     }
 
     private atLeastOneCapturingUnitInSquad(): boolean {
         for (let unit of this.squad.Units) {
-            if (MaraUtils.IsCapturingConfig(unit.Cfg)) {
+            if (MaraUtils.IsCapturingConfigId(unit.UnitCfgId)) {
                 return true;
             }
         }

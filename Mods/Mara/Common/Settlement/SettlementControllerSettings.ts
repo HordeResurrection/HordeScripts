@@ -5,7 +5,7 @@ export class MaraSettlementControllerSettings {
     public Squads: SquadsSettings = new SquadsSettings();
     public ControllerStates: ControllerStatesSettings = new ControllerStatesSettings();
     public ResourceMining: ResourceMiningSettings = new ResourceMiningSettings();
-    public CombatSettings: CombatSettings = new CombatSettings();
+    public Combat: CombatSettings = new CombatSettings();
 }
 
 class UnitSearchSettings {
@@ -16,14 +16,15 @@ class UnitSearchSettings {
 class TimeoutsSettings {
     public RebuildEstimationThreshold: number = 2 * 60 * 50;
     
-    public MaxBuildUpProduction: number = 3 * 60 * 50;
-    public MinBuildUpProduction: number = 1 * 60 * 50;
+    public MaxBuildUpProduction: number = 2 * 60 * 50;
+    public MinBuildUpProduction: number = 0.5 * 60 * 50;
 
     public UnitProductionEstimationThreshold: number = 2 * 60 * 50;
     public Exterminate: number = 5 * 60 * 50;
+    public Develop: number = 2 * 60 * 50;
     
-    public ExpandBuild: number = 3 * 60 * 50;
-    public ExpandPrepare: number = 2 * 60 * 50;
+    public ExpandBuild: number = 1.5 * 60 * 50;
+    public ExpandPrepare: number = 5 * 60 * 50;
     
     public UnfinishedConstructionThreshold: number = 2 * 60 * 50;
 }
@@ -37,11 +38,14 @@ class SquadsSettings {
     public DefaultMovementPrecision: number = 3;
     public KiteTimeout: number = 8 * 50; // 8 sec
     public KiteThresholdPositionChangeDistance: number = 5;
+
+    public DebugSquads: boolean = false;
 }
 
 class ControllerStatesSettings {
     public BuildUpProbabilityWhenOffensePossible = 0.70;
-    public BuildUpProbabilityWhenDefensePossible = 0.35;
+    public BuildUpProbabilityWhenDefensePossible = 0.30;
+    public UnnecessaryExpandProbability = 0.20;
     
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;

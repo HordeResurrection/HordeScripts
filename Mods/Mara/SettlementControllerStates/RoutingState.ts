@@ -1,7 +1,7 @@
-import { MaraResourceMap } from "../Common/Resources/MaraResourceMap";
-import { MaraResourceType } from "../Common/Resources/MaraResourceType";
+import { MaraMap } from "../Common/MapAnalysis/MaraMap";
+import { MaraResourceType } from "../Common/MapAnalysis/MaraResourceType";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
-import { MaraResources } from "../Common/Resources/MaraResources";
+import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraUtils } from "../MaraUtils";
 import { NonUniformRandomSelectItem } from "../Common/NonUniformRandomSelectItem";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
@@ -31,17 +31,12 @@ export class RoutingState extends MaraSettlementControllerState {
             if (expandData.NeedExpand) {
                 this.settlementController.Debug(`Low on one or more resource, required resources: ${expandData.ResourcesToMine.ToString()}`);
 
-                let positiveItem = new NextStrategyItem();
-                positiveItem.NeedExpand = true;
-                positiveItem.Weight = expandData.MinResourceAmount;
-
-                let negativeItem = new NextStrategyItem();
-                negativeItem.NeedExpand = false;
-                negativeItem.Weight = expandData.MinResourceThreshold - expandData.MinResourceAmount;
-
-                let pick = MaraUtils.NonUniformRandomSelect(this.settlementController.MasterMind, [positiveItem, negativeItem]);
-
-                if (pick!.NeedExpand) {
+                if (
+                    this.decideOnExpand(
+                        expandData.MinResourceAmount,
+                        expandData.MinResourceThreshold - expandData.MinResourceAmount
+                    )
+                ) {
                     this.settlementController.Debug(`Proceeding to expand...`);
                     this.fillExpandData(expandData.ResourcesToMine);
                     this.settlementController.State = SettlementControllerStateFactory.MakeExpandPrepareState(this.settlementController);
@@ -53,7 +48,46 @@ export class RoutingState extends MaraSettlementControllerState {
                 return;
             }
             else {
-                this.defineOffensiveStrategy();
+                let expandProbability = 100 * this.settlementController.Settings.ControllerStates.UnnecessaryExpandProbability;
+                
+                if (
+                    this.decideOnExpand(
+                        expandProbability,
+                        100 - expandProbability
+                    )
+                ) {
+                    this.settlementController.Debug(`Proceeding to expand for no reason`);
+
+                    let totalResources = this.settlementController.MiningController.GetTotalResources();
+                    
+                    let lowestResource;
+                    let lowestResourceAmount = Infinity;
+
+                    totalResources.Resources.forEach((value, key) => {
+                        if (key == MaraResourceType.People) {
+                            return;
+                        }
+                        
+                        if (!lowestResource || value < lowestResourceAmount) {
+                            lowestResource = key;
+                            lowestResourceAmount = value;
+                        }
+                    });
+
+                    let resourcesToMine = new MaraResources(0, 0, 0, 0);
+                    resourcesToMine.Resources.set(lowestResource, lowestResourceAmount);
+
+                    if (totalResources.People < PEOPLE_THRESHOLD) {
+                        resourcesToMine.Resources.set(MaraResourceType.People, PEOPLE_THRESHOLD);
+                    }
+
+                    this.fillExpandData(resourcesToMine);
+                    this.settlementController.State = SettlementControllerStateFactory.MakeExpandPrepareState(this.settlementController);
+                }
+                else {
+                    this.defineOffensiveStrategy();
+                }
+                
                 return;
             }
         }
@@ -72,12 +106,15 @@ export class RoutingState extends MaraSettlementControllerState {
     }
 
     private pickBuildUpOrDevelopment(buildUpProbability: number): void {
+        let realBuildUpProbability = buildUpProbability * (0.7 ** this.settlementController.ConsequtiveBuildUpCount);
         let pick = MaraUtils.Random(this.settlementController.MasterMind, 100);
 
-        if (pick < buildUpProbability) {
+        if (pick < realBuildUpProbability) {
+            this.settlementController.ConsequtiveBuildUpCount ++;
             this.settlementController.State = SettlementControllerStateFactory.MakeBuildingUpState(this.settlementController);
         }
         else {
+            this.settlementController.ConsequtiveBuildUpCount = 0;
             this.settlementController.State = SettlementControllerStateFactory.MakeDevelopingState(this.settlementController);
         }
     }
@@ -217,7 +254,7 @@ export class RoutingState extends MaraSettlementControllerState {
     private isExpandNeeded(): NeedExpandResult {
         let leftResources = new Set<MaraResourceType>();
         
-        MaraResourceMap.ResourceClusters.forEach((value) => {
+        MaraMap.ResourceClusters.forEach((value) => {
             if (value.GoldAmount > 0) {
                 leftResources.add(MaraResourceType.Gold);
             }
@@ -242,6 +279,8 @@ export class RoutingState extends MaraSettlementControllerState {
 
         let minResourceToThresholdRatio = Infinity;
 
+        //TODO: rewrite code below to get rid of certain resource names
+        
         if (resources.People < PEOPLE_THRESHOLD) {
             this.settlementController.Debug(`Low people`);
             result.NeedExpand = true;
@@ -299,5 +338,21 @@ export class RoutingState extends MaraSettlementControllerState {
         }
 
         return result;
+    }
+
+    private decideOnExpand(positiveWeigth: number, negativeWeigth: number): boolean {
+        this.settlementController.Debug(`deciding on expand, positive weigth: ${positiveWeigth}, negative: ${negativeWeigth}`);
+        
+        let positiveItem = new NextStrategyItem();
+        positiveItem.NeedExpand = true;
+        positiveItem.Weight = positiveWeigth;
+
+        let negativeItem = new NextStrategyItem();
+        negativeItem.NeedExpand = false;
+        negativeItem.Weight = negativeWeigth;
+
+        let pick = MaraUtils.NonUniformRandomSelect(this.settlementController.MasterMind, [positiveItem, negativeItem]);
+        
+        return pick!.NeedExpand;
     }
 }

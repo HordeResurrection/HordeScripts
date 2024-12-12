@@ -2,7 +2,7 @@ import { MaraUtils } from "Mara/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
-import { MaraResources } from "../Common/Resources/MaraResources";
+import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraPoint } from "../Common/MaraPoint";
 import { UnitComposition } from "../Common/UnitComposition";
 
