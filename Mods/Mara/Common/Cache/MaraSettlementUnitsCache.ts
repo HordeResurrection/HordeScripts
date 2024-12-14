@@ -1,7 +1,7 @@
 import { MaraPoint } from "../MaraPoint";
 import { MaraUnitBushItem } from "./MaraUnitBushItem";
 import { MaraUnitCacheItem } from "./MaraUnitCacheItem";
-import RBush from "./rbush.js"
+import RBush from "../RBush/rbush.js"
 
 export class MaraSettlementUnitsCache {
     Settlement: any;

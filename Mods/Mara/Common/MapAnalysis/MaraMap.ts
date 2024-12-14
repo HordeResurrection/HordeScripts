@@ -13,6 +13,8 @@ import { MaraMapNodeType } from "./MaraMapNodeType";
 import { createHordeColor } from "library/common/primitives";
 import { MaraPath } from "./MaraPath";
 import SortedSet from "./SortedSet.js"
+import RBush from "../RBush/rbush.js"
+import { MaraRect } from "../MaraRect";
 
 class TileTypeCache extends MaraCellDataHolder {
     constructor () {
@@ -46,6 +48,24 @@ class ClusterData extends MaraCellDataHolder {
     }
 }
 
+export class MaraResourceClusterBushItem {
+    minX: number;
+    minY: number;
+    maxX: number;
+    maxY: number;
+
+    ResourceCluster: MaraResourceCluster;
+
+    constructor(cluster: MaraResourceCluster) {
+        this.minX = cluster.Center.X;
+        this.minY = cluster.Center.Y;
+        this.maxX = cluster.Center.X;
+        this.maxY = cluster.Center.Y;
+
+        this.ResourceCluster = cluster;
+    }
+}
+
 export class MaraMap {
     public static ResourceClusters: Map<string, MaraResourceCluster>;
     public static ProcessedResourceCells: Set<string> = new Set<string>();
@@ -66,6 +86,7 @@ export class MaraMap {
     private static resourceMapMonitor: any;
     private static resourceData: Array<Array<any>> = [];
     private static clusterData: ClusterData = new ClusterData();
+    private static clusterSpatialIndex: RBush;
 
     private static unitBuildHandlers: Map<number, any>;
     
@@ -238,6 +259,19 @@ export class MaraMap {
         if (MaraMap.DEBUG_MAP) {
             MaraMap.drawMap();
         }
+    }
+
+    static GetResourceClustersAroundPoint(point: MaraPoint, radius: number): Array<MaraResourceCluster> {
+        let rect = MaraRect.CreateFromPoint(new MaraPoint(point.X, point.Y), radius);
+
+        let cacheItems = MaraMap.clusterSpatialIndex.search({
+            minX: rect.TopLeft.X,
+            minY: rect.TopLeft.Y,
+            maxX: rect.BottomRight.X,
+            maxY: rect.BottomRight.Y
+        }) as Array<MaraResourceClusterBushItem>;
+
+        return cacheItems.map((i) => i.ResourceCluster);
     }
 
     private static buildMap(): void {
@@ -907,6 +941,7 @@ export class MaraMap {
         let maxColIndex = Math.floor(MaraUtils.GetScenaWidth() / MaraMap.RESOURCE_CLUSTER_SIZE);
 
         MaraMap.ResourceClusters = new Map<string, MaraResourceCluster>();
+        let clusterSpatialData: Array<MaraResourceClusterBushItem> = [];
         
         for (let rowIndex = 0; rowIndex < maxRowIndex; rowIndex ++) {
             for (let colIndex = 0; colIndex < maxColIndex; colIndex ++) {
@@ -914,9 +949,13 @@ export class MaraMap {
 
                 if (cluster.WoodAmount > 1120 || cluster.MetalAmount > 0 || cluster.GoldAmount > 0) {
                     MaraMap.ResourceClusters.set(cluster.ToString(), cluster);
+                    clusterSpatialData.push(new MaraResourceClusterBushItem(cluster));
                 }
             }
         }
+
+        MaraMap.clusterSpatialIndex = new RBush(2);
+        MaraMap.clusterSpatialIndex.load(clusterSpatialData);
     }
 
     private static watchSettlement(settlement: any): void {

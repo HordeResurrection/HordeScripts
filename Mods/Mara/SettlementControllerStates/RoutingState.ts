@@ -254,6 +254,7 @@ export class RoutingState extends MaraSettlementControllerState {
     private isExpandNeeded(): NeedExpandResult {
         let leftResources = new Set<MaraResourceType>();
         
+        //!!
         MaraMap.ResourceClusters.forEach((value) => {
             if (value.GoldAmount > 0) {
                 leftResources.add(MaraResourceType.Gold);

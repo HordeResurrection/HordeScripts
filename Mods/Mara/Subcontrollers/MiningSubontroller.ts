@@ -76,16 +76,14 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
 
         for (let sawmillData of this.Sawmills) {
-            MaraMap.ResourceClusters.forEach(
-                (value) => {
-                    if (
-                        MaraUtils.ChebyshevDistance(value.Center, sawmillData.Sawmill?.UnitRect.Center) < 
-                            this.settlementController.Settings.ResourceMining.WoodcuttingRadius
-                    ) {
-                        totalResources.Wood += value.WoodAmount;
-                    }
-                }
-            );
+            if (sawmillData.Sawmill) {
+                let clusters = MaraMap.GetResourceClustersAroundPoint(
+                    sawmillData.Sawmill.UnitRect.Center,
+                    this.settlementController.Settings.ResourceMining.WoodcuttingRadius
+                );
+
+                clusters.forEach((c) => totalResources.Wood += c.WoodAmount);
+            }
         }
 
         let model = MaraUtils.GetPropertyValue(settlement.Census, "Model");
