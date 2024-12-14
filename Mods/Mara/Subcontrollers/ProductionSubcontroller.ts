@@ -11,7 +11,6 @@ import { SettlementClusterLocation } from "../Common/Settlement/SettlementCluste
 import { MaraRect } from "../Common/MaraRect";
 import { MaraUnitConfigCache } from "../Common/Cache/MaraUnitConfigCache";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
-import { Mara } from "../Mara";
 import { MaraUnitCache } from "../Common/Cache/MaraUnitCache";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
@@ -61,33 +60,17 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
 
         if (tickNumber % 50 == 0) {
-            Mara.Profiler("ProductionSubcontroller.Maintenance").Start();
-            
-            Mara.Profiler("ProductionSubcontroller.BuildingsCleanup").Start();
             this.cleanupUnfinishedBuildings(tickNumber);
-            Mara.Profiler("ProductionSubcontroller.BuildingsCleanup").Stop();
-
-            Mara.Profiler("ProductionSubcontroller.cleanupRepairRequests").Start();
             this.cleanupRepairRequests();
-            Mara.Profiler("ProductionSubcontroller.cleanupRepairRequests").Stop();
-            
-            Mara.Profiler("ProductionSubcontroller.repairUnits").Start();
             this.repairUnits();
-            Mara.Profiler("ProductionSubcontroller.repairUnits").Stop();
-            
-            Mara.Profiler("ProductionSubcontroller.Maintenance").Stop();
         }
 
-        Mara.Profiler("ProductionSubcontroller.queuedRequests").Start();
         this.productionIndex = null;
         let addedRequests: Array<MaraProductionRequest> = [];
 
         for (let request of this.queuedRequests) {
-            Mara.Profiler("ProductionSubcontroller.getProducer").Start();
             let freeProducer = this.getProducer(request.ConfigId);
-            Mara.Profiler("ProductionSubcontroller.getProducer").Stop();
-
-            Mara.Profiler("ProductionSubcontroller.mmProduction").Start();
+            
             if (freeProducer) {
                 request.Executor = freeProducer;
                 
@@ -97,10 +80,8 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                     this.settlementController.ReservedUnitsData.ReserveUnit(freeProducer);
                 }
             }
-            Mara.Profiler("ProductionSubcontroller.mmProduction").Stop();
         }
 
-        Mara.Profiler("ProductionSubcontroller.queueCleanup").Start();
         if (addedRequests.length > 0) {
             this.settlementController.Debug(`Removed ${addedRequests.length} units from target production list`);
 
@@ -114,10 +95,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
             this.executingRequests.push(...addedRequests);
         }
-        Mara.Profiler("ProductionSubcontroller.queueCleanup").Stop();
-        Mara.Profiler("ProductionSubcontroller.queuedRequests").Stop();
-
-        Mara.Profiler("ProductionSubcontroller.executingRequests").Start();
+        
         if (this.executingRequests.length > 0) {
             let filteredRequests: Array<MaraProductionRequest> = [];
             
@@ -137,7 +115,6 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
             this.executingRequests = filteredRequests;
         }
-        Mara.Profiler("ProductionSubcontroller.executingRequests").Stop();
     }
 
     RequestProduction(request: MaraProductionRequest): void {
@@ -310,17 +287,11 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     private repairUnits(): void {
-        Mara.Profiler("ProductionSubcontroller.repairUnits.getRepairZones").Start()
         let repairZones = this.getRepairZones();
-        Mara.Profiler("ProductionSubcontroller.repairUnits.getRepairZones").Stop()
-
-        Mara.Profiler("ProductionSubcontroller.repairUnits.getUnitsToRepair").Start()
+        
         let unitsToRepair: Array<MaraUnitCacheItem> = this.getUnitsToRepair(repairZones);
-        Mara.Profiler("ProductionSubcontroller.repairUnits.getUnitsToRepair").Stop()
-
-        Mara.Profiler("ProductionSubcontroller.repairUnits.GetTotalResources").Start()
+        
         let availableResources = this.settlementController.MiningController.GetStashedResourses();
-        Mara.Profiler("ProductionSubcontroller.repairUnits.GetTotalResources").Stop()
         
         for (let unit of unitsToRepair) {
             let maxHealth = MaraUtils.GetConfigIdMaxHealth(unit.UnitCfgId);
@@ -338,19 +309,15 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             let repairCost = repairPrice.Multiply(missingHealth);
 
             if (availableResources.IsGreaterOrEquals(repairCost)) {
-                Mara.Profiler("ProductionSubcontroller.repairUnits.getRepairer").Start()
                 let repairer = this.getRepairer();
-                Mara.Profiler("ProductionSubcontroller.repairUnits.getRepairer").Stop()
-
+                
                 if (repairer) {
-                    Mara.Profiler("ProductionSubcontroller.repairUnits.createRequest").Start()
                     let repairRequest = new MaraRepairRequest(unit, repairer);
                     this.settlementController.ReservedUnitsData.ReserveUnit(repairer);
                     MaraUtils.IssueRepairCommand([repairer], this.settlementController.Player, unit.UnitCell);
 
                     this.repairRequests.push(repairRequest);
                     this.settlementController.Debug(`Created repair request: ${repairRequest.ToString()}`);
-                    Mara.Profiler("ProductionSubcontroller.repairUnits.createRequest").Stop()
                 }
             }
         }
@@ -495,7 +462,6 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     private updateProductionIndex(): void {
-        Mara.Profiler("ProductionSubcontroller.UpdateProdIndex").Start();
         this.productionIndex = new Map<string, Array<MaraUnitCacheItem>>();
         
         let producers = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
@@ -530,14 +496,9 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                 }
             }
         }
-        Mara.Profiler("ProductionSubcontroller.UpdateProdIndex").Stop();
     }
 
     private configProductionRequirementsMet(config: any): boolean {
-        Mara.Profiler("ProductionSubcontroller.HasUnmetRequirements").Start();
-        let result = this.settlementController.Settlement.TechTree.HasUnmetRequirements(config);
-        Mara.Profiler("ProductionSubcontroller.HasUnmetRequirements").Stop();
-
-        return result;
+        return this.settlementController.Settlement.TechTree.HasUnmetRequirements(config);
     }
 }

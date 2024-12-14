@@ -369,9 +369,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
     }
 
     GetPath(from: MaraPoint, to: MaraPoint): Array<MaraPoint> {
-        Mara.Profiler("GetPaths").Start()
         let possiblePaths = MaraMap.GetPaths(from, to);
-        Mara.Profiler("GetPaths").Stop()
         Mara.Debug(`paths count: ${possiblePaths.length}`)
 
         if (possiblePaths.length == 0) {

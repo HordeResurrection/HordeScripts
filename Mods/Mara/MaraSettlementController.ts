@@ -22,7 +22,6 @@ import { EconomySnapshotItem } from "./Common/Settlement/EconomySnapshotItem";
 import { MaraRect } from "./Common/MaraRect";
 import { MaraUnitCacheItem } from "./Common/Cache/MaraUnitCacheItem";
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
-import { MaraProfiler } from "./Common/MaraProfiler";
 
 class ReservedUnitsData {
     public ReservableUnits: Array<Map<number, MaraUnitCacheItem>>;
@@ -116,7 +115,7 @@ export class MaraSettlementController {
     public CanMineResources: boolean = true;
     public ConsequtiveBuildUpCount: number = 0;
     
-    private subcontrollers: Array<{profiler: MaraProfiler, controller: MaraSubcontroller}> = [];
+    private subcontrollers: Array<MaraSubcontroller> = [];
     private state: MaraSettlementControllerState;
     private nextState: MaraSettlementControllerState | null;
     private currentUnitComposition: UnitComposition | null;
@@ -139,16 +138,16 @@ export class MaraSettlementController {
         this.subcontrollers = [];
 
         this.MiningController = new MiningSubcontroller(this);
-        this.subcontrollers.push({profiler: Mara.Profiler("MiningSubcontrollerTick"), controller: this.MiningController});
+        this.subcontrollers.push(this.MiningController);
 
         this.ProductionController = new ProductionSubcontroller(this);
-        this.subcontrollers.push({profiler: Mara.Profiler("ProductionSubcontrollerTick"), controller: this.ProductionController});
+        this.subcontrollers.push(this.ProductionController);
 
         this.StrategyController = new StrategySubcontroller(this);
-        this.subcontrollers.push({profiler: Mara.Profiler("StrategySubcontrollerTick"), controller: this.StrategyController});
+        this.subcontrollers.push(this.StrategyController);
 
         this.TacticalController = new TacticalSubcontroller(this);
-        this.subcontrollers.push({profiler: Mara.Profiler("TacticalSubcontrollerTick"), controller: this.TacticalController});
+        this.subcontrollers.push(this.TacticalController);
 
         this.State = SettlementControllerStateFactory.MakeRoutingState(this);
     }
@@ -167,42 +166,30 @@ export class MaraSettlementController {
         this.settlementLocation = null;
 
         if (tickNumber % 50 == 0) {
-            Mara.Profiler("SettlementController.CleanupExpands").Start()
             this.СleanupExpands();
-            Mara.Profiler("SettlementController.CleanupExpands").Stop()
         }
 
         if (tickNumber % 10 == 0) {
-            Mara.Profiler("SettlementController.ReservedUnits").Start()
             this.ReservedUnitsData.Cleanup();
-            Mara.Profiler("SettlementController.ReservedUnits").Stop()
         }
 
         for (let subcontroller of this.subcontrollers) {
-            subcontroller.profiler.Start();
-            subcontroller.controller.Tick(tickNumber);
-            subcontroller.profiler.Stop(false);
+            subcontroller.Tick(tickNumber);
         }
         
         if (this.nextState) {
             if (this.state) {
                 this.Debug(`Leaving state ${this.state.constructor.name}`);
-                Mara.Profiler("SettlementController.ExitState").Start()
                 this.state.OnExit();
-                Mara.Profiler("SettlementController.ExitState").Stop()
             }
             
             this.state = this.nextState;
             this.nextState = null;
             this.Debug(`Entering state ${this.state.constructor.name}, tick ${tickNumber}`);
-            Mara.Profiler("SettlementController.EnterState").Start()
             this.state.OnEntry();
-            Mara.Profiler("SettlementController.EnterState").Stop()
         }
 
-        Mara.Profiler(this.state.ProfilerName).Start();
         this.state.Tick(tickNumber);
-        Mara.Profiler(this.state.ProfilerName).Stop();
     }
 
     Log(level: MaraLogLevel, message: string): void {

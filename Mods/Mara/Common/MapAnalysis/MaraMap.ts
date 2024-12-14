@@ -148,44 +148,33 @@ export class MaraMap {
     }
 
     static GetPaths(from: MaraPoint, to: MaraPoint): Array<MaraPath> {
-        Mara.Debug(`nodes count: ${MaraMap.mapNodes.length}`);
-        Mara.Profiler("GetPaths.NodesSearch").Start()
         let fromNode = MaraMap.mapNodes.find((n) => n.Region.HasCell(from));
 
         if (!fromNode) {
-            Mara.Profiler("GetPaths.NodesSearch").Stop()
             return [];
         }
 
         let toNode = MaraMap.mapNodes.find((n) => n.Region.HasCell(to));
 
         if (!toNode) {
-            Mara.Profiler("GetPaths.NodesSearch").Stop()
             return [];
         }
-
-        Mara.Profiler("GetPaths.NodesSearch").Stop()
         
         let paths: Array<MaraPath> = [];
         
-        Mara.Profiler("GetPaths.NodesInit").Start()
         MaraMap.mapNodes.forEach((n) => {
             n.Weigth = n.Type != MaraMapNodeType.Unwalkable ? 1 : Infinity;
         });
-        Mara.Profiler("GetPaths.NodesInit").Stop()
 
         const WEIGTH_INCREMENT = 100;
 
         while (paths.length < MaraMap.MAX_PATH_COUNT) {
-            Mara.Profiler("GetPaths.dijkstraPath").Start()
             let path = MaraMap.dijkstraPath(fromNode, toNode, MaraMap.mapNodes);
-            Mara.Profiler("GetPaths.dijkstraPath").Stop()
-
+            
             if (path.length == 0) { // not found
                 return [];
             }
         
-            Mara.Profiler("GetPaths.PathPrepare").Start()
             if (path.every((v) => v.Weigth > WEIGTH_INCREMENT)) {
                 break;
             }
@@ -202,7 +191,6 @@ export class MaraMap {
 
                 paths.push(new MaraPath(resultNodes));
             }
-            Mara.Profiler("GetPaths.PathPrepare").Stop()
         }
 
         return paths;
@@ -871,15 +859,10 @@ export class MaraMap {
         let processedNodes = {};
         
         while (unprocessedNodes.length > 0) {
-            Mara.Profiler("GetPaths.dijkstraPath.FindExtremum").Start()
             let closestNode: MaraMapNode = unprocessedNodes.beginIterator().value();
-            Mara.Profiler("GetPaths.dijkstraPath.FindExtremum").Stop()
-    
-            Mara.Profiler("GetPaths.dijkstraPath.NeighboursProcessing").Start()
+            
             for (let node of closestNode.Neighbours) {
-                Mara.Profiler("GetPaths.dijkstraPath.prcessedNodesSearch").Start()
                 let n = processedNodes[node.Id];
-                Mara.Profiler("GetPaths.dijkstraPath.prcessedNodesSearch").Stop()
                 
                 if (n != null) {
                     continue;
@@ -893,12 +876,9 @@ export class MaraMap {
                     unprocessedNodes.insert(node);
                 }
             }
-            Mara.Profiler("GetPaths.dijkstraPath.NeighboursProcessing").Stop()
-    
-            Mara.Profiler("GetPaths.dijkstraPath.unprocessedCleanup").Start()
+            
             processedNodes[closestNode.Id] = closestNode;
             unprocessedNodes.remove(closestNode);
-            Mara.Profiler("GetPaths.dijkstraPath.unprocessedCleanup").Stop()
         }
     
         if (to.ShortestDistance == Infinity) { //path not found
@@ -910,13 +890,11 @@ export class MaraMap {
     
         let currentNode = to;
     
-        Mara.Profiler("GetPaths.dijkstraPath.backwardProcessing").Start()
         while (currentNode != from) {
             let nextNode = currentNode.Neighbours.find((n) => currentNode.ShortestDistance == (currentNode.Weigth + n.ShortestDistance))!;
             result.push(nextNode);
             currentNode = nextNode;
         }
-        Mara.Profiler("GetPaths.dijkstraPath.backwardProcessing").Stop()
     
         return result.reverse();
     }

@@ -59,14 +59,11 @@ export class Mara {
                     return;
                 }
 
-                Mara.Profiler("MaraTick").Start();
                 MaraMap.Tick();
                 
                 for (let controller of Mara.controllers) {
                     if (!controller.Settlement.Existence.IsTotalDefeat) {
-                        Mara.Profiler("SettlementController").Start();
                         controller.Tick(tickNumber - controller.TickOffset);
-                        Mara.Profiler("SettlementController").Stop();
                     }
                     else {
                         Mara.Log(MaraLogLevel.Info, `Controller '${controller.Player.Nickname}' lost the battle, but not the war!`);
@@ -75,24 +72,21 @@ export class Mara {
 
                 Mara.controllers = Mara.controllers.filter((controller) => {return !controller.Settlement.Existence.IsTotalDefeat});
 
-                Mara.Profiler("MaraTick").Stop();
+                // if (Mara.Profiler("MaraTick").ExecutionTime >= 20) {
+                //     Mara.Debug(`============ LONG TICK PROFILING DATA ============`);
 
-                if (Mara.Profiler("MaraTick").ExecutionTime >= 20) {
-                    Mara.Debug(`============ LONG TICK PROFILING DATA ============`);
-
-                    for (let profiler in Mara.profilers) {
-                        Mara.Profiler(profiler).Print();
-                    }
-                }
+                //     for (let profiler in Mara.profilers) {
+                //         Mara.Profiler(profiler).Print();
+                //     }
+                // }
 
                 Mara.profilers = {};
             }
         }
         catch (ex) {
-            //log.exception(ex);
+            log.exception(ex);
             broadcastMessage(`(Мара) Обнаружена ошибка. Мара остановлена.`, createHordeColor(255, 255, 0, 0));
             Mara.CanRun = false;
-            throw ex;
         }
     };
 
