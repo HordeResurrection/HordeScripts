@@ -2,7 +2,6 @@
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 import { MaraUtils } from "Mara/MaraUtils";
-import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { UnitComposition } from "../Common/UnitComposition";
@@ -13,15 +12,31 @@ import { MaraRect } from "../Common/MaraRect";
 import { MaraUnitConfigCache } from "../Common/Cache/MaraUnitConfigCache";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { Mara } from "../Mara";
+import { MaraUnitCache } from "../Common/Cache/MaraUnitCache";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
     private queuedRequests: Array<MaraProductionRequest> = [];
     private executingRequests: Array<MaraProductionRequest> = [];
     private repairRequests: Array<MaraRepairRequest> = [];
     private productionIndex: Map<string, Array<MaraUnitCacheItem>> | null = null;
+    private producers: Array<MaraUnitCacheItem> = [];
 
     constructor (parent: MaraSettlementController) {
         super(parent);
+
+        parent.Settlement.Units.UnitsListChanged.connect(
+            (sender, UnitsListChangedEventArgs) => {
+                this.onUnitListChanged(UnitsListChangedEventArgs);
+            }
+        );
+
+        let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+
+        for (let unit of allUnits) {
+            if (MaraUtils.IsProducerConfigId(unit.UnitCfgId)) {
+                this.producers.push(unit);
+            }
+        }
     }
 
     private get productionCfgIdList(): Array<string> {
@@ -233,6 +248,25 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
         else {
             return [];
+        }
+    }
+
+    private onUnitListChanged(UnitsListChangedEventArgs: any): void {
+        let cacheItem = MaraUnitCache.GetUnitById(UnitsListChangedEventArgs.Unit.Id);
+
+        if (!cacheItem) {
+            return;
+        }
+
+        if (!MaraUtils.IsProducerConfigId(cacheItem.UnitCfgId)) {
+            return;
+        }
+        
+        if (UnitsListChangedEventArgs.IsAdded) {
+            this.producers.push(cacheItem);
+        }
+        else {
+            this.producers = this.producers.filter((p) => p.UnitId != cacheItem.UnitId);
         }
     }
 
@@ -463,46 +497,29 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     private updateProductionIndex(): void {
         Mara.Profiler("ProductionSubcontroller.UpdateProdIndex").Start();
         this.productionIndex = new Map<string, Array<MaraUnitCacheItem>>();
-
-        let cfgCache = new Map<string, Array<string>>();
-
-        Mara.Profiler("ProductionSubcontroller.GetAllSettlementUnits").Start();
-        let units = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
-        Mara.Profiler("ProductionSubcontroller.GetAllSettlementUnits").Stop();
         
-        for (let unit of units) {
-            let unitCfgId = unit.UnitCfgId;
-            
-            if (!cfgCache.has(unitCfgId)) {
-                Mara.Profiler("ProductionSubcontroller.GetProfessionParams").Start();
-                let producerParams = unit.Unit.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer, true);
-                Mara.Profiler("ProductionSubcontroller.GetProfessionParams").Stop();
-                let producedCfgIds: Array<string> = [];
-            
-                Mara.Profiler("ProductionSubcontroller.producerParams").Start();
-                if (producerParams) {
-                    if (!unit.Unit.IsAlive || unit.Unit.EffectsMind.BuildingInProgress) {
-                        continue;
-                    }
+        let producers = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        producers = producers.filter((unit) => unit.Unit.IsAlive && !unit.Unit.EffectsMind.BuildingInProgress);
+
+        let requirementsCache = new Map<string, boolean>();
+        
+        for (let unit of producers) {
+            let possibleProduceableCfgIds = MaraUtils.GetConfigIdProducedConfigIds(unit.UnitCfgId);
+
+            let produceableCfgIds = possibleProduceableCfgIds.filter((cfgId) => {
+                if (!requirementsCache.has(cfgId)) {
+                    let unitConfig = MaraUtils.GetUnitConfig(cfgId);
+                    let isCfgIdProduceable = this.configProductionRequirementsMet(unitConfig);
+
+                    requirementsCache.set(cfgId, isCfgIdProduceable);
                     
-                    let produceList = enumerate(producerParams.CanProduceList);
-                    let produceListItem;
-
-                    while ((produceListItem = eNext(produceList)) !== undefined) {
-                        if (!this.configProductionRequirementsMet(produceListItem)) {
-                            continue;
-                        }
-                        
-                        producedCfgIds.push(produceListItem.Uid);
-                    }
+                    return isCfgIdProduceable;
                 }
-                Mara.Profiler("ProductionSubcontroller.producerParams").Stop();
-
-                cfgCache.set(unitCfgId, producedCfgIds);
-            }
-
-            let produceableCfgIds = cfgCache.get(unitCfgId);
-
+                else {
+                    return requirementsCache.get(cfgId);
+                }
+            });
+            
             for (let cfgId of produceableCfgIds!) {
                 if (this.productionIndex.has(cfgId)) {
                     let producers = this.productionIndex.get(cfgId);

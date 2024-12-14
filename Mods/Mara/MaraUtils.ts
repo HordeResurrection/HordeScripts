@@ -2,7 +2,7 @@ import { Mara, MaraLogLevel } from "Mara/Mara";
 import { MaraSquad } from "Mara/Subcontrollers/Squads/MaraSquad";
 import { createPoint } from "library/common/primitives";
 import { UnitFlags, UnitCommand, AllContent, UnitConfig, UnitQueryFlag, UnitSpecification, DrawLayer, FontUtils, GeometryCanvas, Stride_Color, Stride_Vector2 } from "library/game-logic/horde-types";
-import { UnitProfession } from "library/game-logic/unit-professions";
+import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
 import { MaraProductionRequest } from "./Common/MaraProductionRequest";
 import { MaraPoint } from "./Common/MaraPoint";
@@ -18,7 +18,6 @@ import { spawnGeometry, spawnString } from "library/game-logic/decoration-spawn"
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
 import { MaraUnitConfigCache } from "./Common/Cache/MaraUnitConfigCache";
 import { MaraUnitCacheItem } from "./Common/Cache/MaraUnitCacheItem";
-import { MaraResources } from "./Common/MapAnalysis/MaraResources";
 
 const DEFAULT_UNIT_SEARCH_RADIUS = 3;
 
@@ -1083,12 +1082,24 @@ export class MaraUtils {
         return unitConfig.Size.Width;
     }
 
-    static GetConfigIdRepairPrice(cfgId: string): MaraResources {
-        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configIdRepairPrice, "configIdRepairPrice") as MaraResources
+    static GetConfigIdProducedConfigIds(cfgId: string): Array<string> {
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configProducedConfigIds, "configProducedConfigIds") as Array<string>
     }
 
-    private static configIdRepairPrice(unitConfig: any): MaraResources {
+    private static configProducedConfigIds(unitConfig: any): Array<string> {
+        let producerParams = unitConfig.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer, true);
+        let producedCfgIds: Array<string> = [];
+    
+        if (producerParams) {
+            let produceList = enumerate(producerParams.CanProduceList);
+            let produceListItem;
 
+            while ((produceListItem = eNext(produceList)) !== undefined) {
+                producedCfgIds.push(produceListItem.Uid);
+            }
+        }
+
+        return producedCfgIds;
     }
     //#endregion
     
