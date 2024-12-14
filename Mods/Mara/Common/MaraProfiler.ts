@@ -6,6 +6,10 @@ export class MaraProfiler {
     private executionTime: number;
     private startTime: number;
 
+    public get ExecutionTime(): number {
+        return this.executionTime;
+    }
+
     constructor(message: string, start: boolean = false) {
         this.message = message;
         this.callCount = 0;
@@ -41,11 +45,8 @@ export class MaraProfiler {
 
     public Stop(print: boolean = false) {
         let execTime = Date.now() - this.startTime;
-
-        if (execTime >= 10) {
-            this.executionTime += execTime;
-            this.callCount++;
-        }
+        this.executionTime += execTime;
+        this.callCount++;
 
         if (print) {
             this.Print();
