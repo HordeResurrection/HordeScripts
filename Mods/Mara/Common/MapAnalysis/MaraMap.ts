@@ -67,7 +67,7 @@ export class MaraResourceClusterBushItem {
 }
 
 export class MaraMap {
-    public static ResourceClusters: Map<string, MaraResourceCluster>;
+    public static ResourceClusters: Array<MaraResourceCluster>;
     public static ProcessedResourceCells: Set<string> = new Set<string>();
     
     public static readonly REGION_SIZE = 20;
@@ -940,7 +940,7 @@ export class MaraMap {
         let maxRowIndex = Math.floor(MaraUtils.GetScenaHeigth() / MaraMap.RESOURCE_CLUSTER_SIZE);
         let maxColIndex = Math.floor(MaraUtils.GetScenaWidth() / MaraMap.RESOURCE_CLUSTER_SIZE);
 
-        MaraMap.ResourceClusters = new Map<string, MaraResourceCluster>();
+        MaraMap.ResourceClusters = [];
         let clusterSpatialData: Array<MaraResourceClusterBushItem> = [];
         
         for (let rowIndex = 0; rowIndex < maxRowIndex; rowIndex ++) {
@@ -948,7 +948,7 @@ export class MaraMap {
                 let cluster = new MaraResourceCluster(colIndex, rowIndex);
 
                 if (cluster.WoodAmount > 1120 || cluster.MetalAmount > 0 || cluster.GoldAmount > 0) {
-                    MaraMap.ResourceClusters.set(cluster.ToString(), cluster);
+                    MaraMap.ResourceClusters.push(cluster);
                     clusterSpatialData.push(new MaraResourceClusterBushItem(cluster));
                 }
             }

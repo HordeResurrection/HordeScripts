@@ -254,20 +254,23 @@ export class RoutingState extends MaraSettlementControllerState {
     private isExpandNeeded(): NeedExpandResult {
         let leftResources = new Set<MaraResourceType>();
         
-        //!!
-        MaraMap.ResourceClusters.forEach((value) => {
-            if (value.GoldAmount > 0) {
+        for (let cluster of MaraMap.ResourceClusters) {
+            if (cluster.GoldAmount > 0) {
                 leftResources.add(MaraResourceType.Gold);
             }
 
-            if (value.MetalAmount > 0) {
+            if (cluster.MetalAmount > 0) {
                 leftResources.add(MaraResourceType.Metal);
             }
 
-            if (value.WoodAmount > 0) {
+            if (cluster.WoodAmount > 0) {
                 leftResources.add(MaraResourceType.Wood);
             }
-        });
+
+            if (leftResources.size == 3) {
+                break;
+            }
+        }
                 
         let resources = this.settlementController.MiningController.GetTotalResources();
         this.settlementController.Debug(`Total resources: ${resources.ToString()}`);
