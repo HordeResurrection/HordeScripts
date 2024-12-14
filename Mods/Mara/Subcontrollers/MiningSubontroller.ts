@@ -46,21 +46,27 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
     }
 
+    public GetStashedResourses(): MaraResources {
+        let settlement = this.settlementController.Settlement;
+        let settlementResources = settlement.Resources;
+        
+        return new MaraResources(
+            settlementResources.Lumber,
+            settlementResources.Metal,
+            settlementResources.Gold,
+            settlementResources.FreePeople
+        );
+    }
+
     public GetTotalResources(): MaraResources {
         this.checkForUnaccountedBuildings();
         
         let settlement = this.settlementController.Settlement;
-        let settlementResources = settlement.Resources;
         
-        let totalResources = new MaraResources(
-            settlementResources.Lumber,
-            settlementResources.Metal,
-            settlementResources.Gold,
-            0
-        );
+        let totalResources = this.GetStashedResourses();
 
         let freeHousing = Math.max(settlement.Census.MaxPeople - settlement.Census.BusyAndReservedPeople, 0);
-        totalResources.People = settlementResources.FreePeople + freeHousing;
+        totalResources.People += freeHousing;
 
         for (let mineData of this.mines) {
             let mineResources = this.getMineResources(mineData.Mine!);

@@ -285,7 +285,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         Mara.Profiler("ProductionSubcontroller.repairUnits.getUnitsToRepair").Stop()
 
         Mara.Profiler("ProductionSubcontroller.repairUnits.GetTotalResources").Start()
-        let totalResources = this.settlementController.MiningController.GetTotalResources();
+        let availableResources = this.settlementController.MiningController.GetStashedResourses();
         Mara.Profiler("ProductionSubcontroller.repairUnits.GetTotalResources").Stop()
         
         for (let unit of unitsToRepair) {
@@ -303,7 +303,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
             let repairCost = repairPrice.Multiply(missingHealth);
 
-            if (totalResources.IsGreaterOrEquals(repairCost)) {
+            if (availableResources.IsGreaterOrEquals(repairCost)) {
                 Mara.Profiler("ProductionSubcontroller.repairUnits.getRepairer").Start()
                 let repairer = this.getRepairer();
                 Mara.Profiler("ProductionSubcontroller.repairUnits.getRepairer").Stop()
