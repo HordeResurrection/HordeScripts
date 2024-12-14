@@ -89,9 +89,10 @@ export class Mara {
             }
         }
         catch (ex) {
-            log.exception(ex);
+            //log.exception(ex);
             broadcastMessage(`(Мара) Обнаружена ошибка. Мара остановлена.`, createHordeColor(255, 255, 0, 0));
             Mara.CanRun = false;
+            throw ex;
         }
     };
 
