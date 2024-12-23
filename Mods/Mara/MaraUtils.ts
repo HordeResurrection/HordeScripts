@@ -1067,7 +1067,7 @@ export class MaraUtils {
     }
 
     static GetConfigIdHeight(cfgId: string): number {
-        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configHeight, "configMaxHealth") as number
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configHeight, "configHeight") as number
     }
 
     private static configHeight(unitConfig: any): number {
@@ -1075,7 +1075,7 @@ export class MaraUtils {
     }
 
     static GetConfigIdWidth(cfgId: string): number {
-        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configWidth, "configMaxHealth") as number
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configWidth, "configWidth") as number
     }
 
     private static configWidth(unitConfig: any): number {
