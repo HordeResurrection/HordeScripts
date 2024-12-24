@@ -81,7 +81,7 @@ class ReservedUnitsData {
 
         map.forEach(
             (value, key) => {
-                if (!value.Unit.IsAlive) {
+                if (!value.UnitIsAlive) {
                     keysToDelete.push(key);
                 }
             }

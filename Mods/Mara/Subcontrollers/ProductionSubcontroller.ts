@@ -389,8 +389,8 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
         for (let request of this.repairRequests) {
             if (
-                !request.Executor.Unit.IsAlive ||
-                !request.Target.Unit.IsAlive ||
+                !request.Executor.UnitIsAlive ||
+                !request.Target.UnitIsAlive ||
                 request.Executor.Unit.OrdersMind.OrdersCount == 0
             ) {
                 this.finalizeRepairRequest(request);
@@ -439,7 +439,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
     private getRepairer(): MaraUnitCacheItem | null {
         let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
-        let allRepairers = allUnits.filter((u) => MaraUtils.IsRepairerConfigId(u.UnitCfgId) && u.Unit.IsAlive);
+        let allRepairers = allUnits.filter((u) => MaraUtils.IsRepairerConfigId(u.UnitCfgId) && u.UnitIsAlive);
 
         for (let repairer of allRepairers) {
             if (
@@ -465,7 +465,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         this.productionIndex = new Map<string, Array<MaraUnitCacheItem>>();
         
         let producers = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
-        producers = producers.filter((unit) => unit.Unit.IsAlive && !unit.Unit.EffectsMind.BuildingInProgress);
+        producers = producers.filter((unit) => unit.UnitIsAlive && !unit.Unit.EffectsMind.BuildingInProgress);
 
         let requirementsCache = new Map<string, boolean>();
         

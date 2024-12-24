@@ -480,7 +480,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let defensiveStrength = 0;
         
         for (let unit of units) {
-            if (MaraUtils.IsCombatConfigId(unit.UnitCfgId) && unit.Unit.IsAlive) {
+            if (MaraUtils.IsCombatConfigId(unit.UnitCfgId) && unit.UnitIsAlive) {
                 if (MaraUtils.IsBuildingConfigId(unit.UnitCfgId)) {
                     defensiveStrength += MaraUtils.GetUnitStrength(unit);
                 }
@@ -658,7 +658,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let totalStrength = 0;
         
         for (let unit of allUnits) {
-            if (MaraUtils.IsCombatConfigId(unit.UnitCfgId) && unit.Unit.IsAlive) {
+            if (MaraUtils.IsCombatConfigId(unit.UnitCfgId) && unit.UnitIsAlive) {
                 totalStrength += MaraUtils.GetUnitStrength(unit);
             }
         }

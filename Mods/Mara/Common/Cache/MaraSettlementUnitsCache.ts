@@ -32,6 +32,12 @@ export class MaraSettlementUnitsCache {
             }
         );
 
+        settlement.Units.UnitLifeStateChanged.connect(
+            (sender, args) => {
+                this.unitLifeStateChangedProcessor(sender, args);
+            }
+        );
+
         ForEach(settlement.Units, (unit) => {
                 this.subscribeToUnit(unit);
             }
@@ -103,6 +109,15 @@ export class MaraSettlementUnitsCache {
         
         if (cacheItem) {
             cacheItem.UnitHealth = unit.Health;
+        }
+    }
+
+    private unitLifeStateChangedProcessor(sender, args): void {
+        let unit = args.TriggeredUnit;
+        let cacheItem = this.cacheItemIndex.get(unit.Id);
+        
+        if (cacheItem) {
+            cacheItem.UnitIsAlive = unit.IsAlive;
         }
     }
 }

@@ -253,7 +253,7 @@ export class MaraSquadBattleState extends MaraSquadState {
             this.cellHeuristics = new MaraCellHeuristics();
             
             for (let enemy of this.enemyUnits) {
-                if (!MaraUnitConfigCache.GetCanAttack(unit.UnitCfgId, enemy.UnitCfgId) || !enemy.Unit.IsAlive) {
+                if (!MaraUnitConfigCache.GetCanAttack(unit.UnitCfgId, enemy.UnitCfgId) || !enemy.UnitIsAlive) {
                     continue;
                 }
 
@@ -371,7 +371,7 @@ export class MaraSquadBattleState extends MaraSquadState {
             let shortestDistance = Infinity;
             
             for (let enemy of this.enemyUnits) {
-                if (!MaraUnitConfigCache.GetCanAttack(unit.UnitCfgId, enemy.UnitCfgId) || !enemy.Unit.IsAlive) {
+                if (!MaraUnitConfigCache.GetCanAttack(unit.UnitCfgId, enemy.UnitCfgId) || !enemy.UnitIsAlive) {
                     continue;
                 }
 

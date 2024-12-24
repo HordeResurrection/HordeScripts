@@ -266,13 +266,13 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
     private isUnreservedHarvester(unit: MaraUnitCacheItem) {
         return (
-            unit.Unit.IsAlive && !this.settlementController.ReservedUnitsData.IsUnitReserved(unit)
+            unit.UnitIsAlive && !this.settlementController.ReservedUnitsData.IsUnitReserved(unit)
         );
     }
 
     private isValidHarvestingBuilding(building: MaraUnitCacheItem): boolean {
         return (
-            building.Unit.IsAlive && 
+            building.UnitIsAlive && 
             building.UnitOwner == this.settlementController.Settlement &&
             this.settlementController.StrategyController.IsSafeExpand(building.UnitRect.Center)
         )

@@ -9,6 +9,7 @@ export class MaraUnitCacheItem {
     UnitOwner: any;
     UnitMapLayer: any;
     UnitHealth: number;
+    UnitIsAlive: boolean;
 
     UnitRect: MaraRect;
 
@@ -38,5 +39,6 @@ export class MaraUnitCacheItem {
         this.UnitOwner = unit.Owner;
         this.UnitMapLayer = unit.MapLayer;
         this.UnitHealth = unit.Health;
+        this.UnitIsAlive = unit.IsAlive;
     }
 }

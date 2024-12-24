@@ -215,7 +215,7 @@ export class ExpandBuildState extends ProductionState {
             this.expandCenter, 
             this.settlementController.Settings.ResourceMining.MiningRadius,
             [this.settlementController.Settlement],
-            (unit) => {return MaraUtils.IsMetalStockConfigId(unit.UnitCfgId) && unit.Unit.IsAlive}
+            (unit) => {return MaraUtils.IsMetalStockConfigId(unit.UnitCfgId) && unit.UnitIsAlive}
         );
 
         if (metalStocks.length == 0) {

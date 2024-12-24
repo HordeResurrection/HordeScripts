@@ -260,7 +260,9 @@ export class MaraUtils {
     }
 
     static GetAllSettlementUnits(settlement: any): Array<MaraUnitCacheItem> {
-        return MaraUnitCache.GetAllSettlementUnits(settlement);
+        let allUnits = MaraUnitCache.GetAllSettlementUnits(settlement);
+        
+        return allUnits.filter((unit) => unit.UnitIsAlive);
     }
 
     static GetUnitsAroundPoint(point: any, radius: number, unitFilter?: (unit: MaraUnitCacheItem) => boolean): Array<MaraUnitCacheItem> {
