@@ -1053,7 +1053,7 @@ export class MaraUtils {
 
     private static configStrength(unitConfig: any): number {
         if (MaraUtils.isArmedConfig(unitConfig)) {
-            return unitConfig.MaxHealth * (unitConfig.Shield + 1);
+            return unitConfig.MaxHealth * Math.sqrt(unitConfig.Shield + 1);
         }
         else {
             return 0;
