@@ -151,6 +151,9 @@ export class Mara {
             settlementData.Player,
             tickOffset
         );
+
+        let settlementUnitsCache = MaraUnitCache.GetSettlementCache(settlementData.Settlement)!;
+        settlementUnitsCache.BindToSettlementController(controller);
         
         Mara.controllers.push(controller);
         processedSettlements.push(settlementData.Settlement);

@@ -22,13 +22,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
     constructor (parent: MaraSettlementController) {
         super(parent);
-
-        parent.Settlement.Units.UnitsListChanged.connect(
-            (sender, UnitsListChangedEventArgs) => {
-                this.onUnitListChanged(UnitsListChangedEventArgs);
-            }
-        );
-
+        
         let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
 
         for (let unit of allUnits) {
@@ -228,8 +222,8 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
     }
 
-    private onUnitListChanged(UnitsListChangedEventArgs: any): void {
-        let cacheItem = MaraUnitCache.GetUnitById(UnitsListChangedEventArgs.Unit.Id);
+    public OnUnitListChanged(unit: MaraUnitCacheItem, isAdded: boolean): void {
+        let cacheItem = MaraUnitCache.GetUnitById(unit.UnitId);
 
         if (!cacheItem) {
             return;
@@ -239,7 +233,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             return;
         }
         
-        if (UnitsListChangedEventArgs.IsAdded) {
+        if (isAdded) {
             this.producers.push(cacheItem);
         }
         else {

@@ -2,9 +2,11 @@ import { MaraPoint } from "../MaraPoint";
 import { MaraUnitBushItem } from "./MaraUnitBushItem";
 import { MaraUnitCacheItem } from "./MaraUnitCacheItem";
 import RBush from "../RBush/rbush.js"
+import { MaraSettlementController } from "../../MaraSettlementController";
 
 export class MaraSettlementUnitsCache {
     Settlement: any;
+    SettlementController: MaraSettlementController;
     
     private bush: RBush;
     private cacheItemIndex: Map<number, MaraUnitCacheItem>;
@@ -22,23 +24,24 @@ export class MaraSettlementUnitsCache {
 
         settlement.Units.UnitUnitMovedToCell.connect(
             (sender, args) => {
-                this.unitPositionChangedProcessor(sender, args);
+                this.unitPositionChangedProcessor(args);
             }
         );
 
         settlement.Units.UnitHealthChanged.connect(
             (sender, args) => {
-                this.unitHealthChangedProcessor(sender, args);
+                this.unitHealthChangedProcessor(args);
             }
         );
 
         settlement.Units.UnitLifeStateChanged.connect(
             (sender, args) => {
-                this.unitLifeStateChangedProcessor(sender, args);
+                this.unitLifeStateChangedProcessor(args);
             }
         );
 
-        ForEach(settlement.Units, (unit) => {
+        ForEach(settlement.Units, 
+            (unit) => {
                 this.subscribeToUnit(unit);
             }
         );
@@ -65,30 +68,47 @@ export class MaraSettlementUnitsCache {
         return this.cacheItemIndex.get(unitId);
     }
 
-    private unitListChangedProcessor(sender, UnitsListChangedEventArgs): void {
-        let unit = UnitsListChangedEventArgs.Unit;
-        let unitId = unit.Id;
-        
-        if (UnitsListChangedEventArgs.IsAdded) {
-            this.subscribeToUnit(unit);
-        }
-        else {
-            let cacheItem = this.cacheItemIndex.get(unitId)!;
-            this.bush.remove(cacheItem.UnitBushItem, MaraUnitBushItem.IsEqual);
-            this.cacheItemIndex.delete(unitId);
+    public BindToSettlementController(settlementController: MaraSettlementController): void {
+        this.SettlementController = settlementController;
+        let allUnits = this.GetAllUnits();
+
+        for (let unit of allUnits) {
+            this.SettlementController.OnUnitListChanged(unit, true);
         }
     }
 
-    private subscribeToUnit(unit: any): void {
+    private unitListChangedProcessor(sender, UnitsListChangedEventArgs): void {
+        let unit = UnitsListChangedEventArgs.Unit;
+        let unitId = unit.Id;
+        let isUnitAdded = UnitsListChangedEventArgs.IsAdded;
+        let cacheItem: MaraUnitCacheItem;
+        
+        if (isUnitAdded) {
+            cacheItem = this.subscribeToUnit(unit);
+        }
+        else {
+            cacheItem = this.cacheItemIndex.get(unitId)!;
+            this.bush.remove(cacheItem.UnitBushItem, MaraUnitBushItem.IsEqual);
+            this.cacheItemIndex.delete(unitId);
+        }
+
+        if (this.SettlementController) {
+            this.SettlementController.OnUnitListChanged(cacheItem, isUnitAdded);
+        }
+    }
+
+    private subscribeToUnit(unit: any): MaraUnitCacheItem {
         let cacheItem = new MaraUnitCacheItem(unit);
         let bushItem = new MaraUnitBushItem(cacheItem);
         cacheItem.UnitBushItem = bushItem;
 
         this.bush.insert(bushItem);
         this.cacheItemIndex.set(cacheItem.UnitId, cacheItem);
+
+        return cacheItem;
     }
 
-    private unitPositionChangedProcessor(sender, args): void {
+    private unitPositionChangedProcessor(args): void {
         let cacheItem = this.cacheItemIndex.get(args.TriggeredUnit.Id);
 
         if (!cacheItem) {
@@ -103,7 +123,7 @@ export class MaraSettlementUnitsCache {
         cacheItem.UnitBushItem = newBushItem;
     }
 
-    private unitHealthChangedProcessor(sender, args): void {
+    private unitHealthChangedProcessor(args): void {
         let unit = args.TriggeredUnit;
         let cacheItem = this.cacheItemIndex.get(unit.Id);
         
@@ -112,12 +132,16 @@ export class MaraSettlementUnitsCache {
         }
     }
 
-    private unitLifeStateChangedProcessor(sender, args): void {
+    private unitLifeStateChangedProcessor(args): void {
         let unit = args.TriggeredUnit;
         let cacheItem = this.cacheItemIndex.get(unit.Id);
         
         if (cacheItem) {
             cacheItem.UnitIsAlive = unit.IsAlive;
+
+            if (this.SettlementController) {
+                this.SettlementController.OnUnitLifeStateChanged(cacheItem);
+            }
         }
     }
 }
