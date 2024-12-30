@@ -207,7 +207,7 @@ export class MaraControllableSquad extends MaraSquad {
 
     protected cleanup(): void {
         let unitCount = this.Units.length;
-        this.Units = this.Units.filter((unit) => {return unit != null && unit.Unit.IsAlive});
+        this.Units = this.Units.filter((unit) => {return unit != null && unit.UnitIsAlive});
         
         if (this.Units.length != unitCount) {
             this.recalcMinSpread();

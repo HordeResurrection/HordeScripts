@@ -117,7 +117,7 @@ export class ExterminatingState extends MaraSettlementControllerState {
     private isValidTarget(unit: MaraUnitCacheItem | null): boolean {
         return !(
             !unit || 
-            !unit.Unit.IsAlive ||
+            !unit.UnitIsAlive ||
             this.settlementController.StrategyController.CurrentEnemy != unit.UnitOwner
         );
     }

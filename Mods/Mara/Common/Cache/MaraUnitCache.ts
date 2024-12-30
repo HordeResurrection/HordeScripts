@@ -73,6 +73,10 @@ export class MaraUnitCache {
         return undefined;
     }
 
+    public static GetSettlementCache(settlement: any): MaraSettlementUnitsCache | undefined {
+        return MaraUnitCache.settlementCaches.find((v) => v.Settlement == settlement);
+    }
+
     private static watchSettlement(settlement: any): void {
         let cache = new MaraSettlementUnitsCache(settlement);
         this.settlementCaches.push(cache);

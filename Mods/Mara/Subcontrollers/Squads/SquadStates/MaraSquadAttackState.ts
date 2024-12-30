@@ -80,7 +80,7 @@ export class MaraSquadAttackState extends MaraSquadState {
 
     private isEnemyUnit(unit: MaraUnitCacheItem): boolean {
         return (
-            unit.Unit.IsAlive &&
+            unit.UnitIsAlive &&
             this.squad.Controller.EnemySettlements.indexOf(unit.UnitOwner) > -1
         );
     }

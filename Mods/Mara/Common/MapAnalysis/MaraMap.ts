@@ -12,6 +12,9 @@ import { MaraMapNode } from "./MaraMapNode";
 import { MaraMapNodeType } from "./MaraMapNodeType";
 import { createHordeColor } from "library/common/primitives";
 import { MaraPath } from "./MaraPath";
+import SortedSet from "./SortedSet.js"
+import RBush from "../RBush/rbush.js"
+import { MaraRect } from "../MaraRect";
 
 class TileTypeCache extends MaraCellDataHolder {
     constructor () {
@@ -45,14 +48,33 @@ class ClusterData extends MaraCellDataHolder {
     }
 }
 
+export class MaraResourceClusterBushItem {
+    minX: number;
+    minY: number;
+    maxX: number;
+    maxY: number;
+
+    ResourceCluster: MaraResourceCluster;
+
+    constructor(cluster: MaraResourceCluster) {
+        this.minX = cluster.Center.X;
+        this.minY = cluster.Center.Y;
+        this.maxX = cluster.Center.X;
+        this.maxY = cluster.Center.Y;
+
+        this.ResourceCluster = cluster;
+    }
+}
+
 export class MaraMap {
-    public static ResourceClusters: Map<string, MaraResourceCluster>;
+    public static ResourceClusters: Array<MaraResourceCluster>;
     public static ProcessedResourceCells: Set<string> = new Set<string>();
     
     public static readonly REGION_SIZE = 20;
     public static readonly GATE_THRESHOLD = 10;
     public static readonly RESOURCE_CLUSTER_SIZE = 8;
     public static readonly RESOURCE_CLUSTER_MAX_MINERAL_CELLS = 9;
+    private static readonly MAX_PATH_COUNT = 10;
     
     private static tileTypeCache: TileTypeCache = new TileTypeCache();
     
@@ -64,6 +86,7 @@ export class MaraMap {
     private static resourceMapMonitor: any;
     private static resourceData: Array<Array<any>> = [];
     private static clusterData: ClusterData = new ClusterData();
+    private static clusterSpatialIndex: RBush;
 
     private static unitBuildHandlers: Map<number, any>;
     
@@ -145,9 +168,9 @@ export class MaraMap {
 
         const WEIGTH_INCREMENT = 100;
 
-        while (true) {
+        while (paths.length < MaraMap.MAX_PATH_COUNT) {
             let path = MaraMap.dijkstraPath(fromNode, toNode, MaraMap.mapNodes);
-
+            
             if (path.length == 0) { // not found
                 return [];
             }
@@ -219,11 +242,24 @@ export class MaraMap {
         MaraMap.nodeIndex.SetMany(nodeCells, newNode);
         MaraMap.mapNodes = MaraMap.mapNodes.filter((n) => n.Region.Cells.length > 0);
 
-        MaraMap.linkMapNodes([newNode, ...overlappedNodes], MaraMap.nodeIndex);
+        MaraMap.linkMap([newNode, ...overlappedNodes], MaraMap.nodeIndex, true);
 
         if (MaraMap.DEBUG_MAP) {
             MaraMap.drawMap();
         }
+    }
+
+    static GetResourceClustersAroundPoint(point: MaraPoint, radius: number): Array<MaraResourceCluster> {
+        let rect = MaraRect.CreateFromPoint(new MaraPoint(point.X, point.Y), radius);
+
+        let cacheItems = MaraMap.clusterSpatialIndex.search({
+            minX: rect.TopLeft.X,
+            minY: rect.TopLeft.Y,
+            maxX: rect.BottomRight.X,
+            maxY: rect.BottomRight.Y
+        }) as Array<MaraResourceClusterBushItem>;
+
+        return cacheItems.map((i) => i.ResourceCluster);
     }
 
     private static buildMap(): void {
@@ -264,7 +300,7 @@ export class MaraMap {
             MaraMap.nodeIndex.SetMany(node.Region.Cells, node);
         }
 
-        MaraMap.linkMapNodes(MaraMap.mapNodes, MaraMap.nodeIndex);
+        MaraMap.linkMap(MaraMap.mapNodes, MaraMap.nodeIndex, false);
         
         MaraMap.cleanupMapNodes();
         MaraMap.nodeIndex.Clear();
@@ -610,15 +646,17 @@ export class MaraMap {
         return regions;
     }
 
-    private static linkMapNodes(mapNodes: Array<MaraMapNode>, nodeIndex: MaraRegionIndex): void {
+    private static linkMap(mapNodes: Array<MaraMapNode>, nodeIndex: MaraRegionIndex, diagonalLinking: boolean): void {
         for (let node of mapNodes) {
             for (let cell of node.Region.Cells) {
                 
                 let shiftVectors = [
-                    new MaraPoint(0, 1),
-                    new MaraPoint(1, 1),
+                    new MaraPoint(0, 1)
                 ];
 
+                if (diagonalLinking) {
+                    shiftVectors.push(new MaraPoint(1, 1))
+                }
 
                 for (let i = 0; i < 4; i ++) {
                     for (let i = 0; i < shiftVectors.length; i ++) {
@@ -796,29 +834,51 @@ export class MaraMap {
     }
 
     private static dijkstraPath(from: MaraMapNode, to: MaraMapNode, nodes: Array<MaraMapNode>): Array<MaraMapNode> {
-        nodes.forEach((n) => n.ShortestDistance = Infinity);
+        let options: any = {};
+        options.comparator = (a, b) => {
+            let distance = a.ShortestDistance - b.ShortestDistance;
+
+            if (isNaN(distance) || distance == 0) {
+                return a.Id - b.Id;
+            }
+            else  {
+                return distance;
+            }
+        }
+
+        let unprocessedNodes = new SortedSet(options);
         from.ShortestDistance = 0;
         
-        let processedNodes: Array<MaraMapNode> = [];
-        let unprocessedNodes: Array<MaraMapNode> = [...nodes];
+        nodes.forEach((n) => {
+            if (n != from) {
+                n.ShortestDistance = Infinity;
+            }
+            unprocessedNodes.insert(n);
+        });
+        
+        let processedNodes = {};
         
         while (unprocessedNodes.length > 0) {
-            let closestNode = MaraUtils.FindExtremum(unprocessedNodes, (a, b) => b.ShortestDistance - a.ShortestDistance)!;
-    
+            let closestNode: MaraMapNode = unprocessedNodes.beginIterator().value();
+            
             for (let node of closestNode.Neighbours) {
-                if (processedNodes.find((n) => n == node)) {
+                let n = processedNodes[node.Id];
+                
+                if (n != null) {
                     continue;
                 }
     
                 let newDistance = closestNode.ShortestDistance + node.Weigth;
     
                 if (newDistance < node.ShortestDistance) {
+                    unprocessedNodes.remove(node);
                     node.ShortestDistance = newDistance;
+                    unprocessedNodes.insert(node);
                 }
             }
-    
-            processedNodes.push(closestNode);
-            unprocessedNodes = unprocessedNodes.filter((n) => n != closestNode);
+            
+            processedNodes[closestNode.Id] = closestNode;
+            unprocessedNodes.remove(closestNode);
         }
     
         if (to.ShortestDistance == Infinity) { //path not found
@@ -858,17 +918,22 @@ export class MaraMap {
         let maxRowIndex = Math.floor(MaraUtils.GetScenaHeigth() / MaraMap.RESOURCE_CLUSTER_SIZE);
         let maxColIndex = Math.floor(MaraUtils.GetScenaWidth() / MaraMap.RESOURCE_CLUSTER_SIZE);
 
-        MaraMap.ResourceClusters = new Map<string, MaraResourceCluster>();
+        MaraMap.ResourceClusters = [];
+        let clusterSpatialData: Array<MaraResourceClusterBushItem> = [];
         
         for (let rowIndex = 0; rowIndex < maxRowIndex; rowIndex ++) {
             for (let colIndex = 0; colIndex < maxColIndex; colIndex ++) {
                 let cluster = new MaraResourceCluster(colIndex, rowIndex);
 
                 if (cluster.WoodAmount > 1120 || cluster.MetalAmount > 0 || cluster.GoldAmount > 0) {
-                    MaraMap.ResourceClusters.set(cluster.ToString(), cluster);
+                    MaraMap.ResourceClusters.push(cluster);
+                    clusterSpatialData.push(new MaraResourceClusterBushItem(cluster));
                 }
             }
         }
+
+        MaraMap.clusterSpatialIndex = new RBush(2);
+        MaraMap.clusterSpatialIndex.load(clusterSpatialData);
     }
 
     private static watchSettlement(settlement: any): void {

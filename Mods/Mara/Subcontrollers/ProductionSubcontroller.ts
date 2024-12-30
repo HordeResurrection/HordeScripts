@@ -2,7 +2,6 @@
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 import { MaraUtils } from "Mara/MaraUtils";
-import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { UnitComposition } from "../Common/UnitComposition";
@@ -12,15 +11,25 @@ import { SettlementClusterLocation } from "../Common/Settlement/SettlementCluste
 import { MaraRect } from "../Common/MaraRect";
 import { MaraUnitConfigCache } from "../Common/Cache/MaraUnitConfigCache";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
+import { MaraUnitCache } from "../Common/Cache/MaraUnitCache";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
     private queuedRequests: Array<MaraProductionRequest> = [];
     private executingRequests: Array<MaraProductionRequest> = [];
     private repairRequests: Array<MaraRepairRequest> = [];
     private productionIndex: Map<string, Array<MaraUnitCacheItem>> | null = null;
+    private producers: Array<MaraUnitCacheItem> = [];
 
     constructor (parent: MaraSettlementController) {
         super(parent);
+        
+        let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+
+        for (let unit of allUnits) {
+            if (MaraUtils.IsProducerConfigId(unit.UnitCfgId)) {
+                this.producers.push(unit);
+            }
+        }
     }
 
     private get productionCfgIdList(): Array<string> {
@@ -46,8 +55,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
         if (tickNumber % 50 == 0) {
             this.cleanupUnfinishedBuildings(tickNumber);
-            this.cleanupRepairRequests()
-            
+            this.cleanupRepairRequests();
             this.repairUnits();
         }
 
@@ -56,7 +64,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
         for (let request of this.queuedRequests) {
             let freeProducer = this.getProducer(request.ConfigId);
-
+            
             if (freeProducer) {
                 request.Executor = freeProducer;
                 
@@ -81,7 +89,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
             this.executingRequests.push(...addedRequests);
         }
-
+        
         if (this.executingRequests.length > 0) {
             let filteredRequests: Array<MaraProductionRequest> = [];
             
@@ -214,6 +222,25 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
     }
 
+    public OnUnitListChanged(unit: MaraUnitCacheItem, isAdded: boolean): void {
+        let cacheItem = MaraUnitCache.GetUnitById(unit.UnitId);
+
+        if (!cacheItem) {
+            return;
+        }
+
+        if (!MaraUtils.IsProducerConfigId(cacheItem.UnitCfgId)) {
+            return;
+        }
+        
+        if (isAdded) {
+            this.producers.push(cacheItem);
+        }
+        else {
+            this.producers = this.producers.filter((p) => p.UnitId != cacheItem.UnitId);
+        }
+    }
+
     private requestCfgIdProduction(configId: string): void {
         let request = new MaraProductionRequest(configId, null, null);
         this.queuedRequests.push(request);
@@ -255,9 +282,10 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
     private repairUnits(): void {
         let repairZones = this.getRepairZones();
+        
         let unitsToRepair: Array<MaraUnitCacheItem> = this.getUnitsToRepair(repairZones);
-
-        let totalResources = this.settlementController.MiningController.GetTotalResources();
+        
+        let availableResources = this.settlementController.MiningController.GetStashedResourses();
         
         for (let unit of unitsToRepair) {
             let maxHealth = MaraUtils.GetConfigIdMaxHealth(unit.UnitCfgId);
@@ -274,9 +302,9 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
             let repairCost = repairPrice.Multiply(missingHealth);
 
-            if (totalResources.IsGreaterOrEquals(repairCost)) {
+            if (availableResources.IsGreaterOrEquals(repairCost)) {
                 let repairer = this.getRepairer();
-
+                
                 if (repairer) {
                     let repairRequest = new MaraRepairRequest(unit, repairer);
                     this.settlementController.ReservedUnitsData.ReserveUnit(repairer);
@@ -355,8 +383,8 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
         for (let request of this.repairRequests) {
             if (
-                !request.Executor.Unit.IsAlive ||
-                !request.Target.Unit.IsAlive ||
+                !request.Executor.UnitIsAlive ||
+                !request.Target.UnitIsAlive ||
                 request.Executor.Unit.OrdersMind.OrdersCount == 0
             ) {
                 this.finalizeRepairRequest(request);
@@ -405,7 +433,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
     private getRepairer(): MaraUnitCacheItem | null {
         let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
-        let allRepairers = allUnits.filter((u) => MaraUtils.IsRepairerConfigId(u.UnitCfgId) && u.Unit.IsAlive);
+        let allRepairers = allUnits.filter((u) => MaraUtils.IsRepairerConfigId(u.UnitCfgId) && u.UnitIsAlive);
 
         for (let repairer of allRepairers) {
             if (
@@ -429,40 +457,29 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
     private updateProductionIndex(): void {
         this.productionIndex = new Map<string, Array<MaraUnitCacheItem>>();
-
-        let cfgCache = new Map<string, Array<string>>();
-
-        let units = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
         
-        for (let unit of units) {
-            let unitCfgId = unit.UnitCfgId;
-            
-            if (!cfgCache.has(unitCfgId)) {
-                let producerParams = unit.Unit.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer, true);
-                let producedCfgIds: Array<string> = [];
-            
-                if (producerParams) {
-                    if (!unit.Unit.IsAlive || unit.Unit.EffectsMind.BuildingInProgress) {
-                        continue;
-                    }
+        let producers = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+        producers = producers.filter((unit) => unit.UnitIsAlive && !unit.Unit.EffectsMind.BuildingInProgress);
+
+        let requirementsCache = new Map<string, boolean>();
+        
+        for (let unit of producers) {
+            let possibleProduceableCfgIds = MaraUtils.GetConfigIdProducedConfigIds(unit.UnitCfgId);
+
+            let produceableCfgIds = possibleProduceableCfgIds.filter((cfgId) => {
+                if (!requirementsCache.has(cfgId)) {
+                    let unitConfig = MaraUtils.GetUnitConfig(cfgId);
+                    let isCfgIdProduceable = this.configProductionRequirementsMet(unitConfig);
+
+                    requirementsCache.set(cfgId, isCfgIdProduceable);
                     
-                    let produceList = enumerate(producerParams.CanProduceList);
-                    let produceListItem;
-
-                    while ((produceListItem = eNext(produceList)) !== undefined) {
-                        if (!this.configProductionRequirementsMet(produceListItem)) {
-                            continue;
-                        }
-                        
-                        producedCfgIds.push(produceListItem.Uid);
-                    }
+                    return isCfgIdProduceable;
                 }
-
-                cfgCache.set(unitCfgId, producedCfgIds);
-            }
-
-            let produceableCfgIds = cfgCache.get(unitCfgId);
-
+                else {
+                    return requirementsCache.get(cfgId);
+                }
+            });
+            
             for (let cfgId of produceableCfgIds!) {
                 if (this.productionIndex.has(cfgId)) {
                     let producers = this.productionIndex.get(cfgId);

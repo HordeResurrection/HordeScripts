@@ -46,21 +46,27 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
     }
 
+    public GetStashedResourses(): MaraResources {
+        let settlement = this.settlementController.Settlement;
+        let settlementResources = settlement.Resources;
+        
+        return new MaraResources(
+            settlementResources.Lumber,
+            settlementResources.Metal,
+            settlementResources.Gold,
+            settlementResources.FreePeople
+        );
+    }
+
     public GetTotalResources(): MaraResources {
         this.checkForUnaccountedBuildings();
         
         let settlement = this.settlementController.Settlement;
-        let settlementResources = settlement.Resources;
         
-        let totalResources = new MaraResources(
-            settlementResources.Lumber,
-            settlementResources.Metal,
-            settlementResources.Gold,
-            0
-        );
+        let totalResources = this.GetStashedResourses();
 
         let freeHousing = Math.max(settlement.Census.MaxPeople - settlement.Census.BusyAndReservedPeople, 0);
-        totalResources.People = settlementResources.FreePeople + freeHousing;
+        totalResources.People += freeHousing;
 
         for (let mineData of this.mines) {
             let mineResources = this.getMineResources(mineData.Mine!);
@@ -70,16 +76,14 @@ export class MiningSubcontroller extends MaraSubcontroller {
         }
 
         for (let sawmillData of this.Sawmills) {
-            MaraMap.ResourceClusters.forEach(
-                (value) => {
-                    if (
-                        MaraUtils.ChebyshevDistance(value.Center, sawmillData.Sawmill?.UnitRect.Center) < 
-                            this.settlementController.Settings.ResourceMining.WoodcuttingRadius
-                    ) {
-                        totalResources.Wood += value.WoodAmount;
-                    }
-                }
-            );
+            if (sawmillData.Sawmill) {
+                let clusters = MaraMap.GetResourceClustersAroundPoint(
+                    sawmillData.Sawmill.UnitRect.Center,
+                    this.settlementController.Settings.ResourceMining.WoodcuttingRadius
+                );
+
+                clusters.forEach((c) => totalResources.Wood += c.WoodAmount);
+            }
         }
 
         let model = MaraUtils.GetPropertyValue(settlement.Census, "Model");
@@ -262,13 +266,13 @@ export class MiningSubcontroller extends MaraSubcontroller {
 
     private isUnreservedHarvester(unit: MaraUnitCacheItem) {
         return (
-            unit.Unit.IsAlive && !this.settlementController.ReservedUnitsData.IsUnitReserved(unit)
+            unit.UnitIsAlive && !this.settlementController.ReservedUnitsData.IsUnitReserved(unit)
         );
     }
 
     private isValidHarvestingBuilding(building: MaraUnitCacheItem): boolean {
         return (
-            building.Unit.IsAlive && 
+            building.UnitIsAlive && 
             building.UnitOwner == this.settlementController.Settlement &&
             this.settlementController.StrategyController.IsSafeExpand(building.UnitRect.Center)
         )

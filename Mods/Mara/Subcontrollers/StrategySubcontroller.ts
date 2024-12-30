@@ -370,6 +370,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
     GetPath(from: MaraPoint, to: MaraPoint): Array<MaraPoint> {
         let possiblePaths = MaraMap.GetPaths(from, to);
+        Mara.Debug(`paths count: ${possiblePaths.length}`)
 
         if (possiblePaths.length == 0) {
             return [to];
@@ -479,7 +480,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let defensiveStrength = 0;
         
         for (let unit of units) {
-            if (MaraUtils.IsCombatConfigId(unit.UnitCfgId) && unit.Unit.IsAlive) {
+            if (MaraUtils.IsCombatConfigId(unit.UnitCfgId) && unit.UnitIsAlive) {
                 if (MaraUtils.IsBuildingConfigId(unit.UnitCfgId)) {
                     defensiveStrength += MaraUtils.GetUnitStrength(unit);
                 }
@@ -657,7 +658,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         let totalStrength = 0;
         
         for (let unit of allUnits) {
-            if (MaraUtils.IsCombatConfigId(unit.UnitCfgId) && unit.Unit.IsAlive) {
+            if (MaraUtils.IsCombatConfigId(unit.UnitCfgId) && unit.UnitIsAlive) {
                 totalStrength += MaraUtils.GetUnitStrength(unit);
             }
         }

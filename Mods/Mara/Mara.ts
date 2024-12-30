@@ -7,6 +7,7 @@ import { broadcastMessage } from "library/common/messages";
 import { createHordeColor } from "library/common/primitives";
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
 import { MaraUnitConfigCache } from "./Common/Cache/MaraUnitConfigCache";
+import { MaraProfiler } from "./Common/MaraProfiler";
 
 export enum MaraLogLevel {
     Debug = 0,
@@ -23,6 +24,8 @@ export enum MaraLogLevel {
 */
 
 export class Mara {
+    private static profilers = {};
+    
     static LogLevel: MaraLogLevel = MaraLogLevel.Debug;
     static CanRun = true;
     
@@ -40,15 +43,23 @@ export class Mara {
 
         return Mara.pathfinder;
     }
+
+    static Profiler(name: string): MaraProfiler {
+        if (Mara.profilers[name] == null) {
+            Mara.profilers[name] = new MaraProfiler(name, false);
+        }
+
+        return Mara.profilers[name];
+    }
     
     static Tick(tickNumber: number): void {
         try {
             if (Mara.CanRun) {
-                MaraMap.Tick();
-                
                 if (tickNumber < 10) { //doing nothing for first 10 ticks since not all core objects could be properly inited
                     return;
                 }
+
+                MaraMap.Tick();
                 
                 for (let controller of Mara.controllers) {
                     if (!controller.Settlement.Existence.IsTotalDefeat) {
@@ -60,6 +71,16 @@ export class Mara {
                 }
 
                 Mara.controllers = Mara.controllers.filter((controller) => {return !controller.Settlement.Existence.IsTotalDefeat});
+
+                // if (Mara.Profiler("MaraTick").ExecutionTime >= 20) {
+                //     Mara.Debug(`============ LONG TICK PROFILING DATA ============`);
+
+                //     for (let profiler in Mara.profilers) {
+                //         Mara.Profiler(profiler).Print();
+                //     }
+                // }
+
+                Mara.profilers = {};
             }
         }
         catch (ex) {
@@ -75,7 +96,7 @@ export class Mara {
         Mara.Info(`Failed to load library './Empathy/soul', reason: not found. Proceeding without it.`);
         Mara.Info(`Empathy subsystem is not responding`);
 
-        try {            
+        try {
             Mara.CanRun = true;
             Mara.controllers = [];
 
@@ -130,6 +151,9 @@ export class Mara {
             settlementData.Player,
             tickOffset
         );
+
+        let settlementUnitsCache = MaraUnitCache.GetSettlementCache(settlementData.Settlement)!;
+        settlementUnitsCache.BindToSettlementController(controller);
         
         Mara.controllers.push(controller);
         processedSettlements.push(settlementData.Settlement);

@@ -35,7 +35,7 @@ export class MaraSquad {
     }
 
     protected cleanup(): void {
-        this.Units = this.Units.filter((unit) => {return unit.Unit.IsAlive});
+        this.Units = this.Units.filter((unit) => {return unit.UnitIsAlive});
     }
 
     Tick(tickNumber: number): void {

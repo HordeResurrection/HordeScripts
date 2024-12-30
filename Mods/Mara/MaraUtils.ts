@@ -2,7 +2,7 @@ import { Mara, MaraLogLevel } from "Mara/Mara";
 import { MaraSquad } from "Mara/Subcontrollers/Squads/MaraSquad";
 import { createPoint } from "library/common/primitives";
 import { UnitFlags, UnitCommand, AllContent, UnitConfig, UnitQueryFlag, UnitSpecification, DrawLayer, FontUtils, GeometryCanvas, Stride_Color, Stride_Vector2 } from "library/game-logic/horde-types";
-import { UnitProfession } from "library/game-logic/unit-professions";
+import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
 import { MaraProductionRequest } from "./Common/MaraProductionRequest";
 import { MaraPoint } from "./Common/MaraPoint";
@@ -18,7 +18,6 @@ import { spawnGeometry, spawnString } from "library/game-logic/decoration-spawn"
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
 import { MaraUnitConfigCache } from "./Common/Cache/MaraUnitConfigCache";
 import { MaraUnitCacheItem } from "./Common/Cache/MaraUnitCacheItem";
-import { MaraResources } from "./Common/MapAnalysis/MaraResources";
 import { ListT } from "library/dotnet/dotnet-types";
 
 const DEFAULT_UNIT_SEARCH_RADIUS = 3;
@@ -260,7 +259,9 @@ export class MaraUtils {
     }
 
     static GetAllSettlementUnits(settlement: any): Array<MaraUnitCacheItem> {
-        return MaraUnitCache.GetAllSettlementUnits(settlement);
+        let allUnits = MaraUnitCache.GetAllSettlementUnits(settlement);
+        
+        return allUnits.filter((unit) => unit.UnitIsAlive);
     }
 
     static GetUnitsAroundPoint(point: any, radius: number, unitFilter?: (unit: MaraUnitCacheItem) => boolean): Array<MaraUnitCacheItem> {
@@ -1022,7 +1023,7 @@ export class MaraUtils {
 
     private static configStrength(unitConfig: any): number {
         if (MaraUtils.isArmedConfig(unitConfig)) {
-            return unitConfig.MaxHealth * (unitConfig.Shield + 1);
+            return unitConfig.MaxHealth * Math.sqrt(unitConfig.Shield + 1);
         }
         else {
             return 0;
@@ -1038,7 +1039,7 @@ export class MaraUtils {
     }
 
     static GetConfigIdHeight(cfgId: string): number {
-        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configHeight, "configMaxHealth") as number
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configHeight, "configHeight") as number
     }
 
     private static configHeight(unitConfig: any): number {
@@ -1046,19 +1047,31 @@ export class MaraUtils {
     }
 
     static GetConfigIdWidth(cfgId: string): number {
-        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configWidth, "configMaxHealth") as number
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configWidth, "configWidth") as number
     }
 
     private static configWidth(unitConfig: any): number {
         return unitConfig.Size.Width;
     }
 
-    static GetConfigIdRepairPrice(cfgId: string): MaraResources {
-        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configIdRepairPrice, "configIdRepairPrice") as MaraResources
+    static GetConfigIdProducedConfigIds(cfgId: string): Array<string> {
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configProducedConfigIds, "configProducedConfigIds") as Array<string>
     }
 
-    private static configIdRepairPrice(unitConfig: any): MaraResources {
+    private static configProducedConfigIds(unitConfig: any): Array<string> {
+        let producerParams = unitConfig.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer, true);
+        let producedCfgIds: Array<string> = [];
+    
+        if (producerParams) {
+            let produceList = enumerate(producerParams.CanProduceList);
+            let produceListItem;
 
+            while ((produceListItem = eNext(produceList)) !== undefined) {
+                producedCfgIds.push(produceListItem.Uid);
+            }
+        }
+
+        return producedCfgIds;
     }
     //#endregion
     
@@ -1099,7 +1112,7 @@ export class MaraUtils {
     }
 
     // Bresenham algorithm to pixelize straight lines are used here
-    // see https://ru.wikipedia.org/wiki/????????_?????????? for details
+    // see https://ru.wikipedia.org/wiki/Алгоритм_Брезенхэма for details
     private static bresenhamLine(start: MaraPoint, end: MaraPoint): Array<MaraPoint> {
         let xDelta = Math.abs(end.X - start.X);
         let yDelta = Math.abs(end.Y - start.Y);

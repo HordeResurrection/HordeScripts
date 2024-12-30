@@ -72,7 +72,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     AttackTick(): void {
         this.reinforceSquads();
         
-        if (this.currentTarget!.Unit.IsAlive) {
+        if (this.currentTarget!.UnitIsAlive) {
             let pullbackLocations = this.getPullbackLocations();
             let healingLocations = pullbackLocations.filter((l) => l.HasHealers);
 
@@ -200,7 +200,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         let combatUnits: Array<MaraUnitCacheItem> = [];
         
         for (let unit of units) {
-            if (this.isCombatUnit(unit) && unit.Unit.IsAlive) {
+            if (this.isCombatUnit(unit) && unit.UnitIsAlive) {
                 if (!this.isBuilding(unit)) {
                     combatUnits.push(unit);
                 }
@@ -409,7 +409,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
                 !this.unitsInSquads.has(unit.UnitId) &&
                 this.isCombatUnit(unit) && 
                 !this.isBuilding(unit) && 
-                unit.Unit.IsAlive
+                unit.UnitIsAlive
             ) {
                 freeUnits.push(unit);
                 this.settlementController.Debug(`Unit ${unit.Unit.ToString()} is marked for reinforcements`);
@@ -606,7 +606,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             
             this.unitsInSquads.forEach(
                 (value, key, map) => {
-                    if (value.Unit.IsAlive) {
+                    if (value.UnitIsAlive) {
                         filteredUnits.set(key, value)
                     }
                 }

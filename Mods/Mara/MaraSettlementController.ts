@@ -81,7 +81,7 @@ class ReservedUnitsData {
 
         map.forEach(
             (value, key) => {
-                if (!value.Unit.IsAlive) {
+                if (!value.UnitIsAlive) {
                     keysToDelete.push(key);
                 }
             }
@@ -163,7 +163,6 @@ export class MaraSettlementController {
     Tick(tickNumber: number): void {
         this.currentUnitComposition = null;
         this.currentDevelopedUnitComposition = null;
-        this.settlementLocation = null;
 
         if (tickNumber % 50 == 0) {
             this.СleanupExpands();
@@ -264,43 +263,7 @@ export class MaraSettlementController {
     }
 
     GetSettlementLocation(): SettlementClusterLocation | null {
-        if (this.settlementLocation) {
-            return this.settlementLocation;
-        }
-        
-        let professionCenter = this.Settlement.Units.Professions;
-        let centralProductionBuilding = professionCenter.ProducingBuildings.First();
-
-        if (centralProductionBuilding) {
-            let productionBuildingCache = MaraUnitCache.GetUnitById(centralProductionBuilding.Id)!;
-
-            let squads = MaraUtils.GetSettlementsSquadsFromUnits(
-                [productionBuildingCache], 
-                [this.Settlement], 
-                (unit) => {return MaraUtils.IsBuildingConfigId(unit.UnitCfgId)},
-                this.Settings.UnitSearch.BuildingSearchRadius
-            );
-            
-            if (!squads || squads.length == 0) {
-                return null;
-            }
-
-            let location = squads[0].GetLocation();
-            let boundingRect = MaraUtils.GetUnitsBoundingRect(squads[0].Units);
-            
-            this.settlementLocation = new SettlementClusterLocation(
-                location.Point,
-                new MaraRect(
-                    new MaraPoint(boundingRect.TopLeft.X - 10, boundingRect.TopLeft.Y - 10),
-                    new MaraPoint(boundingRect.BottomRight.X + 10, boundingRect.BottomRight.Y + 10),
-                )
-            );
-
-            return this.settlementLocation;
-        }
-        else {
-            return null;
-        }
+        return this.settlementLocation;
     }
 
     СleanupExpands(): void {
@@ -316,5 +279,55 @@ export class MaraSettlementController {
                 return expandBuildings.length > 0;
             }
         )
+    }
+
+    public OnUnitListChanged(unit: MaraUnitCacheItem, isAdded: boolean): void {
+        if (MaraUtils.IsBuildingConfigId(unit.UnitCfgId)) {
+            this.recalcSettlementLocation();
+        }
+
+        this.ProductionController.OnUnitListChanged(unit, isAdded);
+    }
+
+    public OnUnitLifeStateChanged(unit: MaraUnitCacheItem): void {
+        if (MaraUtils.IsBuildingConfigId(unit.UnitCfgId)) {
+            this.recalcSettlementLocation();
+        }
+    }
+
+    private recalcSettlementLocation(): void {
+        let professionCenter = this.Settlement.Units.Professions;
+        let centralProductionBuilding = professionCenter.ProducingBuildings.First();
+
+        if (centralProductionBuilding) {
+            let productionBuildingCache = MaraUnitCache.GetUnitById(centralProductionBuilding.Id)!;
+
+            let squads = MaraUtils.GetSettlementsSquadsFromUnits(
+                [productionBuildingCache], 
+                [this.Settlement], 
+                (unit) => {return MaraUtils.IsBuildingConfigId(unit.UnitCfgId)},
+                this.Settings.UnitSearch.BuildingSearchRadius
+            );
+            
+            if (!squads || squads.length == 0) {
+                this.settlementLocation = null;
+                return;
+            }
+
+            let location = squads[0].GetLocation();
+            let boundingRect = MaraUtils.GetUnitsBoundingRect(squads[0].Units);
+            
+            this.settlementLocation = new SettlementClusterLocation(
+                location.Point,
+                new MaraRect(
+                    new MaraPoint(boundingRect.TopLeft.X - 10, boundingRect.TopLeft.Y - 10),
+                    new MaraPoint(boundingRect.BottomRight.X + 10, boundingRect.BottomRight.Y + 10),
+                )
+            );
+        }
+        else {
+            this.settlementLocation = null;
+            return;
+        }
     }
 }
