@@ -136,7 +136,7 @@ class UnitExperienceSystem {
         }
 
         // проверяем, что юнит ничего не делает
-        if (this.unit.OrdersMind.ActiveMotion && this.unit.OrdersMind.ActiveMotion.GetType().Name != "MotionDoNothing") {
+        if (!this.unit.OrdersMind.HasMotionDoNothingNow()) {
             this.selfMedication_DoNothingTick = gameTickNum;
         }
 
