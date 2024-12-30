@@ -760,39 +760,11 @@ export class MaraUtils {
     
     //#region Unit Properties
     static GetUnitTarget(unit: MaraUnitCacheItem): any {
-        let action = unit.Unit.OrdersMind.ActiveAct;
-
-        if (!action) {
-            return null;
-        }
-        
-        if (
-            action.GetType() != 
-                ScriptUtils.GetTypeByName("HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActAttackUnit", "HordeClassLibrary")
-        ) {
-            return null;
-        }
-        else {
-            return action.Target;
-        }
+        return unit.Unit.OrdersMind.GetCurrentHitTarget();
     }
 
     static GetUnitPathLength(unit: MaraUnitCacheItem): number | null {
-        let action = unit.Unit.OrdersMind.ActiveAct;
-
-        if (!action) {
-            return null;
-        }
-        
-        if (
-            action.GetType() == 
-                ScriptUtils.GetTypeByName("HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActMoveTo", "HordeClassLibrary")
-        ) {
-            return action.Solution?.Count;
-        }
-        else {
-            return null;
-        }
+        return unit.Unit.OrdersMind.GetCurrentPathLength();
     }
 
     static GetUnitStrength(unit: MaraUnitCacheItem): number {
