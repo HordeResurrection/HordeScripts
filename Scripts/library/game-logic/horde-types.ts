@@ -173,8 +173,8 @@ export const GeometryCanvas = HordeGame.HordeResurrection.Game.Render.GeometryCa
 // ===================================================
 // --- Типы для использования в рендере
 
-export const Stride_Vector2 = xHost.type(ScriptUtils.GetTypeByName("Stride.Core.Mathematics.Vector2", "Stride.Core.Mathematics"));
-export const Stride_Color = xHost.type(ScriptUtils.GetTypeByName("Stride.Core.Mathematics.Color", "Stride.Core.Mathematics"));
+export const Stride_Vector2 = StrideCore.Stride.Core.Mathematics.Vector2;
+export const Stride_Color = StrideCore.Stride.Core.Mathematics.Color;
 
 
 // ===================================================
