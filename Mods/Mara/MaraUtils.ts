@@ -19,6 +19,7 @@ import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
 import { MaraUnitConfigCache } from "./Common/Cache/MaraUnitConfigCache";
 import { MaraUnitCacheItem } from "./Common/Cache/MaraUnitCacheItem";
 import { MaraResources } from "./Common/MapAnalysis/MaraResources";
+import { ListT } from "library/dotnet/dotnet-types";
 
 const DEFAULT_UNIT_SEARCH_RADIUS = 3;
 
@@ -634,9 +635,8 @@ export class MaraUtils {
     }
     
     private static productionGetter(cfg: any, settlement: any): any {
-        let listType = xHost.type('System.Collections.Generic.List');
         let configType = UnitConfig;
-        let list = host.newObj(listType(configType), 0);
+        let list = new ListT(configType);
     
         settlement.TechTree.HypotheticalProducts.WhoCanProduce(cfg, list);
     

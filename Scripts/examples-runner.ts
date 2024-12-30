@@ -24,7 +24,6 @@ export function allExamples() {
     // - Примеры из файла 'other-examples.ts'
     addExample(new Example_GameWorks());
     addExample(new Example_Introspection());
-    addExample(new Example_ImportDotNetTypes());
 
     // - Примеры работы c данными игрока
     addExample(new Example_PlayerWorks());
@@ -101,7 +100,7 @@ import { Example_InputHiLevel } from "./examples/mastermind-input-hi-level";
 import { Example_InputLowLevel } from "./examples/mastermind-input-low-level";
 import { Example_MasterMindRequest } from "./examples/mastermind-request";
 import { Example_HookReceivedChatMessages, Example_HookSentChatMessages, Example_SendMessageToAll } from "./examples/message-examples";
-import { Example_GameWorks, Example_ImportDotNetTypes, Example_Introspection } from "./examples/other-examples";
+import { Example_GameWorks, Example_Introspection } from "./examples/other-examples";
 import { Example_PlayerWorks } from "./examples/player-examples";
 import { Example_ScenaWorks } from "./examples/scena-examples";
 import { Example_SettlementWorks, Example_SettlementResources, Example_SettlementUnitsInfo } from "./examples/settlement-examples";

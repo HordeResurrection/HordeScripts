@@ -70,29 +70,3 @@ export class Example_Introspection extends HordeExampleBase {
         if (true) inspectFlagEnum(UnitLifeState);
     }
 }
-
-
-/**
- * Пример использования .Net-типов в скриптах
- * 
- * См. также документацию и пример использования ExtendedHostFunctions
- * https://microsoft.github.io/ClearScript/Reference/html/T_Microsoft_ClearScript_ExtendedHostFunctions.htm
- * https://microsoft.github.io/ClearScript/Tutorial/FAQtorial.html (см. пункт 24)
- */
-export class Example_ImportDotNetTypes extends HordeExampleBase {
-
-    public constructor() {
-        super("Import .Net types");
-    }
-
-    public onFirstRun() {
-        this.logMessageOnRun();
-        
-        let List = xHost.type('System.Collections.Generic.List');
-        let DayOfWeek = xHost.type('System.DayOfWeek');
-        let week = new List(DayOfWeek, 7);
-        week.Add(DayOfWeek.Sunday);
-        
-        this.log.info("DayOfWeek:", week[0]);
-    }
-}
