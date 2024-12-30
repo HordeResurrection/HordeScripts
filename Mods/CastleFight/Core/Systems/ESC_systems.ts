@@ -3,7 +3,7 @@ import { generateCellInSpiral } from "library/common/position-tools";
 import { createHordeColor, createResourcesAmount } from "library/common/primitives";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
-import { UnitCommand, UnitDirection, UnitFlags, DiplomacyStatus } from "library/game-logic/horde-types";
+import { UnitCommand, UnitDirection, UnitFlags, DiplomacyStatus, ActProduce } from "library/game-logic/horde-types";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { COMPONENT_TYPE, UnitComponent, BuffableComponent, BUFF_TYPE, SettlementComponent, IncomeIncreaseEvent, IncomeIncreaseComponent, IncomeEvent, IncomeLimitedPeriodicalComponent, Entity, AttackingAlongPathComponent, SpawnBuildingComponent, ReviveComponent, UpgradableBuildingComponent, UpgradableBuildingEvent, BuffEvent, BuffComponent, UnitProducedEvent } from "../Components/ESC_components";
 import { Cell, distance_Chebyshev, UnitGiveOrderToNearEmptyCell, UnitDisallowCommands, spawnUnits } from "../Utils";
@@ -406,7 +406,7 @@ export function SpawnBuildingSystem(world: World, gameTickNum: number) {
                 var spawnBuildingComponent = entity.components.get(COMPONENT_TYPE.SPAWN_BUILDING_COMPONENT) as SpawnBuildingComponent;
 
                 // проверяем, что здание что-то строит
-                if (unitComponent.unit.OrdersMind.ActiveAct.GetType().Name == "ActProduce") {
+                if (host.isType(ActProduce, unitComponent.unit.OrdersMind.ActiveAct)) {
                     var buildingCfg = unitComponent.unit.OrdersMind.ActiveOrder.ProductUnitConfig;
                     // проверяем, если здание хочет сбросить таймер спавна
                     if (buildingCfg.Uid == world.configs["reset_spawn"].Uid) {
@@ -493,7 +493,7 @@ export function UpgradableBuildingSystem(world: World, gameTickNum: number) {
                 var upgradableBuildingComponent = entity.components.get(COMPONENT_TYPE.UPGRADABLE_BUILDING_COMPONENT) as UpgradableBuildingComponent;
 
                 // проверяем, что здание что-то строит
-                if (unitComponent.unit.OrdersMind.ActiveAct.GetType().Name == "ActProduce" &&
+                if (host.isType(ActProduce, unitComponent.unit.OrdersMind.ActiveAct) &&
                     unitComponent.unit.OrdersMind.ActiveAct.ActiveMotion.LeftTime < 100) {
                     var buildingCfg = unitComponent.unit.OrdersMind.ActiveOrder.ProductUnitConfig;
                     
@@ -753,7 +753,7 @@ export function UnitProducedSystem(world: World, gameTickNum: number) {
 //             // если герой не выбран
 //             if (heroAltarComponent.selectedHeroNum < 0) {
 //                 // проверяем, что алтарь что-то строит
-//                 if (unitComponent.unit.OrdersMind.ActiveAct.GetType().Name == "ActProduce") {
+//                 if (host.isType(ActProduce, unitComponent.unit.OrdersMind.ActiveAct)) {
 //                     // выбираем героя
 //                     var productUnitCfg = unitComponent.unit.OrdersMind.ActiveOrder.ProductUnitConfig;
                     

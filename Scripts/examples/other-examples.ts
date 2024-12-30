@@ -2,6 +2,7 @@ import { inspect, inspectEnum, inspectFlagEnum } from "library/common/introspect
 import { isNetworkGame, isReplayMode } from "library/game-logic/game-tools";
 import { UnitAnimState, UnitLifeState } from "library/game-logic/horde-types";
 import HordeExampleBase from "./base-example";
+import { BooleanT, StringT } from "library/dotnet/dotnet-types";
 
 /**
  * Пример работы с данными игры
@@ -58,6 +59,11 @@ export class Example_Introspection extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
         
+        // Проверка типа (актуально не только для примитивных типов, но и для других типов из ядра)
+        let someObject = "any string";
+        this.log.info("Является ли переменная 'someObject' типом 'Boolean'? Ответ:", host.isType(BooleanT, someObject));
+        this.log.info("Является ли переменная 'someObject' типом 'String'? Ответ:", host.isType(StringT, someObject));
+
         // Remove false-condition to reveal the Horde API structure
         if (false) inspect(HordeAPI, 1, "Horde API structure (в разработке)");
         if (false) inspect(HCL, 5, "HordeClassLibrary (полный доступ)");

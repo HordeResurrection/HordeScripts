@@ -121,6 +121,9 @@ export const OrderRepairSelf = HCL.HordeClassLibrary.UnitComponents.OrdersSystem
 
 export const StateMotion = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Motions.StateMotion;
 
+export const AActBase = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Acts.AActBase;
+export const ActProduce = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Acts.Producing.ActProduce;
+
 export const AMotionBase = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Motions.AMotionBase;
 export const MotionHit = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionHit;
 

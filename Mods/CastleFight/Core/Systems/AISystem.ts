@@ -1,6 +1,6 @@
 import { log } from "library/common/logging";
 import { World } from "../World";
-import { PointCommandArgs, ProduceAtCommandArgs, ProduceCommandArgs, UnitCommand, UnitFlags, UnitMapLayer } from "library/game-logic/horde-types";
+import { ActProduce, PointCommandArgs, ProduceAtCommandArgs, ProduceCommandArgs, UnitCommand, UnitFlags, UnitMapLayer } from "library/game-logic/horde-types";
 import { BuffComponent, BuffOptTargetType, BuffsOptTarget, COMPONENT_TYPE, Entity, ReviveComponent, SpawnBuildingComponent, UnitComponent, UnitProducedEvent, UpgradableBuildingComponent } from "../Components/ESC_components";
 import { createPoint, createResourcesAmount } from "library/common/primitives";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
@@ -259,7 +259,7 @@ class IBot {
             }
 
             // проверка, что рабочий ничего не строит
-            if (unitComponent.unit.OrdersMind.ActiveAct.GetType().Name == "ActProduce") {
+            if (host.isType(ActProduce, unitComponent.unit.OrdersMind.ActiveAct)) {
                 break;
             }
 

@@ -1,4 +1,4 @@
-import { IDisposableT, IEnumeratorT, Int32 } from "./dotnet-types";
+import { IDisposableT, IEnumeratorT, Int32T } from "./dotnet-types";
 
 
 // ===================================================
@@ -15,7 +15,7 @@ export function mergeFlags(flagsType, ...flagsArray: any[]) {
     let flags = 0;
 
     for(let f of flagsArray) {
-        flags |= host.cast(Int32, f);
+        flags |= host.cast(Int32T, f);
     }
 
     return host.cast(flagsType, flags);
