@@ -61,8 +61,8 @@ export class Example_Introspection extends HordeExampleBase {
         
         // Проверка типа (актуально не только для примитивных типов, но и для других типов из ядра)
         let someObject = "any string";
-        this.log.info("Является ли переменная 'someObject' типом 'Boolean'? Ответ:", host.isType(BooleanT, someObject));
-        this.log.info("Является ли переменная 'someObject' типом 'String'? Ответ:", host.isType(StringT, someObject));
+        this.log.info("Является ли переменная 'someObject' объектом типа 'Boolean'? Ответ:", host.isType(BooleanT, someObject));
+        this.log.info("Является ли переменная 'someObject' объектом типа 'String'? Ответ:", host.isType(StringT, someObject));
 
         // Remove false-condition to reveal the Horde API structure
         if (false) inspect(HordeAPI, 1, "Horde API structure (в разработке)");
