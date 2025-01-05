@@ -620,34 +620,34 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
         // усредняем ресурсы игроков
 
-        if (gameTickNum % 500 == 0) {
-            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-                // проверяем, что поселение в игре
-                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
-                    continue;
-                }
+        // if (gameTickNum % 500 == 0) {
+        //     for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+        //         // проверяем, что поселение в игре
+        //         if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
+        //             continue;
+        //         }
 
-                var avgGold   : number = 0;
-                var avgMetal  : number = 0;
-                var avgLumber : number = 0;
-                var avgPeople : number = 0;
-                for (var settlement of GlobalVars.teams[teamNum].settlements) {
-                    avgGold   += settlement.Resources.Gold;
-                    avgMetal  += settlement.Resources.Metal;
-                    avgLumber += settlement.Resources.Lumber;
-                    avgPeople += settlement.Resources.FreePeople;
-                }
-                avgGold   = Math.round(avgGold   / GlobalVars.teams[teamNum].settlements.length);
-                avgMetal  = Math.round(avgMetal  / GlobalVars.teams[teamNum].settlements.length);
-                avgLumber = Math.round(avgLumber / GlobalVars.teams[teamNum].settlements.length);
-                avgPeople = Math.round(avgPeople / GlobalVars.teams[teamNum].settlements.length);
+        //         var avgGold   : number = 0;
+        //         var avgMetal  : number = 0;
+        //         var avgLumber : number = 0;
+        //         var avgPeople : number = 0;
+        //         for (var settlement of GlobalVars.teams[teamNum].settlements) {
+        //             avgGold   += settlement.Resources.Gold;
+        //             avgMetal  += settlement.Resources.Metal;
+        //             avgLumber += settlement.Resources.Lumber;
+        //             avgPeople += settlement.Resources.FreePeople;
+        //         }
+        //         avgGold   = Math.round(avgGold   / GlobalVars.teams[teamNum].settlements.length);
+        //         avgMetal  = Math.round(avgMetal  / GlobalVars.teams[teamNum].settlements.length);
+        //         avgLumber = Math.round(avgLumber / GlobalVars.teams[teamNum].settlements.length);
+        //         avgPeople = Math.round(avgPeople / GlobalVars.teams[teamNum].settlements.length);
                 
-                for (var settlement of GlobalVars.teams[teamNum].settlements) {
-                    settlement.Resources.TakeResources(settlement.Resources.GetCopy());
-                    settlement.Resources.AddResources(createResourcesAmount(avgGold, avgMetal, avgLumber, avgPeople));
-                }
-            }
-        }
+        //         for (var settlement of GlobalVars.teams[teamNum].settlements) {
+        //             settlement.Resources.TakeResources(settlement.Resources.GetCopy());
+        //             settlement.Resources.AddResources(createResourcesAmount(avgGold, avgMetal, avgLumber, avgPeople));
+        //         }
+        //     }
+        // }
     }
 
     private End(gameTickNum: number) {
