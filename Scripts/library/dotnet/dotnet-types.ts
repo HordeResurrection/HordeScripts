@@ -29,3 +29,6 @@ export const IEnumeratorGenericT = DotNet.System.Collections.Generic.IEnumerator
 export const IEnumeratorT = DotNet.System.Collections.IEnumerator;
 
 export const IDisposableT = DotNet.System.IDisposable;
+
+export const ArrayT = DotNet.System.Array;
+export const EnumT = DotNet.System.Enum;
