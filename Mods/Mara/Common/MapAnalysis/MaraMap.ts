@@ -15,6 +15,7 @@ import { MaraPath } from "./MaraPath";
 import SortedSet from "./SortedSet.js"
 import RBush from "../RBush/rbush.js"
 import { MaraRect } from "../MaraRect";
+import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
 
 class TileTypeCache extends MaraCellDataHolder {
     constructor () {
@@ -260,6 +261,222 @@ export class MaraMap {
         }) as Array<MaraResourceClusterBushItem>;
 
         return cacheItems.map((i) => i.ResourceCluster);
+    }
+
+    static GetMapNode(cell: MaraPoint): MaraMapNode | undefined {
+        return MaraMap.mapNodes.find((n) => n.Region.HasCell(cell));
+    }
+
+    static ConnectMapNodesByBridge(nodesPath: Array<MaraMapNode>, bridgeConfigId: string, masterMind: any): Array<MaraRect> {
+        if (nodesPath.length < 3) {
+            return [];
+        }
+        
+        let sourceNode = nodesPath[0];
+        let firstUnwalkableNode = nodesPath[1];
+        let sourceCells = MaraMap.getNeighbourCells(firstUnwalkableNode, sourceNode);
+
+        let destNode = nodesPath[nodesPath.length - 1];
+        let lastUnwalkableNode = nodesPath[nodesPath.length - 2];
+        let destCells = MaraMap.getNeighbourCells(lastUnwalkableNode, destNode);
+
+        const RETRY_COUNT = 3;
+
+        for (let i = 0; i < RETRY_COUNT; i ++) {
+            let sourceCell = MaraUtils.RandomSelect(masterMind, sourceCells)!;
+
+            let destCellsData = destCells.map(
+                (v) => {
+                    return {
+                        Distance: MaraUtils.EuclidDistance(sourceCell, v),
+                        Cell: v
+                    }
+                }
+            );
+
+            let destCell = MaraUtils.FindExtremum(destCellsData, (candidate, extremum) => extremum.Distance - candidate.Distance)!.Cell;
+
+            let bridgeSections = MaraMap.markupBridge(sourceCell, destCell, bridgeConfigId);
+
+            if (MaraMap.validateBridge(bridgeSections, sourceNode, destNode)) {
+                return bridgeSections;
+            }
+        }
+        
+        return [];
+    }
+
+    private static validateBridge(bridgeSections: Array<MaraRect>, sourceNode: MaraMapNode, destNode: MaraMapNode): boolean {
+        if (bridgeSections.length == 0) {
+            return false;
+        }
+
+        return (
+            MaraMap.isBridgeSectionNeighboursNode(bridgeSections[0], sourceNode) &&
+            MaraMap.isBridgeSectionNeighboursNode(bridgeSections[bridgeSections.length - 1], destNode)
+        )
+    }
+
+    private static isBridgeSectionNeighboursNode(section: MaraRect, node: MaraMapNode): boolean {
+        for (let x = section.TopLeft.X - 1; x <= section.BottomRight.X + 1; x ++) {
+            for (let y = section.TopLeft.Y - 1; y <= section.BottomRight.Y + 1; y ++) {
+                let cell = new MaraPoint(x, y);
+                
+                if (node.Region.HasCell(cell)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static getNeighbourCells(node1: MaraMapNode, node2: MaraMapNode): Array<MaraPoint> {
+        let result: Array<MaraPoint> = [];
+
+        MaraMap.processAllNeighbours(
+            node1,
+            MaraMap.nodeIndex,
+            true,
+            (neighbourCell, neighbourNode) => {
+                if (
+                    node2.Region.HasCell(neighbourCell) &&
+                    !result.find((v) => v == neighbourCell)
+                ) {
+                    result.push(neighbourCell);
+                }
+            }
+        );
+
+        return result
+    }
+
+    private static markupBridge(from: MaraPoint, to: MaraPoint, bridgeConfigId: string): Array<MaraRect> {
+        let coveredCells = new MaraCellIndex();
+        let cellsToCover = MaraUtils.MakeLine(from, to);
+        let bridgeConfig = MaraUtils.GetUnitConfig(bridgeConfigId);
+    
+        if (!cellsToCover[0].EqualsTo(from)) {
+            cellsToCover.reverse();
+        }
+    
+        let bridgeWidth = MaraUtils.GetConfigIdWidth(bridgeConfigId);
+        let bridgeHeigth = MaraUtils.GetConfigIdHeight(bridgeConfigId);
+        let offset = new MaraPoint(0, 0);
+        let result = new Array<MaraRect>();
+    
+        for (let i = 0; i < cellsToCover.length; i ++) {
+            let currentCell = cellsToCover[i];
+            
+            if (coveredCells.Get(currentCell)) {
+                continue;
+            }
+    
+            let bridgeSectionPosition = currentCell.Shift(offset);
+    
+            if (
+                !MaraMap.isBridgeCanBePlaced(
+                    bridgeConfig, 
+                    bridgeWidth, 
+                    bridgeHeigth,
+                    bridgeSectionPosition, 
+                    coveredCells
+                )
+            ) {
+                let newOffset = MaraMap.recalcBridgeSectionOffset(
+                    bridgeConfig, 
+                    bridgeWidth, 
+                    bridgeHeigth, 
+                    currentCell, 
+                    coveredCells
+                );
+    
+                if (newOffset) {
+                    offset = newOffset;
+                    bridgeSectionPosition = currentCell.Shift(offset);
+                }
+                else {
+                    if (result.length == 0) {
+                        continue;
+                    }
+                    else {
+                        return result;
+                    }
+                }
+            }
+    
+            let bridgeBottomRight = new MaraPoint(
+                bridgeSectionPosition.X + bridgeWidth - 1,
+                bridgeSectionPosition.Y + bridgeHeigth - 1
+            );
+    
+            let newSection = new MaraRect(
+                bridgeSectionPosition,
+                bridgeBottomRight
+            );
+    
+            result.push(newSection);
+    
+            for (let x = bridgeSectionPosition.X; x <= bridgeBottomRight.X; x ++) {
+                for (let y = bridgeSectionPosition.Y; y <= bridgeBottomRight.Y; y ++) {
+                    coveredCells.Set(new MaraPoint(x, y), true);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    private static isBridgeCanBePlaced(
+        bridgeConfig: any, 
+        bridgeWidth: number, 
+        bridgeHeigth: number, 
+        position: MaraPoint, 
+        coveredCells: MaraCellIndex
+    ): boolean {
+        if (!unitCanBePlacedByRealMap(bridgeConfig, position.X, position.Y)) {
+            return false;
+        }
+        
+        let bridgeBottomRight = new MaraPoint(
+            position.X + bridgeWidth - 1,
+            position.Y + bridgeHeigth - 1
+        );
+    
+        let sectionRect = new MaraRect(
+            position,
+            bridgeBottomRight
+        );
+    
+        for (let x = sectionRect.TopLeft.X; x <= sectionRect.BottomRight.X; x ++) {
+            for (let y = sectionRect.TopLeft.Y; y <= sectionRect.BottomRight.Y; y ++) {
+                if (coveredCells.Get(new MaraPoint(x, y))) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    private static recalcBridgeSectionOffset(
+        bridgeConfig: any, 
+        bridgeWidth: number, 
+        bridgeHeigth: number, 
+        position: MaraPoint, 
+        coveredCells: MaraCellIndex
+    ): MaraPoint | null {
+        for (let row = Math.max(position.Y - bridgeHeigth + 1, 0); row <= position.Y; row ++) {
+            for (let col = Math.max(position.X - bridgeWidth + 1, 0); col <= position.X; col ++) {
+                let newPosition = new MaraPoint(col, row);
+                
+                if (MaraMap.isBridgeCanBePlaced(bridgeConfig, bridgeWidth, bridgeHeigth, newPosition, coveredCells)) {
+                    return new MaraPoint(col - position.X, row - position.Y);
+                }
+            }
+        }
+    
+        return null;
     }
 
     private static buildMap(): void {
@@ -648,27 +865,42 @@ export class MaraMap {
 
     private static linkMap(mapNodes: Array<MaraMapNode>, nodeIndex: MaraRegionIndex, diagonalLinking: boolean): void {
         for (let node of mapNodes) {
-            for (let cell of node.Region.Cells) {
-                
-                let shiftVectors = [
-                    new MaraPoint(0, 1)
-                ];
-
-                if (diagonalLinking) {
-                    shiftVectors.push(new MaraPoint(1, 1))
+            MaraMap.processAllNeighbours(
+                node, 
+                nodeIndex,
+                diagonalLinking,
+                (neighbourCell, neighbourNode) => {
+                    MaraMap.linkNodes(node, neighbourNode);
                 }
+            )
+        }
+    }
 
-                for (let i = 0; i < 4; i ++) {
-                    for (let i = 0; i < shiftVectors.length; i ++) {
-                        shiftVectors[i] = shiftVectors[i].Rotate90DegreesCcw();
+    private static processAllNeighbours(
+        mapNode: MaraMapNode, 
+        nodeIndex: MaraRegionIndex, 
+        includeDiagonals: boolean,
+        neighbourProcessor: (neighbourCell: MaraPoint, neighbourNode: MaraMapNode) => void
+    ): void {
+        for (let cell of mapNode.Region.Cells) {
+            let shiftVectors = [
+                new MaraPoint(0, 1)
+            ];
 
-                        let vector = shiftVectors[i];
-                        let neighbourCell = cell.Shift(vector);
-                        let neighbourNode = nodeIndex.Get(neighbourCell);
+            if (includeDiagonals) {
+                shiftVectors.push(new MaraPoint(1, 1))
+            }
 
-                        if (neighbourNode && neighbourNode != node) {
-                            MaraMap.linkNodes(node, neighbourNode);
-                        }
+            for (let i = 0; i < 4; i ++) {
+                for (let i = 0; i < shiftVectors.length; i ++) {
+                    shiftVectors[i] = shiftVectors[i].Rotate90DegreesCcw();
+
+                    let vector = shiftVectors[i];
+                    let neighbourCell = cell.Shift(vector);
+                    let neighbourNode = nodeIndex.Get(neighbourCell);
+
+                    if (neighbourNode && neighbourNode != mapNode) {
+                        neighbourProcessor(neighbourCell, neighbourNode);
                     }
                 }
             }
