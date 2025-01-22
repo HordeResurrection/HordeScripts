@@ -2,10 +2,11 @@ import { ObjectT } from "../dotnet-types";
 import { createArray, mergeFlags } from "../dotnet-utils";
 import { BindingFlags } from "./reflection";
 
+
 /**
  * Создаёт EventSource для закрытого события, чтобы можно было использовать "connect" для обработки события.
  */
-export function makePrivateEventSource(targetObject: object, eventName: string, eventArgsType: object) {
+export function makePrivateEventSource(targetObject: any, eventName: string, eventArgsType: object) {
 
     // Получение дескриптора события (EventInfo)
     let bindingFlags = mergeFlags(BindingFlags, BindingFlags.Public, BindingFlags.NonPublic, BindingFlags.Instance)

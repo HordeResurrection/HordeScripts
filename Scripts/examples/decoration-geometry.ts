@@ -114,7 +114,7 @@ export class Example_GeometryDecoration extends HordeExampleBase {
         }
 
         // Рисуем ломаную линию
-        let points = host.newArr(Stride_Vector2, N);
+        let points = host.newArr(Stride_Vector2, N) as Stride_Vector2[];
         for (let i = 0; i < N; i++) {
             position = this._getRadialPosition((i + t / 2) * 10, 120);
             points[i] = position;

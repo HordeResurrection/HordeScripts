@@ -30,19 +30,9 @@ export function mergeFlags(flagsType: object, ...flagsArray: any[]): any {
 
 /**
  * ForEach - специальная функция для перечисления .Net-объектов.
- * 
- * Примеры:
-```
-    ForEach(someList, item => {
-        log.info('-', item);
-    });
-
-    ForEach(someList, (item, i, source) => {
-        log.info('#' + i, item, 'from', source);
-    });
-```
+ * Примеры см. рядом с декларацией ForEach в "common-declarations.d.ts".
  */
-globalThis.ForEach = ScriptExtensions.ForEach;
+globalThis.ForEach = ScriptUtils.ForEach;
 
 /**
  * Делает IEnumerable перечислимым в JS.

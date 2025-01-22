@@ -146,6 +146,6 @@ export class Example_ConfigRemoving extends HordeExampleBase {
         let factoryCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Factory");
         let producerParams = factoryCfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
         let produceList = producerParams.CanProduceList;
-        ScriptExtensions.RemoveAll(produceList, targetCfg);
+        ScriptUtils.RemoveAll(produceList, targetCfg);
     }
 }
