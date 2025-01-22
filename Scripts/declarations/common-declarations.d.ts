@@ -2,56 +2,6 @@ declare function ForEach(enumerable: any, action: (item: any, i: number, sourceE
 
 declare class ScriptUtils
 {
-    public static SetValueAs(
-            targetTypeInfo: any,
-            memberOwner: any,
-            memberName: string,
-            value: any
-        ): any;
-
-    public static GetValueAs(
-            targetTypeInfo: any,
-            memberOwner: any,
-            memberName: string
-        ): any;
-
-    public static SetValue(
-            memberOwner: any,
-            memberName: string,
-            value: any
-        ): any;
-
-    public static GetValue(
-            memberOwner: any,
-            memberName: string
-        ): any;
-
-    public static Invoke(
-            memberOwner: any,
-            methodName: string,
-            parameters: any[]
-        ): any;
-
-    public static InvokeStatic(
-            type: any,
-            methodName: string,
-            parameters: any[]
-        ): any;
-
-    public static GetTypeByName(
-            typeName: string
-        ): any;
-
-    public static GetTypeByName(
-            typeName: string,
-            assemblyName: string
-        ): any;
-
-    public static CreateInstance(
-            type: any,
-            parameters: any[]
-        ): any;
-
     public static GameVersionEquals(
             version: string
         ): boolean;
@@ -68,7 +18,11 @@ declare class ScriptUtils
 
 declare class HordeContentApi
 {
-    public static readonly ContentStamp: HordeClassLibrary.Scripting.ScriptApi.HordeContentApi
+    public static readonly ContentStamp: string;
+
+    public static GetForce(
+            uid: string
+        ): HordeClassLibrary.HordeContent.Configs.Army.Force;
 
     public static GetUnitConfig(
             uid: string
@@ -88,15 +42,31 @@ declare class HordeContentApi
 
     public static GetSoundEffectConfig(
             uid: string
-        ): any;
+        ): HordeClassLibrary.HordeContent.Configs.SoundEffects.SoundEffectConfig;
+
+    public static GetFont(
+            uid: string
+        ): HordeClassLibrary.HordeContent.Configs.Fonts.FontConfig;
+
+    public static GetString(
+            uid: string
+        ): HordeClassLibrary.HordeContent.Configs.StringConfig;
 
     public static GetAnimationCatalog(
             uid: string
-        ): any;
+        ): HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.BaseAnimationsCatalog;
+
+    public static GetAnimationAtlas(
+            uid: string
+        ): HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlasItem;
 
     public static GetSoundsCatalog(
             uid: string
         ): HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SoundsCatalog;
+
+    public static GetGuiParams(
+            uid: string
+        ): HordeClassLibrary.HordeContent.Configs.Interface.GuiParams;
 
     public static GetRuleConfig(
             uid: string
@@ -156,18 +126,5 @@ declare class HordeContentApi
             cfg: HordeClassLibrary.HordeContent.Configs.AConfig,
             cloneUid?: string
         ): HordeClassLibrary.HordeContent.Configs.AConfig;
-
-    public static AddConfig(
-            cfg: HordeClassLibrary.HordeContent.Configs.AConfig
-        ): any;
-
-    public static RemoveConfig(
-            cfg: HordeClassLibrary.HordeContent.Configs.AConfig
-        ): any;
-
-    public static RemoveConfig(
-            uid: string,
-            configTypeName: string
-        ): any;
 
 }
