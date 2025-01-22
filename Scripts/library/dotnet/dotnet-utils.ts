@@ -16,6 +16,9 @@ export function mergeFlags(flagsType, ...flagsArray: any[]) {
 
     for(let f of flagsArray) {
         flags |= host.cast(Int32T, f);
+        
+        // Внимание!
+        // Если скрипт-машина падает в этом месте с ошибкой "Error: Cannot convert type", то значит поданы некорректные флаги
     }
 
     return host.cast(flagsType, flags);

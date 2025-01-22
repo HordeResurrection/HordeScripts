@@ -55,7 +55,7 @@ export class Example_CustomUnit extends HordeExampleBase {
 
             // Добавление юнита в конюшню
             let producerCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Stables");
-            let producerParams = producerCfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+            let producerParams = producerCfg.GetProfessionParams(UnitProfession.UnitProducer) as UnitProducerProfessionParams;
             let produceList = producerParams.CanProduceList;
             produceList.Add(unitCfg);
 
@@ -101,7 +101,7 @@ export class Example_CustomUnit extends HordeExampleBase {
         ScriptUtils.SetValue(u.BattleMind, "SelectedArmament", this.armament);
 
         // Поиск ближайшего врага
-        let allowedQueryFlags = mergeFlags(UnitQueryFlag, UnitQueryFlag.CanAttackTarget, UnitQueryFlag.Harmless, UnitQueryFlag.NearDeathUnits);
+        let allowedQueryFlags = mergeFlags(UnitQueryFlag, UnitQueryFlag.CanAttackTarget, UnitQueryFlag.HarmlessNonCapturable, UnitQueryFlag.NearDeathWarriors);
         let nearestEnemy = u.CommunicationMind.GetNearestEnemy(allowedQueryFlags, this.armament.Range);
 
         // Был ли найден враг?
