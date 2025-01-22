@@ -72,6 +72,12 @@ declare class HostFunctions {
      * Создаёт делегат на указанную функцию с возвращаемым значением.
      */
     public func(returnHostType: object, argCount: number, scriptFunc: (...arg: any[]) => any);
+    
+    /**
+     * Возвращает .Net-тип для указанного хост-типа.
+     * Внимание! Метод работает только в unsafe-режиме скрипт-машины.
+     */
+    public typeOf(hostType: object): any;
 }
 
 /**

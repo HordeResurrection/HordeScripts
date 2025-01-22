@@ -120,7 +120,7 @@ export const UnitOwnerChangedEventArgs = HordeClassLibrary.UnitComponents.EventA
 export type UnitOwnerChangedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitOwnerChangedEventArgs;
 export const UnitReplacedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitReplacedEventArgs;
 export type UnitReplacedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitReplacedEventArgs;
-//export const UnitEventHandler = HordeClassLibrary.UnitComponents.Events.UnitEventHandler; // Delegate
+export const UnitEventHandler = HordeClassLibrary.UnitComponents.Events.UnitEventHandler;
 export type UnitEventHandler = HordeClassLibrary.UnitComponents.Events.UnitEventHandler;
 
 // ===================================================

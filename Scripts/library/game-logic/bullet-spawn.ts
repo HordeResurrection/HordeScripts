@@ -8,8 +8,8 @@ import { BulletConfig, BulletEmittingArgs, ShotParams, Unit, UnitArmament, UnitM
  */
 export function spawnBullet(
     sourceUnit: Unit,
-    targetUnit: Unit,
-    sourceArmament: UnitArmament,
+    targetUnit: Unit | null,
+    sourceArmament: UnitArmament | null,
     bullCfg: BulletConfig,
     ShotParams: ShotParams,
     launchPos: Point2D,
