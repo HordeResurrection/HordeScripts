@@ -13,7 +13,7 @@ export class Example_ScenaWorks extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-            
+
         // Глобальная переменная "ActiveScena" - это API для доступа к данным текущей сцены
         // Т.к. API ещё не разработано, ВРЕМЕННО прокинул объект реальной сцены
         // Здесь и далее в функии выполняется работа с реальными объектами (не API)

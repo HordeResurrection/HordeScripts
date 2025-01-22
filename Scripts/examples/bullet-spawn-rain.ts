@@ -1,7 +1,7 @@
 import { broadcastMessage } from "library/common/messages";
 import { createPF, createPoint, createHordeColor } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
-import { ShotParams, UnitMapLayer } from "library/game-logic/horde-types";
+import { BulletConfig, Settlement, ShotParams, Unit, UnitMapLayer } from "library/game-logic/horde-types";
 import HordeExampleBase from "./base-example";
 
 
@@ -14,12 +14,12 @@ const WAVES_PERIOD = 10;
 export class Example_SpawnBulletsRain extends HordeExampleBase {
     private rnd: any;
     private waveNum: number = 0;
-    
-    private someUnit: any;
-    private arrowCfg: any;
-    private arrowShotParams: any;
-    private bombCfg: any;
-    private bombShotParams: any;
+
+    private someUnit: Unit;
+    private arrowCfg: BulletConfig;
+    private arrowShotParams: ShotParams;
+    private bombCfg: BulletConfig;
+    private bombShotParams: ShotParams;
 
     public constructor() {
         super("Spawn bullets rain");
@@ -32,7 +32,7 @@ export class Example_SpawnBulletsRain extends HordeExampleBase {
         this.logMessageOnRun();
 
         let realScena = ActiveScena.GetRealScena();
-        let settlement_0 = realScena.Settlements.Item.get('0');  // Олег
+        let settlement_0 = realScena.Settlements.Item.get('0') as Settlement;  // Олег
 
         // Игровой рандомизатор
         this.rnd = realScena.Context.Randomizer;
@@ -53,10 +53,10 @@ export class Example_SpawnBulletsRain extends HordeExampleBase {
         this.bombShotParams = ShotParams.CreateInstance();
         ScriptUtils.SetValue(this.bombShotParams, "Damage", 12);
         ScriptUtils.SetValue(this.bombShotParams, "AdditiveBulletSpeed", createPF(0, 0));
-        
+
         // А теперь развлекаемся!
         broadcastMessage("Внимание! По прогнозу дождь из стрел, местами град! O_O", createHordeColor(255, 255, 50, 10));
-        
+
         // Снаряды полетят в методе EveryTick
     }
 
@@ -67,10 +67,10 @@ export class Example_SpawnBulletsRain extends HordeExampleBase {
         if (gameTickNum % WAVES_PERIOD != 0 || this.waveNum >= WAVES_MAX) {
             return;
         }
-        
+
         let n = this.spawnBulletsRain();
         this.waveNum++;
-        
+
         this.log.info(`Волна ${this.waveNum}. Создано ${n} снаряда(ов)`);
     }
 
@@ -89,16 +89,16 @@ export class Example_SpawnBulletsRain extends HordeExampleBase {
         }
         return n;
     }
-    
+
     /**
      * Функция для создания снаряда со случайным полетом
      */
-    private createBullRnd(someUnit, bulletCfg, shotParams) {
+    private createBullRnd(someUnit: Unit, bulletCfg: BulletConfig, shotParams: ShotParams) {
         // Старт снаряда генерируем наверху карты
-        let start = createPoint(this.rnd.RandomNumber(0,32*48), this.rnd.RandomNumber(0,32));
+        let start = createPoint(this.rnd.RandomNumber(0, 32 * 48), this.rnd.RandomNumber(0, 32));
 
         // Цель снаряда в квадрате (16; 16) - (32; 32)
-        let finish = createPoint(this.rnd.RandomNumber(32*16,32*32), this.rnd.RandomNumber(32*16,32*32));
+        let finish = createPoint(this.rnd.RandomNumber(32 * 16, 32 * 32), this.rnd.RandomNumber(32 * 16, 32 * 32));
 
         // Создание снаряда
         let bull = spawnBullet(

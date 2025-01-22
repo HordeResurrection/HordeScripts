@@ -1,6 +1,6 @@
 import { createPoint } from "library/common/primitives";
 import { inspectEnum } from "library/common/introspection";
-import { UnitCommand } from "library/game-logic/horde-types";
+import { Player, Unit, UnitCommand } from "library/game-logic/horde-types";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
 import HordeExampleBase from "./base-example";
 
@@ -8,8 +8,8 @@ import HordeExampleBase from "./base-example";
  * Пример имитации ввода игрока
  */
 export class Example_InputLowLevel extends HordeExampleBase {
-    player: any;
-    playerVirtualInput: any;
+    player: Player;
+    playerVirtualInput: PlayerVirtualInput;
 
     public constructor() {
         super("Input low-level");
@@ -17,10 +17,10 @@ export class Example_InputLowLevel extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-            
+
         this.player = Players["0"].GetRealPlayer();
         this.playerVirtualInput = new PlayerVirtualInput(this.player);
-        
+
         this.log.info('Список всех команд юнитов');
         inspectEnum(UnitCommand);
 
@@ -85,7 +85,7 @@ export class Example_InputLowLevel extends HordeExampleBase {
 
         this.log.info('- Команда тренировки');
         this.playerVirtualInput.produceUnitCommand("#UnitConfig_Slavyane_Worker1", 1);
-        
+
         this.log.info('- Имитация нажатия созданных элементов ввода');
         this.playerVirtualInput.commit();
     }
@@ -122,7 +122,7 @@ export class Example_InputLowLevel extends HordeExampleBase {
         let selectedSquad = this.player.SelectedSquadVirtual;
         if (selectedSquad.Count > 0) {
             this.log.info('У', this.player.Nickname, 'выделены следующие юниты:');
-            ForEach(selectedSquad, u => {
+            ForEach(selectedSquad, (u: Unit) => {
                 this.log.info('- ', u);
             });
         } else {

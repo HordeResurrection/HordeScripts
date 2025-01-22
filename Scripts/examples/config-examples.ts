@@ -1,6 +1,6 @@
 import { createHordeColor } from "library/common/primitives";
 import { inspect } from "library/common/introspection";
-import { AllContent } from "library/game-logic/horde-types";
+import { AllContent, UnitConfig } from "library/game-logic/horde-types";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import HordeExampleBase from "./base-example";
 
@@ -20,13 +20,13 @@ export class Example_ConfigWorks extends HordeExampleBase {
         this.logMessageOnRun();
         this._configWorks();
     }
-    
+
     private _configWorks() {
         this.log.info("Слепок контента:", HordeContentApi.ContentStamp);
 
         // Перечисление всех доступных конфигов юнитов
         this.log.info("Конфиги рыцарей:");
-        ForEach(AllContent.UnitConfigs.Configs, kv => {
+        ForEach(AllContent.UnitConfigs.Configs, (kv: { Key: string, Value: UnitConfig }) => {
             let uid = kv.Key;
             let uCfg = kv.Value;
             if (uid.includes('men')) {
@@ -40,7 +40,7 @@ export class Example_ConfigWorks extends HordeExampleBase {
         // Здесь можно убрать if-false, чтобы отобразить поля конфига
         // Здесь не следует копать более чем на 1 уровень в глубину, т.к. получается слишком много данных
         if (false) inspect(catapultCfg, 1, "Конфиг катапульты:");
-        
+
         // Получаем значения из конфига
         let rocks = catapultCfg.MainArmament.EmitBulletsCountMin;
         this.log.info("Текущее количество камней при выстреле:", rocks);
@@ -52,7 +52,7 @@ export class Example_ConfigWorks extends HordeExampleBase {
             rocks = 1;
         ScriptUtils.SetValue(catapultCfg.MainArmament, "EmitBulletsCountMin", rocks);
         ScriptUtils.SetValue(catapultCfg.MainArmament, "EmitBulletsCountMax", rocks);
-        
+
         // Результат можно проверить в игре
         this.log.info("Теперь катапульты кидают", catapultCfg.MainArmament.EmitBulletsCountMin, "камней за выстрел!");
     }

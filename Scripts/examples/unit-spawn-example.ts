@@ -14,7 +14,7 @@ export class Example_SpawnUnit extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         let realScena = ActiveScena.GetRealScena();
         let settlements = realScena.Settlements;
 

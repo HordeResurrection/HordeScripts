@@ -2,17 +2,17 @@
 // ===================================================
 // --- Простые объекты
 
-export const Point2D = HordePrimitives.HordeResurrection.Basic.Primitives.Geometry.Point2D;
+export const Point2D = HordeResurrection.Basic.Primitives.Geometry.Point2D;
 export type Point2D = HordeResurrection.Basic.Primitives.Geometry.Point2D;
-export const Size2D = HordePrimitives.HordeResurrection.Basic.Primitives.Geometry.Size2D;
+export const Size2D = HordeResurrection.Basic.Primitives.Geometry.Size2D;
 export type Size2D = HordeResurrection.Basic.Primitives.Geometry.Size2D;
-export const Rect2D = HordePrimitives.HordeResurrection.Basic.Primitives.Geometry.Rect2D;
+export const Rect2D = HordeResurrection.Basic.Primitives.Geometry.Rect2D;
 export type Rect2D = HordeResurrection.Basic.Primitives.Geometry.Rect2D;
-export const Box3D = HordePrimitives.HordeResurrection.Basic.Primitives.Geometry.Box3D;
+export const Box3D = HordeResurrection.Basic.Primitives.Geometry.Box3D;
 export type Box3D = HordeResurrection.Basic.Primitives.Geometry.Box3D;
-export const PreciseFraction = HordePrimitives.HordeResurrection.Basic.Primitives.PreciseFraction;
+export const PreciseFraction = HordeResurrection.Basic.Primitives.PreciseFraction;
 export type PreciseFraction = HordeResurrection.Basic.Primitives.PreciseFraction;
-export const HordeColor = HordePrimitives.HordeResurrection.Basic.Primitives.HordeColor;
+export const HordeColor = HordeResurrection.Basic.Primitives.HordeColor;
 export type HordeColor = HordeResurrection.Basic.Primitives.HordeColor;
 
 /**

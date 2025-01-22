@@ -1,4 +1,5 @@
-import { ScriptUnitWorkerGetOrder, ScriptUnitWorkerCanBePlaced, ScriptUnitWorkerState } from "./horde-types";
+import HordePluginBase from "plugins/base-plugin";
+import { ScriptUnitWorkerGetOrder, ScriptUnitWorkerCanBePlaced, ScriptUnitWorkerState, BulletConfig, BaseBullet, BulletEmittingArgs, UnitConfig, UnitState, Unit, ACommandArgs, Settlement, Scena } from "./horde-types";
 
 
 // ===================================================
@@ -7,20 +8,28 @@ import { ScriptUnitWorkerGetOrder, ScriptUnitWorkerCanBePlaced, ScriptUnitWorker
 /**
  * Установить инициализирующий обработчик для снаряда на основе метода из плагина.
  */
-export function setBulletInitializeWorker(plugin, bulletCfg, workerFunc) {
+export function setBulletInitializeWorker(
+    plugin: HordePluginBase,
+    bulletCfg: BulletConfig,
+    workerFunc: (plugin: HordePluginBase, bull: BaseBullet, emitArgs: BulletEmittingArgs) => void
+) {
     const workerName = plugin.name + '_InitializeBullet'
     const workerTypeName = "InitializeFuncName";
-    const workerWrapper = (bull, emitArgs) => workerFunc.call(plugin, bull, emitArgs);
+    const workerWrapper = (bull: BaseBullet, emitArgs: BulletEmittingArgs) => workerFunc.call(plugin, bull, emitArgs);
     setBulletWorker(bulletCfg, workerTypeName, workerName, workerWrapper);
 }
 
 /**
  * Установить обработчик снаряда на каждый такт на основе метода из плагина.
  */
-export function setBulletProcessWorker(plugin, bulletCfg, workerFunc) {
+export function setBulletProcessWorker(
+    plugin: HordePluginBase,
+    bulletCfg: BulletConfig,
+    workerFunc: (plugin: HordePluginBase, bull: BaseBullet) => void
+) {
     const workerName = plugin.name + '_ProcessBullet'
     const workerTypeName = "ProcessFuncName";
-    const workerWrapper = (bull) => workerFunc.call(plugin, bull);
+    const workerWrapper = (bull: BaseBullet) => workerFunc.call(plugin, bull);
     setBulletWorker(bulletCfg, workerTypeName, workerName, workerWrapper);
 }
 
@@ -29,10 +38,15 @@ export function setBulletProcessWorker(plugin, bulletCfg, workerFunc) {
  * 
  * Примечание: эту функцию можно использовать для задания обработчика без привязки к плагину.
  */
-export function setBulletWorker(bulletCfg, workerTypeName: string, workerName: string, workerFunc){
+export function setBulletWorker(
+    bulletCfg: BulletConfig,
+    workerTypeName: string,
+    workerName: string,
+    workerFunc: (...args: any[]) => void
+) {
     // Прокидываем доступ к функции-обработчику в .Net через глобальную переменную
     BulletWorkersRegistry.Register(workerName, workerFunc);
-    
+
     // Установка функции-обработчика в конфиг
     ScriptUtils.SetValue(bulletCfg.SpecialParams, workerTypeName, workerName);
 }
@@ -44,18 +58,23 @@ export function setBulletWorker(bulletCfg, workerTypeName: string, workerName: s
 /**
  * Установить обработчик состояния юнита на основе метода из плагина.
  */
-export function setUnitStateWorker(plugin, unitCfg, unitState, workerFunc) {
+export function setUnitStateWorker(
+    plugin: HordePluginBase,
+    unitCfg: UnitConfig,
+    unitState: UnitState,
+    workerFunc: (plugin: HordePluginBase, unit: Unit) => void
+) {
     const workerName = `${plugin.name}_${unitState}Worker`
 
     // Обертка для метода из плагина, чтобы работал "this"
-    const workerWrapper = (u) => workerFunc.call(plugin, u);
+    const workerWrapper = (u: Unit) => workerFunc.call(plugin, u);
 
     // Прокидываем доступ к функции-обработчику в .Net через глобальную переменную
     UnitWorkersRegistry.Register(workerName, workerWrapper);
 
     // Объект-обработчик
     const workerObject = new ScriptUnitWorkerState();
-    
+
     // Установка функции-обработчика
     ScriptUtils.SetValue(workerObject, "FuncName", workerName);
 
@@ -67,18 +86,22 @@ export function setUnitStateWorker(plugin, unitCfg, unitState, workerFunc) {
 /**
  * Установить обработчик получения приказа для юнита на основе метода из плагина.
  */
-export function setUnitGetOrderWorker(plugin, unitCfg, workerFunc) {
+export function setUnitGetOrderWorker(
+    plugin: HordePluginBase,
+    unitCfg: UnitConfig,
+    workerFunc: (plugin: HordePluginBase, unit: Unit, cmdArgs: ACommandArgs) => void
+) {
     const workerName = `${plugin.name}_GetOrderWorker`
 
     // Обертка для метода из плагина, чтобы работал "this"
-    const workerWrapper = (u, cmdArgs) => workerFunc.call(plugin, u, cmdArgs);
+    const workerWrapper = (u: Unit, cmdArgs: ACommandArgs) => workerFunc.call(plugin, u, cmdArgs);
 
     // Прокидываем доступ к функции-обработчику в .Net через глобальную переменную
     UnitWorkersRegistry.Register(workerName, workerWrapper);
 
     // Объект-обработчик
     const workerObject = new ScriptUnitWorkerGetOrder();
-    
+
     // Установка функции-обработчика
     ScriptUtils.SetValue(workerObject, "FuncName", workerName);
 
@@ -89,13 +112,22 @@ export function setUnitGetOrderWorker(plugin, unitCfg, workerFunc) {
 /**
  * Установить CanBePlaced-обработчик для юнита на основе метода из плагина.
  */
-export function setUnitCanBePlacedWorker(plugin, unitCfg, func_canBePlacedByKnownMap, func_canBePlacedByRealMap) {
+export function setUnitCanBePlacedWorker(
+    plugin: HordePluginBase,
+    unitCfg: UnitConfig,
+    func_canBePlacedByKnownMap: (plugin: HordePluginBase, settlement: Settlement, uCfg: UnitConfig, x: number, y: number, size1x1: boolean, considerUnit: boolean) => void,
+    func_canBePlacedByRealMap: (plugin: HordePluginBase, scena: Scena, uCfg: UnitConfig, x: number, y: number, size1x1: boolean, considerUnit: boolean) => void
+) {
     const name_canBePlacedByKnownMap = `${plugin.name}_CanBePlacedByKnownMap`;
     const name_canBePlacedByRealMap = `${plugin.name}_CanBePlacedByRealMap`;
 
-    // Обертка для метода из плагина, чтобы работал "this"
-    const wrapper_canBePlacedByKnownMap = (settlement, uCfg, x, y, size1x1, considerUnit) => func_canBePlacedByKnownMap.call(plugin, settlement, uCfg, x, y, size1x1, considerUnit);
-    const wrapper_canBePlacedByRealMap = (scena, uCfg, x, y, size1x1, considerUnit) => func_canBePlacedByRealMap.call(plugin, scena, uCfg, x, y, size1x1, considerUnit);
+    // Обертки для методов из плагина, чтобы работал "this"
+    const wrapper_canBePlacedByKnownMap = (
+        settlement: Settlement, uCfg: UnitConfig, x: number, y: number, size1x1: boolean, considerUnit: boolean
+    ) => func_canBePlacedByKnownMap.call(plugin, settlement, uCfg, x, y, size1x1, considerUnit);
+    const wrapper_canBePlacedByRealMap = (
+        scena: Scena, uCfg: UnitConfig, x: number, y: number, size1x1: boolean, considerUnit: boolean
+    ) => func_canBePlacedByRealMap.call(plugin, scena, uCfg, x, y, size1x1, considerUnit);
 
     // Прокидываем доступ к функции-обработчику в .Net через глобальную переменную
     UnitWorkersRegistry.Register(name_canBePlacedByKnownMap, wrapper_canBePlacedByKnownMap);

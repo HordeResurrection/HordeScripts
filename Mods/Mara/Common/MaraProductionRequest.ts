@@ -1,4 +1,4 @@
-import { BuildTracker } from "library/mastermind/matermind-types";
+import { BuildTracker } from "library/mastermind/mastermind-types";
 import { MaraUtils } from "../MaraUtils";
 import { MaraUnitCacheItem } from "./Cache/MaraUnitCacheItem";
 import { MaraPoint } from "./MaraPoint";

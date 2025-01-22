@@ -1,5 +1,6 @@
 import { IDisposableT, IEnumeratorT } from "library/dotnet/dotnet-types";
 import HordePluginBase from "./base-plugin";
+import { Squad, Unit } from "library/game-logic/horde-types";
 
 
 /**
@@ -13,7 +14,7 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
 
 
     public onFirstRun() {
-        let workPlayer = HordeEngine.HordeResurrection.Engine.Logic.Main.PlayersController.ActivePlayer;
+        let workPlayer = HordeResurrection.Engine.Logic.Main.PlayersController.ActivePlayer;
 
         if (this.globalStorage.squadChangedHandler) {
             this.globalStorage.squadChangedHandler.disconnect();
@@ -34,7 +35,7 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
         });
     }
 
-    private processNewSquad(squad) {
+    private processNewSquad(squad: Squad) {
         let tickText = `${DataStorage.gameTickNum}`;
 
         if (squad.Count == 0) {
@@ -53,7 +54,7 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
             this.log.info("== Selected unit is null");
             return;
         }
-        
+
         this.log.info('==', u);
 
         this._printCurrentOrder(u, '-   ');
@@ -61,27 +62,27 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
         this._printNotifications(u, '-   ');
     }
 
-    private _printCurrentOrder(u, prefix = "") {
+    private _printCurrentOrder(u: Unit, prefix = "") {
         if (!u) {
             return;
         }
 
         let ordersMind = u.OrdersMind;
         this.log.info('= Orders', '(Count:', ordersMind.OrdersCount + ', BehaviorFlags:', ordersMind.BehaviorFlags.ToString() + ')');
-        
+
         let needCancel = ordersMind.NeedCancelActiveOrder;
         let activeOrder = ordersMind.ActiveOrder;
         let notificationsStr = activeOrder.GetNotificationsInfoString();
-        
+
         this.log.info(prefix + 'Current:', activeOrder);
         this.log.info(prefix + '  >', 'IsInstinct:', activeOrder.IsInstinct, '|', notificationsStr, '| NeedCancel:', needCancel);
         this.log.info(prefix + '  Act:', ordersMind.ActiveAct);
         this.log.info(prefix + '  Motion:', ordersMind.ActiveMotion);
         this.log.info(prefix + '  Motive:', str(ordersMind.ActiveOrder.MotiveNotification));
-        
+
     }
 
-    private _printNextOrders(u, prefix = "") {
+    private _printNextOrders(u: Unit, prefix = "") {
         if (!u) {
             return;
         }
@@ -96,11 +97,11 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
             nextOrders.push(instinctOrder);
         }
 
-        let enumerator = host.cast(IEnumeratorT, queue.GetFollowingOrdersEnumerator());
+        let enumerator = host.cast(IEnumeratorT, queue.GetFollowingOrdersEnumerator()) as IEnumeratorT;
         while (enumerator.MoveNext()) {
             nextOrders.push(enumerator.Current);
         }
-        host.cast(IDisposableT, enumerator).Dispose();
+        (host.cast(IDisposableT, enumerator) as IDisposableT).Dispose();
 
         if (nextOrders.length > 0) {
             for (let i = 0; i < nextOrders.length; i++) {
@@ -114,14 +115,14 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
             this.log.info(prefix + 'Next: <Queue is empty>');
         }
     }
-    
-    private _printNotifications(u, prefix = "") {
+
+    private _printNotifications(u: Unit, prefix = "") {
         if (!u) {
             return;
         }
-        
+
         this.log.info('= Notifications');
-        
+
         let instinctsMind = u.InstinctsMind;
         this.log.info(prefix + 'MainAlarm:', str(instinctsMind.MainAlarm));
         this.log.info(prefix + 'MainThreat:', str(instinctsMind.MainThreat));

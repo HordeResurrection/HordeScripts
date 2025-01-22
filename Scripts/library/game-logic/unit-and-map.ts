@@ -74,7 +74,7 @@ export function unitTeleport(unit: Unit, cell: Point2D) {
 export function* iterateOverUnitsInBox(cell: Point2D, radius: number) {
     let box = createBox(cell.X - radius, cell.Y - radius, 0, cell.X + radius - 1, cell.Y + radius - 1, 2);
     let unitsInBox = ActiveScena.UnitsMap.UnitsTree.GetUnitsInBox(box);
-    
+
     let count = unitsInBox.Count;
     if (count == 0) {
         return;

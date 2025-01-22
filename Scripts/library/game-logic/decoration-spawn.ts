@@ -1,11 +1,11 @@
 import { createHordeColor, Point2D } from "library/common/primitives";
-import { StringVisualEffect, DrawLayer, FontUtils, GeometryVisualEffect, Scena } from "./horde-types";
+import { StringVisualEffect, DrawLayer, FontUtils, GeometryVisualEffect, Scena, VisualEffectConfig } from "./horde-types";
 
 
 /**
  * Создание эффекта-декорации в заданных координатах
  */
-export function spawnDecoration(scena, decorationCfg, position) {
+export function spawnDecoration(scena: Scena, decorationCfg: VisualEffectConfig, position: Point2D) {
     let decoration = decorationCfg.CreateInstance(scena.Context, position);
     scena.ObjectController.RegisterVisualEffect(decoration);
     return decoration;
@@ -32,7 +32,7 @@ export function spawnString(scena: Scena, text: string, position: Point2D, ticks
 /**
  * Создание геометрии-декорации в заданных координатах
  */
-export function spawnGeometry(scena, geometry, position, ticksToLive) {
+export function spawnGeometry(scena: Scena, geometry, position: Point2D, ticksToLive: number) {
     let args = new GeometryVisualEffect.CreationArgs();
     args.GeometryBuffer = geometry;
     args.TicksToLive = ticksToLive;
@@ -47,5 +47,5 @@ export function spawnGeometry(scena, geometry, position, ticksToLive) {
  * Создание звукового эффекта в заданных координатах
  */
 export function spawnSound(scena, soundsCatalog, sectionName, position, isLooping) {
-	scena.ObjectController.UtterSound(soundsCatalog, sectionName, position, isLooping);
+    scena.ObjectController.UtterSound(soundsCatalog, sectionName, position, isLooping);
 }

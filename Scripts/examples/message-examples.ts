@@ -49,9 +49,9 @@ export class Example_HookSentChatMessages extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         // Получаем UI-объект строки чата
-        const AllUIModules = HordeGame.HordeResurrection.Game.UI.AllUIModules;
+        const AllUIModules = HordeResurrection.Game.UI.AllUIModules;
         const BattleUI = AllUIModules.BattleUI;
         let chatPanel = ScriptUtils.GetValue(BattleUI, "ChatPanel");
         let chatInputLine = ScriptUtils.GetValue(chatPanel, "ChatInputLine");
@@ -91,9 +91,12 @@ export class Example_HookReceivedChatMessages extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
+        this.log.info('В данный момент этот пример не работает.');
+        return;
+
         // NetworkController - центральный класс сетевого взаимодействия
-        let NetworkController = HordeEngine.HordeResurrection.Engine.Logic.Main.NetworkController;
+        let NetworkController = HordeResurrection.Engine.Logic.Main.NetworkController;
         if (NetworkController.NetWorker == null) {
             this.log.info('Сетевой режим не активирован. Для этого примера необходимо начать сетевую игру.');
             return;
@@ -108,8 +111,8 @@ export class Example_HookReceivedChatMessages extends HordeExampleBase {
         let that = this;
         this.globalStorage.currentHandler = NetworkController.NetWorker.Events.ChatEvents.ChatItemPacketReceived.connect(function (sender, args) {
             try {
-                let senderPlayer = HordeEngine.HordeResurrection.Engine.Logic.Main.PlayersController.GetNetElementMainPlayer(ScriptUtils.GetValue(args, "NetworkElement"));
-                let targets = host.cast(HordeEngine.HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets, ScriptUtils.GetValue(args, "Targets"));
+                let senderPlayer = HordeResurrection.Engine.Logic.Main.PlayersController.GetNetElementMainPlayer(ScriptUtils.GetValue(args, "NetworkElement"));
+                let targets = host.cast(HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets, ScriptUtils.GetValue(args, "Targets"));
                 let message = ScriptUtils.GetValue(args, "Message");
                 that.log.info(`[${senderPlayer.Nickname} -> ${targets}] ${message}`);
             } catch (ex) {

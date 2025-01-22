@@ -1,6 +1,6 @@
-import { createPoint } from "library/common/primitives";
+import { createPoint, Point2D } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
-import { UnitState, StateMotion, UnitAnimState, AnimatorScriptTasks, WorldConstants } from "library/game-logic/horde-types";
+import { UnitState, StateMotion, UnitAnimState, AnimatorScriptTasks, WorldConstants, SoundsCatalog, Unit, MotionHit } from "library/game-logic/horde-types";
 import { setUnitStateWorker } from "library/game-logic/workers-tools";
 import HordePluginBase from "plugins/base-plugin";
 
@@ -9,8 +9,8 @@ import HordePluginBase from "plugins/base-plugin";
  * Плагин для обработки юнита "Воин с дубиной".
  */
 export class BeammanPlugin extends HordePluginBase {
-    private hitTable;
-    private hitSounds: any;
+    private hitTable: HitTable;
+    private hitSounds: SoundsCatalog;
 
     /**
      * Конструктор.
@@ -25,7 +25,7 @@ export class BeammanPlugin extends HordePluginBase {
     public onFirstRun() {
         this.hitTable = createHitTable();
         this.hitSounds = HordeContentApi.GetSoundsCatalog("#SoundsCatalog_Hits_Mele_Dubina_02eb130f59b6");
-        
+
         // Установка обработчика удара
         let unitCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Beamman");
         setUnitStateWorker(this, unitCfg, UnitState.Hit, this.stateWorker_Hit);
@@ -34,11 +34,15 @@ export class BeammanPlugin extends HordePluginBase {
     /**
      * Обработчик состояния Hit для воина с дубиной
      */
-    private stateWorker_Hit(u) {
-        let motion = u.OrdersMind.ActiveMotion;  // Здесь MotionHit
-        if (motion.IsUnprepared)
-        {
-            motion.State = StateMotion.InProgress;
+    private stateWorker_Hit(u: Unit) {
+        let motion = u.OrdersMind.ActiveMotion;
+        if (!host.isType(MotionHit, motion)) {
+            return;
+        }
+        let motionHit = motion as MotionHit;
+
+        if (motionHit.IsUnprepared) {
+            motionHit.State = StateMotion.InProgress;
 
             const stage = 0;
             const looped = false;
@@ -46,15 +50,14 @@ export class BeammanPlugin extends HordePluginBase {
         }
 
         // Произвести удар в момент, который задан анимацией (обычно, когда оружие достигает цели)
-        if (u.VisualMind.Animator.HasTask(AnimatorScriptTasks.Hit))
-        {
+        if (u.VisualMind.Animator.HasTask(AnimatorScriptTasks.Hit)) {
             // Дубина бьёт три раза, начиная с 4-го кадра (задано в "beamman.ginf")
 
             // Вычисляем номер текущего удара
             let hitNum = (u.VisualMind.Animator.CurrentAnimFrame - 4);
 
             // Удар
-            this.makeOneHit(u, motion, hitNum);
+            this.makeOneHit(u, motionHit, hitNum);
 
             // Звуки боя на первый удар
             if (hitNum == 0) {
@@ -69,23 +72,21 @@ export class BeammanPlugin extends HordePluginBase {
         }
 
         // Движение удара считается завершенным только на последнем кадре анимации
-        if (u.VisualMind.Animator.IsAnimationCompleted)
-        {
-            motion.State = StateMotion.Done;
+        if (u.VisualMind.Animator.IsAnimationCompleted) {
+            motionHit.State = StateMotion.Done;
 
             u.VisualMind.SetAnimState(UnitAnimState.Stand);
         }
-        else
-        {
-            motion.State = StateMotion.InProgress;
+        else {
+            motionHit.State = StateMotion.InProgress;
         }
     }
 
-    
+
     /**
      * Выполняет один удар.
      */
-    private makeOneHit(u, motion, hitNum) {
+    private makeOneHit(u: Unit, motion: MotionHit, hitNum: number) {
         // Смещения координат удара относительно центра воина в зависимости от направления
         let hits = this.hitTable[u.Direction.ToString()];
         if (!hits) {
@@ -100,11 +101,11 @@ export class BeammanPlugin extends HordePluginBase {
 
         // Координаты текущего удара
         let targetPosition = createPoint(hitBias.X + u.Position.X,
-                                         hitBias.Y + u.Position.Y);
+            hitBias.Y + u.Position.Y);
 
         // Дружественным воинам урон не наносим
         let unitInCell = u.Scena.UnitsMap.GetUpperUnit(Math.floor(targetPosition.X / WorldConstants.CellSize),
-                                                       Math.floor(targetPosition.Y / WorldConstants.CellSize));
+            Math.floor(targetPosition.Y / WorldConstants.CellSize));
         if (unitInCell != null && unitInCell.Owner.Diplomacy.IsAllianceStatus(u.Owner)) {
             // Исключение - здания и те, кого юнит атакует умышленно
             if (!unitInCell.Cfg.IsBuilding && unitInCell != motion.Target) {
@@ -126,22 +127,22 @@ export class BeammanPlugin extends HordePluginBase {
 /**
  * Таблица смещений удара относительно центра воина по направлениям.
  */
-function createHitTable() {
+function createHitTable(): HitTable {
     return {
         "Up": [
-            createPoint(25,-25),
-            createPoint(0,-25),
-            createPoint(-25,-25),
+            createPoint(25, -25),
+            createPoint(0, -25),
+            createPoint(-25, -25),
         ],
         "RightUp": [
             createPoint(25, -3),
-            createPoint(25,-25),
-            createPoint(0,-25),
+            createPoint(25, -25),
+            createPoint(0, -25),
         ],
         "Right": [
             createPoint(25, 25),
             createPoint(25, -3),
-            createPoint(25,-25),
+            createPoint(25, -25),
         ],
         "RightDown": [
             createPoint(0, 20),
@@ -154,19 +155,22 @@ function createHitTable() {
             createPoint(25, 25),
         ],
         "LeftDown": [
-            createPoint(-25,  3),
+            createPoint(-25, 3),
             createPoint(-25, 25),
             createPoint(0, 20),
         ],
         "Left": [
-            createPoint(-25,-25),
-            createPoint(-25,  3),
+            createPoint(-25, -25),
+            createPoint(-25, 3),
             createPoint(-25, 25),
         ],
         "LeftUp": [
-            createPoint(0,-25),
-            createPoint(-25,-25),
-            createPoint(-25,  3),
+            createPoint(0, -25),
+            createPoint(-25, -25),
+            createPoint(-25, 3),
         ],
     };
+}
+interface HitTable {
+    [key: string]: Point2D[];
 }

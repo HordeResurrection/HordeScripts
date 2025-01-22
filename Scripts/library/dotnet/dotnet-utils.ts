@@ -11,12 +11,12 @@ import { IDisposableT, IEnumeratorT, Int32T } from "./dotnet-types";
  * @param flagsType тип флага. Задаётся отдельно, т.к. нельзя использовать "GetType()" без GodMode.
  * @param flags массив флагов, которые нужно объединить
  */
-export function mergeFlags(flagsType, ...flagsArray: any[]) {
+export function mergeFlags(flagsType: object, ...flagsArray: any[]): any {
     let flags = 0;
 
-    for(let f of flagsArray) {
-        flags |= host.cast(Int32T, f);
-        
+    for (let f of flagsArray) {
+        flags |= host.cast(Int32T, f) as number;
+
         // Внимание!
         // Если скрипт-машина падает в этом месте с ошибкой "Error: Cannot convert type", то значит поданы некорректные флаги
     }
@@ -56,7 +56,7 @@ globalThis.ForEach = ScriptExtensions.ForEach;
     }
 ```
  */
-export function* enumerate(enumerable) {
+export function* enumerate(enumerable: object) {
     var enumerator = host.cast(IEnumeratorT, enumerable.GetEnumerator());
     while (enumerator.MoveNext()) {
         yield enumerator.Current;
@@ -73,7 +73,7 @@ export function eNext(enumerated) {
 /**
  * Преобразует JS-массив в .Net-массив заданного типа.
  */
-export function createArray(type, items) {
+export function createArray(type: object, items: any[]): object[] {
     let array = host.newArr(type, items.length);
     for (let i = 0; i < items.length; i++) {
         array[i] = items[i];

@@ -22,13 +22,13 @@ export class Example_SettlementResourcesBonus extends HordeExampleBase {
      */
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         let scenaSettlements = ActiveScena.GetRealScena().Settlements;
         for (let settlementId of this.settlements) {
             let settlement = scenaSettlements.GetByUid(settlementId);
 
             let resourcesBonus = settlement.Resources.Bonus;
-            
+
             // Установить множители количества добываемых ресурсов
             ScriptUtils.SetValue(resourcesBonus, "MetalFactor", 2.5);
             ScriptUtils.SetValue(resourcesBonus, "GoldFactor", 1.5);

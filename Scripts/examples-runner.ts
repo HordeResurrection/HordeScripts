@@ -86,7 +86,7 @@ export function allExamples() {
 /**
  * Регистрирует пример для запуска.
  */
-function addExample(example: HordeExampleBase){
+function addExample(example: HordeExampleBase) {
     activePlugins.register(example);
 }
 

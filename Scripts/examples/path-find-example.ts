@@ -1,4 +1,4 @@
-import { createPoint } from "library/common/primitives";
+import { createPoint, Point2D } from "library/common/primitives";
 import { PathFinder } from "library/game-logic/path-find";
 import HordeExampleBase from "./base-example";
 
@@ -40,7 +40,7 @@ export class Example_PathFind extends HordeExampleBase {
         let path = pathChecker.findPath(archerCfg, startCell, finishCell);
         if (path) {
             this.log.info(`Юнит "${archerCfg.Name}" может пройти из ${startCell} в ${finishCell}. Путь:`);
-            ForEach(path, node => {
+            ForEach(path, (node: Point2D) => {
                 this.log.info('-', node);
             });
         } else {

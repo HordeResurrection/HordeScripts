@@ -1,6 +1,7 @@
 import { createPoint } from "library/common/primitives";
 import { UnitDirection } from "library/game-logic/horde-types";
 import { spawnUnit } from "library/game-logic/unit-spawn";
+import HordePluginBase from "plugins/base-plugin";
 
 // ==============================================================
 // --- Утилиты
@@ -8,7 +9,7 @@ import { spawnUnit } from "library/game-logic/unit-spawn";
 /**
  * Возвращает предыдущего или создаёт нового юнита для теста.
  */
-export function getOrCreateTestUnit(plugin) {
+export function getOrCreateTestUnit(plugin: HordePluginBase) {
     let unit = plugin.globalStorage.unitForExample;
     if (unit && unit.IsAlive) {
         return unit;
@@ -21,7 +22,7 @@ export function getOrCreateTestUnit(plugin) {
 /**
  * Создаёт юнита для теста.
  */
-export function createUnitForTest(plugin) {
+export function createUnitForTest(plugin: HordePluginBase) {
     let testCell = createPoint(5, 5);
 
     let realScena = ActiveScena.GetRealScena();

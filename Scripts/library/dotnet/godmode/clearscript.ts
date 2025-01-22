@@ -5,9 +5,9 @@ import { BindingFlags } from "./reflection";
 /**
  * Создаёт EventSource для закрытого события, чтобы можно было использовать "connect" для обработки события.
  */
-export function makePrivateEventSource(targetObject, eventName, eventArgsType) {
+export function makePrivateEventSource(targetObject: object, eventName: string, eventArgsType: object) {
 
-	// Получение дескриптора события (EventInfo)
+    // Получение дескриптора события (EventInfo)
     let bindingFlags = mergeFlags(BindingFlags, BindingFlags.Public, BindingFlags.NonPublic, BindingFlags.Instance)
     let eventInfo = targetObject.GetType().GetEvent(eventName, bindingFlags);
     // log.info('  EventInfo:', eventInfo);

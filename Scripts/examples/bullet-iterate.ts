@@ -14,25 +14,25 @@ const HITS_TO_STOP_EVENT_HANDLERS = 20;
 export class Example_IterateBullets extends HordeExampleBase {
 
     private eventHits = 0;
-        
+
     public constructor() {
         super("Iterate bullets");
     }
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         this.eventHits = 0;
 
         let bulletsRegistry = ActiveScena.Bullets;
         this.log.info('Реестр снарядов:', bulletsRegistry);
-        
+
         let that = this;
 
         if (this.globalStorage.currentAddedHandler) {
             this.globalStorage.currentAddedHandler.disconnect();
         }
-        this.globalStorage.currentAddedHandler = bulletsRegistry.ItemAdded.connect(function(sender, args) {
+        this.globalStorage.currentAddedHandler = bulletsRegistry.ItemAdded.connect(function (sender, args) {
             try {
                 that.eventHits++;
                 let bull = args.Item;
@@ -41,11 +41,11 @@ export class Example_IterateBullets extends HordeExampleBase {
                 that.log.exception(ex);
             }
         });
-        
+
         if (this.globalStorage.currentRemovedHandler) {
             this.globalStorage.currentRemovedHandler.disconnect();
         }
-        this.globalStorage.currentRemovedHandler = bulletsRegistry.ItemRemoved.connect(function(sender, args) {
+        this.globalStorage.currentRemovedHandler = bulletsRegistry.ItemRemoved.connect(function (sender, args) {
             try {
                 that.eventHits++;
                 let bull = args.Item;
@@ -57,7 +57,7 @@ export class Example_IterateBullets extends HordeExampleBase {
     }
 
     public onEveryTick(gameTickNum: number): void {
-        
+
         // Отписаться от обработки событий через некоторое время
         if (this.eventHits >= HITS_TO_STOP_EVENT_HANDLERS) {
             if (this.globalStorage.currentAddedHandler) {

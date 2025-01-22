@@ -15,9 +15,9 @@ export class Example_GameWorks extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         // Инфо по тактам
-        const BattleController = HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController;
+        const BattleController = HordeResurrection.Engine.Logic.Battle.BattleController;
         this.log.info('Текущий такт:', BattleController.GameTimer.GameFramesCounter);
         this.log.info('Текущий FPS:', BattleController.GameTimer.CurrentFpsLimit);
 
@@ -34,7 +34,7 @@ export class Example_GameWorks extends HordeExampleBase {
         }
 
         // Инфо по реплею (недоступно при инициализации сцены, т.е. в onFirstRun)
-        const ReplayWorkMode = HordeEngine.HordeResurrection.Engine.Logic.Battle.ReplaySystem.ReplayWorkMode;
+        const ReplayWorkMode = HordeResurrection.Engine.Logic.Battle.ReplaySystem.ReplayWorkMode;
         let replayWorkMode = BattleController.ReplayModuleWorkMode;
         if (replayWorkMode == ReplayWorkMode.Play) {
             this.log.info('В данный момент идет воспроизведение реплея (проверка 2)');
@@ -58,21 +58,20 @@ export class Example_Introspection extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         // Проверка типа (актуально не только для примитивных типов, но и для других типов из ядра)
         let someObject = "any string";
         this.log.info("Является ли переменная 'someObject' объектом типа 'Boolean'? Ответ:", host.isType(BooleanT, someObject));
         this.log.info("Является ли переменная 'someObject' объектом типа 'String'? Ответ:", host.isType(StringT, someObject));
 
-        // Remove false-condition to reveal the Horde API structure
-        if (false) inspect(HordeAPI, 1, "Horde API structure (в разработке)");
-        if (false) inspect(HCL, 5, "HordeClassLibrary (полный доступ)");
-        if (true) inspect(Players["0"].GetRealPlayer().GetRealSettlement().Units, 1, ".Net объект с юнитами поселения");
+        // Пример: имеется объект класса SettlementUnits, нужно узнать все его члены
+        let settlementUnits = Players["0"].GetRealPlayer().GetRealSettlement().Units;
+        if (true) inspect(settlementUnits, 1, ".Net-объект с юнитами поселения");
 
-        // Пример получения содержимого в enum-типах
+        // Пример: вывод элементов enum-типа
         if (true) inspectEnum(UnitAnimState);
 
-        // Пример получения содержимого в enum-типах, которые флаги
+        // Пример: вывод элементов enum-типа (для флагов)
         if (true) inspectFlagEnum(UnitLifeState);
     }
 }

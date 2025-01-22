@@ -1,6 +1,6 @@
-import { createGameMessageWithSound } from "library/common/messages";
 import { createResourcesAmount } from "library/common/primitives";
 import HordeExampleBase from "./base-example";
+import { Unit } from "library/game-logic/horde-types";
 
 
 /**
@@ -14,7 +14,7 @@ export class Example_SettlementWorks extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         let realPlayer = Players["0"].GetRealPlayer();
         let realSettlement = realPlayer.GetRealSettlement();
 
@@ -42,7 +42,7 @@ export class Example_SettlementWorks extends HordeExampleBase {
 
         // Перечисление юнитов этого поселения
         let enumerator = units.GetEnumerator();
-        while(enumerator.MoveNext()) {
+        while (enumerator.MoveNext()) {
             this.log.info('Первый юнит:', enumerator.Current);
             break;  // Через ForEach пока что нельзя делать break, а через использование enumerator'а можно
         }
@@ -50,10 +50,10 @@ export class Example_SettlementWorks extends HordeExampleBase {
 
         // Модуль победы/поражения
         let existence = realSettlement.Existence;
-        
+
         // Объявить поражение
         if (false) { existence.ForceTotalDefeat(); }  // Убрать false и тогда этому поселению будет засчитано поражение
-        
+
         // Сбросить состояние победы/поражения
         if (false) { existence.ForceResetToCombat(); }
     }
@@ -74,11 +74,11 @@ export class Example_SettlementResources extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         let scenaSettlements = ActiveScena.GetRealScena().Settlements;
         for (let settlementId of this.settlements) {
             let settlement = scenaSettlements.GetByUid(settlementId);
-            
+
             // Высокоуровневый объект для управления ресурсами поселения
             let settlementResources = settlement.Resources;
             this.log.info("Ресурсы поселения", '"' + settlement.TownName + '":', settlementResources);
@@ -103,7 +103,7 @@ export class Example_SettlementResources extends HordeExampleBase {
 
             amount = createResourcesAmount(300, 100, 200, 0);
             this.log.info("Попытка снять:", amount);
-            if(!settlementResources.TakeResourcesIfEnough(amount)) {
+            if (!settlementResources.TakeResourcesIfEnough(amount)) {
                 this.log.info("- Ресурсов недостаточно!");
             }
             this.log.info("- Текущее количество ресурсов:", settlementResources.GetCopy());
@@ -126,7 +126,7 @@ export class Example_SettlementUnitsInfo extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         let realPlayer = Players["0"].GetRealPlayer();
         let realSettlement = realPlayer.GetRealSettlement();
         let that = this;
@@ -134,7 +134,7 @@ export class Example_SettlementUnitsInfo extends HordeExampleBase {
         // Юниты разных типов
         let professionCenter = realSettlement.Units.Professions;
         this.log.info('Выбор юнита по типу:');
-        let logUnit = function(str, u) { that.log.info(str+':', u ? u : '<None>') };
+        let logUnit = function (str: string, u: Unit) { that.log.info(str + ':', u ? u : '<None>') };
         logUnit('- Первый в MainBuildings', professionCenter.MainBuildings.First());
         logUnit('- Первый в Barracks', professionCenter.Barracks.First());
         logUnit('- Первый в Factories', professionCenter.Factories.First());

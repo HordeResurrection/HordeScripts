@@ -6,11 +6,11 @@ export const Activator = xHost.type("System.Activator");
 /**
  * Возвращает имя с неймспейсом для указанного хост-типа.
  */
-export function getTypeNameWithNamespace(hostType) {
-	let csType = host.typeOf(hostType);
-	let name = csType.Name;
-	if (csType.Namespace) {
-		name = csType.Namespace + '.' + name;
+export function getTypeNameWithNamespace(hostType: object) {
+	let type = host.typeOf(hostType);
+	let name = type.Name;
+	if (type.Namespace) {
+		name = type.Namespace + '.' + name;
 	}
 	return name;
 }
@@ -18,7 +18,7 @@ export function getTypeNameWithNamespace(hostType) {
 /**
  * Возвращает полное имя указанного хост-типа.
  */
-export function getTypeFullName(hostType) {
-	let csType = host.typeOf(hostType);
-	return csType.FullName;
+export function getTypeFullName(hostType: object) {
+	let type = host.typeOf(hostType);
+	return type.FullName;
 }

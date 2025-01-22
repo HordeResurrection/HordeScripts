@@ -1,4 +1,4 @@
-import { DiplomacyStatus } from "library/game-logic/horde-types";
+import { DiplomacyStatus, Settlement } from "library/game-logic/horde-types";
 import HordeExampleBase from "./base-example";
 
 
@@ -27,12 +27,12 @@ export class Example_SettlementDiplomacy extends HordeExampleBase {
      */
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         let scenaSettlements = ActiveScena.GetRealScena().Settlements;
 
         for (let settlementId of this.settlements) {
             let settlement = scenaSettlements.GetByUid(settlementId);
-            
+
             let oldDipStatuses = this.getCurrentStatuses(settlement);
             this.declarePeaceToAll(settlement);
             this.declareAllianceToAll(settlement);
@@ -43,13 +43,13 @@ export class Example_SettlementDiplomacy extends HordeExampleBase {
     /**
      * Получение текущих дип. статусов.
      */
-    private getCurrentStatuses(settlement) {
+    private getCurrentStatuses(settlement: Settlement) {
         const townName = '"' + settlement.TownName + '"';
         let scenaSettlements = ActiveScena.GetRealScena().Settlements;
 
         this.log.info("Получение дипломатических статусов", townName);
         let dipStatuses = {};
-        ForEach(scenaSettlements, otherSettlement => {
+        ForEach(scenaSettlements, (otherSettlement: Settlement) => {
             if (otherSettlement == settlement) { return; }
 
             dipStatuses[otherSettlement.Uid] = settlement.Diplomacy.GetDiplomacyStatus(otherSettlement);
@@ -64,12 +64,12 @@ export class Example_SettlementDiplomacy extends HordeExampleBase {
     /**
      * Заключение мира со всеми
      */
-    private declarePeaceToAll(settlement) {
+    private declarePeaceToAll(settlement: Settlement) {
         const townName = '"' + settlement.TownName + '"';
         let scenaSettlements = ActiveScena.GetRealScena().Settlements;
 
         this.log.info("Заключение мира с", townName);
-        ForEach(scenaSettlements, otherSettlement => {
+        ForEach(scenaSettlements, (otherSettlement: Settlement) => {
             if (otherSettlement == settlement) { return; }
 
             settlement.Diplomacy.DeclarePeace(otherSettlement);
@@ -83,12 +83,12 @@ export class Example_SettlementDiplomacy extends HordeExampleBase {
     /**
      * Заключение союзов со всеми
      */
-    private declareAllianceToAll(settlement) {
+    private declareAllianceToAll(settlement: Settlement) {
         const townName = '"' + settlement.TownName + '"';
         let scenaSettlements = ActiveScena.GetRealScena().Settlements;
 
         this.log.info("Заключение союзов с", townName);
-        ForEach(scenaSettlements, otherSettlement => {
+        ForEach(scenaSettlements, (otherSettlement: Settlement) => {
             if (otherSettlement == settlement) { return; }
 
             settlement.Diplomacy.DeclareAlliance(otherSettlement);
@@ -102,12 +102,12 @@ export class Example_SettlementDiplomacy extends HordeExampleBase {
     /**
      * Вернуть все как было
      */
-    private restoreStatuses(settlement, oldDipStatuses) {
+    private restoreStatuses(settlement: Settlement, oldDipStatuses: { [key: string]: DiplomacyStatus }) {
         const townName = '"' + settlement.TownName + '"';
         let scenaSettlements = ActiveScena.GetRealScena().Settlements;
 
         this.log.info("Восстановление изначальных отношений..");
-        ForEach(scenaSettlements, otherSettlement => {
+        ForEach(scenaSettlements, (otherSettlement: Settlement) => {
             if (otherSettlement == settlement) { return; }
             let oldDipStatus = oldDipStatuses[otherSettlement.Uid];
             if (oldDipStatus == DiplomacyStatus.Unknown) {

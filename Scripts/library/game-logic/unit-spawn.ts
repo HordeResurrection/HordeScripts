@@ -13,7 +13,12 @@ type SpawnUnitParameters = HordeClassLibrary.World.Objects.Units.SpawnUnitParame
  * 
  * Возвращает созданного юнита.
  */
-export function spawnUnit(settlement: Settlement, uCfg: UnitConfig, cell: Point2D, direction: UnitDirection) {
+export function spawnUnit(
+    settlement: Settlement,
+    uCfg: UnitConfig,
+    cell: Point2D,
+    direction: UnitDirection
+) {
     let spawnParams = new SpawnUnitParameters();
     spawnParams.ProductUnitConfig = uCfg;
     spawnParams.Cell = cell;
@@ -28,7 +33,13 @@ export function spawnUnit(settlement: Settlement, uCfg: UnitConfig, cell: Point2
  *
  * Возвращает список созданных юнитов.
  */
-export function spawnUnits(settlement: Settlement, uCfg: UnitConfig, uCount: number, direction: UnitDirection, generator: any): Unit[] {
+export function spawnUnits(
+    settlement: Settlement,
+    uCfg: UnitConfig,
+    uCount: number,
+    direction: UnitDirection,
+    generator: Generator<{ X: number, Y: number }>
+): Unit[] {
     let spawnParams = new SpawnUnitParameters();
     spawnParams.ProductUnitConfig = uCfg;
     spawnParams.Direction = direction;

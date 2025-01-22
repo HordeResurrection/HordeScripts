@@ -1,12 +1,22 @@
+import { Point2D } from "library/common/primitives";
+import { BulletConfig, BulletEmittingArgs, ShotParams, Unit, UnitArmament, UnitMapLayer } from "./horde-types";
 
 /**
  * Создание одного снаряда в заданных координатах.
  * 
  * Возвращает созданный снаряд.
  */
-export function spawnBullet(sourceUnit, targetUnit, sourceArmament, bullCfg, ShotParams, launchPos, targetPos, targetLayer) {
-    const BulletEmittingArgsT = HCL.HordeClassLibrary.World.Objects.Bullets.BulletEmittingArgs;
-    let emittingArgs = new BulletEmittingArgsT();
+export function spawnBullet(
+    sourceUnit: Unit,
+    targetUnit: Unit,
+    sourceArmament: UnitArmament,
+    bullCfg: BulletConfig,
+    ShotParams: ShotParams,
+    launchPos: Point2D,
+    targetPos: Point2D,
+    targetLayer: UnitMapLayer
+) {
+    let emittingArgs = new BulletEmittingArgs();
     ScriptUtils.SetValue(emittingArgs, "SourceUnit", sourceUnit);
     ScriptUtils.SetValue(emittingArgs, "TargetUnit", targetUnit);
     ScriptUtils.SetValue(emittingArgs, "SourceArmament", sourceArmament);
@@ -16,7 +26,7 @@ export function spawnBullet(sourceUnit, targetUnit, sourceArmament, bullCfg, Sho
     ScriptUtils.SetValue(emittingArgs, "TargetPosition", targetPos);
     ScriptUtils.SetValue(emittingArgs, "TargetLayer", targetLayer);
 
-    let emittingArgsVar = host.newVar(BulletEmittingArgsT);
+    let emittingArgsVar = host.newVar(BulletEmittingArgs);
     emittingArgsVar.value = emittingArgs;
 
     let bull = bullCfg.CreateInstance(emittingArgsVar.ref);

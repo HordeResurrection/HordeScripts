@@ -1,130 +1,94 @@
-declare function ForEach(enumerable: any, action: (item: any, i: number, sourceEnumerable: any) => void): void;
 
-declare class ScriptUtils
-{
-    public static GameVersionEquals(
-            version: string
-        ): boolean;
+// Static Utils
+declare function ForEach(enumerable: any, action: (item: any, i: number, sourceEnumerable: object) => void): void;
+declare const ScriptUtils: typeof HordeClassLibrary.Scripting.ScriptApi.ScriptUtils;
+declare const HordeContentApi: typeof HordeClassLibrary.Scripting.ScriptApi.HordeContentApi;
+declare const ScriptExtensions: typeof HordeClassLibrary.Scripting.ScriptApi.ScriptExtensions;
+declare const ScriptMachineDebugApi: HordeClassLibrary.Scripting.ScriptApi.ScriptMachineDebugApi;
 
-    public static GameVersionEqualsOrGreater(
-            version: string
-        ): boolean;
+// Global variables
+declare const ActiveScena: HordeClassLibrary.World.ScenaComponents.Scena;
+declare const Players: HordeResurrection.Engine.Logic.Main.Players.Player[];
 
-    public static GameVersionLesserThan(
-            version: string
-        ): boolean;
+// Global storages
+declare const DataStorage: { [key: string]: any; };
+declare const UnitWorkersRegistry: HordeClassLibrary.Scripting.Misc.ScriptWorkersRegistry;
+declare const BulletWorkersRegistry: HordeClassLibrary.Scripting.Misc.ScriptWorkersRegistry;
+// declare namespace DataStorage {
+//     scriptWorkTicks: number;
+//     reloadCounter: number;
+//     gameTickNum: number;
+// }
 
+// DebugLogger
+declare class DebugLogger {
+    public static WriteLine(message: string): void;
 }
 
-declare class HordeContentApi
-{
-    public static readonly ContentStamp: string;
+// Host functions
+declare const host: HostFunctions;
+declare class HostFunctions {
+    // Тут перечислены только некоторые методы.
+    // Полный список: https://microsoft.github.io/ClearScript/Reference/html/Methods_T_Microsoft_ClearScript_HostFunctions.htm
 
-    public static GetForce(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.Army.Force;
+    /**
+     * Метод для создания DotNet-массивов.
+     * После создания, необходимо вручную выполнить каст объекта через "as".
+     * 
+     * Пример:
+     * ```
+     * host.newArr(UnitIdLabel, ids.length) as UnitIdLabel[]
+     * ```
+     */
+    public newArr(hostType: object, ...length: number[]): object[];
 
-    public static GetUnitConfig(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
+    /**
+     * Метод для каста DotNet-объектов.
+     * Поэтому, в коде TS, возвращаемое значение нужно дополнительно кастовать через "as".
+     * 
+     * Пример:
+     * ```
+     * (host.cast(IDisposableT, enumerator) as IDisposableT).Dispose();
+     * ```
+     */
+    public cast(hostType: object, obj: any): any;
 
-    public static GetUnitCommand(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.UnitCommandConfig;
+    /**
+     * Метод для проверки типа DotNet-объектов.
+     */
+    public isType(hostType: object, obj: any): boolean;
 
-    public static GetBulletConfig(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.Bullets.BulletConfig;
+    /**
+     * Метод для создания ref-объектов для передачи в методы в качестве out/ref-аргументов.
+     */
+    public newVar(hostType: object, initValue?: any): refObject<any>;
 
-    public static GetVisualEffectConfig(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.VisualEffects.VisualEffectConfig;
+    /**
+     * Создаёт делегат на указанную функцию без возвращаемого значения.
+     */
+    public func(argCount: number, scriptFunc: (...arg: any[]) => void);
 
-    public static GetSoundEffectConfig(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.SoundEffects.SoundEffectConfig;
+    /**
+     * Создаёт делегат на указанную функцию с возвращаемым значением.
+     */
+    public func(returnHostType: object, argCount: number, scriptFunc: (...arg: any[]) => any);
+}
 
-    public static GetFont(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.Fonts.FontConfig;
+/**
+ * Ref-объект для работы с методами с out/ref-параметрами.
+ */
+declare class refObject<T> {
+    public value: T;
+    public readonly ref: T;
+    public readonly out: T;
+}
 
-    public static GetString(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.StringConfig;
+///////////////////////////////////
+// Unsafe utils
 
-    public static GetAnimationCatalog(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.BaseAnimationsCatalog;
+declare class ScriptReflection {
 
-    public static GetAnimationAtlas(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlasItem;
-
-    public static GetSoundsCatalog(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SoundsCatalog;
-
-    public static GetGuiParams(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.Interface.GuiParams;
-
-    public static GetRuleConfig(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.Rules.RuleConfig;
-
-    public static GetMindCharacter(
-            uid: string
-        ): HordeClassLibrary.HordeContent.Configs.MasterMind.MindCharacterConfig;
-
-    public static GetConfig(
-            cfgUid: string,
-            configTypeName: string
-        ): HordeClassLibrary.HordeContent.Configs.AConfig;
-
-    public static HasUnitConfig(
-            uid: string
-        ): boolean;
-
-    public static HasUnitCommand(
-            uid: string
-        ): boolean;
-
-    public static HasBulletConfig(
-            uid: string
-        ): boolean;
-
-    public static HasVisualEffectConfig(
-            uid: string
-        ): boolean;
-
-    public static HasSoundEffectConfig(
-            uid: string
-        ): boolean;
-
-    public static HasAnimation(
-            uid: string
-        ): boolean;
-
-    public static HasSoundsCatalog(
-            uid: string
-        ): boolean;
-
-    public static HasRuleConfig(
-            uid: string
-        ): boolean;
-
-    public static HasMindCharacter(
-            uid: string
-        ): boolean;
-
-    public static HasConfig(
-            cfgUid: string,
-            configTypeName: string
-        ): boolean;
-
-    public static CloneConfig(
-            cfg: HordeClassLibrary.HordeContent.Configs.AConfig,
-            cloneUid?: string
-        ): HordeClassLibrary.HordeContent.Configs.AConfig;
+}
+declare class xHost {
 
 }

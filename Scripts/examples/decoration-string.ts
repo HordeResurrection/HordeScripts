@@ -31,7 +31,7 @@ export class Example_StringDecoration extends HordeExampleBase {
         // Удаляем предыдущую строку (если был hotreload)
         if (this.globalStorage.decorationString)
             this.globalStorage.decorationString.Free();
-        
+
         // Создаём новую строку
         let position = this.center;
         let ticksToLive = 2000;
@@ -42,7 +42,7 @@ export class Example_StringDecoration extends HordeExampleBase {
         this.decorationString.Height = 18;
         this.decorationString.Color = createHordeColor(255, 100, 255, 100);
         this.decorationString.DrawLayer = DrawLayer.Birds;  // Отображать поверх всех юнитов
-        
+
         // Выбор шрифта:
         this.decorationString.Font = FontUtils.DefaultFont;        // Шрифт Северного Ветра (нельзя изменить высоту букв)
         this.decorationString.Font = FontUtils.DefaultVectorFont;  // Шрифт, что используется в чате

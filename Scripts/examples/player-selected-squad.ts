@@ -1,10 +1,11 @@
+import { Player, Squad, Unit } from "library/game-logic/horde-types";
 import HordeExampleBase from "./base-example";
 
 /**
  * Пример работы с выделенным игроком отрядом
  */
 export class Example_PlayerSelectedSquad extends HordeExampleBase {
-    workPlayer: any;
+    workPlayer: Player;
 
     public constructor() {
         super("Player selected squad");
@@ -43,13 +44,13 @@ export class Example_PlayerSelectedSquad extends HordeExampleBase {
         this.log.info("Установлен обработчик на событие выделения отряда");
     }
 
-    private processNewSquad(squad) {
+    private processNewSquad(squad: Squad) {
         if (squad.Count == 0) {
             this.log.info("Selected squad is empty");
             return;
         }
         this.log.info("Selected squad:");
-        ForEach(squad, u => {
+        ForEach(squad, (u: Unit) => {
             this.log.info('-', u);
         });
     }

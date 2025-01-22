@@ -1,3 +1,4 @@
+import { Unit } from "library/game-logic/horde-types";
 import HordePluginBase from "plugins/base-plugin";
 
 
@@ -34,9 +35,9 @@ export class TestEnvironmentPlugin extends HordePluginBase {
     /**
      * Метод для работы с выделенным юнитом.
      */
-    public handleSelectedUnit(callback) {
-        //let player = HordeEngine.HordeResurrection.Engine.Logic.Main.PlayersController.ActivePlayer;  // ActivePlayer не будет работать по сети
-        let player = Players["0"].GetRealPlayer();
+    public handleSelectedUnit(callback: (u: Unit) => void) {
+        //let player = HordeResurrection.Engine.Logic.Main.PlayersController.ActivePlayer;  // ActivePlayer не будет работать по сети
+        let player = Players["0"];
         
         let selectedUnit = player.SelectedSquadVirtual.GetFirstUnit();
         if (!selectedUnit)

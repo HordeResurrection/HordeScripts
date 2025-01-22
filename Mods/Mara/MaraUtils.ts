@@ -7,7 +7,7 @@ import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "lib
 import { MaraProductionRequest } from "./Common/MaraProductionRequest";
 import { MaraPoint } from "./Common/MaraPoint";
 import { generateCellInSpiral } from "library/common/position-tools";
-import { ProduceRequest, ProduceRequestParameters } from "library/mastermind/matermind-types";
+import { ProduceRequest, ProduceRequestParameters } from "library/mastermind/mastermind-types";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { MaraSettlementData } from "./Common/Settlement/MaraSettlementData";
 import { AllowedCompositionItem } from "./Common/AllowedCompositionItem";

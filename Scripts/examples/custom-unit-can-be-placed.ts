@@ -1,7 +1,10 @@
-import { CanBePlacedByKnownMapJsResult, CanBePlacedByRealMapJsResult, KnownUnit, Unit } from "library/game-logic/horde-types";
+import { CanBePlacedByKnownMapJsResult, CanBePlacedByRealMapJsResult, KnownUnit, Scena, Settlement, Unit, UnitConfig } from "library/game-logic/horde-types";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { setUnitCanBePlacedWorker } from "library/game-logic/workers-tools";
 import HordeExampleBase from "./base-example";
+
+const BaseBuildingCanBePlaced = HordeClassLibrary.UnitComponents.Workers.BaseBuilding.Special.BaseBuildingCanBePlaced;
+type BaseBuildingCanBePlaced = HordeClassLibrary.UnitComponents.Workers.BaseBuilding.Special.BaseBuildingCanBePlaced;
 
 /**
  * Пример создания юнита со скриптовым CanBePlaced-обработчиком.
@@ -10,18 +13,18 @@ import HordeExampleBase from "./base-example";
  * Внимание! В данный момент здесь наблюдается низкая производительность из-за маршаллинга.
  */
 export class Example_CustomUnitCanBePlaced extends HordeExampleBase {
-    private baseCanBePlacedWorker: any;
+    private baseCanBePlacedWorker: BaseBuildingCanBePlaced;
 
     public constructor() {
         super("Custom worker: CanBePlaced");
 
-        this.baseCanBePlacedWorker = new HCL.HordeClassLibrary.UnitComponents.Workers.BaseBuilding.Special.BaseBuildingCanBePlaced();
+        this.baseCanBePlacedWorker = new BaseBuildingCanBePlaced();
     }
 
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         // Создание конфига кастомного замка
         let unitCfg = this.getOrCreateUnitConfig();
 
@@ -34,7 +37,7 @@ export class Example_CustomUnitCanBePlaced extends HordeExampleBase {
 
     private getOrCreateUnitConfig() {
         let exampleCfgUid = "#UnitConfig_Slavyane_Castle_EXAMPLE";
-        let unitCfg;
+        let unitCfg: UnitConfig;
         if (HordeContentApi.HasUnitConfig(exampleCfgUid)) {
             // Конфиг уже был создан, берем предыдущий
             unitCfg = HordeContentApi.GetUnitConfig(exampleCfgUid);
@@ -42,12 +45,12 @@ export class Example_CustomUnitCanBePlaced extends HordeExampleBase {
         } else {
             // Создание нового конфига
             let unitCfgOrig = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Castle");
-            unitCfg = HordeContentApi.CloneConfig(unitCfgOrig, exampleCfgUid);
+            unitCfg = HordeContentApi.CloneConfig(unitCfgOrig, exampleCfgUid) as UnitConfig;
             ScriptUtils.SetValue(unitCfg, "Name", "Замок-пример");
 
             // Добавление здания рабочему
             let producerCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Worker1");
-            let producerParams = producerCfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+            let producerParams = producerCfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer) as UnitProducerProfessionParams;
             let produceList = producerParams.CanProduceList;
             produceList.Add(unitCfg);
 
@@ -58,13 +61,13 @@ export class Example_CustomUnitCanBePlaced extends HordeExampleBase {
     }
 
 
-    private canBePlacedWorkerByKnownMap(settlement, uCfg, x, y, size1x1, considerUnit) {
+    private canBePlacedWorkerByKnownMap(settlement: Settlement, uCfg: UnitConfig, x: number, y: number, size1x1?: boolean, considerUnit?: boolean) {
 
         // Запуск обычного CanBePlaced-обработчика на известной карте
-        let troubleUnitVar = host.newVar(KnownUnit);
+        let troubleUnitVar = host.newVar(KnownUnit) as refObject<KnownUnit>;
         let tmpResult = this.baseCanBePlacedWorker.CanBePlacedByKnownMap(settlement, uCfg, x, y, troubleUnitVar.out, size1x1, considerUnit);
 
-        let result = new CanBePlacedByKnownMapJsResult(tmpResult, troubleUnitVar);
+        let result = new CanBePlacedByKnownMapJsResult(tmpResult, troubleUnitVar.value);
         if (!tmpResult) {
             return result;
         }
@@ -98,18 +101,18 @@ export class Example_CustomUnitCanBePlaced extends HordeExampleBase {
                 }
             }
         }
-        
+
         return result;
     }
 
 
-    private canBePlacedWorkerByRealMap(scena, uCfg, x, y, size1x1, considerUnit) {
+    private canBePlacedWorkerByRealMap(scena: Scena, uCfg: UnitConfig, x: number, y: number, size1x1?: boolean, considerUnit?: boolean) {
 
         // Запуск обычного CanBePlaced-обработчика на реальной карте
-        let troubleUnitVar = host.newVar(Unit);
+        let troubleUnitVar = host.newVar(Unit) as refObject<Unit>;
         let tmpResult = this.baseCanBePlacedWorker.CanBePlacedByRealMap(scena, uCfg, x, y, troubleUnitVar.out, size1x1, considerUnit);
 
-        let result = new CanBePlacedByRealMapJsResult(tmpResult, troubleUnitVar);
+        let result = new CanBePlacedByRealMapJsResult(tmpResult, troubleUnitVar.value);
         if (!tmpResult) {
             return result;
         }
@@ -142,7 +145,7 @@ export class Example_CustomUnitCanBePlaced extends HordeExampleBase {
                 }
             }
         }
-        
+
         return result;
     }
 }

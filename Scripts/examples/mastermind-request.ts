@@ -1,5 +1,5 @@
 import { createPoint } from "library/common/primitives";
-import { ProduceRequest, ProduceRequestParameters } from "library/mastermind/matermind-types";
+import { ARequest, ProduceRequest, ProduceRequestParameters } from "library/mastermind/mastermind-types";
 import HordeExampleBase from "./base-example";
 
 /**
@@ -13,21 +13,21 @@ export class Example_MasterMindRequest extends HordeExampleBase {
 
     public constructor() {
         super("Request for MasterMind");
-        
+
         this.workPlayerNum = "1";
         this.printRequestsPeriod = 1000;
     }
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         let workPlayer = Players[this.workPlayerNum].GetRealPlayer();
         this.masterMind = workPlayer.MasterMind;
         if (!this.masterMind) {
             this.log.info('Выбранный игрок не управляется MasterMind.');
             return;
         }
-        
+
         // Активация MasterMind, если отключен
         if (!this.masterMind.IsWorkMode) {
             this.log.info('Включение режима работы MasterMind для', workPlayer.Nickname);
@@ -49,7 +49,7 @@ export class Example_MasterMindRequest extends HordeExampleBase {
         // Проверяем запросы
         let requests = this.masterMind.Requests;
         this.log.info('Запросов в обработке:', requests.Count);
-        ForEach(requests, item => {
+        ForEach(requests, (item: ARequest) => {
             this.log.info('-', item);
         });
     }
@@ -68,7 +68,7 @@ export class Example_MasterMindRequest extends HordeExampleBase {
         // Отобразить текущие запросы
         let requests = this.masterMind.Requests;
         this.log.info('Запросов в обработке:', requests.Count);
-        ForEach(requests, item => {
+        ForEach(requests, (item: ARequest) => {
             this.log.info('-', item);
         });
     }
@@ -104,7 +104,7 @@ export class Example_MasterMindRequest extends HordeExampleBase {
         produceRequestParameters.Producer = producer;                   // Так можно задать юнита-исполнителя (если null, то будет выбран свободный подходящий производитель)
 
         // Добавление запроса
-        for(let i = 0; i < n; i++) {
+        for (let i = 0; i < n; i++) {
             this.addProduceRequest(produceRequestParameters);
         }
     }
@@ -123,7 +123,7 @@ export class Example_MasterMindRequest extends HordeExampleBase {
         produceRequestParameters.ReservationIgnoreLevel = 0;            // Уровень баллов резервирования, которые будут проигнорированы при выбре места строительства
 
         // Добавление запроса
-        for(let i = 0; i < n; i++) {
+        for (let i = 0; i < n; i++) {
             this.addProduceRequest(produceRequestParameters);
         }
     }

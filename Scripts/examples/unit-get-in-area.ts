@@ -2,6 +2,7 @@ import { createPoint, createRect } from "library/common/primitives";
 import { BooleanT } from "library/dotnet/dotnet-types";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
 import HordeExampleBase from "./base-example";
+import { Unit } from "library/game-logic/horde-types";
 
 const X_0 = 0;
 const Y_0 = 0;
@@ -21,7 +22,7 @@ export class Example_GetUnitsInArea_Bruteforce extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         let unitsMap = ActiveScena.GetRealScena().UnitsMap;
         let count = 0;
 
@@ -53,7 +54,7 @@ export class Example_GetUnitsInArea_Squad extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         // Создаём колбек для фильтрации юнитов
         let filterCallback = host.func(BooleanT, 1, function (unit) {
             // Для примера пропускаем все здания в области
@@ -65,7 +66,7 @@ export class Example_GetUnitsInArea_Squad extends HordeExampleBase {
         let squad = unitsMap.GetSquadFromRect(rect, filterCallback);
 
         this.log.info('Собрано юнитов:', squad.Count);
-        ForEach(squad, u => {
+        ForEach(squad, (u: Unit) => {
             this.log.info('-', u);
         });
     }

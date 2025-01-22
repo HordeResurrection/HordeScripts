@@ -1,10 +1,12 @@
+import { Point2D } from "./primitives";
 
-const GeometryPresets = HCL.HordeClassLibrary.World.Geometry.GeometryPresets;
+const GeometryPresets = HordeClassLibrary.World.Geometry.GeometryPresets;
+type GeometryPresets = HordeClassLibrary.World.Geometry.GeometryPresets;
 
 /**
  * Позицию в пикселях переводит в координаты клетки
  */
-export function positionToCell(position) {
+export function positionToCell(position: Point2D): Point2D {
     return GeometryPresets.PositionToCell(position);
 }
 
@@ -12,7 +14,7 @@ export function positionToCell(position) {
 /**
  * Переводит координаты клетки в позицию (т.е. координаты центра клетки в пикселях)
  */
-export function cellToCenterPosition(cell) {
+export function cellToCenterPosition(cell: Point2D): Point2D {
     return GeometryPresets.CellToCenterPosition(cell);
 }
 
@@ -20,7 +22,7 @@ export function cellToCenterPosition(cell) {
 /**
  * Генератор позиций вокруг точки по спирале в рамках сцены
  */
-export function* generateCellInSpiral(centerX, centerY) {
+export function* generateCellInSpiral(centerX: number, centerY: number): Generator<{ X: number, Y: number }> {
     let scenaWidth = ActiveScena.GetRealScena().Size.Width;
     let scenaHeight = ActiveScena.GetRealScena().Size.Height;
 
@@ -92,7 +94,7 @@ export function* generateCellInSpiral(centerX, centerY) {
 /**
  * Генератор рандомных позиций в прямоугольнике в рамках сцены
  */
-export function* generateRandomCellInRect(rectX, rectY, rectW, rectH) {
+export function* generateRandomCellInRect(rectX: number, rectY: number, rectW: number, rectH: number): Generator<{ X: number, Y: number }> {
     let scenaWidth = ActiveScena.GetRealScena().Size.Width;
     let scenaHeight = ActiveScena.GetRealScena().Size.Height;
     // Рандомизатор
@@ -103,7 +105,7 @@ export function* generateRandomCellInRect(rectX, rectY, rectW, rectH) {
     rectW = Math.min(scenaWidth - rectX, rectW);
     rectH = Math.min(scenaHeight - rectY, rectH);
 
-    let randomNumbers = [];
+    let randomNumbers: { X: number, Y: number }[] = [];
     for (let x = rectX; x < rectX + rectW; x++) {
         for (let y = rectY; y < rectY + rectH; y++) {
             randomNumbers.push({ X: x, Y: y });
@@ -120,7 +122,7 @@ export function* generateRandomCellInRect(rectX, rectY, rectW, rectH) {
     return;
 }
 
-export function* generateCellInRect(rectX: number, rectY: number, rectW: number, rectH: number) {
+export function* generateCellInRect(rectX: number, rectY: number, rectW: number, rectH: number): Generator<{ X: number, Y: number }> {
     let scenaWidth = ActiveScena.GetRealScena().Size.Width;
     let scenaHeight = ActiveScena.GetRealScena().Size.Height;
 

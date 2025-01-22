@@ -1,9 +1,8 @@
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
 import HordeExampleBase from "./base-example";
 import { getOrCreateTestUnit } from "./unit-example-utils";
+import { ReplaceUnitParameters } from "library/game-logic/horde-types";
 
-
-const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 
 /**
  * Пример замены юнита
@@ -16,7 +15,7 @@ export class Example_ReplaceUnit extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         // Юнит для замены
         let unitToReplace = this.getUnitToReplace();
         if (!unitToReplace) {
@@ -35,15 +34,15 @@ export class Example_ReplaceUnit extends HordeExampleBase {
         replaceParams.PreserveOrders = true;        // Нужно ли передать приказы?
         replaceParams.PreserveKillsCounter = true;  // Нужно ли передать счетчик убийств?
         replaceParams.Silent = true;                // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
-        
+
         // Замена
-        this.log.info('Заменяем выбранного юнита на:', replaceParams.ReplaceToUnitConfig);
+        this.log.info('Заменяем выбранного юнита на:', replaceParams.NewUnitConfig);
         let newUnit = unitToReplace.Owner.Units.ReplaceUnit(replaceParams);
         if (!newUnit) {
             this.log.info("Не удалось заменить юнита");
             return;
         }
-        
+
         // Создание графического эффекта
         spawnDecoration(ActiveScena.GetRealScena(), HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), newUnit.Position);
         this.log.info("Выбранный юнит заменен на:", newUnit);

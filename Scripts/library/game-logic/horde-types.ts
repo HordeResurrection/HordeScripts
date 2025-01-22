@@ -2,7 +2,7 @@
 // ===================================================
 // --- Глобальные переменные
 
-export const BattleController = HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController;
+export const BattleController = HordeResurrection.Engine.Logic.Battle.BattleController;
 export type BattleController = HordeResurrection.Engine.Logic.Battle.BattleController;
 export const AllContent = HordeClassLibrary.HordeContent.AllContent;
 export type AllContent = HordeClassLibrary.HordeContent.AllContent;
@@ -36,6 +36,7 @@ export type ResourceTileType = HordeClassLibrary.World.Objects.Tiles.ResourceTil
 export const TilePayload = HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TilePayload;
 export type TilePayload = HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TilePayload;
 
+
 // ===================================================
 // --- Снаряды
 
@@ -45,7 +46,8 @@ export const BulletState = HordeClassLibrary.World.Objects.Bullets.BulletState;
 export type BulletState = HordeClassLibrary.World.Objects.Bullets.BulletState;
 export const ScriptBullet = HordeClassLibrary.World.Objects.Bullets.Implementations.Other.ScriptBullet;
 export type ScriptBullet = HordeClassLibrary.World.Objects.Bullets.Implementations.Other.ScriptBullet;
-
+export const BulletEmittingArgs = HordeClassLibrary.World.Objects.Bullets.BulletEmittingArgs;
+export type BulletEmittingArgs = HordeClassLibrary.World.Objects.Bullets.BulletEmittingArgs;
 
 // ===================================================
 // --- Конфиг юнита
@@ -70,7 +72,56 @@ export const UnitArmament = HordeClassLibrary.UnitComponents.BattleSystem.UnitAr
 export type UnitArmament = HordeClassLibrary.UnitComponents.BattleSystem.UnitArmament;
 export const ShotParams = HordeClassLibrary.World.Objects.Bullets.ShotParams;
 export type ShotParams = HordeClassLibrary.World.Objects.Bullets.ShotParams;
+export const Squad = HordeClassLibrary.World.Objects.Squads.Squad;
+export type Squad = HordeClassLibrary.World.Objects.Squads.Squad;
 
+export const ReplaceUnitFlags = HordeClassLibrary.World.Objects.Units.ReplaceUnitFlags;
+export type ReplaceUnitFlags = HordeClassLibrary.World.Objects.Units.ReplaceUnitFlags;
+export const ReplaceUnitParameters = HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
+export type ReplaceUnitParameters = HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
+export const SpawnUnitParameters = HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
+export type SpawnUnitParameters = HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
+
+export const BaseUnitEventArgs = HordeClassLibrary.UnitComponents.EventArgs.BaseUnitEventArgs;
+export type BaseUnitEventArgs = HordeClassLibrary.UnitComponents.EventArgs.BaseUnitEventArgs;
+export const CauseDamageEventArgs = HordeClassLibrary.UnitComponents.EventArgs.CauseDamageEventArgs;
+export type CauseDamageEventArgs = HordeClassLibrary.UnitComponents.EventArgs.CauseDamageEventArgs;
+export const ComradeIsAttackedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.ComradeIsAttackedEventArgs;
+export type ComradeIsAttackedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.ComradeIsAttackedEventArgs;
+export const MoveAwayRequestEventArgs = HordeClassLibrary.UnitComponents.EventArgs.MoveAwayRequestEventArgs;
+export type MoveAwayRequestEventArgs = HordeClassLibrary.UnitComponents.EventArgs.MoveAwayRequestEventArgs;
+export const MoveOutRequestEventArgs = HordeClassLibrary.UnitComponents.EventArgs.MoveOutRequestEventArgs;
+export type MoveOutRequestEventArgs = HordeClassLibrary.UnitComponents.EventArgs.MoveOutRequestEventArgs;
+export const StepAwayRequestEventArgs = HordeClassLibrary.UnitComponents.EventArgs.StepAwayRequestEventArgs;
+export type StepAwayRequestEventArgs = HordeClassLibrary.UnitComponents.EventArgs.StepAwayRequestEventArgs;
+export const TakeDamageByUnknownSourceEventArgs = HordeClassLibrary.UnitComponents.EventArgs.TakeDamageByUnknownSourceEventArgs;
+export type TakeDamageByUnknownSourceEventArgs = HordeClassLibrary.UnitComponents.EventArgs.TakeDamageByUnknownSourceEventArgs;
+export const TakeDamageEventArgs = HordeClassLibrary.UnitComponents.EventArgs.TakeDamageEventArgs;
+export type TakeDamageEventArgs = HordeClassLibrary.UnitComponents.EventArgs.TakeDamageEventArgs;
+export const UnitBuildingCompleteEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitBuildingCompleteEventArgs;
+export type UnitBuildingCompleteEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitBuildingCompleteEventArgs;
+export const UnitDeathEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitDeathEventArgs;
+export type UnitDeathEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitDeathEventArgs;
+export const UnitDeletionEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitDeletionEventArgs;
+export type UnitDeletionEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitDeletionEventArgs;
+export const UnitDummyStateChangedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitDummyStateChangedEventArgs;
+export type UnitDummyStateChangedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitDummyStateChangedEventArgs;
+export const UnitHealthChangedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitHealthChangedEventArgs;
+export type UnitHealthChangedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitHealthChangedEventArgs;
+export const UnitLifeStateChangedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitLifeStateChangedEventArgs;
+export type UnitLifeStateChangedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitLifeStateChangedEventArgs;
+export const UnitMovedToCellEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitMovedToCellEventArgs;
+export type UnitMovedToCellEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitMovedToCellEventArgs;
+export const UnitNearDeathEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitNearDeathEventArgs;
+export type UnitNearDeathEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitNearDeathEventArgs;
+export const UnitOrderChangedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitOrderChangedEventArgs;
+export type UnitOrderChangedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitOrderChangedEventArgs;
+export const UnitOwnerChangedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitOwnerChangedEventArgs;
+export type UnitOwnerChangedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitOwnerChangedEventArgs;
+export const UnitReplacedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitReplacedEventArgs;
+export type UnitReplacedEventArgs = HordeClassLibrary.UnitComponents.EventArgs.UnitReplacedEventArgs;
+//export const UnitEventHandler = HordeClassLibrary.UnitComponents.Events.UnitEventHandler; // Delegate
+export type UnitEventHandler = HordeClassLibrary.UnitComponents.Events.UnitEventHandler;
 
 // ===================================================
 // --- Перечисления связанные с юнитами
@@ -123,6 +174,10 @@ export type UnitVisibility = HordeClassLibrary.UnitComponents.Enumerations.UnitV
 export const UnitCommand = HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand;
 export type UnitCommand = HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand;
 
+export const ACommandArgs = HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs;
+export type ACommandArgs = HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs;
+export const AUnknownCommandArgs = HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.AUnknownCommandArgs;
+export type AUnknownCommandArgs = HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.AUnknownCommandArgs;
 export const OneClickCommandArgs = HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.OneClickCommandArgs;
 export type OneClickCommandArgs = HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.OneClickCommandArgs;
 export const PointCommandArgs = HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.PointCommandArgs;
@@ -225,6 +280,7 @@ export type CanBePlacedByKnownMapJsResult = HordeClassLibrary.UnitComponents.Wor
 export const CanBePlacedByRealMapJsResult = HordeClassLibrary.UnitComponents.Workers.Script.CanBePlacedByRealMapJsResult;
 export type CanBePlacedByRealMapJsResult = HordeClassLibrary.UnitComponents.Workers.Script.CanBePlacedByRealMapJsResult;
 
+
 // ===================================================
 // --- Конфиги
 
@@ -274,18 +330,25 @@ export type GeometryVisualEffect = HordeClassLibrary.World.Objects.VisualEffects
 
 export const DrawLayer = HordeClassLibrary.World.Simple.DrawLayer;
 export type DrawLayer = HordeClassLibrary.World.Simple.DrawLayer;
-export const FontUtils = HordeGame.HordeResurrection.Game.UI.Utils.FontUtils;
+export const FontUtils = HordeResurrection.Game.UI.Utils.FontUtils;
 export type FontUtils = HordeResurrection.Game.UI.Utils.FontUtils;
-export const GeometryCanvas = HordeGame.HordeResurrection.Game.Render.GeometryCanvas.GeometryCanvas;
+export const GeometryCanvas = HordeResurrection.Game.Render.GeometryCanvas.GeometryCanvas;
 export type GeometryCanvas = HordeResurrection.Game.Render.GeometryCanvas.GeometryCanvas;
+
+
+// ===================================================
+// --- Player
+
+export const Player = HordeResurrection.Engine.Logic.Main.Players.Player;
+export type Player = HordeResurrection.Engine.Logic.Main.Players.Player;
 
 
 // ===================================================
 // --- Типы для использования в рендере
 
-export const Stride_Vector2 = StrideCore.Stride.Core.Mathematics.Vector2;
+export const Stride_Vector2 = Stride.Core.Mathematics.Vector2;
 export type Stride_Vector2 = any;
-export const Stride_Color = StrideCore.Stride.Core.Mathematics.Color;
+export const Stride_Color = Stride.Core.Mathematics.Color;
 export type Stride_Color = any;
 
 
@@ -294,4 +357,3 @@ export type Stride_Color = any;
 
 export const AnimatorScriptTasks = HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.Tasks.AnimatorScriptTasks;
 export type AnimatorScriptTasks = HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.Tasks.AnimatorScriptTasks;
-

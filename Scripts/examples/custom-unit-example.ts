@@ -1,18 +1,22 @@
 import { createPF, createPoint, createResourcesAmount, Point2D } from "library/common/primitives";
 import { DictionaryT } from "library/dotnet/dotnet-types";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
-import { UnitArmament, UnitDirection, UnitQueryFlag, UnitState } from "library/game-logic/horde-types";
+import { Unit, UnitArmament, UnitConfig, UnitDirection, UnitQueryFlag, UnitState } from "library/game-logic/horde-types";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { setUnitStateWorker } from "library/game-logic/workers-tools";
 import HordeExampleBase from "./base-example";
+
+
+const BaseUnitMove = HordeClassLibrary.UnitComponents.Workers.BaseUnit.BaseUnitMove;
+type BaseUnitMove = HordeClassLibrary.UnitComponents.Workers.BaseUnit.BaseUnitMove;
 
 /**
  * Пример создания юнита со скриптовым обработчиком движения.
  * Здесь запрограммирован конный арбалетчик, который на ходу стреляет стрелами.
  */
 export class Example_CustomUnit extends HordeExampleBase {
-    private armament: any;
-    private baseMoveWorker: any;
+    private armament: UnitArmament;
+    private baseMoveWorker: BaseUnitMove;
 
     public constructor() {
         super("Custom unit (арбалетчик)");
@@ -27,7 +31,7 @@ export class Example_CustomUnit extends HordeExampleBase {
      */
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         // Создание конфига воина
         let unitCfg = this.getOrCreateUnitConfig();
 
@@ -43,7 +47,7 @@ export class Example_CustomUnit extends HordeExampleBase {
      */
     private getOrCreateUnitConfig() {
         let exampleCfgUid = "#UnitConfig_Slavyane_Araider_EXAMPLE";
-        let unitCfg;
+        let unitCfg: UnitConfig;
         if (HordeContentApi.HasUnitConfig(exampleCfgUid)) {
             // Конфиг уже был создан, берем предыдущий
             unitCfg = HordeContentApi.GetUnitConfig(exampleCfgUid);
@@ -51,7 +55,7 @@ export class Example_CustomUnit extends HordeExampleBase {
         } else {
             // Создание нового конфига
             let unitCfgOrig = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Araider");
-            unitCfg = HordeContentApi.CloneConfig(unitCfgOrig, exampleCfgUid);
+            unitCfg = HordeContentApi.CloneConfig(unitCfgOrig, exampleCfgUid) as UnitConfig;
 
             // Добавление юнита в конюшню
             let producerCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Stables");
@@ -64,7 +68,7 @@ export class Example_CustomUnit extends HordeExampleBase {
 
         // Настройка
         ScriptUtils.SetValue(unitCfg, "ProductionTime", 50); // Быстрое производство для теста
-        ScriptUtils.SetValue(unitCfg, "CostResources", createResourcesAmount(150, 200, 50 ,1));
+        ScriptUtils.SetValue(unitCfg, "CostResources", createResourcesAmount(150, 200, 50, 1));
 
         return unitCfg;
     }
@@ -131,7 +135,7 @@ export class Example_CustomUnit extends HordeExampleBase {
  * Создаёт базовый обработчик движения.
  */
 function createBaseMoveWorker() {
-    return new HCL.HordeClassLibrary.UnitComponents.Workers.BaseUnit.BaseUnitMove();
+    return new BaseUnitMove();
 }
 
 
@@ -142,7 +146,7 @@ function createArmamament() {
 
     // Смещение арбалета по направлениям
     let gunCoord = new DictionaryT(UnitDirection, Point2D);
-    gunCoord.Add(UnitDirection.Up, createPoint(3,-10));
+    gunCoord.Add(UnitDirection.Up, createPoint(3, -10));
     gunCoord.Add(UnitDirection.RightUp, createPoint(5, -5));
     gunCoord.Add(UnitDirection.Right, createPoint(8, -4));
     gunCoord.Add(UnitDirection.RightDown, createPoint(0, 0));
