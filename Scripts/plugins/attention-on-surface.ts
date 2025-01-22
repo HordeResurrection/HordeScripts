@@ -1,11 +1,8 @@
 import HordePluginBase from "./base-plugin";
-import { BattleController, Scena, VisualEffectConfig, WorldConstants } from "library/game-logic/horde-types";
+import { BattleController, Scena, VisualEffectConfig, VisualEffectFogOfWarMode, WorldConstants } from "library/game-logic/horde-types";
 import * as primitives from "library/common/primitives";
 import * as decorations from "library/game-logic/decoration-spawn";
 
-
-const VisualEffectFogOfWarMode = HordeClassLibrary.World.Objects.VisualEffects.VisualEffectFogOfWarMode;
-type VisualEffectFogOfWarMode = HordeClassLibrary.World.Objects.VisualEffects.VisualEffectFogOfWarMode;
 
 /**
  * Плагин, который создаёт декорацию-метку в том месте на карте, где был зафиксирован Attention-клик (alt-клик)
@@ -38,11 +35,8 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
             this.globalStorage.attentionClickHandler.disconnect();
         }
 
-        const AllUIModules = HordeResurrection.Game.UI.AllUIModules;
-        const MouseScript = AllUIModules.MouseScript;
-
         let that = this;
-        let handler = MouseScript.AttentionClick.connect((sender, args) => that._attentionHandler(sender, args));
+        let handler = BattleController.AttentionSent.connect((sender, args) => that._attentionHandler(sender, args));
         this.globalStorage.attentionClickHandler = handler;
     }
 
@@ -54,11 +48,8 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
             this.globalStorage.attentionReceivedHandler.disconnect();
         }
 
-        const AllUIModules = HordeResurrection.Game.UI.AllUIModules;
-        const BattleUI = AllUIModules.BattleUI;
-
         let that = this;
-        let handler = BattleUI.AttentionReceived.connect((sender, args) => that._attentionHandler(sender, args));
+        let handler = BattleController.AttentionReceived.connect((sender, args) => that._attentionHandler(sender, args));
         this.globalStorage.attentionReceivedHandler = handler;
     }
 

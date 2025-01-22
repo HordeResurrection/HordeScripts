@@ -1,6 +1,7 @@
 import { broadcastMessage } from "library/common/messages";
 import { createHordeColor } from "library/common/primitives";
 import HordeExampleBase from "./base-example";
+import { BattleController } from "library/game-logic/horde-types";
 
 
 // ===================================================
@@ -50,12 +51,6 @@ export class Example_HookSentChatMessages extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
-        // Получаем UI-объект строки чата
-        const AllUIModules = HordeResurrection.Game.UI.AllUIModules;
-        const BattleUI = AllUIModules.BattleUI;
-        let chatPanel = ScriptUtils.GetValue(BattleUI, "ChatPanel");
-        let chatInputLine = ScriptUtils.GetValue(chatPanel, "ChatInputLine");
-
         // Удаляем предыдущий обработчик сообщений, если был закреплен
         if (this.globalStorage.currentHandler) {
             this.globalStorage.currentHandler.disconnect();
@@ -63,11 +58,11 @@ export class Example_HookSentChatMessages extends HordeExampleBase {
 
         // Устанавливаем обработчик сообщений
         let that = this;
-        this.globalStorage.currentHandler = chatInputLine.MessageSent.connect(function (sender, args) {
+        this.globalStorage.currentHandler = BattleController.ChatMessageSent.connect(function (sender, args) {
             try {
-                let senderPlayer = ScriptUtils.GetValue(args, "InitiatorPlayer");
-                let targets = ScriptUtils.GetValue(args, "Targets");
-                let message = ScriptUtils.GetValue(args, "Message");
+                let senderPlayer = args.InitiatorPlayer;
+                let targets = args.Targets;
+                let message = args.Message;
                 that.log.info(`[${senderPlayer.Nickname} -> ${targets}] ${message}`);
             } catch (ex) {
                 that.log.exception(ex);
@@ -92,16 +87,6 @@ export class Example_HookReceivedChatMessages extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
-        this.log.info('В данный момент этот пример не работает.');
-        return;
-
-        // NetworkController - центральный класс сетевого взаимодействия
-        let NetworkController = HordeResurrection.Engine.Logic.Main.NetworkController;
-        if (NetworkController.NetWorker == null) {
-            this.log.info('Сетевой режим не активирован. Для этого примера необходимо начать сетевую игру.');
-            return;
-        }
-
         // Удаляем предыдущий обработчик сообщений, если был закреплен
         if (this.globalStorage.currentHandler) {
             this.globalStorage.currentHandler.disconnect();
@@ -109,11 +94,11 @@ export class Example_HookReceivedChatMessages extends HordeExampleBase {
 
         // Устанавливаем обработчик сообщений
         let that = this;
-        this.globalStorage.currentHandler = NetworkController.NetWorker.Events.ChatEvents.ChatItemPacketReceived.connect(function (sender, args) {
+        this.globalStorage.currentHandler = BattleController.ChatMessageReceived.connect(function (sender, args) {
             try {
-                let senderPlayer = HordeResurrection.Engine.Logic.Main.PlayersController.GetNetElementMainPlayer(ScriptUtils.GetValue(args, "NetworkElement"));
-                let targets = host.cast(HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets, ScriptUtils.GetValue(args, "Targets"));
-                let message = ScriptUtils.GetValue(args, "Message");
+                let senderPlayer = args.InitiatorPlayer;
+                let targets = args.Targets;
+                let message = args.Message;
                 that.log.info(`[${senderPlayer.Nickname} -> ${targets}] ${message}`);
             } catch (ex) {
                 that.log.exception(ex);

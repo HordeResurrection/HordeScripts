@@ -324,6 +324,9 @@ export type StringVisualEffect = HordeClassLibrary.World.Objects.VisualEffects.S
 export const GeometryVisualEffect = HordeClassLibrary.World.Objects.VisualEffects.GeometryVisualEffect;
 export type GeometryVisualEffect = HordeClassLibrary.World.Objects.VisualEffects.GeometryVisualEffect;
 
+export const VisualEffectFogOfWarMode = HordeClassLibrary.World.Objects.VisualEffects.VisualEffectFogOfWarMode;
+export type VisualEffectFogOfWarMode = HordeClassLibrary.World.Objects.VisualEffects.VisualEffectFogOfWarMode;
+
 
 // ===================================================
 // --- Графика
