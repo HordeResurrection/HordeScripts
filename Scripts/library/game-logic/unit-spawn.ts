@@ -1,18 +1,19 @@
 import { log } from "library/common/logging";
 import { generateRandomCellInRect } from "library/common/position-tools";
-import { createPoint } from "library/common/primitives";
-import { UnitDirection } from "./horde-types";
+import { createPoint, Point2D } from "library/common/primitives";
+import { Settlement, Unit, UnitConfig, UnitDirection } from "./horde-types";
 import { unitCanBePlacedByRealMap } from "./unit-and-map";
 
 
-const SpawnUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
+const SpawnUnitParameters = HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
+type SpawnUnitParameters = HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
 
 /**
  * Создание одного юнита в заданной клетке.
  * 
  * Возвращает созданного юнита.
  */
-export function spawnUnit(settlement, uCfg, cell, direction) {
+export function spawnUnit(settlement: Settlement, uCfg: UnitConfig, cell: Point2D, direction: UnitDirection) {
     let spawnParams = new SpawnUnitParameters();
     spawnParams.ProductUnitConfig = uCfg;
     spawnParams.Cell = cell;
@@ -27,12 +28,12 @@ export function spawnUnit(settlement, uCfg, cell, direction) {
  *
  * Возвращает список созданных юнитов.
  */
-export function spawnUnits(settlement, uCfg, uCount, direction, generator) {
+export function spawnUnits(settlement: Settlement, uCfg: UnitConfig, uCount: number, direction: UnitDirection, generator: any): Unit[] {
     let spawnParams = new SpawnUnitParameters();
     spawnParams.ProductUnitConfig = uCfg;
     spawnParams.Direction = direction;
 
-    let outSpawnedUnits: any[] = [];
+    let outSpawnedUnits: Unit[] = [];
     for (let position = generator.next(); !position.done && outSpawnedUnits.length < uCount; position = generator.next()) {
         if (unitCanBePlacedByRealMap(uCfg, position.value.X, position.value.Y)) {
             spawnParams.Cell = createPoint(position.value.X, position.value.Y);
@@ -48,10 +49,7 @@ export function spawnUnits(settlement, uCfg, uCount, direction, generator) {
 // --- Test
 
 export function test_spawnUnits() {
-    let realScena = ActiveScena.GetRealScena();
-    let settlements = realScena.Settlements;
-
-    let settlement_0 = settlements.Item.get('0');  // Олег
+    let settlement_0 = ActiveScena.Settlements.Item.get('0');  // Олег
     let archerCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Archer");
     let spawnCounts = 100;
     let dir = UnitDirection.RightDown;

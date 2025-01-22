@@ -15,6 +15,8 @@ export type WorldConstants = HordeClassLibrary.World.Const.WorldConstants;
 
 export const Scena = HordeClassLibrary.World.ScenaComponents.Scena;
 export type Scena = HordeClassLibrary.World.ScenaComponents.Scena;
+export const Settlement = HordeClassLibrary.World.Settlements.Settlement;
+export type Settlement = HordeClassLibrary.World.Settlements.Settlement;
 export const DiplomacyStatus = HordeClassLibrary.World.Simple.DiplomacyStatus;
 export type DiplomacyStatus = HordeClassLibrary.World.Simple.DiplomacyStatus;
 
@@ -281,9 +283,9 @@ export type GeometryCanvas = HordeResurrection.Game.Render.GeometryCanvas.Geomet
 // ===================================================
 // --- Типы для использования в рендере
 
-export const Stride_Vector2 = Stride.Core.Mathematics.Vector2;
+export const Stride_Vector2 = StrideCore.Stride.Core.Mathematics.Vector2;
 export type Stride_Vector2 = any;
-export const Stride_Color = Stride.Core.Mathematics.Color;
+export const Stride_Color = StrideCore.Stride.Core.Mathematics.Color;
 export type Stride_Color = any;
 
 

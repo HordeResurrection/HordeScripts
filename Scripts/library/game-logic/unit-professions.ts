@@ -1,4 +1,5 @@
 import { log } from "library/common/logging";
+import { UnitConfig } from "./horde-types";
 
 // ===================================================
 // --- Перечисление профессий (enum)
@@ -73,8 +74,8 @@ export type TypeToProfession = HordeClassLibrary.UnitComponents.ProfessionData.T
  * 
  * @return result - параметры профессии
  */
-export function getUnitProfessionParams(uCfg, prof) {
-    let profParams = host.newVar(HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.AUnitProfessionParams);
+export function getUnitProfessionParams(uCfg: UnitConfig, prof: UnitProfession) {
+    let profParams = host.newVar(AUnitProfessionParams);
     if (!uCfg.ProfessionParams.TryGetValue(prof, profParams.out)) {
         log.warning('Can\'t get profession params:', prof);
         return null;

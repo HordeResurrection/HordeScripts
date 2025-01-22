@@ -1,5 +1,5 @@
-import { createHordeColor } from "library/common/primitives";
-import { StringVisualEffect, DrawLayer, FontUtils, GeometryVisualEffect } from "./horde-types";
+import { createHordeColor, Point2D } from "library/common/primitives";
+import { StringVisualEffect, DrawLayer, FontUtils, GeometryVisualEffect, Scena } from "./horde-types";
 
 
 /**
@@ -14,7 +14,7 @@ export function spawnDecoration(scena, decorationCfg, position) {
 /**
  * Создание строки-декорации в заданных координатах
  */
-export function spawnString(scena, text, position, ticksToLive) {
+export function spawnString(scena: Scena, text: string, position: Point2D, ticksToLive: number) {
     let args = new StringVisualEffect.CreationArgs();
     args.Text = text;
     args.TicksToLive = ticksToLive;

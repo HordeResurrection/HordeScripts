@@ -1,5 +1,5 @@
-import { createBox } from "library/common/primitives";
-import { KnownUnit, Unit } from "./horde-types";
+import { createBox, Point2D } from "library/common/primitives";
+import { KnownUnit, Settlement, Unit, UnitConfig } from "./horde-types";
 
 
 // ===================================================
@@ -9,7 +9,7 @@ import { KnownUnit, Unit } from "./horde-types";
  * Можно ли установить юнита с таким конфигом в заданную точку?
  * (Тут используется актуальные данные карты)
  */
-export function unitCanBePlacedByRealMap(uCfg, x, y) {
+export function unitCanBePlacedByRealMap(uCfg: UnitConfig, x: number, y: number) {
     return uCfg.CanBePlacedByRealMap(ActiveScena.GetRealScena(), x, y);
 }
 
@@ -17,7 +17,7 @@ export function unitCanBePlacedByRealMap(uCfg, x, y) {
  * Можно ли установить юнита с таким конфигом в заданную точку согласно известной карте?
  * (Т.е. учитывается туман войны и другие виды вИдения)
  */
-export function unitCanBePlacedByKnownMap(uCfg, settlement, x, y) {
+export function unitCanBePlacedByKnownMap(uCfg: UnitConfig, settlement: Settlement, x: number, y: number) {
     return uCfg.CanBePlacedByKnownMap(settlement, x, y);
 }
 
@@ -25,7 +25,7 @@ export function unitCanBePlacedByKnownMap(uCfg, settlement, x, y) {
  * Скорость юнита в указанной точке карты.
  * (Тут используется актуальные данные карты)
  */
-export function unitSpeedAtCellByRealMap(unit, cell) {
+export function unitSpeedAtCellByRealMap(unit: Unit, cell: Point2D) {
     let unitVar = host.newVar(Unit);
     return unit.MapMind.SpeedAtCellByRealMap(cell, unitVar.out)
 
@@ -37,7 +37,7 @@ export function unitSpeedAtCellByRealMap(unit, cell) {
  * Скорость юнита в указанной точке карты согласно известной карте.
  * (Т.е. учитывается туман войны и другие виды вИдения)
  */
-export function unitSpeedAtCellByKnownMap(unit, cell) {
+export function unitSpeedAtCellByKnownMap(unit: Unit, cell: Point2D) {
     let knownUnitVar = host.newVar(KnownUnit);
     return unit.MapMind.SpeedAtCellByKnownMap(cell, knownUnitVar.out)
 
@@ -49,14 +49,14 @@ export function unitSpeedAtCellByKnownMap(unit, cell) {
  * Может ли юнит дойти к указанной точке?
  * (Тут учитывается туман войны и другие виды вИдения)
  */
-export function unitCheckPathTo(unit, cell) {
+export function unitCheckPathTo(unit: Unit, cell: Point2D) {
     return unit.MapMind.CheckPathTo(cell, false).Found;
 }
 
 /**
  * Телепортировать юнита
  */
-export function unitTeleport(unit, cell) {
+export function unitTeleport(unit: Unit, cell: Point2D) {
     unit.MapMind.TeleportToCell(cell);
     return unit.Cell == cell;
 }
@@ -71,7 +71,7 @@ export function unitTeleport(unit, cell) {
  * @param cell центр
  * @param radius радиус квадрата поиска
  */
-export function* iterateOverUnitsInBox(cell, radius) {
+export function* iterateOverUnitsInBox(cell: Point2D, radius: number) {
     let box = createBox(cell.X - radius, cell.Y - radius, 0, cell.X + radius - 1, cell.Y + radius - 1, 2);
     let unitsInBox = ActiveScena.UnitsMap.UnitsTree.GetUnitsInBox(box);
     

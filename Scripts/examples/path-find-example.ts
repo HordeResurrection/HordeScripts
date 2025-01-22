@@ -6,8 +6,6 @@ import HordeExampleBase from "./base-example";
  * Пример поиска пути.
  */
 export class Example_PathFind extends HordeExampleBase {
-    context: any;
-    scena: any;
 
     /**
      * Конструктор.
@@ -22,12 +20,11 @@ export class Example_PathFind extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
-        let scena = ActiveScena.GetRealScena();
-        let pathChecker = new PathFinder(scena);
+        let pathChecker = new PathFinder(ActiveScena);
 
         // Точки пути
         let startCell = createPoint(39, 31);
-        let finishCell =  createPoint(42, 26);
+        let finishCell = createPoint(42, 26);
 
         // Проверяем наличие пути из точки в точку для всадника (оптимизированный алгоритм)
         let raiderCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Raider");
