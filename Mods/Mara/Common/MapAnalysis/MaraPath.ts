@@ -1,11 +1,11 @@
 import { MaraUtils } from "../../MaraUtils";
-import { MaraPoint } from "../MaraPoint";
+import { MaraMapNode } from "./MaraMapNode";
 
 export class MaraPath {
-    Nodes: Array<MaraPoint>;
+    Nodes: Array<MaraMapNode>;
     Length: number;
 
-    constructor(nodes: Array<MaraPoint>) {
+    constructor(nodes: Array<MaraMapNode>) {
         this.Nodes = nodes;
 
         let length = 0;

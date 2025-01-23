@@ -148,7 +148,7 @@ export class MaraMap {
         MaraMap.clusterData.Set(cell, cluster);
     }
 
-    static GetPaths(from: MaraPoint, to: MaraPoint): Array<MaraPath> {
+    static GetPaths(from: MaraPoint, to: MaraPoint, unwalkableNodeTypesToInclude: Array<any> = []): Array<MaraPath> {
         let fromNode = MaraMap.mapNodes.find((n) => n.Region.HasCell(from));
 
         if (!fromNode) {
@@ -162,12 +162,24 @@ export class MaraMap {
         }
         
         let paths: Array<MaraPath> = [];
+
+        const UNWALKABLE_NODE_INITIAL_WEIGTH = 500;
         
         MaraMap.mapNodes.forEach((n) => {
-            n.Weigth = n.Type != MaraMapNodeType.Unwalkable ? 1 : Infinity;
+            if (n.Type != MaraMapNodeType.Unwalkable) {
+                n.Weigth = 1;
+            }
+            else if (
+                unwalkableNodeTypesToInclude.findIndex((v) => v == n.TileType) > -1
+            ) {
+                n.Weigth = UNWALKABLE_NODE_INITIAL_WEIGTH;
+            }
+            else {
+                n.Weigth = Infinity;
+            }
         });
 
-        const WEIGTH_INCREMENT = 100;
+        const WEIGTH_INCREMENT = 1000;
 
         while (paths.length < MaraMap.MAX_PATH_COUNT) {
             let path = MaraMap.dijkstraPath(fromNode, toNode, MaraMap.mapNodes);
@@ -181,16 +193,7 @@ export class MaraMap {
             }
             else {
                 path.forEach((v) => v.Weigth += WEIGTH_INCREMENT);
-                
-                let cleanPath = path.filter((n) => n != fromNode && n != toNode);
-                let gateCenters = cleanPath.map((v) => v.Region.Center);
-                
-                let resultNodes: Array<MaraPoint> = [];
-                resultNodes.push(from);
-                resultNodes.push(...gateCenters);
-                resultNodes.push(to);
-
-                paths.push(new MaraPath(resultNodes));
+                paths.push(new MaraPath(path));
             }
         }
 

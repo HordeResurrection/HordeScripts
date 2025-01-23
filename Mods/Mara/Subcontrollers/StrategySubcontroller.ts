@@ -370,8 +370,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
     GetPath(from: MaraPoint, to: MaraPoint): Array<MaraPoint> {
         let possiblePaths = MaraMap.GetPaths(from, to);
-        Mara.Debug(`paths count: ${possiblePaths.length}`)
-
+        
         if (possiblePaths.length == 0) {
             return [to];
         }
@@ -390,8 +389,10 @@ export class StrategySubcontroller extends MaraSubcontroller {
             }
 
             let selectedCandidate = MaraUtils.NonUniformRandomSelect(this.settlementController.MasterMind, candidates);
+            let nodes = selectedCandidate!.Path.Nodes;
+            let cellsPath = nodes.map((n) => n.Region.Center);
 
-            return selectedCandidate!.Path.Nodes;
+            return [from, ...cellsPath, to];
         }
     }
 

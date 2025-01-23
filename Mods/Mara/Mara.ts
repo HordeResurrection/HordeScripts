@@ -8,6 +8,8 @@ import { createHordeColor } from "library/common/primitives";
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
 import { MaraUnitConfigCache } from "./Common/Cache/MaraUnitConfigCache";
 import { MaraProfiler } from "./Common/MaraProfiler";
+import { MaraPoint } from "./Common/MaraPoint";
+import { TileType } from "library/game-logic/horde-types";
 
 export enum MaraLogLevel {
     Debug = 0,
@@ -120,6 +122,16 @@ export class Mara {
         }
 
         Mara.Info(`Mara successfully engaged. Have fun! ^^`);
+
+        let from = new MaraPoint(8, 105);
+        let to = new MaraPoint(37, 73);
+        
+        let paths = MaraMap.GetPaths(from, to, [TileType.Water]);
+        let nodes = paths[0].Nodes;
+
+        for (let i = 0; i < nodes.length - 1; i ++) {
+            MaraUtils.DrawLineOnScena(nodes[i].Region.Center, nodes[i+1].Region.Center);
+        }
     };
 
     static AttachToPlayer(playerId: string, processedSettlements: Array<any>, tickOffset: number = 0): void {
