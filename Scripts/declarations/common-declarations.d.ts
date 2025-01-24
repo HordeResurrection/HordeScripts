@@ -134,12 +134,12 @@ declare class HostFunctions {
     /**
      * Создаёт делегат на указанную функцию без возвращаемого значения.
      */
-    public static func(argCount: number, scriptFunc: (...arg: any[]) => void): any;
+    public static func(argCount: number, scriptFunc: Function): any;
 
     /**
      * Создаёт делегат на указанную функцию с возвращаемым значением.
      */
-    public static func(returnHostType: object, argCount: number, scriptFunc: (...arg: any[]) => any): any;
+    public static func(returnHostType: object, argCount: number, scriptFunc: Function): any;
 
     /**
      * Возвращает .Net-тип для указанного хост-типа.
