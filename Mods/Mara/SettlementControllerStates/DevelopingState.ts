@@ -1,9 +1,9 @@
 import { MaraUtils } from "Mara/MaraUtils";
 import { ProductionState } from "./ProductionState";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
-import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { UnitComposition } from "../Common/UnitComposition";
+import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 
 export class DevelopingState extends ProductionState {
     protected getProductionRequests(): Array<MaraProductionRequest> {

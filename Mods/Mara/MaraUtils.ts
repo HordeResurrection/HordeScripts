@@ -4,7 +4,7 @@ import { createPoint } from "library/common/primitives";
 import { UnitFlags, UnitCommand, AllContent, UnitConfig, UnitQueryFlag, UnitSpecification, DrawLayer, FontUtils, GeometryCanvas, Stride_Color, Stride_Vector2 } from "library/game-logic/horde-types";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
-import { MaraProductionRequest } from "./Common/MaraProductionRequest";
+import { MaraProductionRequestItem } from "./Common/MaraProductionRequestItem";
 import { MaraPoint } from "./Common/MaraPoint";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { ProduceRequest, ProduceRequestParameters } from "library/mastermind/matermind-types";
@@ -603,7 +603,7 @@ export class MaraUtils {
 
     static NonUniformRandomSelect<Type extends NonUniformRandomSelectItem>(
         masterMind: any, 
-        items:Array<Type>
+        items: Array<Type>
     ): Type | null {
         if (items.length == 0) {
             return null;
@@ -1227,25 +1227,30 @@ export class MaraUtils {
         return point1.X == point2.X && point1.Y == point2.Y;
     }
 
-    static RequestMasterMindProduction(productionRequest: MaraProductionRequest, masterMind: any, checkDuplicate: boolean = false): boolean {
-        let cfg = MaraUtils.GetUnitConfig(productionRequest.ConfigId);
+    static RequestMasterMindProduction(
+        productionRequestItem: MaraProductionRequestItem, 
+        executor: MaraUnitCacheItem,
+        masterMind: any, 
+        checkDuplicate: boolean = false
+    ): boolean {
+        let cfg = MaraUtils.GetUnitConfig(productionRequestItem.ConfigId);
 
         let produceRequestParameters = new ProduceRequestParameters(cfg, 1);
         produceRequestParameters.CheckExistsRequest = checkDuplicate;
         produceRequestParameters.AllowAuxiliaryProduceRequests = false;
-        produceRequestParameters.Producer = productionRequest.Executor!.Unit;
+        produceRequestParameters.Producer = executor.Unit;
         
-        if (productionRequest.Point) {
-            produceRequestParameters.TargetCell = createPoint(productionRequest.Point.X, productionRequest.Point.Y);
+        if (productionRequestItem.Point) {
+            produceRequestParameters.TargetCell = createPoint(productionRequestItem.Point.X, productionRequestItem.Point.Y);
         }
 
-        produceRequestParameters.MaxRetargetAttempts = productionRequest.Precision;
-        produceRequestParameters.DisableBuildPlaceChecking = productionRequest.Precision == 0;
+        produceRequestParameters.MaxRetargetAttempts = productionRequestItem.Precision;
+        produceRequestParameters.DisableBuildPlaceChecking = productionRequestItem.Precision == 0;
 
         let addedRequest = host.newVar(ProduceRequest);
         
         if (masterMind.ProductionDepartment.AddRequestToProduce(produceRequestParameters, addedRequest.out)) {
-            productionRequest.MasterMindRequest = addedRequest;
+            productionRequestItem.MasterMindRequest = addedRequest;
             return true;
         }
         else {

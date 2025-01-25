@@ -3,8 +3,8 @@ import { SettlementControllerStateFactory } from "../Common/Settlement/Settlemen
 import { MaraUtils } from "../MaraUtils";
 import { UnitComposition } from "../Common/UnitComposition";
 import { EconomySnapshotItem } from "../Common/Settlement/EconomySnapshotItem";
-import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 import { MaraPoint } from "../Common/MaraPoint";
+import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 
 export class RebuildState extends ProductionState {
     protected getProductionRequests(): Array<MaraProductionRequest> {

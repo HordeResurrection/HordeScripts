@@ -1,11 +1,11 @@
 import { MaraResourceType } from "../Common/MapAnalysis/MaraResourceType";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
-import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 import { MaraPoint } from "../Common/MaraPoint";
 import { MaraUtils } from "../MaraUtils";
 import { UnitComposition } from "../Common/UnitComposition";
 import { ProductionState } from "./ProductionState";
 import { MaraResourceCluster } from "../Common/MapAnalysis/MaraResourceCluster";
+import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 
 export class ExpandBuildState extends ProductionState {
     private expandCenter: MaraPoint;

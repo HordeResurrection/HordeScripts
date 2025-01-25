@@ -1,10 +1,11 @@
 import { MaraUtils } from "Mara/MaraUtils";
 import { MaraSettlementControllerState } from "./MaraSettlementControllerState";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
-import { MaraProductionRequest } from "../Common/MaraProductionRequest";
+import { MaraProductionRequestItem } from "../Common/MaraProductionRequestItem";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraPoint } from "../Common/MaraPoint";
 import { UnitComposition } from "../Common/UnitComposition";
+import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 
 export abstract class ProductionState extends MaraSettlementControllerState {
     private requests: Array<MaraProductionRequest>;
@@ -46,7 +47,9 @@ export abstract class ProductionState extends MaraSettlementControllerState {
         }
 
         for (let request of this.requests) {
-            MaraUtils.IncrementMapItem(this.targetComposition, request.ConfigId);
+            for (let item of request.Items) {
+                MaraUtils.IncrementMapItem(this.targetComposition, item.ConfigId);
+            }
         }
 
         this.timeoutTick = null;
@@ -101,7 +104,6 @@ export abstract class ProductionState extends MaraSettlementControllerState {
         }
         else {
             for (let request of requestsToReorder) {
-                request.WipeResults();
                 this.settlementController.ProductionController.RequestProduction(request);
             }
         }
@@ -129,7 +131,8 @@ export abstract class ProductionState extends MaraSettlementControllerState {
         precision: number | null,
         isForce: boolean = false
     ): MaraProductionRequest {
-        let productionRequest = new MaraProductionRequest(configId, point, precision, isForce);
+        let item = new MaraProductionRequestItem(configId, point, precision);
+        let productionRequest = new MaraProductionRequest([item], isForce);
         this.settlementController.ProductionController.RequestProduction(productionRequest);
         
         return productionRequest;
@@ -137,33 +140,41 @@ export abstract class ProductionState extends MaraSettlementControllerState {
 
     private getRequestsToReorder(): Array<MaraProductionRequest> {
         let completedRequests = this.requests.filter((value) => {return value.IsCompleted});
-        let orderedRequests = this.requests.filter((value) => {return !value.IsCompleted});
 
+        let orderedRequests = this.requests.filter((value) => {return !value.IsCompleted});
         let developedComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
         let compositionToRequest = MaraUtils.SubstractCompositionLists(this.targetComposition, developedComposition);
 
         for (let request of orderedRequests) {
-            MaraUtils.DecrementMapItem(compositionToRequest, request.ConfigId);
+            for (let item of request.Items) {
+                MaraUtils.DecrementMapItem(compositionToRequest, item.ConfigId);
+            }
         }
 
-        let requestsToReorder: Array<MaraProductionRequest> = [];
-        let unknownRequests: Array<MaraProductionRequest> = [];
+        let requestsToReorder = new Map<number, MaraProductionRequest>();
+        let unknownRequestItems: Array<MaraProductionRequestItem> = [];
         
         for (let request of completedRequests) {
-            if (request.IsSuccess) {
-                if (request.ProducedUnit) {
-                    if (!request.ProducedUnit.IsAlive) {
-                        requestsToReorder.push(request);
-                        MaraUtils.DecrementMapItem(compositionToRequest, request.ConfigId);
+            for (let item of request.Items) {
+                if (item.IsSuccess) {
+                    if (item.ProducedUnit) {
+                        if (!item.ProducedUnit.IsAlive) {
+                            item.WipeResults();
+                            MaraUtils.DecrementMapItem(compositionToRequest, item.ConfigId);
+                        }
+                    }
+                    else {
+                        unknownRequestItems.push(item);
                     }
                 }
                 else {
-                    unknownRequests.push(request);
+                    item.WipeResults();
+                    MaraUtils.DecrementMapItem(compositionToRequest, item.ConfigId);
                 }
             }
-            else {
-                requestsToReorder.push(request);
-                MaraUtils.DecrementMapItem(compositionToRequest, request.ConfigId);
+
+            if (!request.IsCompleted) { // this will change after above actions on request items
+                requestsToReorder.set(request.Id, request);
             }
         }
 
@@ -171,27 +182,33 @@ export abstract class ProductionState extends MaraSettlementControllerState {
             (value, key) => {
                 let requestCount = value;
                 
-                for (let request of unknownRequests) {
+                for (let item of unknownRequestItems) {
                     if (requestCount == 0) {
                         break;
                     }
                     
-                    if (request.ConfigId == key) {
-                        requestsToReorder.push(request);
+                    if (item.ConfigId == key) {
+                        item.WipeResults();
+                        requestsToReorder.set(item.ParentRequest.Id, item.ParentRequest);
                         requestCount --;
                     }
                 }
             }
         );
 
-        return requestsToReorder;
+        let result: Array<MaraProductionRequest> = [];
+        requestsToReorder.forEach((v) => result.push(v));
+
+        return result;
     }
 
     private getInsufficientResources(): MaraResources {
         let compositionToProduce: UnitComposition = new Map<string, number>();
 
         for (let request of this.requests) {
-            MaraUtils.IncrementMapItem(compositionToProduce, request.ConfigId);
+            for (let item of request.Items) {
+                MaraUtils.IncrementMapItem(compositionToProduce, item.ConfigId);
+            }
         }
 
         this.settlementController.Debug(`Current unit composition to produce:`);

@@ -1,6 +1,6 @@
 
-import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
+import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
 import { ProductionState } from "./ProductionState";
 
 export class ExpandPrepareState extends ProductionState {

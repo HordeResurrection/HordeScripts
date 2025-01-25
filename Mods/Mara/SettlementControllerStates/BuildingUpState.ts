@@ -1,8 +1,8 @@
 import { MaraUtils } from "Mara/MaraUtils";
 import { ProductionState } from "./ProductionState";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
-import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
+import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 
 export class BuildingUpState extends ProductionState {
     protected getProductionTimeout(): number | null {
