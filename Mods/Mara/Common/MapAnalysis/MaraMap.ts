@@ -148,6 +148,25 @@ export class MaraMap {
         MaraMap.clusterData.Set(cell, cluster);
     }
 
+    static GetShortestPath(from: MaraPoint, to: MaraPoint, unwalkableNodeTypesToInclude: Array<any> = []): MaraPath | null {
+        let fromNode = MaraMap.mapNodes.find((n) => n.Region.HasCell(from));
+
+        if (!fromNode) {
+            return null;
+        }
+
+        let toNode = MaraMap.mapNodes.find((n) => n.Region.HasCell(to));
+
+        if (!toNode) {
+            return null;
+        }
+
+        MaraMap.initPathfinding(unwalkableNodeTypesToInclude);
+
+        let path = MaraMap.dijkstraPath(fromNode, toNode, MaraMap.mapNodes);
+        return new MaraPath(path);
+    }
+
     static GetPaths(from: MaraPoint, to: MaraPoint, unwalkableNodeTypesToInclude: Array<any> = []): Array<MaraPath> {
         let fromNode = MaraMap.mapNodes.find((n) => n.Region.HasCell(from));
 
@@ -160,25 +179,10 @@ export class MaraMap {
         if (!toNode) {
             return [];
         }
+
+        MaraMap.initPathfinding(unwalkableNodeTypesToInclude);
         
         let paths: Array<MaraPath> = [];
-
-        const UNWALKABLE_NODE_INITIAL_WEIGTH = 500;
-        
-        MaraMap.mapNodes.forEach((n) => {
-            if (n.Type != MaraMapNodeType.Unwalkable) {
-                n.Weigth = 1;
-            }
-            else if (
-                unwalkableNodeTypesToInclude.findIndex((v) => v == n.TileType) > -1
-            ) {
-                n.Weigth = UNWALKABLE_NODE_INITIAL_WEIGTH;
-            }
-            else {
-                n.Weigth = Infinity;
-            }
-        });
-
         const WEIGTH_INCREMENT = 1000;
 
         while (paths.length < MaraMap.MAX_PATH_COUNT) {
@@ -307,6 +311,24 @@ export class MaraMap {
         }
         
         return [];
+    }
+
+    private static initPathfinding(unwalkableNodeTypesToInclude: Array<any>): void {
+        const UNWALKABLE_NODE_INITIAL_WEIGTH = 500;
+        
+        MaraMap.mapNodes.forEach((n) => {
+            if (n.Type != MaraMapNodeType.Unwalkable) {
+                n.Weigth = 1;
+            }
+            else if (
+                unwalkableNodeTypesToInclude.findIndex((v) => v == n.TileType) > -1
+            ) {
+                n.Weigth = UNWALKABLE_NODE_INITIAL_WEIGTH;
+            }
+            else {
+                n.Weigth = Infinity;
+            }
+        });
     }
 
     private static validateBridge(bridgeSections: Array<MaraRect>, sourceNode: MaraMapNode, destNode: MaraMapNode): boolean {
