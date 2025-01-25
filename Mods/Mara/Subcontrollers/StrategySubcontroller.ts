@@ -375,6 +375,10 @@ export class StrategySubcontroller extends MaraSubcontroller {
             return [to];
         }
         else {
+            for (let path of possiblePaths) {
+                this.settlementController.Debug(`path candidate: ${path.ToString()}, length: ${path.Length}`);
+            }
+            
             let longestPath = MaraUtils.FindExtremum(possiblePaths, (a, b) => a.Length - b.Length);
             let longestPathLen = longestPath!.Length + 1;
 
