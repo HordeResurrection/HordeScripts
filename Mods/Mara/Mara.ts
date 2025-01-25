@@ -123,15 +123,17 @@ export class Mara {
 
         Mara.Info(`Mara successfully engaged. Have fun! ^^`);
 
-        let from = new MaraPoint(8, 105);
-        let to = new MaraPoint(37, 73);
+        //TODO: remove this debug code
         
-        let paths = MaraMap.GetPaths(from, to, [TileType.Water]);
-        let nodes = paths[0].Nodes;
+        // let from = new MaraPoint(8, 105);
+        // let to = new MaraPoint(37, 73);
+        
+        // let paths = MaraMap.GetPaths(from, to, [TileType.Water]);
+        // let nodes = paths[0].Nodes;
 
-        for (let i = 0; i < nodes.length - 1; i ++) {
-            MaraUtils.DrawLineOnScena(nodes[i].Region.Center, nodes[i+1].Region.Center);
-        }
+        // for (let i = 0; i < nodes.length - 1; i ++) {
+        //     MaraUtils.DrawLineOnScena(nodes[i].Region.Center, nodes[i+1].Region.Center);
+        // }
     };
 
     static AttachToPlayer(playerId: string, processedSettlements: Array<any>, tickOffset: number = 0): void {
