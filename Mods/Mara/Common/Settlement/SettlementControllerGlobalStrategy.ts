@@ -14,6 +14,7 @@ class CfgIdSelectionItem {
 export class SettlementGlobalStrategy {
     OffensiveCfgIds: Array<CfgIdSelectionItem>;
     DefensiveBuildingsCfgIds: Array<CfgIdSelectionItem>;
+    AuxCfgIds: Array<CfgIdSelectionItem>;
     LowestTechOffensiveCfgId: string;
     
     private isInited: boolean = false;
@@ -56,9 +57,22 @@ export class SettlementGlobalStrategy {
 
         this.DefensiveBuildingsCfgIds = Array.from(defensiveResults.ConfigData.values());
 
+        let availableWalkableCfgs = availableCfgIds.filter(
+            (value) => MaraUtils.IsWalkableConfigId(value)
+        );
+
+        let walkableResults = this.initCfgIdsType(
+            settlementController, 
+            availableWalkableCfgs, 
+            1
+        );
+
+        this.AuxCfgIds = Array.from(walkableResults.ConfigData.values());
+
         settlementController.Debug(`Inited global strategy`);
         settlementController.Debug(`Offensive CfgIds: ${this.OffensiveCfgIds.map((value) => value.CfgId).join(", ")}`);
         settlementController.Debug(`Defensive CfgIds: ${this.DefensiveBuildingsCfgIds.map((value) => value.CfgId).join(", ")}`);
+        settlementController.Debug(`Auxiliary CfgIds: ${this.AuxCfgIds.map((value) => value.CfgId).join(", ")}`);
     }
 
     private initCfgIdsType(

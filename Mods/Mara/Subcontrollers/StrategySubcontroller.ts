@@ -4,7 +4,6 @@ import { MaraPoint } from "../Common/MaraPoint";
 import { MaraUtils, AlmostDefeatCondition } from "Mara/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSquad } from "./Squads/MaraSquad";
-import { Mara } from "../Mara";
 import { SettlementGlobalStrategy } from "../Common/Settlement/SettlementControllerGlobalStrategy";
 import { UnitComposition } from "../Common/UnitComposition";
 import { MaraResourceCluster } from "../Common/MapAnalysis/MaraResourceCluster";
@@ -15,6 +14,7 @@ import { NonUniformRandomSelectItem } from "../Common/NonUniformRandomSelectItem
 import { MaraPath } from "../Common/MapAnalysis/MaraPath";
 import { MaraUnitCache } from "../Common/Cache/MaraUnitCache";
 import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
+import { MaraResourceClusterSelection } from "../Common/MaraResourceClusterSelection";
 
 class PathSelectItem implements NonUniformRandomSelectItem {
     Weight: number;
@@ -495,14 +495,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return defensiveStrength;
     }
 
-    SelectOptimalResourceCluster(candidates: Array<MaraResourceCluster>): MaraResourceCluster | null {
-        let harvesterConfigIds = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
-        let harvesterConfigs: Array<any> = [];
-
-        for (let cfgId of harvesterConfigIds) {
-            harvesterConfigs.push(MaraUtils.GetUnitConfig(cfgId));
-        }
-
+    SelectOptimalResourceCluster(candidates: Array<MaraResourceCluster>): MaraResourceClusterSelection {
         let settlementLocation = this.settlementController.GetSettlementLocation();
         let settlementCenter: MaraPoint | null = null;
 
@@ -514,32 +507,19 @@ export class StrategySubcontroller extends MaraSubcontroller {
             }
         }
         else {
-            return null; //what's the point?..
+            return new MaraResourceClusterSelection(null, true, null); //what's the point?..
         }
 
         let produceableOffensiveCfgIds = this.getOffensiveCfgIds();
         let canAttack = produceableOffensiveCfgIds.length > 0;
 
         let acceptableClusters: Array<any> = [];
+        let reachableClusters: Array<any> = [];
 
         for (let cluster of candidates) {
-            let isClusterReachable = false;
-            let clusterCenter = MaraUtils.FindFreeCell(cluster.Center);
-
-            for (let harvesterCfg of harvesterConfigs) { //!! TODO: use MaraMap instead
-                if (MaraUtils.IsPathExists(settlementCenter!, clusterCenter, harvesterCfg, Mara.Pathfinder)) {
-                    isClusterReachable = true;
-                    break;
-                }
-            }
-
-            if (!isClusterReachable) {
-                continue;
-            }
-
             let distance = MaraUtils.ChebyshevDistance(cluster.Center, settlementLocation.Center);
 
-            let units = MaraUtils.GetUnitsAroundPoint( //!!
+            let units = MaraUtils.GetUnitsAroundPoint(
                 cluster.Center,
                 cluster.Size, //radius = cluster radius * 2
                 (unit) => {
@@ -560,13 +540,29 @@ export class StrategySubcontroller extends MaraSubcontroller {
 
             if (totalEnemyStrength == 0 || canAttack) {
                 distance += totalEnemyStrength / 10;
+
+                let path = MaraMap.GetShortestPath(settlementCenter!, cluster.Center);
+
+                if (path) {
+                    reachableClusters.push({Cluster: cluster, Distance: distance});
+                }
+
                 acceptableClusters.push({Cluster: cluster, Distance: distance});
             }
         }
 
+        let optimalCluster = this.selectOptimalCluster(acceptableClusters);
+        let isReachable = reachableClusters.find((c) => c == optimalCluster);
+
+        let reachableCluster = this.selectOptimalCluster(reachableClusters);
+
+        return new MaraResourceClusterSelection(optimalCluster, isReachable, reachableCluster);
+    }
+
+    private selectOptimalCluster(clusterData: any): MaraResourceCluster | null {
         let minDistance = Infinity;
         
-        for (let item of acceptableClusters) {
+        for (let item of clusterData) {
             if (minDistance > item.Distance) {
                 minDistance = item.Distance;
             }
@@ -579,7 +575,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         
         let finalClusters: Array<MaraResourceCluster> = [];
 
-        for (let item of acceptableClusters) {
+        for (let item of clusterData) {
             if (item.Distance / minDistance <= 1.1) {
                 finalClusters.push(item.Cluster);
             }

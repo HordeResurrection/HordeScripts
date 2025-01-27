@@ -6,6 +6,9 @@ import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraPoint } from "../Common/MaraPoint";
 import { UnitComposition } from "../Common/UnitComposition";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
+import { MaraMap } from "../Common/MapAnalysis/MaraMap";
+import { TileType } from "library/game-logic/horde-types";
+import { MaraMapNodeType } from "../Common/MapAnalysis/MaraMapNodeType";
 
 export abstract class ProductionState extends MaraSettlementControllerState {
     private requests: Array<MaraProductionRequest>;
@@ -136,6 +139,80 @@ export abstract class ProductionState extends MaraSettlementControllerState {
         this.settlementController.ProductionController.RequestProduction(productionRequest);
         
         return productionRequest;
+    }
+
+    protected makeProductionQueueRequest(
+        items: Array<MaraProductionRequestItem>
+    ): MaraProductionRequest {
+        let productionRequest = new MaraProductionRequest(items, false);
+        this.settlementController.ProductionController.RequestProduction(productionRequest);
+        
+        return productionRequest;
+    }
+
+    protected makeBridgeProductionRequest(from: MaraPoint, to: MaraPoint): MaraProductionRequest | null {
+        this.settlementController.Debug(`Requesting bridge build from ${from.ToString()} to ${to.ToString()}`)
+        
+        let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
+        let bridgeCfgId = produceableCfgIds.find((cfgId) => MaraUtils.IsWalkableConfigId(cfgId));
+
+        if (!bridgeCfgId) {
+            this.settlementController.Debug(`Unable to build bridge: no available bridge config`);
+            return null;
+        }
+
+        let path = MaraMap.GetShortestPath(from, to, [TileType.Water]);
+
+        if (!path) {
+            this.settlementController.Debug(`Unable to build bridge: path not found`);
+            return null;
+        }
+
+        let requestItems: Array<MaraProductionRequestItem> = [];
+
+        for (let curNodeIndex = 0; curNodeIndex < path.Nodes.length - 1; curNodeIndex ++) {
+            let currentNode = path.Nodes[curNodeIndex];
+            let nextNode = path.Nodes[curNodeIndex + 1];
+
+            if (
+                currentNode.Type == MaraMapNodeType.Walkable &&
+                nextNode.Type == MaraMapNodeType.Unwalkable
+            ) {
+                for (
+                    let nextNodeIndex = curNodeIndex + 1; 
+                    nextNodeIndex < path.Nodes.length;
+                    nextNodeIndex ++
+                ) {
+                    let nextNode = path.Nodes[nextNodeIndex];
+
+                    if (nextNode.Type == MaraMapNodeType.Walkable) {
+                        let subpath = path.Nodes.slice(curNodeIndex, nextNodeIndex + 1);
+                        let bridgeSections = MaraMap.ConnectMapNodesByBridge(subpath, bridgeCfgId, this.settlementController.MasterMind);
+
+                        if (bridgeSections.length == 0) {
+                            this.settlementController.Debug(`Unable to markup bridge from ${currentNode.Region.Center} to ${nextNode.Region.Center}`);
+                            return null;
+                        }
+
+                        for (let section of bridgeSections) {
+                            let item = new MaraProductionRequestItem(bridgeCfgId, section.TopLeft, 0);
+                            requestItems.push(item);
+                        }
+                        
+                        curNodeIndex = nextNodeIndex + 1;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (requestItems.length > 0) {
+            return this.makeProductionQueueRequest(requestItems);
+        }
+        else {
+            this.settlementController.Debug(`Destination is reachable, bridge is not needed`);
+            return null;
+        }
     }
 
     private getRequestsToReorder(): Array<MaraProductionRequest> {

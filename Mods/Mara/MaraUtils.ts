@@ -980,7 +980,11 @@ export class MaraUtils {
         return unitConfig.Specification.HasFlag(UnitSpecification.Church);
     }
 
-    static IsWalkableConfig(unitConfig: any): boolean {
+    static IsWalkableConfigId(cfgId: any): boolean {
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.isWalkableConfig, "IsWalkableConfig") as boolean;
+    }
+
+    private static isWalkableConfig(unitConfig: any): boolean {
         return unitConfig.BuildingConfig != null && unitConfig.HasFlags(UnitFlags.Walkable);
     }
 

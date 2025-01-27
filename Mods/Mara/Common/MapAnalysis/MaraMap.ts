@@ -1204,7 +1204,7 @@ export class MaraMap {
     private static unitListChangedProcessor(sender, UnitsListChangedEventArgs): void {
         let unit = UnitsListChangedEventArgs.Unit;
 
-        if (MaraUtils.IsWalkableConfig(unit.Cfg)) {
+        if (MaraUtils.IsWalkableConfigId(unit.Cfg.Uid)) {
             if (UnitsListChangedEventArgs.IsAdded) {
                 let handler = unit.EventsMind.BuildingComplete.connect(
                     (sender, args) => {

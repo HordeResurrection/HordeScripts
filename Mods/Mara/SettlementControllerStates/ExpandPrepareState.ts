@@ -21,6 +21,19 @@ export class ExpandPrepareState extends ProductionState {
                     }
                 }
             );
+
+            let settlementLocation = this.settlementController.GetSettlementLocation();
+
+            if (settlementLocation) {
+                let bridgeRequest = this.makeBridgeProductionRequest(
+                    settlementLocation.Center, 
+                    this.settlementController.TargetExpand?.Cluster.Center
+                );
+
+                if (bridgeRequest) {
+                    result.push(bridgeRequest);
+                }
+            }
             
             return result;
         }

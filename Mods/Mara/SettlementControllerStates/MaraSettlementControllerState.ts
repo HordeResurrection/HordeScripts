@@ -150,7 +150,27 @@ export abstract class MaraSettlementControllerState extends FsmState {
                 let closestSortData = sortData.slice(0, 10);
                 let closestCandidates = closestSortData.map((value) => value.Cluster);
 
-                return this.settlementController.StrategyController.SelectOptimalResourceCluster(closestCandidates);
+                let clusterSelection = this.settlementController.StrategyController.SelectOptimalResourceCluster(closestCandidates);
+
+                if (clusterSelection.Optimal) {
+                    if (clusterSelection.IsOptimalClusterReachable) {
+                        return clusterSelection.Optimal;
+                    }
+                    else {
+                        let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
+                        let bridgeCfgId = produceableCfgIds.find((cfgId) => MaraUtils.IsWalkableConfigId(cfgId));
+
+                        if (bridgeCfgId) {
+                            return clusterSelection.Optimal;
+                        }
+                        else {
+                            return clusterSelection.OptimalReachable;
+                        }
+                    }
+                }
+                else {
+                    return clusterSelection.OptimalReachable;
+                }
             }
             else {
                 return null;
