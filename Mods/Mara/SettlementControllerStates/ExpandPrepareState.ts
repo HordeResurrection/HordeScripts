@@ -1,7 +1,9 @@
 
+import { TileType } from "library/game-logic/horde-types";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
 import { ProductionState } from "./ProductionState";
+import { MaraMap } from "../Common/MapAnalysis/MaraMap";
 
 export class ExpandPrepareState extends ProductionState {
     protected onTargetCompositionReached(): void {
@@ -25,10 +27,13 @@ export class ExpandPrepareState extends ProductionState {
             let settlementLocation = this.settlementController.GetSettlementLocation();
 
             if (settlementLocation) {
-                let bridgeRequest = this.makeBridgeProductionRequest(
+                let path = MaraMap.GetShortestPath(
                     settlementLocation.Center, 
-                    this.settlementController.TargetExpand?.Cluster.Center
+                    this.settlementController.TargetExpand?.Cluster.Center, 
+                    [TileType.Water]
                 );
+                
+                let bridgeRequest = this.makeBridgeProductionRequest(path);
 
                 if (bridgeRequest) {
                     result.push(bridgeRequest);

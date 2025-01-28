@@ -7,8 +7,8 @@ import { MaraPoint } from "../Common/MaraPoint";
 import { UnitComposition } from "../Common/UnitComposition";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 import { MaraMap } from "../Common/MapAnalysis/MaraMap";
-import { TileType } from "library/game-logic/horde-types";
 import { MaraMapNodeType } from "../Common/MapAnalysis/MaraMapNodeType";
+import { MaraPath } from "../Common/MapAnalysis/MaraPath";
 
 export abstract class ProductionState extends MaraSettlementControllerState {
     private requests: Array<MaraProductionRequest>;
@@ -150,7 +150,14 @@ export abstract class ProductionState extends MaraSettlementControllerState {
         return productionRequest;
     }
 
-    protected makeBridgeProductionRequest(from: MaraPoint, to: MaraPoint): MaraProductionRequest | null {
+    protected makeBridgeProductionRequest(path: MaraPath | null): MaraProductionRequest | null {
+        if (!path) {
+            this.settlementController.Debug(`Unable to build bridge: path not found`);
+            return null;
+        }
+        
+        let from = path.Nodes[0].Region.Center;
+        let to = path.Nodes[path.Nodes.length - 1].Region.Center;
         this.settlementController.Debug(`Requesting bridge build from ${from.ToString()} to ${to.ToString()}`)
         
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
@@ -158,13 +165,6 @@ export abstract class ProductionState extends MaraSettlementControllerState {
 
         if (!bridgeCfgId) {
             this.settlementController.Debug(`Unable to build bridge: no available bridge config`);
-            return null;
-        }
-
-        let path = MaraMap.GetShortestPath(from, to, [TileType.Water]);
-
-        if (!path) {
-            this.settlementController.Debug(`Unable to build bridge: path not found`);
             return null;
         }
 

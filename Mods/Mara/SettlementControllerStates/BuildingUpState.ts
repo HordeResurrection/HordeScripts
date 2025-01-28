@@ -3,6 +3,8 @@ import { ProductionState } from "./ProductionState";
 import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
+import { MaraMap } from "../Common/MapAnalysis/MaraMap";
+import { TileType } from "library/game-logic/horde-types";
 
 export class BuildingUpState extends ProductionState {
     protected getProductionTimeout(): number | null {
@@ -40,6 +42,32 @@ export class BuildingUpState extends ProductionState {
                     }
                 }
             );
+
+            let settlementLocation = this.settlementController.GetSettlementLocation();
+
+            if (settlementLocation) {
+                let attackTarget = this.settlementController.StrategyController.GetOffensiveTarget(enemy);
+
+                if (attackTarget) {
+                    let paths = MaraMap.GetPaths(settlementLocation.Center, attackTarget.UnitCell, [TileType.Water]);
+                    
+                    let waterPaths = paths.filter(
+                        (p) => p.Nodes.findIndex(
+                            (n) => n.TileType == TileType.Water
+                        ) > -1
+                    );
+
+                    let randomPath = MaraUtils.RandomSelect(this.settlementController.MasterMind, waterPaths)
+                
+                    if (randomPath) {
+                        let bridgeRequest = this.makeBridgeProductionRequest(randomPath);
+
+                        if (bridgeRequest) {
+                            result.push(bridgeRequest);
+                        }
+                    }
+                }
+            }
             
             return result;
         }
