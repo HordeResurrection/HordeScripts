@@ -1315,7 +1315,7 @@ export class MaraUtils {
         spawnGeometry(ActiveScena, geometryBuffer, createPoint(0, 0), ticksToLive);
     }
 
-    static DrawPath(path:Array<MaraPoint>, color: any): void {
+    static DrawPath(path: Array<MaraPoint>, color: any): void {
         for (let i = 0; i < path.length - 1; i ++) {
             MaraUtils.DrawLineOnScena(path[i], path[i + 1], color);
         }

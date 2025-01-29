@@ -11,6 +11,7 @@ export class MaraMapNode {
     TileType: any;
     Weigth: number;
     ShortestDistance: number;
+    AStarHeuristic: number;
     Id: number;
 
     constructor (region: MaraRegion, neighbours: Array<MaraMapNode>, type: MaraMapNodeType) {

@@ -163,8 +163,20 @@ export class MaraMap {
 
         MaraMap.initPathfinding(unwalkableNodeTypesToInclude);
 
-        let path = MaraMap.dijkstraPath(fromNode, toNode, MaraMap.mapNodes);
-        return new MaraPath(path);
+        //let path = MaraMap.dijkstraPath(fromNode, toNode, MaraMap.mapNodes);
+        let path = MaraMap.aStarPath(
+            fromNode, 
+            toNode, 
+            MaraMap.aStarHeuristic,
+            MaraMap.mapNodes
+        );
+
+        if (path.length == 0) {
+            return null;
+        }
+        else {
+            return new MaraPath(path);
+        }
     }
 
     static GetPaths(from: MaraPoint, to: MaraPoint, unwalkableNodeTypesToInclude: Array<any> = []): Array<MaraPath> {
@@ -186,7 +198,8 @@ export class MaraMap {
         const WEIGTH_INCREMENT = 1000;
 
         while (paths.length < MaraMap.MAX_PATH_COUNT) {
-            let path = MaraMap.dijkstraPath(fromNode, toNode, MaraMap.mapNodes);
+            //let path = MaraMap.dijkstraPath(fromNode, toNode, MaraMap.mapNodes);
+            let path = MaraMap.aStarPath(fromNode, toNode, MaraMap.aStarHeuristic, MaraMap.mapNodes);
             
             if (path.length == 0) { // not found
                 return [];
@@ -1088,6 +1101,97 @@ export class MaraMap {
 
             clusterIndex ++;
         });
+    }
+
+    private static aStarHeuristic(
+        curNode: MaraMapNode, 
+        toNode: MaraMapNode
+    ): number {
+        let distance = MaraUtils.ChebyshevDistance(toNode.Region.Center, curNode.Region.Center);
+
+        return distance / MaraMap.REGION_SIZE;
+    }
+
+    private static aStarPath(
+        from: MaraMapNode, 
+        to: MaraMapNode, 
+        heuristic: (
+            curNode: MaraMapNode, 
+            toNode: MaraMapNode
+        ) => number,
+        nodes: Array<MaraMapNode>,
+    ): Array<MaraMapNode> {
+        let options: any = {};
+        options.comparator = (a, b) => {
+            let distance = a.AStarHeuristic - b.AStarHeuristic;
+
+            if (isNaN(distance) || distance == 0) {
+                return a.Id - b.Id;
+            }
+            else  {
+                return distance;
+            }
+        }
+
+        let unprocessedNodes = new SortedSet(options);
+        from.ShortestDistance = 0;
+        from.AStarHeuristic = heuristic(from, to);
+        
+        for (let n of nodes) {
+            if (n != from) {
+                n.ShortestDistance = Infinity;
+                n.AStarHeuristic = Infinity;
+            }
+
+            unprocessedNodes.insert(n);
+        }
+        
+        let processedNodes = {};
+        
+        while (unprocessedNodes.length > 0) {
+            let closestNode: MaraMapNode = unprocessedNodes.beginIterator().value();
+
+            if (closestNode == to) {
+                break;
+            }
+            
+            for (let node of closestNode.Neighbours) {
+                let n = processedNodes[node.Id];
+                
+                if (n != null) {
+                    continue;
+                }
+    
+                let newDistance = closestNode.ShortestDistance + node.Weigth;
+    
+                if (newDistance < node.ShortestDistance) {
+                    unprocessedNodes.remove(node);
+                    node.ShortestDistance = newDistance;
+                    node.AStarHeuristic = newDistance + heuristic(node, to);
+                    unprocessedNodes.insert(node);
+                }
+            }
+            
+            processedNodes[closestNode.Id] = closestNode;
+            unprocessedNodes.remove(closestNode);
+        }
+    
+        if (to.ShortestDistance == Infinity) { //path not found
+            return [];
+        }
+    
+        let result: Array<MaraMapNode> = [];
+        result.push(to);
+    
+        let currentNode = to;
+    
+        while (currentNode != from) {
+            let nextNode = currentNode.Neighbours.find((n) => currentNode.ShortestDistance == (currentNode.Weigth + n.ShortestDistance))!;
+            result.push(nextNode);
+            currentNode = nextNode;
+        }
+    
+        return result.reverse();
     }
 
     private static dijkstraPath(from: MaraMapNode, to: MaraMapNode, nodes: Array<MaraMapNode>): Array<MaraMapNode> {

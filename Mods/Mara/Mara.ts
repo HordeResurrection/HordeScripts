@@ -125,14 +125,23 @@ export class Mara {
 
         //TODO: remove this debug code
         
-        // let from = new MaraPoint(8, 105);
-        // let to = new MaraPoint(37, 73);
-        
-        // let paths = MaraMap.GetPaths(from, to, [TileType.Water]);
-        // let nodes = paths[0].Nodes;
+        // let from = new MaraPoint(29, 21);
+        // let to = new MaraPoint(172, 171);
 
-        // for (let i = 0; i < nodes.length - 1; i ++) {
-        //     MaraUtils.DrawLineOnScena(nodes[i].Region.Center, nodes[i+1].Region.Center);
+        // let path = MaraMap.GetShortestPath(from, to)!;
+        // Mara.Debug(`Found path: ${path.Nodes.length} - ${path.ToString()}`);
+        // MaraUtils.DrawPath(path.Nodes.map((n) => n.Region.Center), createHordeColor(255, 255, 0, 0));
+
+        // let profiler = new MaraProfiler("path calculation", true);
+        
+        // for (let i = 0; i < 10000; i ++) {
+        //     let paths = MaraMap.GetPaths(from, to, [/*TileType.Water*/]);
+        // }
+
+        // profiler.Stop(true);
+        
+        // for (let path of paths) {
+        //     MaraUtils.DrawPath(path.Nodes.map((n) => n.Region.Center), createHordeColor(255, 255, 0, 0));
         // }
     };
 
