@@ -57,13 +57,21 @@ export class BuildingUpState extends ProductionState {
                         ) > -1
                     );
 
-                    let randomPath = MaraUtils.RandomSelect(this.settlementController.MasterMind, waterPaths)
-                
-                    if (randomPath) {
-                        let bridgeRequest = this.makeBridgeProductionRequest(randomPath);
+                    let walkablePathsWeigth = 2 * (paths.length - waterPaths.length);
+                    let waterPathsWeigth = waterPaths.length;
 
-                        if (bridgeRequest) {
-                            result.push(bridgeRequest);
+                    let targetProbability = 100 * walkablePathsWeigth / (walkablePathsWeigth + waterPathsWeigth);
+                    let random = MaraUtils.Random(this.settlementController.MasterMind, 100);
+
+                    if (random >= targetProbability) {
+                        let randomPath = MaraUtils.RandomSelect(this.settlementController.MasterMind, paths);
+                        
+                        if (randomPath) {
+                            let bridgeRequest = this.makeBridgeProductionRequest(randomPath);
+                            
+                            if (bridgeRequest) {
+                                result.push(bridgeRequest);
+                            }
                         }
                     }
                 }
