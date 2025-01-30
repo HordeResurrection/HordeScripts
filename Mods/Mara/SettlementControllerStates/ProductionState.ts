@@ -175,7 +175,10 @@ export abstract class ProductionState extends MaraSettlementControllerState {
             let nextNode = path.Nodes[curNodeIndex + 1];
 
             if (
-                currentNode.Type == MaraMapNodeType.Walkable &&
+                (
+                    currentNode.Type == MaraMapNodeType.Walkable ||
+                    currentNode.Type == MaraMapNodeType.Gate
+                ) &&
                 nextNode.Type == MaraMapNodeType.Unwalkable
             ) {
                 for (
@@ -185,7 +188,10 @@ export abstract class ProductionState extends MaraSettlementControllerState {
                 ) {
                     let nextNode = path.Nodes[nextNodeIndex];
 
-                    if (nextNode.Type == MaraMapNodeType.Walkable) {
+                    if (
+                        nextNode.Type == MaraMapNodeType.Walkable ||
+                        nextNode.Type == MaraMapNodeType.Gate
+                    ) {
                         let subpath = path.Nodes.slice(curNodeIndex, nextNodeIndex + 1);
                         let bridgeSections = MaraMap.ConnectMapNodesByBridge(subpath, bridgeCfgId, this.settlementController.MasterMind);
 
