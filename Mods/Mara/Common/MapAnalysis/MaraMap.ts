@@ -16,6 +16,7 @@ import SortedSet from "./SortedSet.js"
 import RBush from "../RBush/rbush.js"
 import { MaraRect } from "../MaraRect";
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
+import { MaraMapNodeLink } from "./MaraMapNodeLink";
 
 class TileTypeCache extends MaraCellDataHolder {
     constructor () {
@@ -76,6 +77,11 @@ export class MaraMap {
     public static readonly RESOURCE_CLUSTER_SIZE = 8;
     public static readonly RESOURCE_CLUSTER_MAX_MINERAL_CELLS = 9;
     private static readonly MAX_PATH_COUNT = 10;
+
+    private static readonly WALKABLE_TO_WALKABLE_COST = 1;
+    private static readonly WALKABLE_TO_UNWALKABLE_COST = 2;
+    private static readonly UNWALKABLE_TO_WALKABLE_COST = 1;
+    private static readonly UNWALKABLE_TO_UNWALKABLE_COST = 20;
     
     private static tileTypeCache: TileTypeCache = new TileTypeCache();
     
@@ -195,7 +201,7 @@ export class MaraMap {
         MaraMap.initPathfinding(unwalkableNodeTypesToInclude);
         
         let paths: Array<MaraPath> = [];
-        const WEIGTH_INCREMENT = 1000;
+        const WEIGTH_INCREMENT = 100;
 
         while (paths.length < MaraMap.MAX_PATH_COUNT) {
             //let path = MaraMap.dijkstraPath(fromNode, toNode, MaraMap.mapNodes);
@@ -244,11 +250,11 @@ export class MaraMap {
         }
 
         for (let node of overlappedNodes) {
-            for (let neighbour of node.Neighbours) {
-                neighbour.Neighbours = neighbour.Neighbours.filter((n) => n != node);
+            for (let link of node.Links) {
+                link.Node.Links = link.Node.Links.filter((n) => n.Node != node);
             }
 
-            node.Neighbours = [];
+            node.Links = [];
         }
 
         overlappedNodes = overlappedNodes.filter((n) => n.Region.Cells.length > 0);
@@ -956,17 +962,17 @@ export class MaraMap {
                 let node = MaraMap.mapNodes[i];
 
                 if (
-                    node.Neighbours.length == 1 &&
+                    node.Links.length == 1 &&
                     (
                         node.Type == MaraMapNodeType.Gate ||
                         node.Type == MaraMapNodeType.Walkable && node.Region.Cells.length < MaraMap.REGION_SIZE / 4
                     )
                 ) {
-                    let neighbour = node.Neighbours[0];
+                    let link = node.Links[0];
 
-                    if (neighbour.Type == MaraMapNodeType.Walkable) {
-                        neighbour.Region.AddCells(node.Region.Cells);
-                        neighbour.Neighbours = neighbour.Neighbours.filter((v) => v != node);
+                    if (link.Node.Type == MaraMapNodeType.Walkable) {
+                        link.Node.Region.AddCells(node.Region.Cells);
+                        link.Node.Links = link.Node.Links.filter((v) => v.Node != node);
                         
                         atLeastOneNodeChanged = true;
                     }
@@ -985,12 +991,33 @@ export class MaraMap {
     }
 
     private static linkNodes(node: MaraMapNode, neighbourNode: MaraMapNode): void {
-        if (!node.Neighbours.find((v) => v == neighbourNode)) {
-            node.Neighbours.push(neighbourNode);
+        if (!node.Links.find((v) => v.Node == neighbourNode)) {
+            let link = new MaraMapNodeLink(neighbourNode, MaraMap.getTransitionCost(node, neighbourNode));
+            node.Links.push(link);
         }
     
-        if (!neighbourNode.Neighbours.find((v) => v == node)) {
-            neighbourNode.Neighbours.push(node);
+        if (!neighbourNode.Links.find((v) => v.Node == node)) {
+            let link = new MaraMapNodeLink(neighbourNode, MaraMap.getTransitionCost(neighbourNode, node));
+            neighbourNode.Links.push(link);
+        }
+    }
+
+    private static getTransitionCost(from: MaraMapNode, to: MaraMapNode): number {
+        if (from.IsWalkable()) {
+            if (to.IsWalkable()) {
+                return MaraMap.WALKABLE_TO_WALKABLE_COST;
+            }
+            else {
+                return MaraMap.WALKABLE_TO_UNWALKABLE_COST;
+            }
+        }
+        else {
+            if (to.IsWalkable()) {
+                return MaraMap.UNWALKABLE_TO_WALKABLE_COST;
+            }
+            else {
+                return MaraMap.UNWALKABLE_TO_UNWALKABLE_COST;
+            }
         }
     }
 
@@ -1043,15 +1070,15 @@ export class MaraMap {
         let processedPairs: [MaraRegion, MaraRegion][] = [];
         
         for (let node of MaraMap.mapNodes) {
-            for (let neighbour of node.Neighbours) {
+            for (let link of node.Links) {
                 if (
                     !processedPairs.find(
-                        (r) => (r[0] == neighbour.Region || r[1] == neighbour.Region) &&
+                        (r) => (r[0] == link.Node.Region || r[1] == link.Node.Region) &&
                         (r[0] == node.Region || r[1] == node.Region)
                     )
                 ) {
-                    processedPairs.push([node.Region, neighbour.Region]);
-                    MaraUtils.DrawLineOnScena(node.Region.Center, neighbour.Region.Center);
+                    processedPairs.push([node.Region, link.Node.Region]);
+                    MaraUtils.DrawLineOnScena(node.Region.Center, link.Node.Region.Center);
                 }
             }
 
@@ -1155,20 +1182,23 @@ export class MaraMap {
                 break;
             }
             
-            for (let node of closestNode.Neighbours) {
-                let n = processedNodes[node.Id];
+            for (let link of closestNode.Links) {
+                let n = processedNodes[link.Node.Id];
                 
                 if (n != null) {
                     continue;
                 }
     
-                let newDistance = closestNode.ShortestDistance + node.Weigth;
+                let newDistance = MaraMap.calcDistance(closestNode, link);
     
-                if (newDistance < node.ShortestDistance) {
-                    unprocessedNodes.remove(node);
-                    node.ShortestDistance = newDistance;
-                    node.AStarHeuristic = newDistance + heuristic(node, to);
-                    unprocessedNodes.insert(node);
+                if (newDistance < link.Node.ShortestDistance) {
+                    unprocessedNodes.remove(link.Node);
+                    
+                    link.Node.PrevNode = closestNode;
+                    link.Node.ShortestDistance = newDistance;
+                    link.Node.AStarHeuristic = newDistance + heuristic(link.Node, to);
+                    
+                    unprocessedNodes.insert(link.Node);
                 }
             }
             
@@ -1186,7 +1216,7 @@ export class MaraMap {
         let currentNode = to;
     
         while (currentNode != from) {
-            let nextNode = currentNode.Neighbours.find((n) => currentNode.ShortestDistance == (currentNode.Weigth + n.ShortestDistance))!;
+            let nextNode = currentNode.PrevNode;
             result.push(nextNode);
             currentNode = nextNode;
         }
@@ -1194,70 +1224,10 @@ export class MaraMap {
         return result.reverse();
     }
 
-    private static dijkstraPath(from: MaraMapNode, to: MaraMapNode, nodes: Array<MaraMapNode>): Array<MaraMapNode> {
-        let options: any = {};
-        options.comparator = (a, b) => {
-            let distance = a.ShortestDistance - b.ShortestDistance;
-
-            if (isNaN(distance) || distance == 0) {
-                return a.Id - b.Id;
-            }
-            else  {
-                return distance;
-            }
-        }
-
-        let unprocessedNodes = new SortedSet(options);
-        from.ShortestDistance = 0;
-        
-        nodes.forEach((n) => {
-            if (n != from) {
-                n.ShortestDistance = Infinity;
-            }
-            unprocessedNodes.insert(n);
-        });
-        
-        let processedNodes = {};
-        
-        while (unprocessedNodes.length > 0) {
-            let closestNode: MaraMapNode = unprocessedNodes.beginIterator().value();
-            
-            for (let node of closestNode.Neighbours) {
-                let n = processedNodes[node.Id];
-                
-                if (n != null) {
-                    continue;
-                }
-    
-                let newDistance = closestNode.ShortestDistance + node.Weigth;
-    
-                if (newDistance < node.ShortestDistance) {
-                    unprocessedNodes.remove(node);
-                    node.ShortestDistance = newDistance;
-                    unprocessedNodes.insert(node);
-                }
-            }
-            
-            processedNodes[closestNode.Id] = closestNode;
-            unprocessedNodes.remove(closestNode);
-        }
-    
-        if (to.ShortestDistance == Infinity) { //path not found
-            return [];
-        }
-    
-        let result: Array<MaraMapNode> = [];
-        result.push(to);
-    
-        let currentNode = to;
-    
-        while (currentNode != from) {
-            let nextNode = currentNode.Neighbours.find((n) => currentNode.ShortestDistance == (currentNode.Weigth + n.ShortestDistance))!;
-            result.push(nextNode);
-            currentNode = nextNode;
-        }
-    
-        return result.reverse();
+    private static calcDistance(source: MaraMapNode, link: MaraMapNodeLink): number {
+        return source.ShortestDistance + 
+            link.Node.Weigth + 
+            link.Weigth * MaraUtils.ChebyshevDistance(source.Region.Center, link.Node.Region.Center);
     }
 
     private static initCellResources(): void {
