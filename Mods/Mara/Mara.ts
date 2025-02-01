@@ -8,8 +8,6 @@ import { createHordeColor } from "library/common/primitives";
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
 import { MaraUnitConfigCache } from "./Common/Cache/MaraUnitConfigCache";
 import { MaraProfiler } from "./Common/MaraProfiler";
-import { MaraPoint } from "./Common/MaraPoint";
-import { TileType } from "library/game-logic/horde-types";
 
 export enum MaraLogLevel {
     Debug = 0,
@@ -122,29 +120,6 @@ export class Mara {
         }
 
         Mara.Info(`Mara successfully engaged. Have fun! ^^`);
-
-        //TODO: remove this debug code
-        
-        // let from = new MaraPoint(65, 9);
-        // let to = new MaraPoint(7, 71);
-
-        //let path = MaraMap.GetShortestPath(from, to)!;
-        // Mara.Debug(`Found path: ${path.Nodes.length} - ${path.ToString()}`);
-        //MaraUtils.DrawPath(path.Nodes.map((n) => n.Region.Center), createHordeColor(255, 255, 0, 0));
-
-        // let profiler = new MaraProfiler("path calculation", true);
-        
-        // for (let i = 0; i < 10000; i ++) {
-        //     let paths = MaraMap.GetPaths(from, to, [/*TileType.Water*/]);
-        // }
-
-        // profiler.Stop(true);
-        
-        // let paths = MaraMap.GetPaths(from, to, [TileType.Water]);
-        
-        // for (let path of paths) {
-        //     MaraUtils.DrawPath(path.Nodes.map((n) => n.Region.Center), createHordeColor(255, 255, 0, 0));
-        // }
     };
 
     static AttachToPlayer(playerId: string, processedSettlements: Array<any>, tickOffset: number = 0): void {
