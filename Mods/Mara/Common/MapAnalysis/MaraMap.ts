@@ -294,6 +294,8 @@ export class MaraMap {
     }
 
     static ConnectMapNodesByBridge(nodesPath: Array<MaraMapNode>, bridgeConfigId: string, masterMind: any): Array<MaraRect> {
+        return []; //TODO: temporarily disable bridge building, remove this
+        
         if (nodesPath.length < 3) {
             return [];
         }
