@@ -87,7 +87,7 @@ export class Example_UnitWorks extends HordeExampleBase {
 
         // Телепортация юнита (отключено, чтобы не сбивать другие примеры)
         if (false) {
-            if (unitTeleport(unit, cell)) {
+            if (unitTeleport(unit!, cell)) {
                 this.log.info('Юнит телепортирован в', cell);
             } else {
                 this.log.info('Юнит НЕ может быть телепортирован в', cell);

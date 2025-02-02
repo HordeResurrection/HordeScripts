@@ -43,7 +43,7 @@ export function inspectToStr(object: object, maxDepth: number | undefined, resul
 /**
  * Выводит в лог результат интроспекции.
  */
-export function inspect(object: object, maxDepth: number | undefined = undefined, msg: string | null = null) {
+export function inspect(object: any, maxDepth: number | undefined = undefined, msg: string | null = null) {
     msg = msg ?? 'Object introspection result:';
     if (!object) {
         log.info(msg, '\nType:', typeof object);

@@ -59,3 +59,9 @@ export const ArrayT = System.Array;
 export type ArrayT = System.Array;
 export const EnumT = System.Enum;
 export type EnumT = System.Enum;
+
+export const ActionT = System.Action;
+export type ActionT = System.Action;
+
+export const FuncT = System.Func;
+export type FuncT = System.Func;

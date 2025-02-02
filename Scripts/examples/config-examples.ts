@@ -94,14 +94,14 @@ export class Example_ConfigCreation extends HordeExampleBase {
         this.remover.removeConfig();
 
         // Клонируем конфиг и изменяем
-        let newBallistaCfg = HordeContentApi.CloneConfig(ballistaCfg, newCfgUid);
+        let newBallistaCfg = HordeContentApi.CloneConfig(ballistaCfg, newCfgUid) as UnitConfig;
         ScriptUtils.SetValue(newBallistaCfg, "Name", "Динамическая баллиста");
         ScriptUtils.SetValue(newBallistaCfg, "ProductionTime", 50);
         ScriptUtils.SetValue(newBallistaCfg, "TintColor", createHordeColor(255, 255, 150, 150));
         this.log.info('Создан новый конфиг баллисты:', newBallistaCfg.Uid, `(${newBallistaCfg.Name})`);
 
         // Добавляем новую баллисту в завод
-        let producerParams = factoryCfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        let producerParams = factoryCfg.GetProfessionParams<UnitProducerProfessionParams>(UnitProducerProfessionParams, UnitProfession.UnitProducer);
         let produceList = producerParams.CanProduceList;
         this.log.info('Сейчас завод производит:', produceList.Count, 'вида техники');
         this.log.info('Добавляем только что созданную баллисту в список производства..');
@@ -144,7 +144,7 @@ export class Example_ConfigRemoving extends HordeExampleBase {
 
         this.log.info('Удаление из завода ссылок на конфиг:', targetCfgUid);
         let factoryCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Factory");
-        let producerParams = factoryCfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        let producerParams = factoryCfg.GetProfessionParams<UnitProducerProfessionParams>(UnitProducerProfessionParams, UnitProfession.UnitProducer);
         let produceList = producerParams.CanProduceList;
         ScriptUtils.RemoveAll(produceList, targetCfg);
     }

@@ -69,7 +69,7 @@ declare function ForEach(enumerable: object, action: (item: any, i: number, sour
 declare const ScriptUtils: typeof ScriptUtilsT;
 declare class ScriptUtilsT extends HordeClassLibrary.Scripting.ScriptApi.ScriptUtils {
     public static ForEach(enumerable: object, action: (item: any, i: number, sourceEnumerable: object) => void): void;
-    public static RemoveAll(list: object, item: any): void;
+    public static RemoveAll(list: object, item: any): number;
 }
 
 /**
@@ -132,14 +132,26 @@ declare class HostFunctions {
     public static newVar(hostType: object, initValue?: any): refObject<any>;
 
     /**
-     * Создаёт делегат на указанную функцию без возвращаемого значения.
+     * Создаёт делегат заданного типа.
      */
-    public static func(argCount: number, scriptFunc: Function): any;
+    public static del(delegateHostType: object, scriptFunc: Function): System.Delegate;
 
     /**
-     * Создаёт делегат на указанную функцию с возвращаемым значением.
+     * Создаёт Action-делегат (т.е. без возвращаемого значения).
      */
-    public static func(returnHostType: object, argCount: number, scriptFunc: Function): any;
+    public static proc(argCount: number, scriptFunc: Function): System.Action;
+
+    /**
+     * Создаёт Func-делегат без приведения типа для возвращаемого значения.
+     * Примечание: в движке ClearScript, возвращаемый объект будет с типом "System.Object".
+     */
+    public static func(argCount: number, scriptFunc: Function): System.Func;
+
+    /**
+     * Создаёт Func-делегат с приведением типа возвращаемого значения.
+     * Примечание: приведение типа выполняется на уровне движка ClearScript, поэтому в TypeScript-коде придется типизировать отдельно.
+     */
+    public static func(returnHostType: object, argCount: number, scriptFunc: Function): System.Func;
 
     /**
      * Возвращает .Net-тип для указанного хост-типа.

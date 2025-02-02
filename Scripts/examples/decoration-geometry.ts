@@ -106,7 +106,7 @@ export class Example_GeometryDecoration extends HordeExampleBase {
 
         // Можно использовать встроенные заготовки, но для них уже заранее заданы цвет, толщина линий и другие параметры.
         // (Таким же образом можно делать и свои заготовки)
-        const UnitInForestTemplates = HordeGame.HordeResurrection.Game.Render.GeometryCanvas.UnitInForestTemplates;
+        const UnitInForestTemplates = HordeResurrection.Game.Render.GeometryCanvas.UnitInForestTemplates;
         let inForestGeometryBuffer = UnitInForestTemplates.GetFigure(UnitHealthLevel.Good);
         for (let i = 0; i < N; i++) {
             position = this._getRadialPosition(i * 40, 10 + (t % 100 + i * 6) % 100);
