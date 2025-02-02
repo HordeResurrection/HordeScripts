@@ -55,7 +55,7 @@ export class PathFinder {
 
         // Вспомогательные объекты
         let tmpPoint = createPoint(0, 0);
-        this.finishSet = new HashSetT(Point2D);
+        this.finishSet = new HashSetT<Point2D>(Point2D);
         this.finishSet.Add(tmpPoint);
 
         // Инициализация объекта для проверки наличия пути

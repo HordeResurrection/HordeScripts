@@ -38,17 +38,17 @@ export const TimeSpanT = System.TimeSpan;
 export type TimeSpanT = System.TimeSpan;
 
 export const ListT = System.Collections.Generic.List;
-export type ListT = System.Collections.Generic.List;
+export type ListT<T> = System.Collections.Generic.List<T>;
 export const HashSetT = System.Collections.Generic.HashSet;
-export type HashSetT = System.Collections.Generic.HashSet;
+export type HashSetT<T> = System.Collections.Generic.HashSet<T>;
 export const LinkedListT = System.Collections.Generic.LinkedList;
-export type LinkedListT = System.Collections.Generic.LinkedList;
+export type LinkedListT<T> = System.Collections.Generic.LinkedList<T>;
 export const DictionaryT = System.Collections.Generic.Dictionary;
-export type DictionaryT = System.Collections.Generic.Dictionary;
+export type DictionaryT<TKey, TValue> = System.Collections.Generic.Dictionary<TKey, TValue>;
 export const IEnumerableT = System.Collections.Generic.IEnumerable;
-export type IEnumerableT = System.Collections.Generic.IEnumerable;
+export type IEnumerableT<T> = System.Collections.Generic.IEnumerable<T>;
 export const IEnumeratorGenericT = System.Collections.Generic.IEnumerator;
-export type IEnumeratorGenericT = System.Collections.Generic.IEnumerator;
+export type IEnumeratorGenericT<T> = System.Collections.Generic.IEnumerator<T>;
 export const IEnumeratorT = System.Collections.IEnumerator;
 export type IEnumeratorT = System.Collections.IEnumerator;
 

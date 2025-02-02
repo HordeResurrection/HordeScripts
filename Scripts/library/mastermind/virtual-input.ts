@@ -35,7 +35,7 @@ export class PlayerVirtualInput {
 	public constructor(player: Player) {
 		this.player = player;
 		this.isEnabled = this.player.IsLocal;
-		this.inputsList = new ListT(AVirtualInputItem);
+		this.inputsList = new ListT<AVirtualInputItem>(AVirtualInputItem);
 	}
 
 	public selectUnits(cellStart: Point2D, cellEnd: Point2D, selectMode = VirtualSelectUnitsMode.Select) {
