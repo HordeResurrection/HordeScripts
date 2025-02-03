@@ -51,7 +51,7 @@ export class Example_UnitWorks extends HordeExampleBase {
         //   CauseEffectiveDamage(target, dmg, type) - нанесение урона другому юниту без учета брони
 
         // Отдел приказов
-        let ordersMind = unit.OrdersMind;
+        //let ordersMind = unit.OrdersMind;
         // Подробнее см. в отдельном примере - "Example_UnitOrders"
 
         // Отдел команд

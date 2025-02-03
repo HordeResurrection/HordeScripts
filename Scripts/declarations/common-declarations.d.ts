@@ -169,6 +169,26 @@ declare class refObject<T> {
     readonly out: T;
 }
 
+/**
+ * Объект для работы с .Net-событием через ClearScript.
+ */
+declare class EventSource<T extends Function> {
+    /**
+     * Подключить обработчик события.
+     */
+    connect(scriptFunc: T): EventConnection;
+}
+
+/**
+ * Объект для работы с обработчиком .Net-события.
+ */
+declare class EventConnection {
+    /**
+     * Отключить обработчик события.
+     */
+    disconnect(): void;
+}
+
 //#endregion
 
 // =============================================================================================
