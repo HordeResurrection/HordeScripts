@@ -68,8 +68,8 @@ declare function ForEach(enumerable: object, action: (item: any, i: number, sour
  */
 declare const ScriptUtils: typeof ScriptUtilsT;
 declare class ScriptUtilsT extends HordeClassLibrary.Scripting.ScriptApi.ScriptUtils {
-    public static ForEach(enumerable: object, action: (item: any, i: number, sourceEnumerable: object) => void): void;
-    public static RemoveAll(list: object, item: any): number;
+    static ForEach(enumerable: object, action: (item: any, i: number, sourceEnumerable: object) => void): void;
+    static RemoveAll(list: object, item: any): number;
 }
 
 /**
@@ -86,7 +86,7 @@ declare const ScriptMachineDebugApi: HordeClassLibrary.Scripting.ScriptApi.Scrip
  * Вывод логов.
  */
 declare class DebugLogger {
-    public static WriteLine(message: string): void;
+    static WriteLine(message: string): void;
 }
 
 /**
@@ -107,8 +107,8 @@ declare class HostFunctions {
     ```
         let ids = host.newArr(UnitIdLabel, ids.length) as UnitIdLabel[];
     ```
-     */
-    public static newArr(hostType: object, ...length: number[]): object[];
+    */
+    static newArr(hostType: object, ...length: number[]): object[];
 
     /**
      * Метод для каста DotNet-объектов.
@@ -118,55 +118,55 @@ declare class HostFunctions {
     ```
         (host.cast(IDisposableT, enumerator) as IDisposableT).Dispose();
     ```
-     */
-    public static cast(hostType: object, obj: any): any;
+    */
+    static cast(hostType: object, obj: any): any;
 
     /**
      * Метод для проверки типа DotNet-объектов.
      */
-    public static isType(hostType: object, obj: any): boolean;
+    static isType(hostType: object, obj: any): boolean;
 
     /**
      * Метод для создания ref-объектов для передачи в методы в качестве out/ref-аргументов.
      */
-    public static newVar(hostType: object, initValue?: any): refObject<any>;
+    static newVar(hostType: object, initValue?: any): refObject<any>;
 
     /**
      * Создаёт делегат заданного типа.
      */
-    public static del(delegateHostType: object, scriptFunc: Function): System.Delegate;
+    static del(delegateHostType: object, scriptFunc: Function): System.Delegate;
 
     /**
      * Создаёт Action-делегат (т.е. без возвращаемого значения).
      */
-    public static proc(argCount: number, scriptFunc: Function): System.Action;
+    static proc(argCount: number, scriptFunc: Function): System.Action;
 
     /**
      * Создаёт Func-делегат без приведения типа для возвращаемого значения.
      * Примечание: в движке ClearScript, возвращаемый объект будет с типом "System.Object".
      */
-    public static func(argCount: number, scriptFunc: Function): System.Func;
+    static func(argCount: number, scriptFunc: Function): System.Func;
 
     /**
      * Создаёт Func-делегат с приведением типа возвращаемого значения.
      * Примечание: приведение типа выполняется на уровне движка ClearScript, поэтому в TypeScript-коде придется типизировать отдельно.
      */
-    public static func(returnHostType: object, argCount: number, scriptFunc: Function): System.Func;
+    static func(returnHostType: object, argCount: number, scriptFunc: Function): System.Func;
 
     /**
      * Возвращает .Net-тип для указанного хост-типа.
      * Внимание! Метод работает только в unsafe-режиме скрипт-машины.
      */
-    public static typeOf(hostType: object): any;
+    static typeOf(hostType: object): any;
 }
 
 /**
  * Ref-объект для работы с методами с out/ref-параметрами.
  */
 declare class refObject<T> {
-    public value: T;
-    public readonly ref: T;
-    public readonly out: T;
+    value: T;
+    readonly ref: T;
+    readonly out: T;
 }
 
 //#endregion
@@ -182,12 +182,12 @@ declare class refObject<T> {
  * Внимание! Класс доступен только в unsafe-режиме скрипт-машины!
  */
 declare class ScriptReflection {
-    public static SetValue(memberOwner: object, memberName: string, value: any): void;
-    public static GetValue(memberOwner: object, memberName: string): any;
-    public static Invoke(memberOwner: object, methodName: string, ...parameters: any[]): any;
-    public static InvokeStatic(type: object, methodName: string, ...parameters: any[]): any;
-    public static CreateInstance(type: object, ...parameters: any[]): any;
-    public static GetTypeByName(typeName: string, assemblyName?: string): any;
+    static SetValue(memberOwner: object, memberName: string, value: any): void;
+    static GetValue(memberOwner: object, memberName: string): any;
+    static Invoke(memberOwner: object, methodName: string, ...parameters: any[]): any;
+    static InvokeStatic(type: object, methodName: string, ...parameters: any[]): any;
+    static CreateInstance(type: object, ...parameters: any[]): any;
+    static GetTypeByName(typeName: string, assemblyName?: string): any;
 }
 
 /**
@@ -201,17 +201,17 @@ declare class ExtendedHostFunctions extends HostFunctions {
     /**
      * Импортирует хост-тип по заданному .Net-типу.
      */
-    public static type(type: object): any;
+    static type(type: object): any;
 
     /**
      * Импортирует хост-тип по заданному имени .Net-типа.
      */
-    public static type(name: string, ...typeArgs: any[]): any;
+    static type(name: string, ...typeArgs: any[]): any;
 
     /**
      * Импортирует хост-тип по заданному имени .Net-типа.
      */
-    public static type(name: string, assemblyName: string, ...typeArgs: any[]): any;
+    static type(name: string, assemblyName: string, ...typeArgs: any[]): any;
 }
 
 //#endregion
