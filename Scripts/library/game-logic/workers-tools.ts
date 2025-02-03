@@ -106,7 +106,7 @@ export function setUnitGetOrderWorker(
     ScriptUtils.SetValue(workerObject, "FuncName", workerName);
 
     // Установка обработчика в конфиг
-    unitCfg.GetOrderWorker = workerObject;
+    ScriptUtils.SetValue(unitCfg, "GetOrderWorker", workerObject);
 }
 
 /**
