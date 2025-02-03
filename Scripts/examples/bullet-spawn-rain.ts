@@ -1,7 +1,7 @@
 import { broadcastMessage } from "library/common/messages";
 import { createPF, createPoint, createHordeColor } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
-import { BulletConfig, Settlement, ShotParams, Unit, UnitMapLayer } from "library/game-logic/horde-types";
+import { BulletConfig, ShotParams, Unit, UnitMapLayer } from "library/game-logic/horde-types";
 import HordeExampleBase from "./base-example";
 
 
@@ -31,11 +31,10 @@ export class Example_SpawnBulletsRain extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
-        let realScena = ActiveScena.GetRealScena();
-        let settlement_0 = realScena.Settlements.Item.get('0') as Settlement;  // Олег
+        let settlement_0 = ActiveScena.Settlements.Item.get('0');  // Олег
 
         // Игровой рандомизатор
-        this.rnd = realScena.Context.Randomizer;
+        this.rnd = ActiveScena.Context.Randomizer;
 
         // Любой юнит, от имени которого будет отправлена стрела
         this.someUnit = settlement_0.Units.GetCastleOrAnyUnit();

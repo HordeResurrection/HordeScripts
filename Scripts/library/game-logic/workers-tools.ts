@@ -89,7 +89,7 @@ export function setUnitStateWorker(
 export function setUnitGetOrderWorker(
     plugin: HordePluginBase,
     unitCfg: UnitConfig,
-    workerFunc: (plugin: HordePluginBase, unit: Unit, cmdArgs: ACommandArgs) => void
+    workerFunc: (plugin: HordePluginBase, unit: Unit, cmdArgs: ACommandArgs) => boolean
 ) {
     const workerName = `${plugin.name}_GetOrderWorker`
 

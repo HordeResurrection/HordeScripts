@@ -24,17 +24,33 @@ export type DiplomacyStatus = HordeClassLibrary.World.Simple.DiplomacyStatus;
 // ===================================================
 // --- Тайлы
 
+// Ландшафт
+export const Tile = HordeClassLibrary.World.Objects.Tiles.Tile;
+export type Tile = HordeClassLibrary.World.Objects.Tiles.Tile;
+export const TileModel = HordeClassLibrary.World.Objects.Tiles.TileModel;
+export type TileModel = HordeClassLibrary.World.Objects.Tiles.TileModel;
+export const KnownTile = HordeClassLibrary.World.Objects.Tiles.KnownTile;
+export type KnownTile = HordeClassLibrary.World.Objects.Tiles.KnownTile;
+
 // Unknown, Grass, Forest, Water, Marsh, Sand, Mounts, Road, Ice
 export const TileType = HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType;
 export type TileType = HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType;
 
-// None, Gold, Metal
-export const ResourceTileType = HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
-export type ResourceTileType = HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
-
 // None, Scorched, Chopped, Exploded, ...
 export const TilePayload = HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TilePayload;
 export type TilePayload = HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TilePayload;
+
+// Ресурсы
+export const ResourceTile = HordeClassLibrary.World.Objects.Tiles.ResourceTile;
+export type ResourceTile = HordeClassLibrary.World.Objects.Tiles.ResourceTile;
+export const ResourceTileModel = HordeClassLibrary.World.Objects.Tiles.ResourceTileModel;
+export type ResourceTileModel = HordeClassLibrary.World.Objects.Tiles.ResourceTileModel;
+export const KnownResourceTile = HordeClassLibrary.World.Objects.Tiles.KnownResourceTile;
+export type KnownResourceTile = HordeClassLibrary.World.Objects.Tiles.KnownResourceTile;
+
+// None, Gold, Metal
+export const ResourceTileType = HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
+export type ResourceTileType = HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
 
 
 // ===================================================
@@ -187,6 +203,8 @@ export type ProduceAtCommandArgs = HordeClassLibrary.UnitComponents.OrdersSystem
 export const ProduceCommandArgs = HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ProduceCommandArgs;
 export type ProduceCommandArgs = HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ProduceCommandArgs;
 
+export const AOrderBase = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase;
+export type AOrderBase = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase;
 export const OrderAttackParameters = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderAttackParameters;
 export type OrderAttackParameters = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderAttackParameters;
 export const OrderAttackUnit = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderAttackUnit;

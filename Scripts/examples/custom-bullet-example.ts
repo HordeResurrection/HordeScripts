@@ -65,8 +65,7 @@ export class Example_CustomBullet extends HordeExampleBase {
     private createBullet() {
 
         // Любой юнит, от имени которого будет отправлена стрела
-        let realScena = ActiveScena.GetRealScena();
-        let settlement_0 = realScena.Settlements.Item.get('0');  // Олег
+        let settlement_0 = ActiveScena.Settlements.Item.get('0');  // Олег
         let someUnit = settlement_0.Units.GetCastleOrAnyUnit();
 
         // Создание снаряда

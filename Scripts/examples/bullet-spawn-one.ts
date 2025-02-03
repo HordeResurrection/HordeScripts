@@ -20,8 +20,7 @@ export class Example_SpawnOneBullet extends HordeExampleBase {
     }
 
     private _spawnBullet() {
-        let realScena = ActiveScena.GetRealScena();
-        let settlement_0 = realScena.Settlements.Item.get('0');  // Олег
+        let settlement_0 = ActiveScena.Settlements.Item.get('0');  // Олег
 
         // Любой юнит, от имени которого будет отправлена стрела
         let someUnit = settlement_0.Units.GetCastleOrAnyUnit();

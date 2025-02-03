@@ -1,5 +1,5 @@
 import { createPoint } from "library/common/primitives";
-import { ACommandArgs, Settlement, Unit, UnitCommand, UnitCommandConfig } from "library/game-logic/horde-types";
+import { ACommandArgs, Unit, UnitCommand, UnitCommandConfig } from "library/game-logic/horde-types";
 import { setUnitGetOrderWorker } from "library/game-logic/workers-tools";
 import HordeExampleBase from "./base-example";
 
@@ -13,7 +13,7 @@ const CUSTOM_COMMAND_ID = UnitCommand.StepAway;
  * Пример создания команды для юнита со скриптовым обработчиком.
  */
 export class Example_CustomUnitCommand extends HordeExampleBase {
-    private baseGetOrderWorker: any;
+    private baseGetOrderWorker: HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerGetOrder;
 
     public constructor() {
         super("Custom unit command");
@@ -43,7 +43,7 @@ export class Example_CustomUnitCommand extends HordeExampleBase {
      * Добавление команды для замка.
      */
     private addCommandToCastle(cmdCfg: UnitCommandConfig) {
-        let settlement_0 = ActiveScena.Settlements.Item.get('0') as Settlement;
+        let settlement_0 = ActiveScena.Settlements.Item.get('0');
 
         // Замок, которому будет добавлена команда
         let someCastle = settlement_0.Units.GetCastleOrAnyUnit();
@@ -102,14 +102,15 @@ export class Example_CustomUnitCommand extends HordeExampleBase {
     /**
      * Обработчик для получения приказа из команды
      */
-    private worker_getUnitOrder(u: Unit, commandArgs: ACommandArgs) {
+    private worker_getUnitOrder(u: Unit, commandArgs: ACommandArgs): boolean {
         if (u.OrdersMind.IsUncontrollable) {
-            return;  // Юнит в данный момент является неуправляемым (например, в режиме паники)
+            return false;  // Юнит в данный момент является неуправляемым (например, в режиме паники)
         }
 
         if (commandArgs.CommandType == CUSTOM_COMMAND_ID) {
             // Была прожата кастомная команда
             this.log.info("Зафиксированно нажатие кастомной команды. Здесь можно выполнить любые действия.");
+            return true;
         } else {
             // Это не кастомная команда - запуск обычного обработчика получения приказа
             return this.baseGetOrderWorker.GetOrder(u, commandArgs);
