@@ -182,6 +182,8 @@ export const UnitState = HordeClassLibrary.UnitComponents.Enumerations.UnitState
 export type UnitState = HordeClassLibrary.UnitComponents.Enumerations.UnitState;
 export const UnitVisibility = HordeClassLibrary.UnitComponents.Enumerations.UnitVisibility;
 export type UnitVisibility = HordeClassLibrary.UnitComponents.Enumerations.UnitVisibility;
+export const UnitBehaviorByOrderFlag = HordeClassLibrary.UnitComponents.Enumerations.UnitBehaviorByOrderFlag;
+export type UnitBehaviorByOrderFlag = HordeClassLibrary.UnitComponents.Enumerations.UnitBehaviorByOrderFlag;
 
 
 // ===================================================

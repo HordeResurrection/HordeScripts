@@ -26,7 +26,7 @@ declare const UnitWorkersRegistry: HordeClassLibrary.Scripting.Misc.ScriptWorker
 declare const BulletWorkersRegistry: HordeClassLibrary.Scripting.Misc.ScriptWorkersRegistry;
 
 /**
- * Различные данные, которые НЕ будут очищаться при hot-reload.
+ * Хранилище данных, которые НЕ будут очищаться при hot-reload.
  */
 declare const DataStorage: DataStorageT;
 declare class DataStorageT {
@@ -37,13 +37,18 @@ declare class DataStorageT {
     gameTickNum: number;
 }
 
+/**
+ * Доступ и работа с конфигами игровых объектов.
+ */
+declare const HordeContentApi: typeof HordeClassLibrary.Scripting.ScriptApi.HordeContentApi;
+
 //#endregion
 
 // =============================================================================================
 // === Утилиты скрипт-машины
 // =============================================================================================
 
-//#region Utilities
+//#region Script machine utilities
 
 /**
  * ForEach - специальная функция для перечисления .Net-объектов.
@@ -71,11 +76,6 @@ declare class ScriptUtilsT extends HordeClassLibrary.Scripting.ScriptApi.ScriptU
     static ForEach(enumerable: object, action: (item: any, i: number, sourceEnumerable: object) => void): void;
     static RemoveAll(list: object, item: any): number;
 }
-
-/**
- * Доступ и работа с конфигами игровых объектов.
- */
-declare const HordeContentApi: typeof HordeClassLibrary.Scripting.ScriptApi.HordeContentApi;
 
 /**
  * Управление отладочными переменными скрипт-машины.
@@ -160,42 +160,13 @@ declare class HostFunctions {
     static typeOf(hostType: object): any;
 }
 
-/**
- * Ref-объект для работы с методами с out/ref-параметрами.
- */
-declare class refObject<T> {
-    value: T;
-    readonly ref: T;
-    readonly out: T;
-}
-
-/**
- * Объект для работы с .Net-событием через ClearScript.
- */
-declare class EventSource<T extends Function> {
-    /**
-     * Подключить обработчик события.
-     */
-    connect(scriptFunc: T): EventConnection;
-}
-
-/**
- * Объект для работы с обработчиком .Net-события.
- */
-declare class EventConnection {
-    /**
-     * Отключить обработчик события.
-     */
-    disconnect(): void;
-}
-
 //#endregion
 
 // =============================================================================================
 // === Утилиты unsafe-режима скрипт-машины
 // =============================================================================================
 
-//#region Unsafe mode tools
+//#region Script machine unsafe
 
 /**
  * Функции для рефлексии.
@@ -234,4 +205,77 @@ declare class ExtendedHostFunctions extends HostFunctions {
     static type(name: string, assemblyName: string, ...typeArgs: any[]): any;
 }
 
+//#endregion
+ 
+// =============================================================================================
+// === Вспмогательные типы
+// =============================================================================================
+
+//#region Service types
+
+/**
+ * Ref-объект для работы с методами с out/ref-параметрами.
+ */
+declare class refObject<T> {
+    value: T;
+    readonly ref: T;
+    readonly out: T;
+}
+
+/**
+ * Объект для работы с .Net-событием через ClearScript.
+ */
+declare class EventSource<T extends Function> {
+    /**
+     * Подключить обработчик события.
+     */
+    connect(scriptFunc: T): EventConnection;
+}
+
+/**
+ * Объект для работы с обработчиком .Net-события.
+ */
+declare class EventConnection {
+    /**
+     * Отключить обработчик события.
+     */
+    disconnect(): void;
+}
+
+//#endregion
+
+// =============================================================================================
+// === Заглушки для деклараций
+// =============================================================================================
+
+//#region Declaration stubs
+
+/**
+ * Декларации-заглушки для различных .Net-типов.
+ */
+declare namespace TypeStub {
+    /**
+     * Декларация-заглушка для .Net-структур (struct).
+     */
+    class ValueType extends System.Object {
+
+    }
+
+    /**
+     * Декларация-заглушка для .Net-перечислений (enum).
+     * @template T Соответствущий enum-тип.
+     */
+    class Enum<T extends number> extends ValueType {
+        private $T: T;
+    }
+
+    /**
+     * Декларация-заглушка для .Net-перечислений (enum) с атрибутом [Flags].
+     * @template T Соответствущий enum-тип.
+     */
+    class Flags<T extends number> extends Enum<T> {
+		HasFlag(flag: T): boolean;
+    }
+}
+ 
 //#endregion
