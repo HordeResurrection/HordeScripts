@@ -4,6 +4,8 @@ import { MaraSquadState } from "./MaraSquadState";
 import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
 
 export abstract class MaraSquadGatheringUpState extends MaraSquadState {
+    private startTick: number | null = null;
+    
     OnEntry(): void {
         if (this.squad.CurrentMovementPoint) {
             let closestToTargetUnit: MaraUnitCacheItem | null = null;
@@ -27,6 +29,10 @@ export abstract class MaraSquadGatheringUpState extends MaraSquadState {
     OnExit(): void {}
     
     Tick(tickNumber: number): void {
+        if (this.startTick == null) {
+            this.startTick = tickNumber;
+        }
+        
         if (this.squad.IsEnemyNearby()) {
             this.squad.SetState(new MaraSquadBattleState(this.squad));
             return;
@@ -40,6 +46,11 @@ export abstract class MaraSquadGatheringUpState extends MaraSquadState {
         }
 
         if (this.squad.IsAllUnitsIdle()) {
+            this.onGatheredUp();
+            return;
+        }
+
+        if (tickNumber - this.startTick > this.squad.Controller.SquadsSettings.GatherUpTimeout) {
             this.onGatheredUp();
             return;
         }
