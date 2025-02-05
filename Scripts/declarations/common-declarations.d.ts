@@ -29,7 +29,7 @@ declare const BulletWorkersRegistry: HordeClassLibrary.Scripting.Misc.ScriptWork
  * Хранилище данных, которые НЕ будут очищаться при hot-reload.
  */
 declare const DataStorage: DataStorageT;
-declare class DataStorageT {
+declare abstract class DataStorageT {
     [key: string]: any;
     plugins: { [key: string]: any };
     scriptWorkTicks: number;
@@ -72,7 +72,7 @@ declare function ForEach(enumerable: object, action: (item: any, i: number, sour
  * Различные методы-утилиты.
  */
 declare const ScriptUtils: typeof ScriptUtilsT;
-declare class ScriptUtilsT extends HordeClassLibrary.Scripting.ScriptApi.ScriptUtils {
+declare abstract class ScriptUtilsT extends HordeClassLibrary.Scripting.ScriptApi.ScriptUtils {
     static ForEach(enumerable: object, action: (item: any, i: number, sourceEnumerable: object) => void): void;
     static RemoveAll(list: object, item: any): number;
 }
@@ -85,7 +85,7 @@ declare const ScriptMachineDebugApi: HordeClassLibrary.Scripting.ScriptApi.Scrip
 /**
  * Вывод логов.
  */
-declare class DebugLogger {
+declare abstract class DebugLogger {
     static WriteLine(message: string): void;
 }
 
@@ -98,7 +98,7 @@ declare class DebugLogger {
  * как специального класса, а не как простой глобальной переменной.
  */
 declare const host: typeof HostFunctions;
-declare class HostFunctions {
+declare abstract class HostFunctions {
     /**
      * Метод для создания DotNet-массивов.
      * После создания, необходимо вручную выполнить каст объекта через "as".
@@ -172,7 +172,7 @@ declare class HostFunctions {
  * Функции для рефлексии.
  * Внимание! Класс доступен только в unsafe-режиме скрипт-машины!
  */
-declare class ScriptReflection {
+declare abstract class ScriptReflection {
     static SetValue(memberOwner: object, memberName: string, value: any): void;
     static GetValue(memberOwner: object, memberName: string): any;
     static Invoke(memberOwner: object, methodName: string, ...parameters: any[]): any;
@@ -188,7 +188,7 @@ declare class ScriptReflection {
  * Внимание! Класс доступен только в unsafe-режиме скрипт-машины!
  */
 declare const xHost: typeof ExtendedHostFunctions;
-declare class ExtendedHostFunctions extends HostFunctions {
+declare abstract class ExtendedHostFunctions extends HostFunctions {
     /**
      * Импортирует хост-тип по заданному .Net-типу.
      */
@@ -216,7 +216,7 @@ declare class ExtendedHostFunctions extends HostFunctions {
 /**
  * Ref-объект для работы с методами с out/ref-параметрами.
  */
-declare class refObject<T> {
+declare abstract class refObject<T> {
     value: T;
     readonly ref: T;
     readonly out: T;
@@ -225,7 +225,7 @@ declare class refObject<T> {
 /**
  * Объект для работы с .Net-событием через ClearScript.
  */
-declare class EventSource<T extends Function> {
+declare abstract class EventSource<T extends Function> {
     /**
      * Подключить обработчик события.
      */
@@ -235,7 +235,7 @@ declare class EventSource<T extends Function> {
 /**
  * Объект для работы с обработчиком .Net-события.
  */
-declare class EventConnection {
+declare abstract class EventConnection {
     /**
      * Отключить обработчик события.
      */
@@ -257,21 +257,21 @@ declare namespace TypeStub {
     /**
      * Декларация-заглушка для .Net-структур (struct).
      */
-    class ValueType extends System.Object {
+    abstract class ValueType extends System.Object {
 
     }
 
     /**
      * Декларация-заглушка для .Net-перечислений (enum).
      */
-    class Enum extends ValueType {
+    abstract class Enum extends ValueType {
         
     }
 
     /**
      * Декларация-заглушка для .Net-перечислений (enum) с атрибутом [Flags].
      */
-    class Flags extends Enum {
+    abstract class Flags extends Enum {
 		HasFlag(flag: typeof this): boolean;
     }
 }
