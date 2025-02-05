@@ -263,18 +263,16 @@ declare namespace TypeStub {
 
     /**
      * Декларация-заглушка для .Net-перечислений (enum).
-     * @template T Соответствущий enum-тип.
      */
-    class Enum<T extends number> extends ValueType {
-        private $T: T;
+    class Enum extends ValueType {
+        
     }
 
     /**
      * Декларация-заглушка для .Net-перечислений (enum) с атрибутом [Flags].
-     * @template T Соответствущий enum-тип.
      */
-    class Flags<T extends number> extends Enum<T> {
-		HasFlag(flag: T): boolean;
+    class Flags extends Enum {
+		HasFlag(flag: typeof this): boolean;
     }
 }
  
