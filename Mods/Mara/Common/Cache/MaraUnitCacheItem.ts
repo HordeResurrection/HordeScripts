@@ -1,8 +1,11 @@
 import { MaraPoint } from "../MaraPoint";
 import { MaraRect } from "../MaraRect";
+import { MaraSettlementUnitsCache } from "./MaraSettlementUnitsCache";
 import { MaraUnitBushItem } from "./MaraUnitBushItem";
 
 export class MaraUnitCacheItem {
+    Parent: MaraSettlementUnitsCache | null;
+    
     Unit: any
     UnitId: number;
     UnitCfgId: string;
@@ -10,6 +13,7 @@ export class MaraUnitCacheItem {
     UnitMapLayer: any;
     UnitHealth: number;
     UnitIsAlive: boolean;
+    UnitIsDummy: boolean;
 
     UnitRect: MaraRect;
 
@@ -32,7 +36,9 @@ export class MaraUnitCacheItem {
         return this.UnitRect.TopLeft;
     }
 
-    constructor(unit: any) {
+    constructor(unit: any, parent: MaraSettlementUnitsCache) {
+        this.Parent = parent;
+        
         this.Unit = unit;
         this.UnitId = unit.Id;
         this.UnitCfgId = unit.Cfg.Uid;
@@ -40,5 +46,6 @@ export class MaraUnitCacheItem {
         this.UnitMapLayer = unit.MapLayer;
         this.UnitHealth = unit.Health;
         this.UnitIsAlive = unit.IsAlive;
+        this.UnitIsDummy = unit.IsDummy;
     }
 }

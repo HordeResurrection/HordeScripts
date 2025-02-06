@@ -3,6 +3,7 @@ import { MaraUnitBushItem } from "./MaraUnitBushItem";
 import { MaraUnitCacheItem } from "./MaraUnitCacheItem";
 import RBush from "../RBush/rbush.js"
 import { MaraSettlementController } from "../../MaraSettlementController";
+import { Mara } from "../../Mara";
 
 export class MaraSettlementUnitsCache {
     Settlement: any;
@@ -37,6 +38,12 @@ export class MaraSettlementUnitsCache {
         settlement.Units.UnitLifeStateChanged.connect(
             (sender, args) => {
                 this.unitLifeStateChangedProcessor(args);
+            }
+        );
+
+        settlement.Units.UnitDummyStateChangedEvent.connect(
+            (sender, args) => {
+                this.unitDummyStateChangedProcessor(args);
             }
         );
 
@@ -77,6 +84,11 @@ export class MaraSettlementUnitsCache {
         }
     }
 
+    private finalizeCacheItem(item: MaraUnitCacheItem): void {
+        this.bush.remove(item.UnitBushItem, MaraUnitBushItem.IsEqual);
+        item.Parent = null;
+    }
+
     private unitListChangedProcessor(sender, UnitsListChangedEventArgs): void {
         let unit = UnitsListChangedEventArgs.Unit;
         let unitId = unit.Id;
@@ -88,7 +100,7 @@ export class MaraSettlementUnitsCache {
         }
         else {
             cacheItem = this.cacheItemIndex.get(unitId)!;
-            this.bush.remove(cacheItem.UnitBushItem, MaraUnitBushItem.IsEqual);
+            this.finalizeCacheItem(cacheItem);
             this.cacheItemIndex.delete(unitId);
         }
 
@@ -98,7 +110,7 @@ export class MaraSettlementUnitsCache {
     }
 
     private subscribeToUnit(unit: any): MaraUnitCacheItem {
-        let cacheItem = new MaraUnitCacheItem(unit);
+        let cacheItem = new MaraUnitCacheItem(unit, this);
         let bushItem = new MaraUnitBushItem(cacheItem);
         cacheItem.UnitBushItem = bushItem;
 
@@ -142,6 +154,16 @@ export class MaraSettlementUnitsCache {
             if (this.SettlementController) {
                 this.SettlementController.OnUnitLifeStateChanged(cacheItem);
             }
+        }
+    }
+
+    private unitDummyStateChangedProcessor(args): void {
+        let unit = args.TriggeredUnit;
+        let cacheItem = this.cacheItemIndex.get(unit.Id);
+        
+        if (cacheItem) {
+            Mara.Debug(`unit ${cacheItem.Unit.ToString()} dummy state changed to ${cacheItem.Unit.IsDummy}`);
+            cacheItem.UnitIsDummy = unit.IsDummy;
         }
     }
 }

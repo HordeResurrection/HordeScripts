@@ -20,10 +20,12 @@ export class MaraSquadCaptureState extends MaraSquadState {
             return;
         }
 
-        if (!this.distributeCapturingUnits()) {
-            this.squad.Attack(this.squad.CurrentPath!);
-            this.squad.SetState(new MaraSquadAttackState(this.squad));
-            return;
+        if (tickNumber % 50 == 0) {
+            if (!this.distributeCapturingUnits()) {
+                this.squad.Attack(this.squad.CurrentPath!);
+                this.squad.SetState(new MaraSquadAttackState(this.squad));
+                return;
+            }
         }
     }
 

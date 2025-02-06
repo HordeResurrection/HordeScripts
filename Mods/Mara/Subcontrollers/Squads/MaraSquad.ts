@@ -35,7 +35,11 @@ export class MaraSquad {
     }
 
     protected cleanup(): void {
-        this.Units = this.Units.filter((unit) => {return unit.UnitIsAlive});
+        this.cleanupUnitList();
+    }
+
+    protected cleanupUnitList(): void {
+        this.Units = this.Units.filter((unit) => {return unit.UnitIsAlive && unit.Parent != null && !unit.UnitIsDummy});
     }
 
     Tick(tickNumber: number): void {
