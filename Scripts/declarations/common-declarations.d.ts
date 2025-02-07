@@ -35,6 +35,7 @@ declare abstract class DataStorageT {
     scriptWorkTicks: number;
     reloadCounter: number;
     gameTickNum: number;
+    isUnsafeModeEnabled: boolean;
 }
 
 /**
@@ -51,12 +52,8 @@ declare const HordeContentApi: typeof HordeClassLibrary.Scripting.ScriptApi.Hord
 //#region Script machine utilities
 
 /**
- * ForEach - специальная функция для перечисления .Net-объектов.
- * Примеры см. рядом с декларацией ForEach в "common-declarations.d.ts".
- */
-declare function ForEach(enumerable: object, action: (item: any, i: number, sourceEnumerable: object) => void): void;
-/**
- * Примеры для ForEach:
+ * ForEach - специальная функция для перечисления .Net-коллекций.
+ * Примеры:
 ```
     ForEach(someList, item => {
         log.info('-', item);
@@ -67,13 +64,15 @@ declare function ForEach(enumerable: object, action: (item: any, i: number, sour
     });
 ```
  */
+declare function ForEach(enumerable: object, action: _foreachAction): void;
+declare interface _foreachAction { (item: any, i: number, sourceEnumerable: object): void; }
 
 /**
  * Различные методы-утилиты.
  */
 declare const ScriptUtils: typeof ScriptUtilsT;
 declare abstract class ScriptUtilsT extends HordeClassLibrary.Scripting.ScriptApi.ScriptUtils {
-    static ForEach(enumerable: object, action: (item: any, i: number, sourceEnumerable: object) => void): void;
+    static ForEach(enumerable: System.Collections.IEnumerable, action: _foreachAction): void;
     static RemoveAll(list: object, item: any): number;
 }
 
