@@ -64,7 +64,7 @@ export class Example_CustomUnitCanBePlaced extends HordeExampleBase {
     private canBePlacedWorkerByKnownMap(settlement: Settlement, uCfg: UnitConfig, x: number, y: number, size1x1?: boolean, considerUnit?: boolean) {
 
         // Запуск обычного CanBePlaced-обработчика на известной карте
-        let troubleUnitVar = host.newVar(KnownUnit) as refObject<KnownUnit>;
+        let troubleUnitVar = host.newVar(KnownUnit) as HostVariable<KnownUnit>;
         let tmpResult = this.baseCanBePlacedWorker.CanBePlacedByKnownMap(settlement, uCfg, x, y, troubleUnitVar.out, size1x1, considerUnit);
 
         let result = new CanBePlacedByKnownMapJsResult(tmpResult, troubleUnitVar.value);
@@ -109,7 +109,7 @@ export class Example_CustomUnitCanBePlaced extends HordeExampleBase {
     private canBePlacedWorkerByRealMap(scena: Scena, uCfg: UnitConfig, x: number, y: number, size1x1?: boolean, considerUnit?: boolean) {
 
         // Запуск обычного CanBePlaced-обработчика на реальной карте
-        let troubleUnitVar = host.newVar(Unit) as refObject<Unit>;
+        let troubleUnitVar = host.newVar(Unit) as HostVariable<Unit>;
         let tmpResult = this.baseCanBePlacedWorker.CanBePlacedByRealMap(scena, uCfg, x, y, troubleUnitVar.out, size1x1, considerUnit);
 
         let result = new CanBePlacedByRealMapJsResult(tmpResult, troubleUnitVar.value);

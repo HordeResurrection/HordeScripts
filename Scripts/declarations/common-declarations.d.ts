@@ -128,7 +128,7 @@ declare abstract class HostFunctions {
     /**
      * Метод для создания ref-объектов для передачи в методы в качестве out/ref-аргументов.
      */
-    static newVar(hostType: object, initValue?: any): refObject<any>;
+    static newVar(hostType: object, initValue?: any): HostVariable<any>;
 
     /**
      * Создаёт делегат заданного типа.
@@ -205,21 +205,12 @@ declare abstract class ExtendedHostFunctions extends HostFunctions {
 }
 
 //#endregion
- 
+
 // =============================================================================================
 // === Вспмогательные типы
 // =============================================================================================
 
 //#region Service types
-
-/**
- * Ref-объект для работы с методами с out/ref-параметрами.
- */
-declare abstract class refObject<T> {
-    value: T;
-    readonly ref: T;
-    readonly out: T;
-}
 
 /**
  * Объект для работы с .Net-событием через ClearScript.
@@ -239,6 +230,37 @@ declare abstract class EventConnection {
      * Отключить обработчик события.
      */
     disconnect(): void;
+}
+
+/**
+ * Некоторые объекты из ClearScript.
+ */
+declare namespace Microsoft.ClearScript {
+    /**
+     * Хранилище произвольных JS-данных.
+     */
+    interface PropertyBag {
+        [key: string]: any;
+        [nu: number]: any;
+    }
+
+    /**
+     * Произвольный JS-объект.
+     */
+    interface ScriptObject {
+        [key: string]: any;
+        [nu: number]: any;
+        (...args: any[]): any;
+    }
+}
+
+/**
+ * Объект для работы с out/ref-параметрами методов.
+ */
+declare interface HostVariable<T> {
+    value: T;
+    readonly ref: T;
+    readonly out: T;
 }
 
 //#endregion
@@ -264,15 +286,15 @@ declare namespace TypeStub {
      * Декларация-заглушка для .Net-перечислений (enum).
      */
     abstract class Enum extends ValueType {
-        
+
     }
 
     /**
      * Декларация-заглушка для .Net-перечислений (enum) с атрибутом [Flags].
      */
     abstract class Flags extends Enum {
-		HasFlag(flag: typeof this): boolean;
+        HasFlag(flag: typeof this): boolean;
     }
 }
- 
+
 //#endregion
