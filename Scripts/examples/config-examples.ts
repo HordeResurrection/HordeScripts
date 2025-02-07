@@ -32,7 +32,7 @@ export class Example_ConfigWorks extends HordeExampleBase {
             if (uid.includes('men')) {
                 this.log.info('-', '"' + uid + '"', '-', uCfg);
             }
-        })
+        });
 
         // Получаем конфиг катапульты
         let catapultCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Catapult");

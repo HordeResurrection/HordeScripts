@@ -65,7 +65,9 @@ declare const HordeContentApi: typeof HordeClassLibrary.Scripting.ScriptApi.Hord
 ```
  */
 declare function ForEach(enumerable: object, action: _foreachAction): void;
-declare interface _foreachAction { (item: any, i: number, sourceEnumerable: object): void; }
+declare interface _foreachAction { (item: any, i: number, sourceEnumerable: System.Collections.IEnumerable): void; }
+// declare function ForEach<T>($T: T, enumerable: object, action: _foreachActionG<T>): void;
+declare interface _foreachActionG<T> { (item: T, i: number, sourceEnumerable: System.Collections.Generic.IEnumerable<T>): void; }
 
 /**
  * Различные методы-утилиты.
@@ -73,6 +75,7 @@ declare interface _foreachAction { (item: any, i: number, sourceEnumerable: obje
 declare const ScriptUtils: typeof ScriptUtilsT;
 declare abstract class ScriptUtilsT extends HordeClassLibrary.Scripting.ScriptApi.ScriptUtils {
     static ForEach(enumerable: System.Collections.IEnumerable, action: _foreachAction): void;
+    static ForEach<T>($T: T, enumerable: System.Collections.Generic.IEnumerable<T>, action: _foreachActionG<T>): void;
     static RemoveAll(list: object, item: any): number;
 }
 
