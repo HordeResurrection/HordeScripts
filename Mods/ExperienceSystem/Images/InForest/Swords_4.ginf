@@ -1,0 +1,27 @@
+{
+  "Description": "Swords icon in forest",
+  "Items": [
+    {
+      "Uid": "#AnimAtlas_InForest_Swords_4",
+      "Description": "Swords icon in forest",
+      "Location": {
+        "X": 0,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 32,
+        "Height": 32
+      },
+      "FramesCount": 1,
+      "MaskColors": null,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MetaInformation": {}
+    }
+  ]
+}

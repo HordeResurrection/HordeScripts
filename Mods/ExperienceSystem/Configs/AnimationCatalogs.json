@@ -1,0 +1,325 @@
+{
+  "FormatVersion": "v0.47dev",
+  "Items": [
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Bow_1",
+      "Description": "Bow in forest",
+      "InternalEditorPath": "Units\\InForest\\Bow_1",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Bow_1"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Bow_2",
+      "Description": "Bow in forest",
+      "InternalEditorPath": "Units\\InForest\\Bow_2",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Bow_2"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Bow_3",
+      "Description": "Bow in forest",
+      "InternalEditorPath": "Units\\InForest\\Bow_3",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Bow_3"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Bow_4",
+      "Description": "Bow in forest",
+      "InternalEditorPath": "Units\\InForest\\Bow_4",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Bow_4"
+        ]
+      }
+    },
+
+
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Bear_1",
+      "Description": "Bear in forest",
+      "InternalEditorPath": "Units\\InForest\\Bear_1",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Bear_1"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Bear_2",
+      "Description": "Bear in forest",
+      "InternalEditorPath": "Units\\InForest\\Bear_2",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Bear_2"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Bear_3",
+      "Description": "Bear in forest",
+      "InternalEditorPath": "Units\\InForest\\Bear_3",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Bear_3"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Bear_4",
+      "Description": "Bear in forest",
+      "InternalEditorPath": "Units\\InForest\\Bear_4",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Bear_4"
+        ]
+      }
+    },
+
+
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_FireArrow_1",
+      "Description": "FireArrow in forest",
+      "InternalEditorPath": "Units\\InForest\\FireArrow_1",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_FireArrow_1"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_FireArrow_2",
+      "Description": "FireArrow in forest",
+      "InternalEditorPath": "Units\\InForest\\FireArrow_2",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_FireArrow_2"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_FireArrow_3",
+      "Description": "FireArrow in forest",
+      "InternalEditorPath": "Units\\InForest\\FireArrow_3",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_FireArrow_3"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_FireArrow_4",
+      "Description": "FireArrow in forest",
+      "InternalEditorPath": "Units\\InForest\\FireArrow_4",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_FireArrow_4"
+        ]
+      }
+    },
+
+
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Staff_1",
+      "Description": "Staff in forest",
+      "InternalEditorPath": "Units\\InForest\\Staff_1",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Staff_1"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Staff_2",
+      "Description": "Staff in forest",
+      "InternalEditorPath": "Units\\InForest\\Staff_2",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Staff_2"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Staff_3",
+      "Description": "Staff in forest",
+      "InternalEditorPath": "Units\\InForest\\Staff_3",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Staff_3"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Staff_4",
+      "Description": "Staff in forest",
+      "InternalEditorPath": "Units\\InForest\\Staff_4",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Staff_4"
+        ]
+      }
+    },
+
+
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Sword_1",
+      "Description": "Sword in forest",
+      "InternalEditorPath": "Units\\InForest\\Sword_1",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Sword_1"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Sword_2",
+      "Description": "Sword in forest",
+      "InternalEditorPath": "Units\\InForest\\Sword_2",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Sword_2"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Sword_3",
+      "Description": "Sword in forest",
+      "InternalEditorPath": "Units\\InForest\\Sword_3",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Sword_3"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Sword_4",
+      "Description": "Sword in forest",
+      "InternalEditorPath": "Units\\InForest\\Sword_4",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Sword_4"
+        ]
+      }
+    },
+
+
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Swords_1",
+      "Description": "Swords in forest",
+      "InternalEditorPath": "Units\\InForest\\Swords_1",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Swords_1"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Swords_2",
+      "Description": "Swords in forest",
+      "InternalEditorPath": "Units\\InForest\\Swords_2",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Swords_2"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Swords_3",
+      "Description": "Swords in forest",
+      "InternalEditorPath": "Units\\InForest\\Swords_3",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Swords_3"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_Swords_4",
+      "Description": "Swords in forest",
+      "InternalEditorPath": "Units\\InForest\\Swords_4",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_Swords_4"
+        ]
+      }
+    },
+
+
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_SwordAndShield_1",
+      "Description": "SwordAndShield in forest",
+      "InternalEditorPath": "Units\\InForest\\SwordAndShield_1",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_SwordAndShield_1"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_SwordAndShield_2",
+      "Description": "SwordAndShield in forest",
+      "InternalEditorPath": "Units\\InForest\\SwordAndShield_2",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_SwordAndShield_2"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_SwordAndShield_3",
+      "Description": "SwordAndShield in forest",
+      "InternalEditorPath": "Units\\InForest\\SwordAndShield_3",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_SwordAndShield_3"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_InForest_SwordAndShield_4",
+      "Description": "SwordAndShield in forest",
+      "InternalEditorPath": "Units\\InForest\\SwordAndShield_4",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_InForest_SwordAndShield_4"
+        ]
+      }
+    }
+  ]
+}

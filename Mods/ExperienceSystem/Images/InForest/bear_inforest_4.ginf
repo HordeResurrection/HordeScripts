@@ -1,0 +1,26 @@
+{
+  "Description": "Bear icon in forest",
+  "Items": [
+    {
+      "Uid": "#AnimAtlas_InForest_Bear_4",
+      "Description": "Bear icon in forest",
+      "Location": {
+        "X": 0,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 32,
+        "Height": 32
+      },
+      "FramesCount": 1,
+      "MaskColors": null,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      }
+    }
+  ]
+}
