@@ -1,0 +1,9 @@
+{
+  "Uid": "#ContentPack_AutoFFA",
+  "DisplayName": "Auto FFA",
+  "Description": "Мод автоматически управляет дипломатией на карте,\n чтобы игроки не скучали.",
+  "Authors": "Dikysa",
+  "BuiltIn": false,
+  "StandAlone": false,
+  "Params": null
+}
