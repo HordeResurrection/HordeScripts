@@ -1,0 +1,47 @@
+{
+  "FormatVersion": "3",
+  "Items": [
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_RerollPortrait",
+      "Description": "Reroll's portraits",
+      "InternalEditorPath": "Units\\Portraits\\reroll_portrait",
+      "RootSection": {
+        "States": {
+          "Regular": "#AnimAtlas_Portrait_Reroll_Regular",
+          "Focused": "#AnimAtlas_Portrait_Reroll_Focused",
+          "Pressed": "#AnimAtlas_Portrait_Reroll_Pressed",
+          "Disabled": "#AnimAtlas_Portrait_Reroll_Disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_sellEnemyBuffPortrait",
+      "Description": "sell_enemy_buff's portraits",
+      "InternalEditorPath": "Units\\Portraits\\sell_enemy_buff_portrait",
+      "RootSection": {
+        "States": {
+          "Regular": "#AnimAtlas_Portrait_sell_enemy_buff_Regular",
+          "Focused": "#AnimAtlas_Portrait_sell_enemy_buff_Focused",
+          "Pressed": "#AnimAtlas_Portrait_sell_enemy_buff_Pressed",
+          "Disabled": "#AnimAtlas_Portrait_sell_enemy_buff_Disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_digMoatBuffPortrait",
+      "Description": "dig_moat_buff's portraits",
+      "InternalEditorPath": "Units\\Portraits\\dig_moat_buff_portrait",
+      "RootSection": {
+        "States": {
+          "Regular": "#AnimAtlas_Portrait_dig_moat_buff_Regular",
+          "Focused": "#AnimAtlas_Portrait_dig_moat_buff_Focused",
+          "Pressed": "#AnimAtlas_Portrait_dig_moat_buff_Pressed",
+          "Disabled": "#AnimAtlas_Portrait_dig_moat_buff_Disabled"
+        }
+      }
+    }
+  ]
+}

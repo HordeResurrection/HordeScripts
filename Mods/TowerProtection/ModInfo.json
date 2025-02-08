@@ -1,0 +1,9 @@
+{
+  "Uid": "#ContentPack_TowerProtection",
+  "DisplayName": "Башенная защита",
+  "Description": "Используется для карты башенная защита",
+  "Authors": "Dikysa",
+  "BuiltIn": false,
+  "StandAlone": true,
+  "Params": null
+}
