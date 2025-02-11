@@ -27,10 +27,12 @@ export class Mara {
     private static profilers = {};
     
     static LogLevel: MaraLogLevel = MaraLogLevel.Debug;
+    static LogTickNumber: boolean = true;
     static CanRun = true;
     
     private static controllers: Array<MaraSettlementController> = [];
     private static pathfinder: any;
+    private static currentTick: number;
     
     public static get Controllers(): Array<MaraSettlementController> {
         return Mara.controllers;
@@ -54,6 +56,8 @@ export class Mara {
     
     static Tick(tickNumber: number): void {
         try {
+            Mara.currentTick = tickNumber;
+            
             if (Mara.CanRun) {
                 if (tickNumber < 10) { //doing nothing for first 10 ticks since not all core objects could be properly inited
                     return;
@@ -167,13 +171,10 @@ export class Mara {
             return;
         }
 
-        let logMessage = "(Mara) " + message;
+        let logMessage = `(Mara)${Mara.LogTickNumber ? " [" + Mara.currentTick + "]" : ""}${level == MaraLogLevel.Debug ? " D" : ""} ${message}`;
 
         switch (level) {
             case MaraLogLevel.Debug:
-                logMessage = "(Mara) D " + message;
-                log.info(logMessage);
-                break;
             case MaraLogLevel.Info:
                 log.info(logMessage);
                 break;
