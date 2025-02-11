@@ -8,6 +8,7 @@ import { MaraPoint } from "../Common/MaraPoint";
 import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
 import { MaraUnitConfigCache } from "../Common/Cache/MaraUnitConfigCache";
 import { TileType } from "library/game-logic/horde-types";
+import { MaraMap } from "../Common/MapAnalysis/MaraMap";
 
 export class TacticalSubcontroller extends MaraSubcontroller {
     private offensiveSquads: Array<MaraControllableSquad> = [];
@@ -84,7 +85,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
                 }
 
                 if (squad.IsIdle() && squad.CombativityIndex >= 1) {
-                    squad.Attack(this.attackPath);
+                    this.sendSquadToAttack(squad, this.attackPath);
                 }
             }
         }
@@ -485,11 +486,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     private getUnitMovementType(unit: MaraUnitCacheItem): string {
         return MaraUnitConfigCache.GetConfigProperty(
             unit.UnitCfgId, 
-            (cfg) => TacticalSubcontroller.calcConfigMovementType(cfg, this.settlementController.Settings.Combat.UnitSpeedClusterizationThresholds), "MovementType"
+            (cfg) => TacticalSubcontroller.calcConfigMovementClass(cfg, this.settlementController.Settings.Combat.UnitSpeedClusterizationThresholds), 
+            "MovementClass"
         ) as string;
     }
 
-    private static calcConfigMovementType(unitConfig: any, speedsThresholds: Array<number>): string {
+    private static calcConfigMovementClass(unitConfig: any, speedsThresholds: Array<number>): string {
         let unitCfgId = unitConfig.Uid;
         
         let unitSpeed = MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Grass) as number, "GrassSpeed") as number;
@@ -506,27 +508,9 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             speedGroupCode = speedsThresholds.length;
         }
 
-        let moveType = "";
-        
-        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Grass) as number,  "GrassSpeed") as number);
-        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Forest) as number, "ForestSpeed") as number);
-        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Water) as number,  "WaterSpeed") as number);
-        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Marsh) as number,  "MarshSpeed") as number);
-        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Sand) as number,   "SandSpeed") as number);
-        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Mounts) as number, "MountsSpeed") as number);
-        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Road) as number,   "RoadSpeed") as number);
-        moveType += TacticalSubcontroller.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Ice) as number,    "IceSpeed") as number);
+        let moveType = MaraUtils.GetConfigIdMoveType(unitCfgId);
         
         return `${moveType}:${speedGroupCode}`;
-    }
-
-    private static speedToMoveTypeFlag(speed: number): string {
-        if (speed > 0) {
-            return "1";
-        }
-        else {
-            return "0";
-        }
     }
 
     private clusterizeUnitsByMovementType(units: Array<MaraUnitCacheItem>): Array<Array<MaraUnitCacheItem>> {
@@ -590,7 +574,21 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.settlementController.Debug(`Issuing attack command`);
 
         for (let squad of this.offensiveSquads) {
-            squad.Attack(this.attackPath);
+            this.sendSquadToAttack(squad, this.attackPath);
+        }
+    }
+
+    private sendSquadToAttack(squad: MaraControllableSquad, path: Array<MaraPoint>): void {
+        if (path.length > 2) {
+            // first and last cells are excluded since they usually will be different for all paths
+            let pathBody = path.splice(1, path.length - 2);
+            let updatedPathBody = MaraMap.UpdatePathForUnit(squad.Units[0], pathBody);
+
+            let updatedPath = [path[0], ...updatedPathBody, path[1]];
+            squad.Attack(updatedPath);
+        }
+        else {
+            squad.Attack(path);
         }
     }
 

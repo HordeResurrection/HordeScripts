@@ -1,7 +1,7 @@
 import { Mara, MaraLogLevel } from "Mara/Mara";
 import { MaraSquad } from "Mara/Subcontrollers/Squads/MaraSquad";
 import { createPoint } from "library/common/primitives";
-import { UnitFlags, UnitCommand, AllContent, UnitConfig, UnitQueryFlag, UnitSpecification, DrawLayer, FontUtils, GeometryCanvas, Stride_Color, Stride_Vector2 } from "library/game-logic/horde-types";
+import { UnitFlags, UnitCommand, AllContent, UnitConfig, UnitQueryFlag, UnitSpecification, DrawLayer, FontUtils, GeometryCanvas, Stride_Color, Stride_Vector2, TileType } from "library/game-logic/horde-types";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "library/mastermind/virtual-input";
 import { MaraProductionRequestItem } from "./Common/MaraProductionRequestItem";
@@ -1106,6 +1106,35 @@ export class MaraUtils {
         }
 
         return producedCfgIds;
+    }
+
+    static GetConfigIdMoveType(cfgId: string): string {
+        return MaraUnitConfigCache.GetConfigProperty(cfgId, MaraUtils.configMoveType, "configMoveType") as string;
+    }
+
+    private static configMoveType(unitConfig: any): string {
+        let unitCfgId = unitConfig.Uid;
+        let moveType = "";
+                
+        moveType += MaraUtils.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Grass) as number,  "GrassSpeed") as number);
+        moveType += MaraUtils.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Forest) as number, "ForestSpeed") as number);
+        moveType += MaraUtils.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Water) as number,  "WaterSpeed") as number);
+        moveType += MaraUtils.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Marsh) as number,  "MarshSpeed") as number);
+        moveType += MaraUtils.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Sand) as number,   "SandSpeed") as number);
+        moveType += MaraUtils.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Mounts) as number, "MountsSpeed") as number);
+        moveType += MaraUtils.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Road) as number,   "RoadSpeed") as number);
+        moveType += MaraUtils.speedToMoveTypeFlag(MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Ice) as number,    "IceSpeed") as number);
+
+        return moveType;
+    }
+
+    private static speedToMoveTypeFlag(speed: number): string {
+        if (speed > 0) {
+            return "1";
+        }
+        else {
+            return "0";
+        }
     }
     //#endregion
     

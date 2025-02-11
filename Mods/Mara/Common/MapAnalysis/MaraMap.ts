@@ -17,6 +17,7 @@ import RBush from "../RBush/rbush.js"
 import { MaraRect } from "../MaraRect";
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
 import { MaraMapNodeLink } from "./MaraMapNodeLink";
+import { MaraUnitCacheItem } from "../Cache/MaraUnitCacheItem";
 
 class TileTypeCache extends MaraCellDataHolder {
     constructor () {
@@ -82,6 +83,8 @@ export class MaraMap {
     private static readonly WALKABLE_TO_UNWALKABLE_COST = 2;
     private static readonly UNWALKABLE_TO_WALKABLE_COST = 1;
     private static readonly UNWALKABLE_TO_UNWALKABLE_COST = 20;
+
+    private static readonly REACHABLE_CELL_SEARCH_RADIUS = 5;
     
     private static tileTypeCache: TileTypeCache = new TileTypeCache();
     
@@ -96,10 +99,13 @@ export class MaraMap {
     private static clusterSpatialIndex: RBush;
 
     private static unitBuildHandlers: Map<number, any>;
+
+    private static cellsCache: Map<string, MaraPoint>;
     
     public static Init(): void {
         MaraMap.resourceMapMonitor = MaraUtils.GetScena().ResourcesMap.CreateChangesObtainer("resource monitor");
         MaraMap.unitBuildHandlers = new Map<number, any>();
+        MaraMap.cellsCache = new Map<string, MaraPoint>();
         
         Mara.Debug(`Analyzing terrain...`);
         MaraMap.buildMap();
@@ -332,6 +338,38 @@ export class MaraMap {
         }
         
         return [];
+    }
+
+    static UpdatePathForUnit(unit: MaraUnitCacheItem, path: Array<MaraPoint>): Array<MaraPoint> {
+        let updatedPath = new Array<MaraPoint>();
+
+        let unitMovementType = MaraUtils.GetConfigIdMoveType(unit.UnitCfgId);
+
+        for (let cell of path) {
+            let cellKey = unitMovementType + cell.ToString();
+            
+            let reachableCell = MaraMap.cellsCache.get(cellKey);
+            
+            if (!reachableCell) {
+                let closestCell = MaraUtils.FindClosestCell(
+                    cell, 
+                    MaraMap.REACHABLE_CELL_SEARCH_RADIUS,
+                    (cell) => MaraUtils.IsCellReachable(cell, unit)
+                );
+
+                if (closestCell) {
+                    MaraMap.cellsCache.set(cellKey, closestCell);
+                    reachableCell = closestCell;
+                }
+                else {
+                    reachableCell = cell;
+                }
+            }
+
+            updatedPath.push(reachableCell);
+        }
+        
+        return updatedPath;
     }
 
     private static initPathfinding(unwalkableNodeTypesToInclude: Array<any>): void {
