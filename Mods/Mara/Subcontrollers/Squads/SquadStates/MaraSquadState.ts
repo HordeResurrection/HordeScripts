@@ -1,5 +1,5 @@
 import { MaraControllableSquad } from "../MaraControllableSquad";
-import { FsmState } from "../../../Common/FsmState";
+import { FsmState } from "../../../Common/FiniteStateMachine/FsmState";
 import { MaraUtils } from "../../../MaraUtils";
 
 export abstract class MaraSquadState extends FsmState {

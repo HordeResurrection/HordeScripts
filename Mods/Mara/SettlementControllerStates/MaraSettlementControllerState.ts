@@ -1,6 +1,6 @@
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 import { TargetExpandData } from "../Common/Settlement/TargetExpandData";
-import { FsmState } from "Mara/Common/FsmState";
+import { FsmState } from "../Common/FiniteStateMachine/FsmState";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraPoint } from "../Common/MaraPoint";
 import { MaraMap } from "../Common/MapAnalysis/MaraMap";
