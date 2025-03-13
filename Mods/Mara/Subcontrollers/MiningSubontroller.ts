@@ -4,11 +4,11 @@ import { MaraResourceType } from "../Common/MapAnalysis/MaraResourceType";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraPoint } from "../Common/MaraPoint";
 import { MaraUtils, ResourceType } from "../MaraUtils";
-import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 import { MaraResourceCluster } from "../Common/MapAnalysis/MaraResourceCluster";
 import { MaraUnitCache } from "../Common/Cache/MaraUnitCache";
 import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
+import { MaraTaskableSubcontroller } from "./MaraTaskableSubcontroller";
 
 class MineData {
     public Mine: MaraUnitCacheItem | null = null;
@@ -20,7 +20,7 @@ class SawmillData {
     public Woodcutters: Array<MaraUnitCacheItem> = [];
 }
 
-export class MiningSubcontroller extends MaraSubcontroller {
+export class MiningSubcontroller extends MaraTaskableSubcontroller {
     public Sawmills: Array<SawmillData> = [];
 
     private metalStocks: Array<MaraUnitCacheItem> | null = null;
@@ -28,22 +28,6 @@ export class MiningSubcontroller extends MaraSubcontroller {
     
     constructor (parent: MaraSettlementController) {
         super(parent);
-    }
-
-    Tick(tickNumber: number): void {
-        if (tickNumber % 50 != 0) {
-            return;
-        }
-
-        this.cleanup();
-        this.destroyEmptyMines();
-
-        if (tickNumber % (5 * 50) == 0) {
-            this.checkForUnaccountedBuildings();
-            this.redistributeHarvesters();
-            this.engageFreeHarvesters();
-            this.engageIdleHarvesters();
-        }
     }
 
     public GetStashedResourses(): MaraResources {
@@ -204,6 +188,22 @@ export class MiningSubcontroller extends MaraSubcontroller {
         
         return maxMiners +
             this.Sawmills.length * this.settlementController.Settings.ResourceMining.WoodcutterBatchSize;
+    }
+
+    protected doRoutines(tickNumber: number): void {
+        if (tickNumber % 50 != 0) {
+            return;
+        }
+
+        this.cleanup();
+        this.destroyEmptyMines();
+
+        if (tickNumber % (5 * 50) == 0) {
+            this.checkForUnaccountedBuildings();
+            this.redistributeHarvesters();
+            this.engageFreeHarvesters();
+            this.engageIdleHarvesters();
+        }
     }
 
     private getClosestMetalStock(point: MaraPoint): MaraUnitCacheItem | null {

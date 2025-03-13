@@ -30,14 +30,19 @@ export abstract class FiniteStateMachine {
         this.state.Tick(tickNumber);
     }
 
-    SetState(state: FsmState | null): void {
+    SetState(state: FsmState): void {
         this.nextState = state;
     }
 
-    protected abstract get state(): FsmState;
-    protected abstract set state(value: FsmState);
+    ClearState(): void {
+        this.state.OnExit();
+        this.state = null;
+    }
 
-    protected abstract get nextState(): FsmState;
+    protected abstract get state(): FsmState;
+    protected abstract set state(value: FsmState | null);
+
+    protected abstract get nextState(): FsmState | null;
     protected abstract set nextState(value: FsmState | null);
     
     protected abstract onTick(tickNumber: number);
