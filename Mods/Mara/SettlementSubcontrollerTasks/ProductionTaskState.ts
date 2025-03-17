@@ -33,6 +33,7 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
         
         let insufficientResources = this.getInsufficientResources();
 
+        // TODO: rewrite this to request to mining subcontroller
         if (
             insufficientResources.Gold > 0 ||
             insufficientResources.Metal > 0 ||

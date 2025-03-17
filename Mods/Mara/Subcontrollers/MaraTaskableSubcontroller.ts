@@ -3,14 +3,20 @@ import { SettlementSubcontrollerTask } from "../SettlementSubcontrollerTasks/Set
 import { MaraSubcontroller } from "./MaraSubcontroller";
 
 export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
+    protected selfTaskReattemptCooldown = 60 * 50;
+    
     protected abstract doRoutines(tickNumber: number): void;
+    protected abstract makeSelfTask(): SettlementSubcontrollerTask | null;
 
     private activeTask: SettlementSubcontrollerTask | null = null;
     private allTasks: Array<SettlementSubcontrollerTask> = [];
+    private lastSelfTaskFailureTick = -Infinity;
     
     Tick(tickNumber: number): void {
         this.doRoutines(tickNumber);
 
+        this.allTasks = this.allTasks.filter((t) => !t.IsCompleted);
+        
         if (this.activeTask) {
             if (this.activeTask.IsCompleted) {
                 this.debug(`Task ${this.activeTask.constructor.name} completed with result ${this.activeTask.IsSuccess}`);
@@ -24,11 +30,21 @@ export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
                 }
             }
         }
-        else {
+        else if (this.allTasks.length > 0) {
             let highestPriorityTask = MaraUtils.FindExtremum(this.allTasks, (c, e) => c.Priority - e.Priority);
             
             if (highestPriorityTask) {
                 this.setActiveTask(highestPriorityTask);
+            }
+        }
+        else if (tickNumber - this.lastSelfTaskFailureTick > this.selfTaskReattemptCooldown) {
+            let selfTask = this.makeSelfTask();
+
+            if (selfTask) {
+                this.AddTask(selfTask);
+            }
+            else {
+                this.lastSelfTaskFailureTick = tickNumber;
             }
         }
 
@@ -49,6 +65,7 @@ export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
         }
 
         this.activeTask = task;
+        this.allTasks = this.allTasks.filter((t) => t != this.activeTask);
         this.debug(`Start executing task ${this.activeTask.constructor.name}`);
     }
 

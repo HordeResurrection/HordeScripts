@@ -22,6 +22,7 @@ import { EconomySnapshotItem } from "./Common/Settlement/EconomySnapshotItem";
 import { MaraRect } from "./Common/MaraRect";
 import { MaraUnitCacheItem } from "./Common/Cache/MaraUnitCacheItem";
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
+import { MaraLogger } from "./Common/MaraLogger";
 
 class ReservedUnitsData {
     public ReservableUnits: Array<Map<number, MaraUnitCacheItem>>;
@@ -93,7 +94,7 @@ class ReservedUnitsData {
     }
 }
 
-export class MaraSettlementController {
+export class MaraSettlementController implements MaraLogger {
     public TickOffset: number = 0;
     
     public Settlement: any;

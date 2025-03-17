@@ -9,6 +9,9 @@ import { MaraResourceCluster } from "../Common/MapAnalysis/MaraResourceCluster";
 import { MaraUnitCache } from "../Common/Cache/MaraUnitCache";
 import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
 import { MaraTaskableSubcontroller } from "./MaraTaskableSubcontroller";
+import { SettlementSubcontrollerTask } from "../SettlementSubcontrollerTasks/SettlementSubcontrollerTask";
+import { TargetExpandData } from "../Common/Settlement/TargetExpandData";
+import { ExpandBuildTask } from "../SettlementSubcontrollerTasks/MiningSubcontroller/ExpandBuildTask/ExpandBuildTask";
 
 class MineData {
     public Mine: MaraUnitCacheItem | null = null;
@@ -20,7 +23,17 @@ class SawmillData {
     public Woodcutters: Array<MaraUnitCacheItem> = [];
 }
 
+class NeedExpandResult {
+    NeedExpand: boolean;
+    MinResourceAmount: number;
+    MinResourceThreshold: number;
+    ResourcesToMine: MaraResources;
+}
+
 export class MiningSubcontroller extends MaraTaskableSubcontroller {
+    readonly RESOURCE_THRESHOLD = 1000;
+    readonly PEOPLE_THRESHOLD = 10;
+    
     public Sawmills: Array<SawmillData> = [];
 
     private metalStocks: Array<MaraUnitCacheItem> | null = null;
@@ -204,6 +217,358 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             this.engageFreeHarvesters();
             this.engageIdleHarvesters();
         }
+    }
+
+    protected makeSelfTask(): SettlementSubcontrollerTask | null {
+        let canMineResources = this.canMineResources();
+
+        if (!canMineResources) {
+            return null;
+        }
+
+        let expandData = this.isExpandNeeded();
+        
+        if (expandData.NeedExpand) {
+            this.settlementController.Debug(`Low on one or more resource, required resources: ${expandData.ResourcesToMine.ToString()}`);
+            this.settlementController.Debug(`Proceeding to expand...`);
+            let targetExpand = this.fillExpandData(expandData.ResourcesToMine);
+            
+            return new ExpandBuildTask(1, this.settlementController, targetExpand, this.settlementController);
+        }
+        else {
+            return null;
+        }
+    }
+
+    private canMineResources(): boolean {
+        let economy = this.settlementController.GetCurrentDevelopedEconomyComposition();
+
+        let atLeastOneHarvesterPresent = false;
+        let atLeastOneMetalStockPresent = false;
+
+        economy.forEach((value, key) => {
+            if (MaraUtils.IsHarvesterConfigId(key)) {
+                atLeastOneHarvesterPresent = true;
+            }
+            else if (MaraUtils.IsMetalStockConfigId(key)) {
+                atLeastOneMetalStockPresent = true;
+            }
+        });
+
+        if (!atLeastOneHarvesterPresent) {
+            if (!this.checkConfigIdsLimits(MaraUtils.GetAllHarvesterConfigIds)) {
+                return false;
+            }
+        }
+
+        if (!atLeastOneMetalStockPresent) {
+            if (!this.checkConfigIdsLimits(MaraUtils.GetAllMetalStockConfigIds)) {
+                return false;
+            }
+        }
+
+        if (!this.checkConfigIdsLimits(MaraUtils.GetAllSawmillConfigIds)) {
+            return false;
+        }
+
+        if (!this.checkConfigIdsLimits(MaraUtils.GetAllMineConfigIds)) {
+            return false;
+        }
+
+        if (!this.checkConfigIdsLimits(MaraUtils.GetAllHousingConfigIds)) {
+            return false;
+        }
+
+        return true;
+    }
+    
+    private isExpandNeeded(): NeedExpandResult {
+        let leftResources = new Set<MaraResourceType>();
+        
+        for (let cluster of MaraMap.ResourceClusters) {
+            if (cluster.GoldAmount > 0) {
+                leftResources.add(MaraResourceType.Gold);
+            }
+
+            if (cluster.MetalAmount > 0) {
+                leftResources.add(MaraResourceType.Metal);
+            }
+
+            if (cluster.WoodAmount > 0) {
+                leftResources.add(MaraResourceType.Wood);
+            }
+
+            if (leftResources.size == 3) {
+                break;
+            }
+        }
+                
+        let resources = this.settlementController.MiningController.GetTotalResources();
+        this.settlementController.Debug(`Total resources: ${resources.ToString()}`);
+
+        let result = new NeedExpandResult();
+        result.NeedExpand = false;
+        result.ResourcesToMine = new MaraResources(0, 0, 0, 0);
+        result.MinResourceAmount = Infinity;
+        result.MinResourceThreshold = 0;
+
+        let minResourceToThresholdRatio = Infinity;
+
+        //TODO: rewrite code below to get rid of certain resource names
+        //TODO: also go to expand if currently not mining of some resource
+        
+        if (resources.People < this.PEOPLE_THRESHOLD) {
+            this.settlementController.Debug(`Low people`);
+            result.NeedExpand = true;
+            result.ResourcesToMine.People = this.PEOPLE_THRESHOLD - resources.People;
+
+            let ratio = resources.People / this.PEOPLE_THRESHOLD;
+
+            if (minResourceToThresholdRatio > ratio) {
+                result.MinResourceAmount = resources.People;
+                result.MinResourceThreshold = this.PEOPLE_THRESHOLD;
+                minResourceToThresholdRatio = ratio;
+            }
+        }
+        
+        if (resources.Gold < this.RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Gold)) {
+            this.settlementController.Debug(`Low gold`);
+            result.NeedExpand = true;
+            result.ResourcesToMine.Gold = this.RESOURCE_THRESHOLD - resources.Gold;
+
+            let ratio = resources.Gold / this.RESOURCE_THRESHOLD;
+
+            if (minResourceToThresholdRatio > ratio) {
+                result.MinResourceAmount = resources.Gold;
+                result.MinResourceThreshold = this.RESOURCE_THRESHOLD;
+                minResourceToThresholdRatio = ratio;
+            }
+        }
+        
+        if (resources.Metal < this.RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Metal)) {
+            this.settlementController.Debug(`Low metal`);
+            result.NeedExpand = true;
+            result.ResourcesToMine.Metal = this.RESOURCE_THRESHOLD - resources.Metal;
+
+            let ratio = resources.Metal / this.RESOURCE_THRESHOLD;
+
+            if (minResourceToThresholdRatio > ratio) {
+                result.MinResourceAmount = resources.Metal;
+                result.MinResourceThreshold = this.RESOURCE_THRESHOLD;
+                minResourceToThresholdRatio = ratio;
+            }
+        }
+
+        if (resources.Wood < this.RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Wood)) {
+            this.settlementController.Debug(`Low lumber`);
+            result.NeedExpand = true;
+            result.ResourcesToMine.Wood = this.RESOURCE_THRESHOLD - resources.Wood;
+
+            let ratio = resources.Wood / this.RESOURCE_THRESHOLD;
+
+            if (minResourceToThresholdRatio > ratio) {
+                result.MinResourceAmount = resources.Wood;
+                result.MinResourceThreshold = this.RESOURCE_THRESHOLD;
+                minResourceToThresholdRatio = ratio;
+            }
+        }
+
+        return result;
+    }
+
+    protected fillExpandData(requiredResources: MaraResources): TargetExpandData {
+        let optimalCluster = this.selectOptimalResourceCluster(requiredResources);
+
+        if (optimalCluster) {
+            this.settlementController.Debug(`Selected resource cluster ${optimalCluster.Center.ToString()} for expand`);
+            let requiredResourceTypes: MaraResourceType[] = [];
+
+            if (requiredResources.Gold > 0 && optimalCluster.GoldAmount > 0) {
+                this.settlementController.Debug(`Gold production is scheduled`);
+                requiredResourceTypes.push(MaraResourceType.Gold);
+            }
+
+            if (requiredResources.Metal > 0 && optimalCluster.MetalAmount > 0) {
+                this.settlementController.Debug(`Metal production is scheduled`);
+                requiredResourceTypes.push(MaraResourceType.Metal);
+            }
+
+            if (requiredResources.Wood > 0 && optimalCluster.WoodAmount > 0) {
+                this.settlementController.Debug(`Wood production is scheduled`);
+                requiredResourceTypes.push(MaraResourceType.Wood);
+            }
+
+            if (requiredResources.People > 0) {
+                requiredResourceTypes.push(MaraResourceType.People);
+            }
+            
+            return new TargetExpandData(
+                optimalCluster,
+                requiredResourceTypes
+            );
+        }
+        else {
+            this.settlementController.Debug(`No resource cluster for mining selected`);
+            
+            return new TargetExpandData( //when in doubt - build more izbas!!
+                null,
+                [MaraResourceType.People]
+            );
+        }
+    }
+
+    private selectOptimalResourceCluster(requiredResources: MaraResources): MaraResourceCluster | null {
+        let candidates: Array<MaraResourceCluster> = [];
+        
+        let requiredGold = requiredResources.Gold;
+        let requiredMetal = requiredResources.Metal;
+        let requiredWood = requiredResources.Wood;
+
+        MaraMap.ResourceClusters.forEach((value) => {
+            if (requiredGold > 0) {
+                let freeGold = this.getUnoccupiedMinerals(value.GoldCells);
+                
+                if (freeGold > requiredGold && this.canPlaceMine(value, MaraResourceType.Gold)) {
+                    candidates.push(value);
+                    return;
+                }
+            }
+            
+            if (requiredMetal > 0) {
+                let freeMetal = this.getUnoccupiedMinerals(value.MetalCells);
+                
+                if (freeMetal > requiredMetal && this.canPlaceMine(value, MaraResourceType.Metal)) {
+                    candidates.push(value);
+                    return;
+                }
+            }
+            
+            if (requiredWood > 0 && value.WoodAmount >= requiredWood) {
+                if (this.isFreeWoodcuttingCluster(value)) {
+                    candidates.push(value);
+                    return;
+                }
+            }
+        });
+
+        this.settlementController.Debug(`Candidate resource clusters:`);
+        for (let cluster of candidates) {
+            this.settlementController.Debug(`(${cluster.Center.ToString()})`);
+        }
+
+        if (candidates.length > 0) {
+            let settlementLocation = this.settlementController.GetSettlementLocation();
+
+            if (settlementLocation) {
+                let sortData = candidates.map((value) => {
+                    return {
+                        Distance: MaraUtils.ChebyshevDistance(settlementLocation.Center, value.Center),
+                        Cluster: value
+                    }
+                });
+
+                sortData.sort((a, b) => a.Distance - b.Distance);
+
+                let closestSortData = sortData.slice(0, 10);
+                let closestCandidates = closestSortData.map((value) => value.Cluster);
+
+                let clusterSelection = this.settlementController.StrategyController.SelectOptimalResourceCluster(closestCandidates);
+
+                return clusterSelection.OptimalReachable; //TODO: temporarily disable unreachable expands, remove this
+
+                if (clusterSelection.Optimal) {
+                    if (clusterSelection.IsOptimalClusterReachable) {
+                        return clusterSelection.Optimal;
+                    }
+                    else {
+                        let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
+                        let bridgeCfgId = produceableCfgIds.find((cfgId) => MaraUtils.IsWalkableConfigId(cfgId));
+
+                        if (bridgeCfgId) {
+                            return clusterSelection.Optimal;
+                        }
+                        else {
+                            return clusterSelection.OptimalReachable;
+                        }
+                    }
+                }
+                else {
+                    return clusterSelection.OptimalReachable;
+                }
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            return null;
+        }
+    }
+
+    private canPlaceMine(cluster: MaraResourceCluster, resourceType: MaraResourceType): boolean {
+        let mineConfigs = MaraUtils.GetAllMineConfigIds(this.settlementController.Settlement);
+        let cfgId = MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, mineConfigs);
+
+        if (cfgId == null) {
+            return false;
+        }
+
+        let position = this.settlementController.MiningController.FindMinePosition(
+            cluster, 
+            cfgId,
+            resourceType
+        );
+
+        return position != null;
+    }
+
+    private getUnoccupiedMinerals(cells: Array<MaraPoint>): number {
+        let freeMinerals = 0;
+
+        for (let cell of cells) {
+            let unit = MaraUtils.GetUnit(cell);
+
+            if (unit?.UnitOwner == this.settlementController.Settlement) {
+                continue;
+            }
+            else {
+                freeMinerals += MaraMap.GetCellMineralsAmount(cell.X, cell.Y);
+            }
+        }
+
+        return freeMinerals;
+    }
+
+    private isFreeWoodcuttingCluster(cluster: MaraResourceCluster): boolean {
+        for (let sawmillData of this.settlementController.MiningController.Sawmills) {
+            if (
+                MaraUtils.ChebyshevDistance(cluster.Center, sawmillData.Sawmill!.UnitRect.Center) < 
+                    this.settlementController.Settings.ResourceMining.WoodcuttingRadius
+            ) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    private checkConfigIdsLimits(configIdsGetter: (any) => Array<string>): boolean {
+        let availableCfgIds = configIdsGetter(this.settlementController.Settlement);
+
+        if (availableCfgIds.length == 0) {
+            return false;
+        }
+
+        let economy = this.settlementController.GetCurrentDevelopedEconomyComposition();
+        let allowedItems = MaraUtils.MakeAllowedCfgItems(availableCfgIds, economy, this.settlementController.Settlement);
+
+        for (let item of allowedItems) {
+            if (item.MaxCount > 0) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     private getClosestMetalStock(point: MaraPoint): MaraUnitCacheItem | null {
