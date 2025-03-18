@@ -23,6 +23,7 @@ import { MaraRect } from "./Common/MaraRect";
 import { MaraUnitCacheItem } from "./Common/Cache/MaraUnitCacheItem";
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
 import { MaraLogger } from "./Common/MaraLogger";
+import { DevelopmentSubcontroller } from "./Subcontrollers/DevelopmentSubcontroller";
 
 class ReservedUnitsData {
     public ReservableUnits: Array<Map<number, MaraUnitCacheItem>>;
@@ -106,6 +107,7 @@ export class MaraSettlementController implements MaraLogger {
     public ProductionController: ProductionSubcontroller;
     public StrategyController: StrategySubcontroller;
     public TacticalController: TacticalSubcontroller;
+    public DevelopmentController: DevelopmentSubcontroller;
     
     public HostileAttackingSquads: Array<MaraSquad> = [];
     public TargetEconomySnapshot: Array<EconomySnapshotItem> | null = null;
@@ -149,6 +151,9 @@ export class MaraSettlementController implements MaraLogger {
 
         this.TacticalController = new TacticalSubcontroller(this);
         this.subcontrollers.push(this.TacticalController);
+
+        this.DevelopmentController = new DevelopmentSubcontroller(this);
+        this.subcontrollers.push(this.DevelopmentController);
 
         this.State = SettlementControllerStateFactory.MakeRoutingState(this);
     }

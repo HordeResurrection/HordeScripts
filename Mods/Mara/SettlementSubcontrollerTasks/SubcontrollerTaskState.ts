@@ -17,13 +17,10 @@ export abstract class SubcontrollerTaskState extends FsmState {
         return this.constructor.name;
     }
     
-    constructor(settlementController: MaraSettlementController) {
+    constructor(task: SettlementSubcontrollerTask, settlementController: MaraSettlementController) {
         super();
         this.settlementController = settlementController;
-    }
-
-    TacticalControllerTick(): void {
-        this.settlementController.TacticalController.IdleTick();
+        this.task = task;
     }
 
     protected fillExpandData(requiredResources: MaraResources): void {

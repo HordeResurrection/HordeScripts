@@ -26,8 +26,6 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
             return;
         }
         
-        this.settlementController.ProductionController.CancelAllProduction();
-        
         this.requests = this.getProductionRequests();
         this.targetComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
         
@@ -63,6 +61,12 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
 
     OnExit(): void {
         this.onExit();
+
+        for (let request of this.requests) {
+            if (!request.IsCompleted) {
+                request.Cancel();
+            }
+        }
     }
 
     Tick(tickNumber: number): void {

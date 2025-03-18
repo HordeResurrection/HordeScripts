@@ -1,23 +1,22 @@
 import { FsmState } from "../../../Common/FiniteStateMachine/FsmState";
 import { MaraLogger } from "../../../Common/MaraLogger";
-import { TargetExpandData } from "../../../Common/Settlement/TargetExpandData";
 import { MaraSettlementController } from "../../../MaraSettlementController";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
-import { ExpandBuildState } from "./ExpandBuildState";
+import { ProduceSettlementEnhancementsState } from "./ProduceSettlementEnhancementsState";
 
-export class ExpandBuildTask extends SettlementSubcontrollerTask {
+export class DevelopSettlementTask extends SettlementSubcontrollerTask {
     private currentTaskState: FsmState;
     private nextTaskState: FsmState | null;
     
     constructor(
         priority: number, 
-        settlementController: MaraSettlementController, 
-        targetExpand: TargetExpandData,
+        cfgIds: Array<string>,
+        settlementController: MaraSettlementController,
         logger: MaraLogger
     ) {
         super(priority, settlementController, logger);
         
-        let state = new ExpandBuildState(this, this.SettlementController, targetExpand);
+        let state = new ProduceSettlementEnhancementsState(this, this.SettlementController, cfgIds);
         this.SetState(state);
     }
 

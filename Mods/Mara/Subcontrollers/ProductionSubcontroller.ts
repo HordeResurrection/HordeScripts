@@ -69,7 +69,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         let uncompletedRequests: Array<MaraProductionRequest> = [];
 
         for (let request of this.queuedRequests) {
-            if (request.IsCompleted) {
+            if (request.IsCompleted || request.IsCancelled) {
                 this.finalizeProductionRequest(request);
             }
             else {

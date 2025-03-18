@@ -2,12 +2,12 @@ import { MaraResourceCluster } from "../../../Common/MapAnalysis/MaraResourceClu
 import { MaraResourceType } from "../../../Common/MapAnalysis/MaraResourceType";
 import { MaraPoint } from "../../../Common/MaraPoint";
 import { MaraProductionRequest } from "../../../Common/MaraProductionRequest";
-import { SettlementControllerStateFactory } from "../../../Common/Settlement/SettlementControllerStateFactory";
 import { TargetExpandData } from "../../../Common/Settlement/TargetExpandData";
 import { UnitComposition } from "../../../Common/UnitComposition";
 import { MaraSettlementController } from "../../../MaraSettlementController";
 import { MaraUtils } from "../../../MaraUtils";
 import { ProductionTaskState } from "../../ProductionTaskState";
+import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 
 export class ExpandBuildState extends ProductionTaskState {
     private expandCenter: MaraPoint;
@@ -15,8 +15,8 @@ export class ExpandBuildState extends ProductionTaskState {
     private minedMinerals: Set<MaraResourceType> = new Set<MaraResourceType>();
     private targetExpand: TargetExpandData;
 
-    constructor(settlementController: MaraSettlementController, targetExpand: TargetExpandData) {
-        super(settlementController);
+    constructor(task: SettlementSubcontrollerTask, settlementController: MaraSettlementController, targetExpand: TargetExpandData) {
+        super(task, settlementController);
         this.targetExpand = targetExpand;
     }
 
@@ -24,7 +24,6 @@ export class ExpandBuildState extends ProductionTaskState {
         let center = this.calculateExpandCenter();
         
         if (!center) {
-            this.settlementController.State = SettlementControllerStateFactory.MakeIdleState(this.settlementController);
             return false;
         }
         else {

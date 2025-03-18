@@ -9,8 +9,18 @@ export class MaraProductionRequest {
     public Items: Array<MaraProductionRequestItem>;
     public Id = 0;
 
+    private isCancelled = false;
+
     public get IsExecuting(): boolean {
         return this.Items.find((i) => i.IsExecuting) != undefined;
+    }
+
+    public get IsCompleted(): boolean {
+        return this.IsCancelled || this.Items.every((i) => i.IsCompleted);
+    }
+
+    public get IsCancelled(): boolean {
+        return this.isCancelled;
     }
     
     constructor(
@@ -25,11 +35,15 @@ export class MaraProductionRequest {
         this.Id = MaraProductionRequest.idSequence;
     }
 
-    public get IsCompleted(): boolean {
-        return this.Items.every((i) => i.IsCompleted);
-    }
-
     public ToString(): string {
         return this.Items.map((i) => i.ToString()).join("\n");
+    }
+
+    public Cancel(): void {
+        let isAlreadyStarted = this.Items.find((i) => i.IsCompleted || i.IsExecuting) != undefined;
+
+        if (!isAlreadyStarted) {
+            this.isCancelled = true;
+        }
     }
 }
