@@ -1,4 +1,4 @@
-import { IDisposableT, IEnumeratorT, Int32T } from "./dotnet-types";
+import { IDisposableT, IEnumerableT, IEnumeratorT, Int32T } from "./dotnet-types";
 
 
 // ===================================================
@@ -46,14 +46,20 @@ globalThis.ForEach = ScriptUtils.ForEach;
     }
 ```
  */
-export function* enumerate(enumerable: object) {
+export function* enumerate<T>(enumerable: IEnumerableT<T>): Generator<T, void, unknown> {
     var enumerator = host.cast(IEnumeratorT, enumerable.GetEnumerator());
     while (enumerator.MoveNext()) {
-        yield enumerator.Current;
+        yield enumerator.Current as T;
     }
     host.cast(IDisposableT, enumerator).Dispose();
 }
-export function eNext(enumerated) {
+
+/**
+ * Получить следующее значение из итерируемого объекта.
+ * @param enumerated итерируемый объект.
+ * @returns возвращает следующее значение.
+ */
+export function eNext<T>(enumerated: Generator<T, void, unknown>): T | undefined {
     var next = enumerated.next();
     if (next.done)
         return undefined;
