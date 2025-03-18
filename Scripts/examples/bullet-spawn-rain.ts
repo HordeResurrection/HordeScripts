@@ -15,7 +15,7 @@ export class Example_SpawnBulletsRain extends HordeExampleBase {
     private rnd: any;
     private waveNum: number = 0;
 
-    private someUnit: Unit;
+    private someUnit: Unit | undefined;
     private arrowCfg: BulletConfig;
     private arrowShotParams: ShotParams;
     private bombCfg: BulletConfig;
@@ -23,21 +23,9 @@ export class Example_SpawnBulletsRain extends HordeExampleBase {
 
     public constructor() {
         super("Spawn bullets rain");
-    }
-
-    /**
-     * Инициализация переменных
-     */
-    public onFirstRun() {
-        this.logMessageOnRun();
-
-        let settlement_0 = ActiveScena.Settlements.Item.get('0');  // Олег
 
         // Игровой рандомизатор
         this.rnd = ActiveScena.Context.Randomizer;
-
-        // Любой юнит, от имени которого будет отправлена стрела
-        this.someUnit = settlement_0.Units.GetCastleOrAnyUnit();
 
         // Конфиги снарядов
         this.arrowCfg = HordeContentApi.GetBulletConfig("#BulletConfig_Arrow");
@@ -52,6 +40,18 @@ export class Example_SpawnBulletsRain extends HordeExampleBase {
         this.bombShotParams = ShotParams.CreateInstance();
         ScriptUtils.SetValue(this.bombShotParams, "Damage", 12);
         ScriptUtils.SetValue(this.bombShotParams, "AdditiveBulletSpeed", createPF(0, 0));
+    }
+
+    /**
+     * Инициализация переменных
+     */
+    public onFirstRun() {
+        this.logMessageOnRun();
+
+        let settlement_0 = ActiveScena.Settlements.Item.get('0');  // Олег
+
+        // Выбираем любой юнит, от имени которого будет отправлена стрела
+        this.someUnit = settlement_0.Units.GetCastleOrAnyUnit();
 
         // А теперь развлекаемся!
         broadcastMessage("Внимание! По прогнозу дождь из стрел, местами град! O_O", createHordeColor(255, 255, 50, 10));
@@ -77,6 +77,10 @@ export class Example_SpawnBulletsRain extends HordeExampleBase {
      * Заспаунить волну из снарядов
      */
     private spawnBulletsRain() {
+        if (!this.someUnit) {
+            return;
+        }
+
         let n = 0;
         for (let i = 0; i < 20; i++) {
             this.createBullRnd(this.someUnit, this.arrowCfg, this.arrowShotParams);

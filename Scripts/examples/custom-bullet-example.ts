@@ -28,6 +28,12 @@ export class Example_CustomBullet extends HordeExampleBase {
         super("Custom bullet");
         this.smokeDecorationCfg = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_ArrowSmoke");
         this.hitSoundCatalog = HordeContentApi.GetSoundsCatalog("#SoundsCatalog_Hits_Mele_Axe");
+        
+        // Создаём конфиг снаряда
+        this.customBullCfg = createBulletConfig();
+        
+        // Создаём характеристики выстрела
+        this.shotParams = createShotParams();
     }
 
     /**
@@ -36,16 +42,11 @@ export class Example_CustomBullet extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
-        // Создаём конфиг снаряда
-        this.customBullCfg = createBulletConfig();
         this.log.info('Конфиг снаряда для теста:', this.customBullCfg);
 
         // Установка функций-обработчиков для созданного снаряда
         setBulletInitializeWorker(this, this.customBullCfg, this.initializeWorker);
         setBulletProcessWorker(this, this.customBullCfg, this.processWorker);
-
-        // Создаём характеристики выстрела
-        this.shotParams = createShotParams();
     }
 
     /**

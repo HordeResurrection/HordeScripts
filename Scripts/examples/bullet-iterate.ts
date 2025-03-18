@@ -35,7 +35,7 @@ export class Example_IterateBullets extends HordeExampleBase {
         this.globalStorage.currentAddedHandler = bulletsRegistry.ItemAdded.connect(function (sender, args) {
             try {
                 that.eventHits++;
-                let bull = args.Item;
+                let bull = args!.Item;
                 that.log.info('- Снаряд добавлен:', '[' + bull.State + ']', bull);
             } catch (ex) {
                 that.log.exception(ex);
@@ -48,7 +48,7 @@ export class Example_IterateBullets extends HordeExampleBase {
         this.globalStorage.currentRemovedHandler = bulletsRegistry.ItemRemoved.connect(function (sender, args) {
             try {
                 that.eventHits++;
-                let bull = args.Item;
+                let bull = args!.Item;
                 that.log.info('- Снаряд удален:', '[' + bull.State + ']', bull);
             } catch (ex) {
                 that.log.exception(ex);

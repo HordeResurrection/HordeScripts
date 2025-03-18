@@ -128,7 +128,7 @@ export class Example_MasterMindRequest extends HordeExampleBase {
         }
     }
 
-    private addProduceRequest(produceRequestParameters) {
+    private addProduceRequest(produceRequestParameters: ProduceRequestParameters) {
         let requestVar = host.newVar(ProduceRequest);
         if (this.productionDepartament.AddRequestToProduce(produceRequestParameters, requestVar.out)) {
             this.log.info('Добавлен запрос на производство:', requestVar);

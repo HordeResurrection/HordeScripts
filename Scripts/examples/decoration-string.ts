@@ -16,6 +16,7 @@ export class Example_StringDecoration extends HordeExampleBase {
      */
     public constructor() {
         super("String decoration");
+        this.startTick = DataStorage.gameTickNum;
 
         this.center = createPoint(600, 600);
     }
@@ -25,8 +26,6 @@ export class Example_StringDecoration extends HordeExampleBase {
      */
     public onFirstRun() {
         this.logMessageOnRun();
-
-        this.startTick = DataStorage.gameTickNum;
 
         // Удаляем предыдущую строку (если был hotreload)
         if (this.globalStorage.decorationString)

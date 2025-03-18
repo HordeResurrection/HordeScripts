@@ -34,7 +34,7 @@ export type PathFinderStatus = HordeClassLibrary.PathFinders.PathFinderStatus;
  */
 export class PathFinder {
     scena: Scena | undefined;
-    uCfg: UnitConfig;
+    uCfg: UnitConfig | undefined;
 
     cpf: CpfMain | undefined;
     aStar: AStarPathFinder | undefined;
@@ -125,7 +125,11 @@ export class PathFinder {
 В данный момент здесь выполняется CanBePlaced-проверка, которая НЕ определяет непосредственно значение скорости в клетке.
 Это может отразиться на итоговом пути.
      */
-    private speedAtCell(cell) {
+    private speedAtCell(cell: Point2D) {
+
+        if (!this.uCfg) {
+            return 0;
+        }
 
         if (this.uCfg.CanBePlacedByRealMap(this.scena!, cell.X, cell.Y, false, true)) {
             return 1;

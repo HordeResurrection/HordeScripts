@@ -7,7 +7,7 @@ import { GeometryCanvas, GeometryVisualEffect, Stride_Color, Stride_Vector2, Uni
  * Пример отбражения геометрии на поле боя.
  */
 export class Example_GeometryDecoration extends HordeExampleBase {
-    private geometryDecoration: GeometryVisualEffect;
+    private geometryDecoration: GeometryVisualEffect | undefined;
     private center: Point2D;
     private startTick: number;
 
@@ -16,6 +16,7 @@ export class Example_GeometryDecoration extends HordeExampleBase {
      */
     public constructor() {
         super("Geometry decoration");
+        this.startTick = DataStorage.gameTickNum;
 
         this.center = createPoint(500, 500);
     }
@@ -25,8 +26,6 @@ export class Example_GeometryDecoration extends HordeExampleBase {
      */
     public onFirstRun() {
         this.logMessageOnRun();
-
-        this.startTick = DataStorage.gameTickNum;
 
         // Удаляем предыдущую декорацию (если был hotreload)
         if (this.globalStorage.geometryDecoration)
@@ -46,6 +45,10 @@ export class Example_GeometryDecoration extends HordeExampleBase {
      * Метод выполняется каждый игровой такт.
      */
     public onEveryTick(gameTickNum: number) {
+
+        if (!this.geometryDecoration) {
+            return;
+        }
 
         // Перемещение декорации.
         // Здесь код траектории по периметру треугольника

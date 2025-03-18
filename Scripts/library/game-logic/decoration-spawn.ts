@@ -1,5 +1,5 @@
 import { createHordeColor, Point2D } from "library/common/primitives";
-import { StringVisualEffect, DrawLayer, FontUtils, GeometryVisualEffect, Scena, VisualEffectConfig } from "./horde-types";
+import { StringVisualEffect, DrawLayer, FontUtils, GeometryVisualEffect, Scena, VisualEffectConfig, SoundsCatalog } from "./horde-types";
 
 
 /**
@@ -32,7 +32,7 @@ export function spawnString(scena: Scena, text: string, position: Point2D, ticks
 /**
  * Создание геометрии-декорации в заданных координатах
  */
-export function spawnGeometry(scena: Scena, geometry, position: Point2D, ticksToLive: number) {
+export function spawnGeometry(scena: Scena, geometry: any, position: Point2D, ticksToLive: number) {
     let args = new GeometryVisualEffect.CreationArgs();
     args.GeometryBuffer = geometry;
     args.TicksToLive = ticksToLive;
@@ -46,6 +46,6 @@ export function spawnGeometry(scena: Scena, geometry, position: Point2D, ticksTo
 /**
  * Создание звукового эффекта в заданных координатах
  */
-export function spawnSound(scena, soundsCatalog, sectionName, position, isLooping) {
+export function spawnSound(scena: Scena, soundsCatalog: SoundsCatalog, sectionName: string, position: Point2D, isLooping: boolean) {
     scena.ObjectController.UtterSound(soundsCatalog, sectionName, position, isLooping);
 }

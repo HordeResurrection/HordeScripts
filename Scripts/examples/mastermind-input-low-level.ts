@@ -13,13 +13,13 @@ export class Example_InputLowLevel extends HordeExampleBase {
 
     public constructor() {
         super("Input low-level");
+
+        this.player = Players["0"].GetRealPlayer();
+        this.playerVirtualInput = new PlayerVirtualInput(this.player);
     }
 
     public onFirstRun() {
         this.logMessageOnRun();
-
-        this.player = Players["0"].GetRealPlayer();
-        this.playerVirtualInput = new PlayerVirtualInput(this.player);
 
         this.log.info('Список всех команд юнитов');
         inspectEnum(UnitCommand);

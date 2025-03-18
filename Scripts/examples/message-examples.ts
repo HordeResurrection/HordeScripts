@@ -60,6 +60,9 @@ export class Example_HookSentChatMessages extends HordeExampleBase {
         let that = this;
         this.globalStorage.currentHandler = BattleController.ChatMessageSent.connect(function (sender, args) {
             try {
+                if (!args) {
+                    return;
+                }
                 let senderPlayer = args.InitiatorPlayer;
                 let targets = args.Targets;
                 let message = args.Message;
@@ -96,6 +99,9 @@ export class Example_HookReceivedChatMessages extends HordeExampleBase {
         let that = this;
         this.globalStorage.currentHandler = BattleController.ChatMessageReceived.connect(function (sender, args) {
             try {
+                if (!args) {
+                    return;
+                }
                 let senderPlayer = args.InitiatorPlayer;
                 let targets = args.Targets;
                 let message = args.Message;

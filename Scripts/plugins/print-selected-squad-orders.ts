@@ -25,6 +25,9 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
         let squadUISelector = ScriptUtils.GetValue(workPlayer, "SquadUISelector") as HordeResurrection.Engine.Logic.Main.Players.Input.PlayerSquadSelector;
         this.globalStorage.squadChangedHandler = squadUISelector.SquadChanged.connect((sender, args) => {
             try {
+                if (!args) {
+                    return;
+                }
                 if (!args.WithSound) {
                     return;
                 }
@@ -131,7 +134,7 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
     }
 }
 
-function str(obj) {
+function str(obj: any) {
     if (obj)
         return obj.ToString();
     return '<None>';

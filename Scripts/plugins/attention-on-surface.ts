@@ -3,6 +3,8 @@ import { BattleController, Scena, VisualEffectConfig, VisualEffectFogOfWarMode, 
 import * as primitives from "library/common/primitives";
 import * as decorations from "library/game-logic/decoration-spawn";
 
+type AttentionReceivedEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.AttentionReceivedEventArgs;
+
 
 /**
  * Плагин, который создаёт декорацию-метку в том месте на карте, где был зафиксирован Attention-клик (alt-клик)
@@ -36,7 +38,7 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
         }
 
         let that = this;
-        let handler = BattleController.AttentionSent.connect((sender, args) => that._attentionHandler(sender, args));
+        let handler = BattleController.AttentionSent.connect((sender, args) => that._attentionHandler(sender, args!));
         this.globalStorage.attentionClickHandler = handler;
     }
 
@@ -49,12 +51,12 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
         }
 
         let that = this;
-        let handler = BattleController.AttentionReceived.connect((sender, args) => that._attentionHandler(sender, args));
+        let handler = BattleController.AttentionReceived.connect((sender, args) => that._attentionHandler(sender, args!));
         this.globalStorage.attentionReceivedHandler = handler;
     }
 
 
-    private _attentionHandler(sender, args) {
+    private _attentionHandler(sender: any, args: AttentionReceivedEventArgs) {
         try {
             let info: AttentionClickInfo = {
                 tick: BattleController.GameTimer.GameFramesCounter,

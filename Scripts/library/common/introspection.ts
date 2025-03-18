@@ -12,7 +12,7 @@ import { log } from "./logging";
  *
  * Source: https://stackoverflow.com/questions/5357442/how-to-inspect-javascript-objects/20513467#20513467
  */
-export function inspectToStr(object: object, maxDepth: number | undefined, result: string | undefined) {
+export function inspectToStr(object: any, maxDepth: number | undefined, result: string | undefined) {
     if (typeof object != "object")
         return "Invalid object";
     if (typeof result == "undefined")
@@ -77,7 +77,7 @@ export function inspectFlagEnum(enumType: object, n = 31) {
 /**
  * Вывод всех свойств объекта в глубину depth
  */
-export function printObjectItems(object: object, depth = 1, shift = "") {
+export function printObjectItems(object: any, depth = 1, shift = "") {
     if (depth == 0) {
         return;
     }

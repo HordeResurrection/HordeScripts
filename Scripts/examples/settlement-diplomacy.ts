@@ -48,7 +48,7 @@ export class Example_SettlementDiplomacy extends HordeExampleBase {
         let scenaSettlements = ActiveScena.GetRealScena().Settlements;
 
         this.log.info("Получение дипломатических статусов", townName);
-        let dipStatuses = {};
+        let dipStatuses: { [key: string]: DiplomacyStatus } = {};
         ForEach(scenaSettlements, (otherSettlement: Settlement) => {
             if (otherSettlement == settlement) { return; }
 
