@@ -52,7 +52,7 @@ export class Example_ReplaceUnit extends HordeExampleBase {
         // - Варианты:
         return getOrCreateTestUnit(this);
         //return ActiveScena.GetRealScena().Settlements.GetByUid("0").Units.GetCastleOrAnyUnit();
-        //return Players["0"].GetRealPlayer().SelectedSquadVirtual.GetFirstUnit();
+        //return Players[0].GetRealPlayer().SelectedSquadVirtual.GetFirstUnit();
     }
 
     private getTargetConfig() {

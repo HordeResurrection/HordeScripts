@@ -6,7 +6,7 @@ import HordeExampleBase from "./base-example";
  * Пример работы с MasterMind
  */
 export class Example_MasterMindRequest extends HordeExampleBase {
-    workPlayerNum: string;
+    workPlayerNum: number;
     printRequestsPeriod: number;
     masterMind: any;
     productionDepartament: any;
@@ -14,7 +14,7 @@ export class Example_MasterMindRequest extends HordeExampleBase {
     public constructor() {
         super("Request for MasterMind");
 
-        this.workPlayerNum = "1";
+        this.workPlayerNum = 1;
         this.printRequestsPeriod = 1000;
     }
 

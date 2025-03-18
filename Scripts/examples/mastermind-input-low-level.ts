@@ -14,7 +14,7 @@ export class Example_InputLowLevel extends HordeExampleBase {
     public constructor() {
         super("Input low-level");
 
-        this.player = Players["0"].GetRealPlayer();
+        this.player = Players[0].GetRealPlayer();
         this.playerVirtualInput = new PlayerVirtualInput(this.player);
     }
 

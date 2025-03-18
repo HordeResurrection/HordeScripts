@@ -65,7 +65,7 @@ export class Example_Introspection extends HordeExampleBase {
         this.log.info("Является ли переменная 'someObject' объектом типа 'String'? Ответ:", host.isType(StringT, someObject));
 
         // Пример: имеется объект класса SettlementUnits, нужно узнать все его члены
-        let settlementUnits = Players["0"].GetRealPlayer().GetRealSettlement().Units;
+        let settlementUnits = Players[0].GetRealPlayer().GetRealSettlement().Units;
         if (true) inspect(settlementUnits, 1, ".Net-объект с юнитами поселения");
 
         // Пример: вывод элементов enum-типа

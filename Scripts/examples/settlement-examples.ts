@@ -15,12 +15,12 @@ export class Example_SettlementWorks extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
-        let realPlayer = Players["0"].GetRealPlayer();
+        let realPlayer = Players[0].GetRealPlayer();
         let realSettlement = realPlayer.GetRealSettlement();
 
         // Дипломатия
         let diplomacy = realSettlement.Diplomacy;
-        let otherSettlement = Players["1"].GetRealPlayer().GetRealSettlement();
+        let otherSettlement = Players[1].GetRealPlayer().GetRealSettlement();
         if (diplomacy.IsWarStatus(otherSettlement)) {
             this.log.info(`${realSettlement.LeaderName} ВОЮЕТ с ${otherSettlement.LeaderName}!`);
         } else {
@@ -127,7 +127,7 @@ export class Example_SettlementUnitsInfo extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
-        let realPlayer = Players["0"].GetRealPlayer();
+        let realPlayer = Players[0].GetRealPlayer();
         let realSettlement = realPlayer.GetRealSettlement();
         let that = this;
 
