@@ -6,6 +6,8 @@ import { UnitComposition } from "../Common/UnitComposition";
 import { DevelopSettlementTask } from "../SettlementSubcontrollerTasks/DevelopmentSubcontroller/DevelopSettlementTask/DevelopSettlementTask";
 
 export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
+    protected successfulSelfTaskCooldown = 60 * 50;
+    
     constructor (parent: MaraSettlementController) {
         super(parent);
     }

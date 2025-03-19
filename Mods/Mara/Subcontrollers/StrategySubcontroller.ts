@@ -2,7 +2,6 @@
 import { MaraSettlementController } from "Mara/MaraSettlementController";
 import { MaraPoint } from "../Common/MaraPoint";
 import { MaraUtils, AlmostDefeatCondition } from "Mara/MaraUtils";
-import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraSquad } from "./Squads/MaraSquad";
 import { SettlementGlobalStrategy } from "../Common/Settlement/SettlementControllerGlobalStrategy";
 import { UnitComposition } from "../Common/UnitComposition";
@@ -15,16 +14,18 @@ import { MaraPath } from "../Common/MapAnalysis/MaraPath";
 import { MaraUnitCache } from "../Common/Cache/MaraUnitCache";
 import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
 import { MaraResourceClusterSelection } from "../Common/MaraResourceClusterSelection";
+import { MaraTaskableSubcontroller } from "./MaraTaskableSubcontroller";
+import { SettlementSubcontrollerTask } from "../SettlementSubcontrollerTasks/SettlementSubcontrollerTask";
+import { AttackTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/AttackTask/AttackTask";
 
 class PathSelectItem implements NonUniformRandomSelectItem {
     Weight: number;
     Path: MaraPath;
 }
 
-export class StrategySubcontroller extends MaraSubcontroller {
+export class StrategySubcontroller extends MaraTaskableSubcontroller {
     EnemySettlements: Array<any> = []; //but actually Settlement
 
-    private currentEnemy: any; //but actually Settlement
     private globalStrategy: SettlementGlobalStrategy = new SettlementGlobalStrategy();
     
     constructor (parent: MaraSettlementController) {
@@ -41,39 +42,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return this.settlementController.Player;
     }
 
-    public get CurrentEnemy(): any {
-        return this.currentEnemy;
-    }
-    
-    Tick(tickNumber: number): void {
-        if (tickNumber % 10 != 0) {
-            return;
-        }
-
-        if (tickNumber % 50 == 0) {
-            this.updateEnemiesList();
-        }
-
-        if (!this.currentEnemy) {
-            return;
-        }
-
-        if (MaraUtils.IsSettlementDefeated(this.currentEnemy)) {
-            this.settlementController.Debug(`Enemy defeated`);
-            this.ResetEnemy();
-            return;
-        }
-    }
-
-    GetSettlementAttackArmyComposition(): UnitComposition {
-        if (!this.currentEnemy) {
-            this.SelectEnemy();
-
-            if (!this.CurrentEnemy) {
-                return new Map<string, number>();
-            }
-        }
-
+    GetSettlementAttackArmyComposition(settlement: any): UnitComposition {
         let ratio = MaraUtils.RandomSelect<number>(
             this.settlementController.MasterMind,
             this.settlementController.Settings.Combat.OffensiveToDefensiveRatios
@@ -84,7 +53,7 @@ export class StrategySubcontroller extends MaraSubcontroller {
         
         let requiredStrength = this.settlementController.Settings.Combat.AttackStrengthToEnemyStrengthRatio * 
             Math.max(
-                this.calcSettlementStrength(this.currentEnemy), 
+                this.calcSettlementStrength(settlement), 
                 this.settlementController.Settings.ControllerStates.MinAttackStrength
             );
 
@@ -243,20 +212,15 @@ export class StrategySubcontroller extends MaraSubcontroller {
     }
 
     SelectEnemy(): any { //but actually Settlement
-        this.currentEnemy = null;
-
         let undefeatedEnemies: any[] = this.EnemySettlements.filter((value) => {return !MaraUtils.IsSettlementDefeated(value)});
+        let enemy: any = null;
         
         if (undefeatedEnemies.length > 0) {
             let index = MaraUtils.Random(this.settlementController.MasterMind, undefeatedEnemies.length - 1);
-            this.currentEnemy = undefeatedEnemies[index];
+            enemy = undefeatedEnemies[index];
         }
 
-        return this.currentEnemy;
-    }
-
-    ResetEnemy(): void {
-        this.currentEnemy = null;
+        return enemy;
     }
 
     GetOffensiveTarget(
@@ -559,6 +523,28 @@ export class StrategySubcontroller extends MaraSubcontroller {
         return new MaraResourceClusterSelection(optimalCluster, isReachable, reachableCluster);
     }
 
+    protected doRoutines(tickNumber: number): void {
+        if (tickNumber % 50 == 0) {
+            this.updateEnemiesList();
+        }
+    }
+
+    protected makeSelfTask(): SettlementSubcontrollerTask | null {
+        let enemy = this.SelectEnemy();
+
+        if (enemy) {
+            return new AttackTask(
+                1,
+                enemy,
+                this.settlementController,
+                this.settlementController
+            );
+        }
+        else {
+            return null;
+        }
+    }
+
     private selectOptimalCluster(clusterData: any): MaraResourceCluster | null {
         let minDistance = Infinity;
         
@@ -635,12 +621,6 @@ export class StrategySubcontroller extends MaraSubcontroller {
                 return diplomacy.IsWarStatus(value) && MaraUnitCache.GetAllSettlementUnits(value).length > 0
             }
         );
-
-        if (this.currentEnemy) {
-            if (!this.EnemySettlements.find((v) => v == this.currentEnemy)) {
-                this.ResetEnemy();
-            }
-        }
     }
 
     private calcSettlementStrength(settlement: any): number {

@@ -1,6 +1,5 @@
 
 import { MaraUtils } from "Mara/MaraUtils";
-import { SettlementControllerStateFactory } from "../Common/Settlement/SettlementControllerStateFactory";
 import { MaraProductionRequestItem } from "../Common/MaraProductionRequestItem";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraPoint } from "../Common/MaraPoint";
@@ -10,6 +9,7 @@ import { MaraMap } from "../Common/MapAnalysis/MaraMap";
 import { MaraMapNodeType } from "../Common/MapAnalysis/MaraMapNodeType";
 import { MaraPath } from "../Common/MapAnalysis/MaraPath";
 import { SubcontrollerTaskState } from "./SubcontrollerTaskState";
+import { AwaitTaskCompletionState } from "./AwaitTaskCompletionState";
 
 export abstract class ProductionTaskState extends SubcontrollerTaskState {
     private requests: Array<MaraProductionRequest>;
@@ -18,6 +18,7 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
     protected abstract getProductionRequests(): Array<MaraProductionRequest>;
     protected abstract onTargetCompositionReached(): void;
     protected abstract onProductionTimeout(): void;
+    protected requestMiningOnInsufficientResources = true;
 
     private timeoutTick: number | null;
     
@@ -29,24 +30,34 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
         this.requests = this.getProductionRequests();
         this.targetComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
         
-        let insufficientResources = this.getInsufficientResources();
+        if (this.requestMiningOnInsufficientResources) {
+            let compositionToProduce: UnitComposition = new Map<string, number>();
 
-        // TODO: rewrite this to request to mining subcontroller
-        if (
-            insufficientResources.Gold > 0 ||
-            insufficientResources.Metal > 0 ||
-            insufficientResources.Wood > 0 ||
-            insufficientResources.People > 0
-        ) {
-            this.settlementController.Debug(`Not enough resources to produce target composition: ${insufficientResources.ToString()}`);
-
-            if (this.settlementController.CanMineResources) {
-                if (!this.onInsufficientResources(insufficientResources)) {
-                    return;
+            for (let request of this.requests) {
+                for (let item of request.Items) {
+                    MaraUtils.IncrementMapItem(compositionToProduce, item.ConfigId);
                 }
             }
-            else {
-                this.settlementController.Debug(`Unable to build expand, proceeding to production anyway`);
+
+            this.settlementController.Debug(`Current unit composition to produce:`);
+            MaraUtils.PrintMap(compositionToProduce);
+
+            let requestResult = this.settlementController.MiningController.ProvideResourcesForUnitComposition(compositionToProduce);
+
+            if (!requestResult.IsSuccess) {
+                this.settlementController.Debug(`Not enough resources to produce target composition. Awaiting completion of mining subcontroller task`);
+
+                let awaitState = new AwaitTaskCompletionState(
+                    requestResult.Task!,
+                    this,
+                    this.settlementController.Settings.Timeouts.ExpandBuild,
+                    this.task,
+                    this.settlementController
+                );
+                
+                this.task.SetState(awaitState);
+                
+                return;
             }
         }
 
@@ -86,13 +97,6 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
         
         if (tickNumber % 10 != 0) {
             return;
-        }
-
-        if (tickNumber % 50 == 0) {
-            if (this.settlementController.StrategyController.IsUnderAttack()) {
-                this.settlementController.State = SettlementControllerStateFactory.MakeDefendingState(this.settlementController);
-                return;
-            }
         }
 
         let requestsToReorder = this.getRequestsToReorder();
@@ -288,50 +292,6 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
 
         let result: Array<MaraProductionRequest> = [];
         requestsToReorder.forEach((v) => result.push(v));
-
-        return result;
-    }
-
-    private getInsufficientResources(): MaraResources {
-        let compositionToProduce: UnitComposition = new Map<string, number>();
-
-        for (let request of this.requests) {
-            for (let item of request.Items) {
-                MaraUtils.IncrementMapItem(compositionToProduce, item.ConfigId);
-            }
-        }
-
-        this.settlementController.Debug(`Current unit composition to produce:`);
-        MaraUtils.PrintMap(compositionToProduce);
-
-        let compositionCost = this.calculateCompositionCost(compositionToProduce);
-        this.settlementController.Debug(`Target composition cost: ${compositionCost.ToString()}`);
-
-        let currentResources = this.settlementController.MiningController.GetTotalResources();
-        this.settlementController.Debug(`Current resources: ${currentResources.ToString()}`);
-
-        let insufficientResources = new MaraResources(
-            Math.max(compositionCost.Wood - currentResources.Wood, 0), 
-            Math.max(compositionCost.Metal - currentResources.Metal, 0), 
-            Math.max(compositionCost.Gold - currentResources.Gold, 0), 
-            Math.max(compositionCost.People - currentResources.People, 0)
-        );
-
-        return insufficientResources;
-    }
-
-    private calculateCompositionCost(composition: UnitComposition): MaraResources {
-        let result = new MaraResources(0, 0, 0, 0);
-
-        composition.forEach((value, key) => {
-            let config = MaraUtils.GetUnitConfig(key);
-            let cost = config.CostResources;
-
-            result.Gold += cost.Gold * value;
-            result.Metal += cost.Metal * value;
-            result.Wood += cost.Lumber * value;
-            result.People += cost.People * value;
-        });
 
         return result;
     }
