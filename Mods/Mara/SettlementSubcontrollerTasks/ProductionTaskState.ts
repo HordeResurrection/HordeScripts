@@ -29,19 +29,19 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
         
         this.requests = this.getProductionRequests();
         this.targetComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
+
+        let compositionToProduce: UnitComposition = new Map<string, number>();
+
+        for (let request of this.requests) {
+            for (let item of request.Items) {
+                MaraUtils.IncrementMapItem(compositionToProduce, item.ConfigId);
+            }
+        }
+
+        this.settlementController.Debug(`Current unit composition to produce:`);
+        MaraUtils.PrintMap(compositionToProduce);
         
         if (this.requestMiningOnInsufficientResources) {
-            let compositionToProduce: UnitComposition = new Map<string, number>();
-
-            for (let request of this.requests) {
-                for (let item of request.Items) {
-                    MaraUtils.IncrementMapItem(compositionToProduce, item.ConfigId);
-                }
-            }
-
-            this.settlementController.Debug(`Current unit composition to produce:`);
-            MaraUtils.PrintMap(compositionToProduce);
-
             let requestResult = this.settlementController.MiningController.ProvideResourcesForUnitComposition(compositionToProduce);
 
             if (!requestResult.IsSuccess) {

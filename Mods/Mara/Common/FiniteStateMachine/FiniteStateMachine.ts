@@ -26,8 +26,6 @@ export abstract class FiniteStateMachine {
             this.logger.Debug(`Entering state ${this.state.constructor.name}, tick ${tickNumber}`);
             this.state.OnEntry();
         }
-
-        this.state.Tick(tickNumber);
     }
 
     SetState(state: FsmState): void {

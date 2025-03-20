@@ -5,7 +5,7 @@ import { MaraSettlementController } from "../../../MaraSettlementController";
 import { MaraUtils } from "../../../MaraUtils";
 import { ProductionTaskState } from "../../ProductionTaskState";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
-import { ExterminatingState } from "./ExterminateState";
+import { ExterminatingState } from "./ExterminatingState";
 
 export class BuildUpState extends ProductionTaskState {
     private enemy: any;

@@ -17,6 +17,7 @@ import { MaraResourceClusterSelection } from "../Common/MaraResourceClusterSelec
 import { MaraTaskableSubcontroller } from "./MaraTaskableSubcontroller";
 import { SettlementSubcontrollerTask } from "../SettlementSubcontrollerTasks/SettlementSubcontrollerTask";
 import { AttackTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/AttackTask/AttackTask";
+import { DefendTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/DefendTask/DefendTask";
 
 class PathSelectItem implements NonUniformRandomSelectItem {
     Weight: number;
@@ -24,6 +25,8 @@ class PathSelectItem implements NonUniformRandomSelectItem {
 }
 
 export class StrategySubcontroller extends MaraTaskableSubcontroller {
+    protected selfTaskReattemptCooldown = 10 * 50;
+    
     EnemySettlements: Array<any> = []; //but actually Settlement
 
     private globalStrategy: SettlementGlobalStrategy = new SettlementGlobalStrategy();
@@ -364,14 +367,14 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         }
     }
 
-    OrderAttackersByDangerLevel(): Array<MaraSquad> {
+    OrderAttackersByDangerLevel(attackingSquads: Array<MaraSquad>): Array<MaraSquad> {
         let settlementLocation = this.settlementController.GetSettlementLocation();
         let settlementCenter = settlementLocation?.Center;
 
         if (settlementCenter) {
             let threatData: any[] = [];
 
-            for (let squad of this.settlementController.HostileAttackingSquads) {
+            for (let squad of attackingSquads) {
                 let distanceToCenter = MaraUtils.ChebyshevDistance(settlementCenter, squad.GetLocation().Point);
                 threatData.push({squad: squad, distance: distanceToCenter});
             }
@@ -383,7 +386,7 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
             return threatData.map(v => v.squad);
         }
         else {
-            return this.settlementController.HostileAttackingSquads;
+            return attackingSquads;
         }
     }
 
@@ -526,6 +529,11 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
     protected doRoutines(tickNumber: number): void {
         if (tickNumber % 50 == 0) {
             this.updateEnemiesList();
+
+            if (this.IsUnderAttack()) {
+                let defendTask = new DefendTask(999, this.settlementController, this.settlementController);
+                this.AddTask(defendTask);
+            }
         }
     }
 

@@ -20,7 +20,7 @@ export class ExterminatingState extends SubcontrollerTaskState {
     }
 
     OnExit(): void {
-        // do nothing
+        this.settlementController.TacticalController.Idle();
     }
 
     Tick(tickNumber: number): void {
@@ -58,10 +58,6 @@ export class ExterminatingState extends SubcontrollerTaskState {
             this.task.Complete(false);
             return;
         }
-    }
-
-    TacticalControllerTick(): void {
-        this.settlementController.TacticalController.AttackTick();
     }
 
     private selectTarget(enemy: any): void {
