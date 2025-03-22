@@ -25,7 +25,7 @@ class PathSelectItem implements NonUniformRandomSelectItem {
 }
 
 export class StrategySubcontroller extends MaraTaskableSubcontroller {
-    protected selfTaskReattemptCooldown = 10 * 50;
+    protected selfTaskReattemptCooldown = 20 * 50;
     
     EnemySettlements: Array<any> = []; //but actually Settlement
 
@@ -541,12 +541,14 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         let enemy = this.SelectEnemy();
 
         if (enemy) {
-            return new AttackTask(
-                1,
-                enemy,
-                this.settlementController,
-                this
-            );
+            let offensiveCfgIds = this.getOffensiveCfgIds();
+
+            if (offensiveCfgIds.length > 0) {
+                return new AttackTask(1, enemy, this.settlementController, this);
+            }
+            else {
+                return null;
+            }
         }
         else {
             return null;
