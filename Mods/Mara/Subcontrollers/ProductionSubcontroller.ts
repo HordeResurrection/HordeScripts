@@ -102,10 +102,6 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                 continue;
             }
 
-            if (request.IsCancelled) {
-                this.Debug(`Cancelled production request ${request.ToString()}`);
-            }
-            
             if (request.IsCompleted || (request.IsCancelled && !request.IsExecuting)) {
                 this.finalizeProductionRequest(request);
             }

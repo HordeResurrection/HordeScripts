@@ -17,7 +17,7 @@ export class MaraProductionRequest {
     }
 
     public get IsCompleted(): boolean {
-        return this.IsCancelled || this.Items.every((i) => i.IsCompleted);
+        return this.Items.every((i) => i.IsCompleted);
     }
 
     public get IsCancelled(): boolean {
@@ -39,7 +39,7 @@ export class MaraProductionRequest {
     }
 
     public ToString(): string {
-        return `Priority ${this.Priority} - ` + this.Items.map((i) => i.ToString()).join("\n");
+        return `(${this.Priority}) ` + this.Items.map((i) => i.ToString()).join("\n");
     }
 
     public Cancel(): void {
