@@ -12,7 +12,7 @@ import { MaraMapNode } from "./MaraMapNode";
 import { MaraMapNodeType } from "./MaraMapNodeType";
 import { createHordeColor } from "library/common/primitives";
 import { MaraPath } from "./MaraPath";
-import SortedSet from "./SortedSet.js"
+import SortedSet from "../SortedSet.js"
 import RBush from "../RBush/rbush.js"
 import { MaraRect } from "../MaraRect";
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";

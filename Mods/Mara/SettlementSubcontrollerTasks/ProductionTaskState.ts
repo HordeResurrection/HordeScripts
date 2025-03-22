@@ -146,7 +146,7 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
         isForce: boolean = false
     ): MaraProductionRequest {
         let item = new MaraProductionRequestItem(configId, point, precision);
-        let productionRequest = new MaraProductionRequest([item], isForce);
+        let productionRequest = new MaraProductionRequest([item], this.task.Priority, isForce);
         this.settlementController.ProductionController.RequestProduction(productionRequest);
         
         return productionRequest;
@@ -155,7 +155,7 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
     protected makeProductionQueueRequest(
         items: Array<MaraProductionRequestItem>
     ): MaraProductionRequest {
-        let productionRequest = new MaraProductionRequest(items, false);
+        let productionRequest = new MaraProductionRequest(items, this.task.Priority, false);
         this.settlementController.ProductionController.RequestProduction(productionRequest);
         
         return productionRequest;

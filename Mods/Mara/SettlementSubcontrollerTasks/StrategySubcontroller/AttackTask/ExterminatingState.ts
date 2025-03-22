@@ -72,7 +72,7 @@ export class ExterminatingState extends SubcontrollerTaskState {
 
     private requestReinforcementsProduction(): void {
         for (let cfgId of this.reinforcementsCfgIds) {
-            this.settlementController.ProductionController.RequestSingleCfgIdProduction(cfgId);
+            this.settlementController.ProductionController.RequestSingleCfgIdProduction(cfgId, this.task.Priority);
         }
     }
     private isValidTarget(unit: MaraUnitCacheItem | null): boolean {

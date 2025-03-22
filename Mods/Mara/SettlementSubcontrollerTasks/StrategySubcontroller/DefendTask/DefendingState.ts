@@ -34,7 +34,7 @@ export class DefendingState extends SubcontrollerTaskState {
 
     private requestReinforcementsProduction() {
         for (let cfgId of this.reinforcementsCfgIds) {
-            this.settlementController.ProductionController.ForceRequestSingleCfgIdProduction(cfgId);
+            this.settlementController.ProductionController.ForceRequestSingleCfgIdProduction(cfgId, this.task.Priority);
         }
     }
 }

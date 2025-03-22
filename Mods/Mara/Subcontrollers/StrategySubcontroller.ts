@@ -75,29 +75,29 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         this.settlementController.Debug(`Offensive unit composition:`);
         MaraUtils.PrintMap(unitList);
 
-        let requiredDefensiveStrength = (1 - ratio) * requiredStrength;
-        let currentDefensiveStrength = this.GetCurrentDefensiveStrength();
-        let defensiveStrengthToProduce = Math.max(requiredDefensiveStrength - currentDefensiveStrength, 0);
-        this.settlementController.Debug(`Calculated required defensive strength: ${defensiveStrengthToProduce}`);
+        // let requiredDefensiveStrength = (1 - ratio) * requiredStrength;
+        // let currentDefensiveStrength = this.GetCurrentDefensiveStrength();
+        // let defensiveStrengthToProduce = Math.max(requiredDefensiveStrength - currentDefensiveStrength, 0);
+        // this.settlementController.Debug(`Calculated required defensive strength: ${defensiveStrengthToProduce}`);
         
-        let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
+        // let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
 
-        let defensiveCfgIds = produceableCfgIds.filter(
-            (value) => {
-                return (
-                    this.globalStrategy.OffensiveCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0 || 
-                    this.globalStrategy.DefensiveBuildingsCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0
-                );
-            }
-        );
-        this.settlementController.Debug(`Defensive Cfg IDs: ${defensiveCfgIds}`);
+        // let defensiveCfgIds = produceableCfgIds.filter(
+        //     (value) => {
+        //         return (
+        //             this.globalStrategy.OffensiveCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0 || 
+        //             this.globalStrategy.DefensiveBuildingsCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0
+        //         );
+        //     }
+        // );
+        // this.settlementController.Debug(`Defensive Cfg IDs: ${defensiveCfgIds}`);
 
-        let allowedDefensiveCfgItems = MaraUtils.MakeAllowedCfgItems(defensiveCfgIds, unitList, this.settlementController.Settlement);
-        let defensiveUnitList = this.makeCombatUnitComposition(allowedDefensiveCfgItems, defensiveStrengthToProduce);
-        this.settlementController.Debug(`Defensive unit composition:`);
-        MaraUtils.PrintMap(defensiveUnitList);
+        // let allowedDefensiveCfgItems = MaraUtils.MakeAllowedCfgItems(defensiveCfgIds, unitList, this.settlementController.Settlement);
+        // let defensiveUnitList = this.makeCombatUnitComposition(allowedDefensiveCfgItems, defensiveStrengthToProduce);
+        // this.settlementController.Debug(`Defensive unit composition:`);
+        // MaraUtils.PrintMap(defensiveUnitList);
 
-        defensiveUnitList.forEach((value, key, map) => MaraUtils.AddToMapItem(unitList, key, value));
+        // defensiveUnitList.forEach((value, key, map) => MaraUtils.AddToMapItem(unitList, key, value));
         
         return unitList;
     }

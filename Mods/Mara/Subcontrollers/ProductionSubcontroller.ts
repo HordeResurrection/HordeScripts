@@ -13,9 +13,12 @@ import { MaraUnitConfigCache } from "../Common/Cache/MaraUnitConfigCache";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraUnitCache } from "../Common/Cache/MaraUnitCache";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
+import { SortedSet } from "../Common/SortedSet";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
-    private queuedRequests: Array<MaraProductionRequest> = [];
+    private queuedRequests: SortedSet;
+    private queueOptions: any;
+
     private executingRequestItems: Array<MaraProductionRequestItem> = [];
     private repairRequests: Array<MaraRepairRequest> = [];
     private productionIndex: Map<string, Array<MaraUnitCacheItem>> | null = null;
@@ -31,12 +34,27 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                 this.producers.push(unit);
             }
         }
+
+        this.queueOptions.comparator = (a, b) => {
+            let priorityCompareResult = -(a.Priority - b.Priority);
+            
+            if (isNaN(priorityCompareResult) || priorityCompareResult == 0) {
+                return a.Id - b.Id;
+            }
+            else  {
+                return priorityCompareResult;
+            }
+        }
+
+        this.queuedRequests = new SortedSet(this.queueOptions);
     }
 
     private get productionCfgIdList(): Array<string> {
         let list: Array<string> = [];
 
-        for (let request of this.queuedRequests) {
+        let queuedRequestsArr = this.queuedRequests.toArray();
+        
+        for (let request of queuedRequestsArr) {
             let itemsCfgIds = request.Items.map((i) => i.ConfigId);
             list.push(...itemsCfgIds);
         }
@@ -66,16 +84,25 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
 
         this.productionIndex = null;
-        let uncompletedRequests: Array<MaraProductionRequest> = [];
+        let uncompletedRequests = new SortedSet(this.queueOptions);
+        
+        let iterator = this.queuedRequests.beginIterator();
+        let highestRequestPriority = -Infinity;
 
-        for (let request of this.queuedRequests) {
+        while (iterator != null) {
+            let request = iterator.value();
+            
             if (request.IsCompleted || request.IsCancelled) {
                 this.finalizeProductionRequest(request);
             }
             else {
-                uncompletedRequests.push(request);
+                uncompletedRequests.insert(request);
 
-                if (!request.IsExecuting) {
+                if (request.Priority > highestRequestPriority) {
+                    highestRequestPriority = request.Priority;
+                }
+
+                if (!request.IsExecuting && request.Priority == highestRequestPriority) {
                     let nextProductionItem = request.Items.find((i) => !i.IsCompleted)!;
 
                     if (!request.Executor || !request.Executor.UnitIsAlive) {
@@ -96,6 +123,8 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                     }
                 }
             }
+
+            iterator = iterator.next();
         }
 
         this.queuedRequests = uncompletedRequests;
@@ -124,23 +153,23 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     RequestProduction(request: MaraProductionRequest): void {
-        this.queuedRequests.push(request);
+        this.queuedRequests.insert(request);
         this.settlementController.Debug(`Added ${request.ToString()} to target production list`);
 
         if (request.IsForce) {
             for (let item of request.Items) {
-                this.requestAbsentProductionChainItemsProduction(item.ConfigId);
+                this.requestAbsentProductionChainItemsProduction(item.ConfigId, request.Priority);
             }
         }
     }
 
-    RequestSingleCfgIdProduction(configId: string): void {
+    RequestSingleCfgIdProduction(configId: string, priority: number): void {
         if (this.productionCfgIdList.indexOf(configId) < 0) {
-            this.requestCfgIdProduction(configId);
+            this.requestCfgIdProduction(configId, priority);
         }
     }
 
-    ForceRequestSingleCfgIdProduction(configId: string): void {
+    ForceRequestSingleCfgIdProduction(configId: string, priority: number): void {
         if (!this.productionIndex) {
             this.updateProductionIndex();
         }
@@ -167,16 +196,17 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             return;
         }
         
-        this.requestCfgIdProduction(configId);
-        this.requestAbsentProductionChainItemsProduction(configId);
+        this.requestCfgIdProduction(configId, priority);
+        this.requestAbsentProductionChainItemsProduction(configId, priority);
     }
 
     CancelAllProduction(): void {
-        let executingRequests: Array<MaraProductionRequest> = [];
+        let executingRequests = new SortedSet(this.queueOptions);
+        let queuedRequestsArr = this.queuedRequests.toArray();
         
-        for (let request of this.queuedRequests) {
+        for (let request of queuedRequestsArr) {
             if (request.IsExecuting) {
-                executingRequests.push(request);
+                executingRequests.insert(request);
             }
             else {
                 this.finalizeProductionRequest(request);
@@ -273,15 +303,15 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
     }
 
-    private requestCfgIdProduction(configId: string): void {
+    private requestCfgIdProduction(configId: string, priority: number): void {
         let item = new MaraProductionRequestItem(configId, null, null);
-        let request = new MaraProductionRequest([item])
+        let request = new MaraProductionRequest([item], priority)
         
-        this.queuedRequests.push(request);
-        this.settlementController.Debug(`Added ${configId} to target production list`);
+        this.queuedRequests.insert(request);
+        this.settlementController.Debug(`Added ${configId} to target production list with priority ${request.Priority}`);
     }
 
-    private requestAbsentProductionChainItemsProduction(configId: string): void {
+    private requestAbsentProductionChainItemsProduction(configId: string, priority: number): void {
         let requiredConfigs = MaraUtils.GetCfgIdProductionChain(configId, this.settlementController.Settlement);
         
         let existingUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
@@ -293,7 +323,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
         for (let cfg of requiredConfigs) {
             if (!existingCfgIds.has(cfg.Uid) && !this.productionCfgIdList.find((value) => {return value == cfg.Uid})) {
-                this.requestCfgIdProduction(cfg.Uid);
+                this.requestCfgIdProduction(cfg.Uid, priority);
             }
         }
     }
