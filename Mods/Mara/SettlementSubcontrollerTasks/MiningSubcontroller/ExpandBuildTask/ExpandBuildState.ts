@@ -211,7 +211,7 @@ export class ExpandBuildState extends ProductionTaskState {
     private orderMiningProduction(): Array<MaraProductionRequest> {
         let result = new Array<MaraProductionRequest>();
         
-        let targetExpand = this.settlementController.TargetExpand!;
+        let targetExpand = this.targetExpand;
 
         if (targetExpand.ResourceType.findIndex((value) => {return value == MaraResourceType.Gold}) >= 0) {
             result.push(...this.orderMineProduction(targetExpand.Cluster!, MaraResourceType.Gold));
@@ -257,7 +257,7 @@ export class ExpandBuildState extends ProductionTaskState {
             }
         }
 
-        let targetResourceCluster = this.settlementController.TargetExpand!.Cluster!;
+        let targetResourceCluster = this.targetExpand.Cluster!;
 
         if (!isSawmillPresent) {
             let sawmillConfigs = MaraUtils.GetAllSawmillConfigIds(this.settlementController.Settlement);

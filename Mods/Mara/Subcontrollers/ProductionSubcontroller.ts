@@ -13,7 +13,8 @@ import { MaraUnitConfigCache } from "../Common/Cache/MaraUnitConfigCache";
 import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraUnitCache } from "../Common/Cache/MaraUnitCache";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
-import { SortedSet } from "../Common/SortedSet";
+import SortedSet from "../Common/SortedSet.js";
+import InsertConflictResolvers from "../Common/SortedSet/InsertConflictResolvers.js"
 
 export class ProductionSubcontroller extends MaraSubcontroller {
     private queuedRequests: SortedSet;
@@ -35,6 +36,8 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             }
         }
 
+        this.queueOptions = {};
+        
         this.queueOptions.comparator = (a, b) => {
             let priorityCompareResult = -(a.Priority - b.Priority);
             
@@ -45,6 +48,8 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                 return priorityCompareResult;
             }
         }
+
+        this.queueOptions.onInsertConflict = InsertConflictResolvers.OnInsertConflictIgnore;
 
         this.queuedRequests = new SortedSet(this.queueOptions);
     }
@@ -91,6 +96,11 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
         while (iterator != null) {
             let request = iterator.value();
+            iterator = iterator.next();
+
+            if (!request) {
+                continue;
+            }
             
             if (request.IsCompleted || request.IsCancelled) {
                 this.finalizeProductionRequest(request);
@@ -123,8 +133,6 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                     }
                 }
             }
-
-            iterator = iterator.next();
         }
 
         this.queuedRequests = uncompletedRequests;

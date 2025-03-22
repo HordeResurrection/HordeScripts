@@ -52,7 +52,7 @@ export class TacticalAttackState extends FsmState {
         }
         
         this.tacticalController.ComposeSquads();
-        this.tacticalController.IssueAttackCommand();
+        this.tacticalController.IssueAttackCommand(this.attackPath);
     }
 
     OnExit(): void {

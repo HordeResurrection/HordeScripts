@@ -24,7 +24,6 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     private initialOffensiveSquadCount: number;
     private unitsInSquads: Map<number, MaraUnitCacheItem> = new Map<number, MaraUnitCacheItem>();
 
-    private attackPath: Array<MaraPoint>;
     private state: FsmState;
     private nextState: FsmState | null;
 
@@ -83,15 +82,12 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             this.state.OnEntry();
         }
 
-        this.state.Tick(tickNumber);
-
         for (let squad of this.AllSquads) {
             squad.Tick(tickNumber);
         }
         
         if (tickNumber % 10 == 0) {
             this.updateSquads();
-            this.settlementController.State.TacticalControllerTick();
         }
     }
 
@@ -259,11 +255,11 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.sendSquadToClosestLocation(squad, locations);
     }
 
-    IssueAttackCommand(): void {
+    IssueAttackCommand(attackPath: Array<MaraPoint>): void {
         this.settlementController.Debug(`Issuing attack command`);
 
         for (let squad of this.OffensiveSquads) {
-            this.SendSquadToAttack(squad, this.attackPath);
+            this.SendSquadToAttack(squad, attackPath);
         }
     }
 

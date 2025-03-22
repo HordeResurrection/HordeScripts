@@ -17,6 +17,7 @@ export class ExterminatingState extends SubcontrollerTaskState {
     OnEntry(): void {
         this.reinforcementsCfgIds = this.settlementController.StrategyController.GetReinforcementCfgIds();
         this.timeoutTick = null;
+        this.selectTarget(this.enemy);
     }
 
     OnExit(): void {

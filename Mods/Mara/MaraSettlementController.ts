@@ -155,7 +155,7 @@ export class MaraSettlementController implements MaraLogger {
         this.DevelopmentController = new DevelopmentSubcontroller(this);
         this.subcontrollers.push(this.DevelopmentController);
 
-        this.State = SettlementControllerStateFactory.MakeRoutingState(this);
+        //this.State = SettlementControllerStateFactory.MakeRoutingState(this);
     }
 
     public get State(): MaraSettlementControllerState {
@@ -194,7 +194,7 @@ export class MaraSettlementController implements MaraLogger {
             this.state.OnEntry();
         }
 
-        this.state.Tick(tickNumber);
+        //this.state.Tick(tickNumber);
     }
 
     Log(level: MaraLogLevel, message: string): void {
