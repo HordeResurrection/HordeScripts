@@ -21,7 +21,7 @@ export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
         
         if (this.activeTask) {
             if (this.activeTask.IsCompleted) {
-                this.debug(`Task ${this.activeTask.constructor.name} completed with result ${this.activeTask.IsSuccess}`);
+                this.Debug(`Task ${this.activeTask.constructor.name} completed with result ${this.activeTask.IsSuccess}`);
 
                 if (this.activeTask.IsSuccess) {
                     this.lastSuccessfulSelfTaskTick = tickNumber;
@@ -65,21 +65,17 @@ export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
 
     AddTask(task: SettlementSubcontrollerTask): void {
         this.allTasks.push(task);
-        this.debug(`Added task ${task.constructor.name} with priority ${task.Priority} to queue`);
+        this.Debug(`Added task ${task.constructor.name} with priority ${task.Priority} to queue`);
     }
 
     private setActiveTask(task: SettlementSubcontrollerTask): void {
         if (this.activeTask) {
             this.activeTask.Complete(false);
-            this.debug(`Task ${this.activeTask.constructor.name} cancelled`);
+            this.Debug(`Task ${this.activeTask.constructor.name} cancelled`);
         }
 
         this.activeTask = task;
         this.allTasks = this.allTasks.filter((t) => t != this.activeTask);
-        this.debug(`Start executing task ${this.activeTask.constructor.name}`);
-    }
-
-    private debug(message: string): void {
-        this.settlementController.Debug(`[${this.constructor.name}] ${message}`);
+        this.Debug(`Start executing task ${this.activeTask.constructor.name}`);
     }
 }

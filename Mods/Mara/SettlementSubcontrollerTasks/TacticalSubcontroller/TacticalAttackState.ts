@@ -19,7 +19,7 @@ export class TacticalAttackState extends FsmState {
     }
     
     OnEntry(): void {
-        this.tacticalController.SettlementController.Debug(`Selected '${this.currentTarget.Unit.Name}' as attack target`);
+        this.tacticalController.Debug(`Selected '${this.currentTarget.Unit.Name}' as attack target`);
 
         let settlementLocation = this.tacticalController.SettlementController.GetSettlementLocation();
         let targetPoint = this.currentTarget.UnitCell;

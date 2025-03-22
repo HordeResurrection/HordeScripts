@@ -22,7 +22,7 @@ export class DefendingState extends SubcontrollerTaskState {
     Tick(tickNumber: number): void {
         if (tickNumber % 50 == 0) {
             if (!this.settlementController.StrategyController.IsUnderAttack()) {
-                this.settlementController.Debug(`Attack countered`);
+                this.task.Debug(`Attack countered`);
                 this.task.Complete(true);
                 return;
             }

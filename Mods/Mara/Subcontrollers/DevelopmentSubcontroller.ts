@@ -22,14 +22,11 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
 
         let shortestUnavailableChain = this.getShortestUnavailableChain(economyComposition, produceableCfgIds);
 
-        let reinforcementProducers: Array<string> = this.getReinforcementProducers(economyComposition);
-        this.settlementController.Debug(`Reinforcements producers: ${reinforcementProducers.join(", ")}`);
-
         let economyBoosters: Array<string> = this.getEconomyBoosters(economyComposition);
-        this.settlementController.Debug(`Economy boosters & chain: ${economyBoosters.join(", ")}`);
+        this.Debug(`Economy boosters & chain: ${economyBoosters.join(", ")}`);
 
         let healers: Array<string> = this.getHealers(economyComposition);
-        this.settlementController.Debug(`Healers & chain: ${healers.join(", ")}`);
+        this.Debug(`Healers & chain: ${healers.join(", ")}`);
 
         let selectedCfgIds: Array<string> | null = null;
     
@@ -37,18 +34,17 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
             selectedCfgIds = shortestUnavailableChain;
         }
         else if (
-            reinforcementProducers.length > 0 || 
             economyBoosters.length > 0 ||
             healers.length > 0
         ) {
-            let cfgIdSet = [reinforcementProducers, economyBoosters, healers];
+            let cfgIdSet = [economyBoosters, healers];
             cfgIdSet.filter((item) => item.length > 0);
             
             selectedCfgIds = MaraUtils.RandomSelect(this.settlementController.MasterMind, cfgIdSet);
         }
 
         if (selectedCfgIds) {
-            return new DevelopSettlementTask(1, selectedCfgIds, this.settlementController, this.settlementController);
+            return new DevelopSettlementTask(1, selectedCfgIds, this.settlementController, this);
         }
         else {
             return null;
@@ -85,36 +81,6 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
         }
 
         return shortestUnavailableChain;
-    }
-
-    private getReinforcementProducers(economyComposition: UnitComposition): Array<string> {
-        let reinforcementProducers: Array<string> = [];
-        
-        let combatComposition = this.settlementController.StrategyController.GetSettlementAttackArmyComposition();
-        let estimation = this.settlementController.ProductionController.EstimateProductionTime(combatComposition);
-
-        estimation.forEach((value, key) => {
-            if (value > this.settlementController.Settings.Timeouts.UnitProductionEstimationThreshold / 2) {
-                let producingCfgIds = this.settlementController.ProductionController.GetProducingCfgIds(key);
-
-                if (producingCfgIds.length > 0) {
-                    let totalProducerCount = 0;
-
-                    for (let cfgId of producingCfgIds) {
-                        if (economyComposition.has(cfgId)) {
-                            totalProducerCount += economyComposition.get(cfgId)!;
-                        }
-                    }
-
-                    if (totalProducerCount < this.settlementController.Settings.ControllerStates.MaxSameCfgIdProducerCount) {
-                        let producerCfgId = MaraUtils.RandomSelect(this.settlementController.MasterMind, producingCfgIds);
-                        reinforcementProducers.push(producerCfgId!);
-                    }
-                }
-            }
-        });
-
-        return reinforcementProducers;
     }
 
     private getEconomyBoosters(economyComposition: UnitComposition) {

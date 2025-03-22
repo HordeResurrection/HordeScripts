@@ -72,13 +72,13 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         
         if (this.nextState) {
             if (this.state) {
-                this.settlementController.Debug(`Tactical Subcontroller leaving state ${this.state.constructor.name}`);
+                this.Debug(`Tactical Subcontroller leaving state ${this.state.constructor.name}`);
                 this.state.OnExit();
             }
             
             this.state = this.nextState;
             this.nextState = null;
-            this.settlementController.Debug(`Tactical Subcontroller entering state ${this.state.constructor.name}, tick ${tickNumber}`);
+            this.Debug(`Tactical Subcontroller entering state ${this.state.constructor.name}, tick ${tickNumber}`);
             this.state.OnEntry();
         }
 
@@ -122,7 +122,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     ComposeSquads(): void {
-        this.settlementController.Debug(`Composing squads`);
+        this.Debug(`Composing squads`);
         
         this.OffensiveSquads = [];
         this.DefensiveSquads = [];
@@ -168,14 +168,14 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         }
 
         this.DefensiveSquads = this.createSquadsFromUnits(defensiveUnits);
-        this.settlementController.Debug(`${this.DefensiveSquads.length} defensive squads composed`);
+        this.Debug(`${this.DefensiveSquads.length} defensive squads composed`);
         
         combatUnits.splice(0, unitIndex);
         combatUnits = combatUnits.filter((value, index, array) => {return !this.isBuilding(value)});
         this.OffensiveSquads = this.createSquadsFromUnits(combatUnits);
         this.initialOffensiveSquadCount = this.OffensiveSquads.length;
 
-        this.settlementController.Debug(`${this.initialOffensiveSquadCount} offensive squads composed`);
+        this.Debug(`${this.initialOffensiveSquadCount} offensive squads composed`);
     }
 
     DismissMilitia(): void {
@@ -189,7 +189,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
 
     DebugSquad(message: string) {
         if (this.settlementController.Settings.Squads.DebugSquads) {
-            this.settlementController.Debug(message);
+            this.Debug(message);
         }
     }
 
@@ -256,7 +256,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     IssueAttackCommand(attackPath: Array<MaraPoint>): void {
-        this.settlementController.Debug(`Issuing attack command`);
+        this.Debug(`Issuing attack command`);
 
         for (let squad of this.OffensiveSquads) {
             this.SendSquadToAttack(squad, attackPath);
@@ -484,7 +484,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
                 unit.UnitIsAlive
             ) {
                 freeUnits.push(unit);
-                this.settlementController.Debug(`Unit ${unit.Unit.ToString()} is marked for reinforcements`);
+                this.Debug(`Unit ${unit.Unit.ToString()} is marked for reinforcements`);
             }
         }
 

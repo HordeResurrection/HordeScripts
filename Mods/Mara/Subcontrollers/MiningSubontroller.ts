@@ -207,10 +207,10 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
 
     public ProvideResourcesForUnitComposition(composition: UnitComposition): SubcontrollerRequestResult {
         let compositionCost = this.calculateCompositionCost(composition);
-        this.settlementController.Debug(`Target composition cost: ${compositionCost.ToString()}`);
+        this.Debug(`Target composition cost: ${compositionCost.ToString()}`);
 
         let currentResources = this.settlementController.MiningController.GetTotalResources();
-        this.settlementController.Debug(`Current resources: ${currentResources.ToString()}`);
+        this.Debug(`Current resources: ${currentResources.ToString()}`);
 
         let insufficientResources = new MaraResources(
             Math.max(compositionCost.Wood - currentResources.Wood, 0), 
@@ -228,7 +228,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             insufficientResources.People > 0
         ) {
             let targetExpand = this.fillExpandData(insufficientResources);
-            let task = new ExpandBuildTask(2, this.settlementController, targetExpand, this.settlementController);
+            let task = new ExpandBuildTask(2, this.settlementController, targetExpand, this);
 
             result.IsSuccess = false;
             result.Task = task;
@@ -269,11 +269,11 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         let expandData = this.isExpandNeeded();
         
         if (expandData.NeedExpand) {
-            this.settlementController.Debug(`Low on one or more resource, required resources: ${expandData.ResourcesToMine.ToString()}`);
-            this.settlementController.Debug(`Proceeding to expand...`);
+            this.Debug(`Low on one or more resource, required resources: ${expandData.ResourcesToMine.ToString()}`);
+            this.Debug(`Proceeding to expand...`);
             let targetExpand = this.fillExpandData(expandData.ResourcesToMine);
             
-            return new ExpandBuildTask(1, this.settlementController, targetExpand, this.settlementController);
+            return new ExpandBuildTask(1, this.settlementController, targetExpand, this);
         }
         else {
             return null;
@@ -360,7 +360,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         }
                 
         let resources = this.settlementController.MiningController.GetTotalResources();
-        this.settlementController.Debug(`Total resources: ${resources.ToString()}`);
+        this.Debug(`Total resources: ${resources.ToString()}`);
 
         let result = new NeedExpandResult();
         result.NeedExpand = false;
@@ -374,7 +374,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         //TODO: also go to expand if currently not mining some resource
         
         if (resources.People < this.PEOPLE_THRESHOLD) {
-            this.settlementController.Debug(`Low people`);
+            this.Debug(`Low people`);
             result.NeedExpand = true;
             result.ResourcesToMine.People = this.PEOPLE_THRESHOLD - resources.People;
 
@@ -388,7 +388,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         }
         
         if (resources.Gold < this.RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Gold)) {
-            this.settlementController.Debug(`Low gold`);
+            this.Debug(`Low gold`);
             result.NeedExpand = true;
             result.ResourcesToMine.Gold = this.RESOURCE_THRESHOLD - resources.Gold;
 
@@ -402,7 +402,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         }
         
         if (resources.Metal < this.RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Metal)) {
-            this.settlementController.Debug(`Low metal`);
+            this.Debug(`Low metal`);
             result.NeedExpand = true;
             result.ResourcesToMine.Metal = this.RESOURCE_THRESHOLD - resources.Metal;
 
@@ -416,7 +416,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         }
 
         if (resources.Wood < this.RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Wood)) {
-            this.settlementController.Debug(`Low lumber`);
+            this.Debug(`Low lumber`);
             result.NeedExpand = true;
             result.ResourcesToMine.Wood = this.RESOURCE_THRESHOLD - resources.Wood;
 
@@ -436,21 +436,21 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         let optimalCluster = this.selectOptimalResourceCluster(requiredResources);
 
         if (optimalCluster) {
-            this.settlementController.Debug(`Selected resource cluster ${optimalCluster.Center.ToString()} for expand`);
+            this.Debug(`Selected resource cluster ${optimalCluster.Center.ToString()} for expand`);
             let requiredResourceTypes: MaraResourceType[] = [];
 
             if (requiredResources.Gold > 0 && optimalCluster.GoldAmount > 0) {
-                this.settlementController.Debug(`Gold production is scheduled`);
+                this.Debug(`Gold production is scheduled`);
                 requiredResourceTypes.push(MaraResourceType.Gold);
             }
 
             if (requiredResources.Metal > 0 && optimalCluster.MetalAmount > 0) {
-                this.settlementController.Debug(`Metal production is scheduled`);
+                this.Debug(`Metal production is scheduled`);
                 requiredResourceTypes.push(MaraResourceType.Metal);
             }
 
             if (requiredResources.Wood > 0 && optimalCluster.WoodAmount > 0) {
-                this.settlementController.Debug(`Wood production is scheduled`);
+                this.Debug(`Wood production is scheduled`);
                 requiredResourceTypes.push(MaraResourceType.Wood);
             }
 
@@ -464,7 +464,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             );
         }
         else {
-            this.settlementController.Debug(`No resource cluster for mining selected`);
+            this.Debug(`No resource cluster for mining selected`);
             
             return new TargetExpandData( //when in doubt - build more izbas!!
                 null,
@@ -507,9 +507,9 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             }
         });
 
-        this.settlementController.Debug(`Candidate resource clusters:`);
+        this.Debug(`Candidate resource clusters:`);
         for (let cluster of candidates) {
-            this.settlementController.Debug(`(${cluster.Center.ToString()})`);
+            this.Debug(`(${cluster.Center.ToString()})`);
         }
 
         if (candidates.length > 0) {

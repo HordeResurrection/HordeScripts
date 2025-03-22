@@ -43,10 +43,6 @@ export class MaraProductionRequest {
     }
 
     public Cancel(): void {
-        let isAlreadyStarted = this.Items.find((i) => i.IsCompleted || i.IsExecuting) != undefined;
-
-        if (!isAlreadyStarted) {
-            this.isCancelled = true;
-        }
+        this.isCancelled = true;
     }
 }

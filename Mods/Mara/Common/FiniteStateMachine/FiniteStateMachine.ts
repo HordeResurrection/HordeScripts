@@ -1,7 +1,7 @@
 import { MaraLogger } from "../MaraLogger";
 import { FsmState } from "./FsmState";
 
-export abstract class FiniteStateMachine {
+export abstract class FiniteStateMachine implements MaraLogger {
     protected logger: MaraLogger;
 
     constructor(logger: MaraLogger) {
@@ -17,13 +17,13 @@ export abstract class FiniteStateMachine {
         
         if (this.nextState) {
             if (this.state) {
-                this.logger.Debug(`Leaving state ${this.state.constructor.name}`);
+                this.Debug(`Leaving state ${this.state.constructor.name}`);
                 this.state.OnExit();
             }
             
             this.state = this.nextState;
             this.nextState = null;
-            this.logger.Debug(`Entering state ${this.state.constructor.name}, tick ${tickNumber}`);
+            this.Debug(`Entering state ${this.state.constructor.name}, tick ${tickNumber}`);
             this.state.OnEntry();
         }
     }
@@ -44,4 +44,24 @@ export abstract class FiniteStateMachine {
     protected abstract set nextState(value: FsmState | null);
     
     protected abstract onTick(tickNumber: number);
+
+    private makeLogMessage(message: string): string {
+        return `${this.constructor.name}: ${message}`;
+    }
+
+    Debug(message: string): void {
+        this.logger.Debug(this.makeLogMessage(message));
+    }
+
+    Info(message: string): void {
+        this.logger.Debug(this.makeLogMessage(message));
+    }
+
+    Warning(message: string): void {
+        this.logger.Debug(this.makeLogMessage(message));
+    }
+
+    Error(message: string): void {
+        this.logger.Debug(this.makeLogMessage(message));
+    }
 }

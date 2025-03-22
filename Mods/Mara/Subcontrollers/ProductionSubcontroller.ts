@@ -95,18 +95,26 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         let highestRequestPriority = -Infinity;
 
         while (iterator != null) {
-            let request = iterator.value();
+            let request = iterator.value() as MaraProductionRequest;
             iterator = iterator.next();
 
             if (!request) {
                 continue;
             }
+
+            if (request.IsCancelled) {
+                this.Debug(`Cancelled production request ${request.ToString()}`);
+            }
             
-            if (request.IsCompleted || request.IsCancelled) {
+            if (request.IsCompleted || (request.IsCancelled && !request.IsExecuting)) {
                 this.finalizeProductionRequest(request);
             }
             else {
                 uncompletedRequests.insert(request);
+
+                if (request.IsCancelled) {
+                    continue;
+                }
 
                 if (request.Priority > highestRequestPriority) {
                     highestRequestPriority = request.Priority;
@@ -127,7 +135,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                     }
 
                     if (MaraUtils.RequestMasterMindProduction(nextProductionItem, request.Executor, this.settlementController.MasterMind)) {
-                        this.settlementController.Debug(`Added ${nextProductionItem.ConfigId} to MM queue, producer: ${request.Executor!.Unit.ToString()}`);
+                        this.Debug(`Added ${nextProductionItem.ConfigId} to MM queue, producer: ${request.Executor!.Unit.ToString()}`);
                         this.executingRequestItems.push(nextProductionItem);
                         this.settlementController.ReservedUnitsData.ReserveUnit(request.Executor);
                     }
@@ -142,7 +150,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         for (let item of this.executingRequestItems) {
             if (item.IsCompleted) {
                 item.OnProductionFinished();
-                this.settlementController.Debug(`Request ${item.ToString()} is completed with result ${item.IsSuccess}`);
+                this.Debug(`Request ${item.ToString()} is completed with result ${item.IsSuccess}`);
 
                 if (!item.IsSuccess) {
                     for (let otherItem of item.ParentRequest.Items) {
@@ -162,7 +170,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
     RequestProduction(request: MaraProductionRequest): void {
         this.queuedRequests.insert(request);
-        this.settlementController.Debug(`Added ${request.ToString()} to target production list`);
+        this.Debug(`Added ${request.ToString()} to target production list`);
 
         if (request.IsForce) {
             for (let item of request.Items) {
@@ -222,7 +230,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
         
         this.queuedRequests = executingRequests;
-        this.settlementController.Debug(`Cleared target production list`);
+        this.Debug(`Cleared target production list`);
     }
 
     GetProduceableCfgIds(): Array<string> {
@@ -316,7 +324,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         let request = new MaraProductionRequest([item], priority)
         
         this.queuedRequests.insert(request);
-        this.settlementController.Debug(`Added ${configId} to target production list with priority ${request.Priority}`);
+        this.Debug(`Added ${configId} to target production list with priority ${request.Priority}`);
     }
 
     private requestAbsentProductionChainItemsProduction(configId: string, priority: number): void {
@@ -383,7 +391,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
                     MaraUtils.IssueRepairCommand([repairer], this.settlementController.Player, unit.UnitCell);
 
                     this.repairRequests.push(repairRequest);
-                    this.settlementController.Debug(`Created repair request: ${repairRequest.ToString()}`);
+                    this.Debug(`Created repair request: ${repairRequest.ToString()}`);
                 }
             }
         }
@@ -470,7 +478,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     }
 
     private finalizeRepairRequest(request: MaraRepairRequest): void {
-        this.settlementController.Debug(`Finalized repair request: ${request.ToString()}`);
+        this.Debug(`Finalized repair request: ${request.ToString()}`);
         this.settlementController.ReservedUnitsData.FreeUnit(request.Executor);
     }
 

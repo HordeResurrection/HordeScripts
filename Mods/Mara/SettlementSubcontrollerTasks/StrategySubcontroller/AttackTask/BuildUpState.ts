@@ -36,7 +36,7 @@ export class BuildUpState extends ProductionTaskState {
     }
 
     protected getProductionRequests(): Array<MaraProductionRequest> {
-        this.settlementController.Debug(`Proceeding to build-up against '${this.enemy.TownName}'.`);
+        this.task.Debug(`Proceeding to build-up against '${this.enemy.TownName}'.`);
         let armyToProduce = this.settlementController.StrategyController.GetSettlementAttackArmyComposition(this.enemy);
 
         let result = new Array<MaraProductionRequest>();
