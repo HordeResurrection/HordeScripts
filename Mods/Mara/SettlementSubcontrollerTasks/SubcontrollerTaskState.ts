@@ -27,21 +27,21 @@ export abstract class SubcontrollerTaskState extends FsmState {
         let optimalCluster = this.selectOptimalResourceCluster(requiredResources);
 
         if (optimalCluster) {
-            this.settlementController.Debug(`Selected resource cluster ${optimalCluster.Center.ToString()} for expand`);
+            this.task.Debug(`Selected resource cluster ${optimalCluster.Center.ToString()} for expand`);
             let requiredResourceTypes: MaraResourceType[] = [];
 
             if (requiredResources.Gold > 0 && optimalCluster.GoldAmount > 0) {
-                this.settlementController.Debug(`Gold production is scheduled`);
+                this.task.Debug(`Gold production is scheduled`);
                 requiredResourceTypes.push(MaraResourceType.Gold);
             }
 
             if (requiredResources.Metal > 0 && optimalCluster.MetalAmount > 0) {
-                this.settlementController.Debug(`Metal production is scheduled`);
+                this.task.Debug(`Metal production is scheduled`);
                 requiredResourceTypes.push(MaraResourceType.Metal);
             }
 
             if (requiredResources.Wood > 0 && optimalCluster.WoodAmount > 0) {
-                this.settlementController.Debug(`Wood production is scheduled`);
+                this.task.Debug(`Wood production is scheduled`);
                 requiredResourceTypes.push(MaraResourceType.Wood);
             }
 
@@ -55,7 +55,7 @@ export abstract class SubcontrollerTaskState extends FsmState {
             );
         }
         else {
-            this.settlementController.Debug(`No resource cluster for mining selected`);
+            this.task.Debug(`No resource cluster for mining selected`);
             
             this.settlementController.TargetExpand = new TargetExpandData( //when in doubt - build more izbas!!
                 null,
@@ -128,9 +128,9 @@ export abstract class SubcontrollerTaskState extends FsmState {
             }
         });
 
-        this.settlementController.Debug(`Candidate resource clusters:`);
+        this.task.Debug(`Candidate resource clusters:`);
         for (let cluster of candidates) {
-            this.settlementController.Debug(`(${cluster.Center.ToString()})`);
+            this.task.Debug(`(${cluster.Center.ToString()})`);
         }
 
         if (candidates.length > 0) {

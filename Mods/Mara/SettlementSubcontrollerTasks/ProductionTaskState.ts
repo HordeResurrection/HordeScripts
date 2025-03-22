@@ -38,14 +38,14 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
             }
         }
 
-        this.settlementController.Debug(`Current unit composition to produce:`);
+        this.task.Debug(`Current unit composition to produce:`);
         MaraUtils.PrintMap(compositionToProduce);
         
         if (this.requestMiningOnInsufficientResources) {
             let requestResult = this.settlementController.MiningController.ProvideResourcesForUnitComposition(compositionToProduce);
 
             if (!requestResult.IsSuccess) {
-                this.settlementController.Debug(`Not enough resources to produce target composition. Awaiting completion of mining subcontroller task`);
+                this.task.Debug(`Not enough resources to produce target composition. Awaiting completion of mining subcontroller task`);
 
                 let awaitState = new AwaitTaskCompletionState(
                     requestResult.Task!,
@@ -76,6 +76,7 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
         for (let request of this.requests) {
             if (!request.IsCompleted) {
                 request.Cancel();
+                this.task.Debug(`Cancelled production request ${request.ToString()}`);
             }
         }
     }
@@ -85,11 +86,11 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
         
         if (timeout != null) {
             if (this.timeoutTick == null) {
-                this.settlementController.Debug(`Set production timeout to ${timeout} ticks`);
+                this.task.Debug(`Set production timeout to ${timeout} ticks`);
                 this.timeoutTick = tickNumber + timeout;
             }
             else if (tickNumber > this.timeoutTick) {
-                this.settlementController.Debug(`Production is too long-drawn, discontinuing`);
+                this.task.Debug(`Production is too long-drawn, discontinuing`);
                 this.onTargetCompositionReached();
                 return;
             }
@@ -163,19 +164,19 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
 
     protected makeBridgeProductionRequest(path: MaraPath | null): MaraProductionRequest | null {
         if (!path) {
-            this.settlementController.Debug(`Unable to build bridge: path not found`);
+            this.task.Debug(`Unable to build bridge: path not found`);
             return null;
         }
         
         let from = path.Nodes[0].Region.Center;
         let to = path.Nodes[path.Nodes.length - 1].Region.Center;
-        this.settlementController.Debug(`Requesting bridge build from ${from.ToString()} to ${to.ToString()}`)
+        this.task.Debug(`Requesting bridge build from ${from.ToString()} to ${to.ToString()}`)
         
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
         let bridgeCfgId = produceableCfgIds.find((cfgId) => MaraUtils.IsWalkableConfigId(cfgId));
 
         if (!bridgeCfgId) {
-            this.settlementController.Debug(`Unable to build bridge: no available bridge config`);
+            this.task.Debug(`Unable to build bridge: no available bridge config`);
             return null;
         }
 
@@ -227,7 +228,7 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
             return this.makeProductionQueueRequest(requestItems);
         }
         else {
-            this.settlementController.Debug(`Destination is reachable, bridge is not needed`);
+            this.task.Debug(`Destination is reachable, bridge is not needed`);
             return null;
         }
     }

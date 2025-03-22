@@ -37,11 +37,11 @@ export class AwaitTaskCompletionState extends SubcontrollerTaskState {
     Tick(tickNumber: number): void {
         if (this.timeout != null) {
             if (this.timeoutTick == null) {
-                this.settlementController.Debug(`Set task await timeout to ${this.timeout} ticks`);
+                this.task.Debug(`Set task await timeout to ${this.timeout} ticks`);
                 this.timeoutTick = tickNumber + this.timeout;
             }
             else if (tickNumber > this.timeoutTick) {
-                this.settlementController.Debug(`Task await timeout, discontinuing`);
+                this.task.Debug(`Task await timeout, discontinuing`);
                 this.task.SetState(this.nextState);
                 return;
             }
