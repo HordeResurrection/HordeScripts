@@ -1,6 +1,7 @@
 import { MaraResourceCluster } from "../../../Common/MapAnalysis/MaraResourceCluster";
 import { MaraResourceType } from "../../../Common/MapAnalysis/MaraResourceType";
 import { MaraPoint } from "../../../Common/MaraPoint";
+import { MaraPriority } from "../../../Common/MaraPriority";
 import { MaraProductionRequest } from "../../../Common/MaraProductionRequest";
 import { TargetExpandData } from "../../../Common/Settlement/TargetExpandData";
 import { UnitComposition } from "../../../Common/UnitComposition";
@@ -87,9 +88,9 @@ export class ExpandBuildState extends ProductionTaskState {
 
         result.push(...this.orderHarvestersProduction());
 
-        if (this.isRemoteExpand(this.expandCenter)) {
-            result.push(...this.orderGuardProduction());
-        }
+        // if (this.isRemoteExpand(this.expandCenter)) {
+        //     result.push(...this.orderGuardProduction());
+        // }
 
         return result;
     }
@@ -329,7 +330,7 @@ export class ExpandBuildState extends ProductionTaskState {
                 let harvesterCount = Math.max(value - freeHarvestersCount, 0);
 
                 for (let i = 0; i < harvesterCount; i++) {
-                    result.push(this.makeProductionRequest(key, null, null, true));
+                    result.push(this.makeProductionRequest(key, null, null, true, MaraPriority.Normal));
                 }
 
                 freeHarvestersCount = Math.max(freeHarvestersCount - value, 0);
