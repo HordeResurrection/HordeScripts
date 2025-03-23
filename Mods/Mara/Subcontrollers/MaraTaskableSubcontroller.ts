@@ -3,16 +3,20 @@ import { SettlementSubcontrollerTask } from "../SettlementSubcontrollerTasks/Set
 import { MaraSubcontroller } from "./MaraSubcontroller";
 
 export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
-    protected selfTaskReattemptCooldown = 60 * 50;
-    protected successfulSelfTaskCooldown = 0;
+    protected get selfTaskReattemptCooldown(): number {
+        return 20 * 50;
+    }
+
+    protected get successfulSelfTaskCooldown(): number {
+        return 0;
+    }
     
     protected abstract doRoutines(tickNumber: number): void;
     protected abstract makeSelfTask(): SettlementSubcontrollerTask | null;
 
     private activeTask: SettlementSubcontrollerTask | null = null;
     private allTasks: Array<SettlementSubcontrollerTask> = [];
-    private lastSelfTaskFailureTick = -Infinity;
-    private lastSuccessfulSelfTaskTick = -Infinity;
+    private nextSelfTaskAttemptTick = -Infinity;
     
     Tick(tickNumber: number): void {
         this.doRoutines(tickNumber);
@@ -24,7 +28,8 @@ export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
                 this.Debug(`Task ${this.activeTask.constructor.name} completed with result ${this.activeTask.IsSuccess}`);
 
                 if (this.activeTask.IsSuccess) {
-                    this.lastSuccessfulSelfTaskTick = tickNumber;
+                    this.nextSelfTaskAttemptTick = this.calcWakeUpTick(tickNumber, this.selfTaskReattemptCooldown);
+                    this.Debug(`Sleeping on self-task until tick ${this.nextSelfTaskAttemptTick} due to successfull task completion`);
                 }
 
                 this.activeTask = null;
@@ -44,17 +49,15 @@ export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
                 this.setActiveTask(highestPriorityTask);
             }
         }
-        else if (
-            tickNumber - this.lastSelfTaskFailureTick > this.selfTaskReattemptCooldown &&
-            tickNumber - this.lastSuccessfulSelfTaskTick > this.successfulSelfTaskCooldown
-        ) {
+        else if (tickNumber > this.nextSelfTaskAttemptTick) {
             let selfTask = this.makeSelfTask();
 
             if (selfTask) {
                 this.AddTask(selfTask);
             }
             else {
-                this.lastSelfTaskFailureTick = tickNumber;
+                this.nextSelfTaskAttemptTick = this.calcWakeUpTick(tickNumber, this.selfTaskReattemptCooldown);
+                this.Debug(`No self-task possible, sleeping until tick ${this.nextSelfTaskAttemptTick}`);
             }
         }
 
@@ -77,5 +80,9 @@ export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
         this.activeTask = task;
         this.allTasks = this.allTasks.filter((t) => t != this.activeTask);
         this.Debug(`Start executing task ${this.activeTask.constructor.name}`);
+    }
+
+    private calcWakeUpTick(currentTick: number, cooldown: number): number {
+        return Math.max(currentTick + cooldown, this.nextSelfTaskAttemptTick);
     }
 }

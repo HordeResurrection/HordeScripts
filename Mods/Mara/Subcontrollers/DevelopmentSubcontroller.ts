@@ -6,7 +6,13 @@ import { UnitComposition } from "../Common/UnitComposition";
 import { DevelopSettlementTask } from "../SettlementSubcontrollerTasks/DevelopmentSubcontroller/DevelopSettlementTask/DevelopSettlementTask";
 
 export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
-    protected successfulSelfTaskCooldown = 60 * 50;
+    protected get successfulSelfTaskCooldown(): number {
+        return MaraUtils.Random(
+            this.settlementController.MasterMind,
+            this.settlementController.Settings.Timeouts.SettlementEnhanceMaxCooldown,
+            this.settlementController.Settings.Timeouts.SettlementEnhanceMinCooldown
+        );
+    }
     
     constructor (parent: MaraSettlementController) {
         super(parent);

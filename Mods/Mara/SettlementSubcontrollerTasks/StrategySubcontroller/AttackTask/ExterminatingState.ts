@@ -31,7 +31,7 @@ export class ExterminatingState extends SubcontrollerTaskState {
         }
         else if (tickNumber > this.timeoutTick) {
             this.task.Debug(`Attack is too long-drawn, discontinuing`);
-            this.task.Complete(false);
+            this.task.Complete(true);
             return;
         }
         
@@ -57,7 +57,7 @@ export class ExterminatingState extends SubcontrollerTaskState {
         else {
             this.task.Debug(`Current combativity index '${combativityIndex}' is too low. Retreating...`);
             this.settlementController.TacticalController.Retreat();
-            this.task.Complete(false);
+            this.task.Complete(true);
             return;
         }
     }
