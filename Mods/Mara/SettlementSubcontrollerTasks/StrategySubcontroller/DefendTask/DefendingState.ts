@@ -1,4 +1,5 @@
 
+import { MaraPriority } from "../../../Common/MaraPriority";
 import { MaraSettlementController } from "../../../MaraSettlementController";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 import { SubcontrollerTaskState } from "../../SubcontrollerTaskState";
@@ -34,7 +35,7 @@ export class DefendingState extends SubcontrollerTaskState {
 
     private requestReinforcementsProduction() {
         for (let cfgId of this.reinforcementsCfgIds) {
-            this.settlementController.ProductionController.ForceRequestSingleCfgIdProduction(cfgId, this.task.Priority);
+            this.settlementController.ProductionController.ForceRequestSingleCfgIdProduction(cfgId, MaraPriority.Absolute);
         }
     }
 }

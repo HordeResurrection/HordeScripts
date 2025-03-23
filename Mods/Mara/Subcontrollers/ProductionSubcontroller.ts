@@ -15,6 +15,7 @@ import { MaraUnitCache } from "../Common/Cache/MaraUnitCache";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
 import SortedSet from "../Common/SortedSet.js";
 import InsertConflictResolvers from "../Common/SortedSet/InsertConflictResolvers.js"
+import { MaraPriority } from "../Common/MaraPriority";
 
 export class ProductionSubcontroller extends MaraSubcontroller {
     private queuedRequests: SortedSet;
@@ -175,13 +176,13 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
     }
 
-    RequestSingleCfgIdProduction(configId: string, priority: number): void {
+    RequestSingleCfgIdProduction(configId: string, priority: MaraPriority): void {
         if (this.productionCfgIdList.indexOf(configId) < 0) {
             this.requestCfgIdProduction(configId, priority);
         }
     }
 
-    ForceRequestSingleCfgIdProduction(configId: string, priority: number): void {
+    ForceRequestSingleCfgIdProduction(configId: string, priority: MaraPriority): void {
         if (!this.productionIndex) {
             this.updateProductionIndex();
         }
@@ -315,7 +316,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
     }
 
-    private requestCfgIdProduction(configId: string, priority: number): void {
+    private requestCfgIdProduction(configId: string, priority: MaraPriority): void {
         let item = new MaraProductionRequestItem(configId, null, null);
         let request = new MaraProductionRequest([item], priority)
         
@@ -323,7 +324,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         this.Debug(`Added ${configId} to target production list with priority ${request.Priority}`);
     }
 
-    private requestAbsentProductionChainItemsProduction(configId: string, priority: number): void {
+    private requestAbsentProductionChainItemsProduction(configId: string, priority: MaraPriority): void {
         let requiredConfigs = MaraUtils.GetCfgIdProductionChain(configId, this.settlementController.Settlement);
         
         let existingUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);

@@ -1,5 +1,6 @@
 import { FsmState } from "../../../Common/FiniteStateMachine/FsmState";
 import { MaraLogger } from "../../../Common/MaraLogger";
+import { MaraPriority } from "../../../Common/MaraPriority";
 import { MaraSettlementController } from "../../../MaraSettlementController";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 import { ProduceSettlementEnhancementsState } from "./ProduceSettlementEnhancementsState";
@@ -9,12 +10,11 @@ export class DevelopSettlementTask extends SettlementSubcontrollerTask {
     private nextTaskState: FsmState | null;
     
     constructor(
-        priority: number, 
         cfgIds: Array<string>,
         settlementController: MaraSettlementController,
         logger: MaraLogger
     ) {
-        super(priority, settlementController, logger);
+        super(MaraPriority.Low, settlementController, logger);
         
         let state = new ProduceSettlementEnhancementsState(this, this.SettlementController, cfgIds);
         this.SetState(state);

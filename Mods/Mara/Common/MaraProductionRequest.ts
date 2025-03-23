@@ -1,4 +1,5 @@
 import { MaraUnitCacheItem } from "./Cache/MaraUnitCacheItem";
+import { MaraPriority } from "./MaraPriority";
 import { MaraProductionRequestItem } from "./MaraProductionRequestItem";
 
 export class MaraProductionRequest {
@@ -8,7 +9,7 @@ export class MaraProductionRequest {
     public Executor: MaraUnitCacheItem | null = null;
     public Items: Array<MaraProductionRequestItem>;
     public readonly Id: number;
-    public readonly Priority: number;
+    public readonly Priority: MaraPriority;
 
     private isCancelled = false;
 
@@ -26,7 +27,7 @@ export class MaraProductionRequest {
     
     constructor(
         items: Array<MaraProductionRequestItem>,
-        priority: number,
+        priority: MaraPriority,
         isForce?: boolean
     ) {
         this.Items = items;

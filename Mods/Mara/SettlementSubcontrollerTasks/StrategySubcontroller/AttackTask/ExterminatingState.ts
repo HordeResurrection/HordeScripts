@@ -1,4 +1,5 @@
 import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
+import { MaraPriority } from "../../../Common/MaraPriority";
 import { MaraSettlementController } from "../../../MaraSettlementController";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 import { SubcontrollerTaskState } from "../../SubcontrollerTaskState";
@@ -73,7 +74,7 @@ export class ExterminatingState extends SubcontrollerTaskState {
 
     private requestReinforcementsProduction(): void {
         for (let cfgId of this.reinforcementsCfgIds) {
-            this.settlementController.ProductionController.RequestSingleCfgIdProduction(cfgId, this.task.Priority);
+            this.settlementController.ProductionController.RequestSingleCfgIdProduction(cfgId, MaraPriority.Background);
         }
     }
     private isValidTarget(unit: MaraUnitCacheItem | null): boolean {

@@ -44,7 +44,7 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
         }
 
         if (selectedCfgIds) {
-            return new DevelopSettlementTask(1, selectedCfgIds, this.settlementController, this);
+            return new DevelopSettlementTask(selectedCfgIds, this.settlementController, this);
         }
         else {
             return null;

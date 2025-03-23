@@ -10,6 +10,7 @@ import { MaraMapNodeType } from "../Common/MapAnalysis/MaraMapNodeType";
 import { MaraPath } from "../Common/MapAnalysis/MaraPath";
 import { SubcontrollerTaskState } from "./SubcontrollerTaskState";
 import { AwaitTaskCompletionState } from "./AwaitTaskCompletionState";
+import { MaraPriority } from "../Common/MaraPriority";
 
 export abstract class ProductionTaskState extends SubcontrollerTaskState {
     private requests: Array<MaraProductionRequest>;
@@ -144,10 +145,11 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
         configId: string, 
         point: MaraPoint | null, 
         precision: number | null,
-        isForce: boolean = false
+        isForce: boolean = false,
+        priority?: MaraPriority
     ): MaraProductionRequest {
         let item = new MaraProductionRequestItem(configId, point, precision);
-        let productionRequest = new MaraProductionRequest([item], this.task.Priority, isForce);
+        let productionRequest = new MaraProductionRequest([item], priority ?? this.task.Priority, isForce);
         this.settlementController.ProductionController.RequestProduction(productionRequest);
         
         return productionRequest;

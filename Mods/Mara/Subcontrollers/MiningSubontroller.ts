@@ -14,6 +14,7 @@ import { TargetExpandData } from "../Common/Settlement/TargetExpandData";
 import { ExpandBuildTask } from "../SettlementSubcontrollerTasks/MiningSubcontroller/ExpandBuildTask/ExpandBuildTask";
 import { UnitComposition } from "../Common/UnitComposition";
 import { SubcontrollerRequestResult } from "../Common/SubcontrollerRequestResult";
+import { MaraPriority } from "../Common/MaraPriority";
 
 class MineData {
     public Mine: MaraUnitCacheItem | null = null;
@@ -228,7 +229,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             insufficientResources.People > 0
         ) {
             let targetExpand = this.fillExpandData(insufficientResources);
-            let task = new ExpandBuildTask(2, this.settlementController, targetExpand, this);
+            let task = new ExpandBuildTask(MaraPriority.Major, this.settlementController, targetExpand, this);
 
             result.IsSuccess = false;
             result.Task = task;
@@ -273,7 +274,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             this.Debug(`Proceeding to expand...`);
             let targetExpand = this.fillExpandData(expandData.ResourcesToMine);
             
-            return new ExpandBuildTask(1, this.settlementController, targetExpand, this);
+            return new ExpandBuildTask(MaraPriority.Normal, this.settlementController, targetExpand, this);
         }
         else {
             return null;

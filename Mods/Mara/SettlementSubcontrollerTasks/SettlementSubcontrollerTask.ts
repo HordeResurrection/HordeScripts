@@ -1,14 +1,15 @@
 import { FiniteStateMachine } from "../Common/FiniteStateMachine/FiniteStateMachine";
 import { MaraLogger } from "../Common/MaraLogger";
+import { MaraPriority } from "../Common/MaraPriority";
 import { MaraSettlementController } from "../MaraSettlementController";
 
 export abstract class SettlementSubcontrollerTask extends FiniteStateMachine {
     IsCompleted: boolean;
     IsSuccess: boolean;
-    Priority: number;
+    Priority: MaraPriority;
     readonly SettlementController: MaraSettlementController;
 
-    constructor(priority: number, settlementController: MaraSettlementController, logger: MaraLogger) {
+    constructor(priority: MaraPriority, settlementController: MaraSettlementController, logger: MaraLogger) {
         super(logger);
         this.Priority = priority;
         this.SettlementController = settlementController;
