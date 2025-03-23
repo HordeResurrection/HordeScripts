@@ -70,9 +70,23 @@ export class SettlementGlobalStrategy {
         this.AuxCfgIds = Array.from(walkableResults.ConfigData.values());
 
         settlementController.Debug(`Inited global strategy`);
-        settlementController.Debug(`Offensive CfgIds: ${this.OffensiveCfgIds.map((value) => value.CfgId).join(", ")}`);
-        settlementController.Debug(`Defensive CfgIds: ${this.DefensiveBuildingsCfgIds.map((value) => value.CfgId).join(", ")}`);
-        settlementController.Debug(`Auxiliary CfgIds: ${this.AuxCfgIds.map((value) => value.CfgId).join(", ")}`);
+        settlementController.Debug(`Offensive CfgIds: ${this.printSelectionItems(this.OffensiveCfgIds)}`);
+        settlementController.Debug(`Defensive CfgIds: ${this.printSelectionItems(this.DefensiveBuildingsCfgIds)}`);
+        settlementController.Debug(`Auxiliary CfgIds: ${this.printSelectionItems(this.AuxCfgIds)}`);
+    }
+
+    private printSelectionItems(items: Array<CfgIdSelectionItem>): string {
+        let result = "";
+
+        for (let item of items) {
+            result += item.CfgId + ":\n";
+
+            for (let chainItem of item.ProductionChain) {
+                result += `\t${chainItem}\n`;
+            }
+        }
+
+        return result;
     }
 
     private initCfgIdsType(
