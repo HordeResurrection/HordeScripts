@@ -509,6 +509,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             else {
                 let newSquad = this.createSquad(cluster);
                 this.ReinforcementSquads.push(newSquad);
+                this.DebugSquad(`Created reinforcement squad ${newSquad.ToString()}`);
             }
         }
     }
@@ -517,6 +518,13 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         let usedReinforcementSquads: Array<MaraControllableSquad> = [];
 
         for (let squad of this.ReinforcementSquads) {
+            // a hack to fix strange bug when empty reinforcement squad appears for some reason
+            // remove this code after a proper fix
+            if (squad.Units.length == 0) {
+                usedReinforcementSquads.push(squad);
+                continue;
+            }
+            
             let movementType = this.getUnitMovementType(squad.Units[0]);
             let weakestSquad = this.getWeakestReinforceableSquad(movementType, false);
 
