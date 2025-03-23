@@ -8,6 +8,14 @@ import { ExpandBuildState } from "./ExpandBuildState";
 export class ExpandBuildTask extends SettlementSubcontrollerTask {
     private currentTaskState: FsmState;
     private nextTaskState: FsmState | null;
+
+    public get ExpectedTimeout(): number {
+        return (
+            this.SettlementController.Settings.Timeouts.ExpandPrepare +
+            this.SettlementController.Settings.Timeouts.Exterminate +
+            this.SettlementController.Settings.Timeouts.ExpandBuild
+        );
+    }
     
     constructor(
         priority: number, 

@@ -9,6 +9,8 @@ export abstract class SettlementSubcontrollerTask extends FiniteStateMachine {
     Priority: MaraPriority;
     readonly SettlementController: MaraSettlementController;
 
+    public abstract get ExpectedTimeout(): number;
+
     constructor(priority: MaraPriority, settlementController: MaraSettlementController, logger: MaraLogger) {
         super(logger);
         this.Priority = priority;

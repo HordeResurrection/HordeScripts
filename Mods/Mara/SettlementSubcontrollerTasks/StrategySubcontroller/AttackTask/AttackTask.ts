@@ -8,6 +8,13 @@ import { BuildUpState } from "./BuildUpState";
 export class AttackTask extends SettlementSubcontrollerTask {
     private currentTaskState: FsmState;
     private nextTaskState: FsmState | null;
+
+    public get ExpectedTimeout(): number {
+        return (
+            this.SettlementController.Settings.Timeouts.MaxBuildUpProduction +
+            this.SettlementController.Settings.Timeouts.Exterminate
+        );
+    }
     
     constructor(
         enemySettlement: any,

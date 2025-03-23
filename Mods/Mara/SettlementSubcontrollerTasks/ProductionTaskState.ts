@@ -51,7 +51,6 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
                 let awaitState = new AwaitTaskCompletionState(
                     requestResult.Task!,
                     this,
-                    this.settlementController.Settings.Timeouts.ExpandBuild,
                     this.task,
                     this.settlementController
                 );

@@ -8,6 +8,13 @@ import { ProduceSettlementEnhancementsState } from "./ProduceSettlementEnhanceme
 export class DevelopSettlementTask extends SettlementSubcontrollerTask {
     private currentTaskState: FsmState;
     private nextTaskState: FsmState | null;
+
+    public get ExpectedTimeout(): number {
+        return (
+            this.SettlementController.Settings.Timeouts.Develop +
+            this.SettlementController.Settings.Timeouts.ExpandBuild
+        );
+    }
     
     constructor(
         cfgIds: Array<string>,

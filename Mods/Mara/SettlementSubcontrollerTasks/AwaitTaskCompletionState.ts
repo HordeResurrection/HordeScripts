@@ -13,7 +13,6 @@ export class AwaitTaskCompletionState extends SubcontrollerTaskState {
     constructor(
         awaitedTask: SettlementSubcontrollerTask,
         nextState: SubcontrollerTaskState,
-        timeout: number,
         task: SettlementSubcontrollerTask, 
         settlementController: MaraSettlementController
     ) {
@@ -21,7 +20,7 @@ export class AwaitTaskCompletionState extends SubcontrollerTaskState {
 
         this.awaitedTask = awaitedTask;
         this.nextState = nextState;
-        this.timeout = timeout;
+        this.timeout = task.ExpectedTimeout;
     }
     
     OnEntry(): void {

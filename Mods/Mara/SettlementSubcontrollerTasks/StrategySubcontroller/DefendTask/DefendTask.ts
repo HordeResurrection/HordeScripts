@@ -8,6 +8,10 @@ import { DefendingState } from "./DefendingState";
 export class DefendTask extends SettlementSubcontrollerTask {
     private currentTaskState: FsmState;
     private nextTaskState: FsmState | null;
+
+    public get ExpectedTimeout(): number {
+        return Infinity;
+    }
     
     constructor(
         settlementController: MaraSettlementController,
