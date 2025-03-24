@@ -121,7 +121,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         }
     }
 
-    ComposeSquads(): void {
+    ComposeSquads(attackToDefenseRatio: number): void {
         this.Debug(`Composing squads`);
         
         this.OffensiveSquads = [];
@@ -145,10 +145,9 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             return;
         }
 
-        let ratio = this.settlementController.AttackToDefenseUnitRatio ?? 0.9;
         let defensiveStrength = this.settlementController.StrategyController.GetCurrentDefensiveStrength();
 
-        let requiredDefensiveStrength = (1 - ratio) * (this.calcTotalUnitsStrength(combatUnits) + defensiveStrength);
+        let requiredDefensiveStrength = (1 - attackToDefenseRatio) * (this.calcTotalUnitsStrength(combatUnits) + defensiveStrength);
         let unitIndex = 0;
         let defensiveUnits: Array<MaraUnitCacheItem> = [];
         
@@ -266,10 +265,10 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     SendSquadToAttack(squad: MaraControllableSquad, path: Array<MaraPoint>): void {
         if (path.length > 2) {
             // first and last cells are excluded since they usually will be different for all paths
-            let pathBody = path.splice(1, path.length - 2);
+            let pathBody = path.slice(1, path.length - 2);
             let updatedPathBody = MaraMap.UpdatePathForUnit(squad.Units[0], pathBody);
 
-            let updatedPath = [path[0], ...updatedPathBody, path[1]];
+            let updatedPath = [path[0], ...updatedPathBody, path[path.length - 1]];
             squad.Attack(updatedPath);
         }
         else {

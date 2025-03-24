@@ -50,8 +50,15 @@ export class TacticalAttackState extends FsmState {
         if (this.tacticalController.SettlementController.Settings.Squads.DebugSquads) {
             MaraUtils.DrawPath(this.attackPath, this.tacticalController.SettlementController.Settlement.SettlementColor);
         }
+
+        let ratio = MaraUtils.RandomSelect<number>(
+            this.tacticalController.SettlementController.MasterMind,
+            this.tacticalController.SettlementController.Settings.Combat.OffensiveToDefensiveRatios
+        ) ?? 1;
         
-        this.tacticalController.ComposeSquads();
+        this.tacticalController.Debug(`Calculated attack to defense ratio: ${ratio}`);
+        
+        this.tacticalController.ComposeSquads(ratio);
         this.tacticalController.IssueAttackCommand(this.attackPath);
     }
 

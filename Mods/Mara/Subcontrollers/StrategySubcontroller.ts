@@ -60,21 +60,13 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
     }
 
     GetSettlementAttackArmyComposition(settlement: any): UnitComposition {
-        let ratio = MaraUtils.RandomSelect<number>(
-            this.settlementController.MasterMind,
-            this.settlementController.Settings.Combat.OffensiveToDefensiveRatios
-        ) ?? 1;
-
-        this.settlementController.AttackToDefenseUnitRatio = ratio;
-        this.Debug(`Calculated attack to defense ratio: ${ratio}`);
-        
         let requiredStrength = this.settlementController.Settings.Combat.AttackStrengthToEnemyStrengthRatio * 
             Math.max(
                 this.calcSettlementStrength(settlement), 
                 this.settlementController.Settings.ControllerStates.MinAttackStrength
             );
 
-        let requiredOffensiveStrength = ratio * requiredStrength;
+        let requiredOffensiveStrength = requiredStrength;
         this.Debug(`Calculated required offensive strength: ${requiredOffensiveStrength}`);
 
         let currentOffensiveStrength = this.getCurrentTotalStrength() - this.GetCurrentDefensiveStrength();

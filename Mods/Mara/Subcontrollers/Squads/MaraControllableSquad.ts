@@ -120,7 +120,7 @@ export class MaraControllableSquad extends MaraSquad {
         this.Debug(`closest point index = ${closestPointIndex}`);
 
         if (closestPointIndex >= this.CurrentPath.length - 1) {
-            this.Debug(`next point = ${this.CurrentPath[closestPointIndex]}`);
+            this.Debug(`next point = ${this.CurrentPath[closestPointIndex].ToString()}`);
             return this.CurrentPath[closestPointIndex];
         }
 
