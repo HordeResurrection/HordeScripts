@@ -40,7 +40,7 @@ export class ExpandBuildState extends ProductionTaskState {
     protected onExit(): void {
         let expandUnits = MaraUtils.GetSettlementUnitsAroundPoint(
             this.expandCenter,
-            this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius,
+            Math.max(this.settlementController.Settings.ResourceMining.WoodcuttingRadius, this.settlementController.Settings.ResourceMining.MiningRadius),
             [this.settlementController.Settlement],
             (unit) => 
                 MaraUtils.IsMetalStockConfigId(unit.UnitCfgId) ||
