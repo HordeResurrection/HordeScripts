@@ -38,7 +38,17 @@ export class ExpandBuildState extends ProductionTaskState {
     }
 
     protected onExit(): void {
-        if (this.isRemoteExpand(this.expandCenter)) {
+        let expandUnits = MaraUtils.GetSettlementUnitsAroundPoint(
+            this.expandCenter,
+            this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius,
+            [this.settlementController.Settlement],
+            (unit) => 
+                MaraUtils.IsMetalStockConfigId(unit.UnitCfgId) ||
+                MaraUtils.IsMineConfigId(unit.UnitCfgId) ||
+                MaraUtils.IsSawmillConfigId(unit.UnitCfgId)
+        );
+        
+        if (expandUnits.length > 0 && this.isRemoteExpand(this.expandCenter)) {
             if ( 
                 !this.settlementController.Expands.find( 
                     (value) => {return value.EqualsTo(this.expandCenter)} 
@@ -54,7 +64,7 @@ export class ExpandBuildState extends ProductionTaskState {
     }
 
     protected onProductionTimeout(): void {
-        this.task.Complete(true);
+        this.task.Complete(false);
     }
 
     protected getProductionRequests(): Array<MaraProductionRequest> {
