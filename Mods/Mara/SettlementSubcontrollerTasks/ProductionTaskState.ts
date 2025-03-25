@@ -1,7 +1,6 @@
 
 import { MaraUtils } from "Mara/MaraUtils";
 import { MaraProductionRequestItem } from "../Common/MaraProductionRequestItem";
-import { MaraResources } from "../Common/MapAnalysis/MaraResources";
 import { MaraPoint } from "../Common/MaraPoint";
 import { UnitComposition } from "../Common/UnitComposition";
 import { MaraProductionRequest } from "../Common/MaraProductionRequest";
@@ -134,10 +133,6 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
 
     protected getProductionTimeout(): number | null {
         return null;
-    }
-
-    protected onInsufficientResources(insufficientResources: MaraResources): boolean {
-        return true;
     }
 
     protected makeProductionRequest(

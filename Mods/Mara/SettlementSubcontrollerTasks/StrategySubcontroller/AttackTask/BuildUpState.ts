@@ -88,6 +88,10 @@ export class BuildUpState extends ProductionTaskState {
     }
 
     protected getProductionTimeout(): number | null {
-        return this.settlementController.Settings.Timeouts.Develop;
+        return MaraUtils.Random(
+            this.settlementController.MasterMind,
+            this.settlementController.Settings.Timeouts.MaxBuildUpProduction,
+            this.settlementController.Settings.Timeouts.MinBuildUpProduction
+        );
     }
 }

@@ -18,6 +18,8 @@ import { MaraTaskableSubcontroller } from "./MaraTaskableSubcontroller";
 import { SettlementSubcontrollerTask } from "../SettlementSubcontrollerTasks/SettlementSubcontrollerTask";
 import { AttackTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/AttackTask/AttackTask";
 import { DefendTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/DefendTask/DefendTask";
+import { SubcontrollerRequestResult } from "../Common/SubcontrollerRequestResult";
+import { LandmarkCaptureTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/LandmarkCaptureTask/LandmarkCaptureTask";
 
 class PathSelectItem implements NonUniformRandomSelectItem {
     Weight: number;
@@ -122,7 +124,14 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
                 requiredStrength += MaraUtils.GetUnitStrength(unit);
             }
 
-            requiredStrength = Math.max(this.settlementController.Settings.ControllerStates.MinAttackStrength, requiredStrength);
+            let currentOffensiveStrength = this.getCurrentTotalStrength() - this.GetCurrentDefensiveStrength();
+
+            requiredStrength -= currentOffensiveStrength;
+            requiredStrength = Math.max(requiredStrength, 0);
+        }
+        else {
+            this.Debug(`Expand is not secured by enemy, no attack needed`);
+            return new Map<string, number>();
         }
         
         if (requiredStrength > 0) {
@@ -137,7 +146,7 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
             return composition;
         }
         else {
-            this.Debug(`Expand is not secured by enemy, no attack needed`);
+            this.Debug(`Current strength is sufficient, no additional production needed`);
             return new Map<string, number>();
         }
     }
@@ -530,6 +539,25 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         let reachableCluster = this.selectOptimalCluster(reachableClusters);
 
         return new MaraResourceClusterSelection(optimalCluster, isReachable, reachableCluster);
+    }
+
+    public CaptureLandmark(point: MaraPoint): SubcontrollerRequestResult {
+        let result = new SubcontrollerRequestResult();
+        
+        let enemies = this.GetEnemiesAroundPoint(point, this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius);
+
+        if (enemies.length == 0) {
+            result.IsSuccess = true;
+            result.Task = null;
+        }
+        else {
+            result.IsSuccess = false;
+            result.Task = new LandmarkCaptureTask(point, this.settlementController, this);
+            
+            this.AddTask(result.Task);
+        }
+
+        return result;
     }
 
     protected doRoutines(tickNumber: number): void {

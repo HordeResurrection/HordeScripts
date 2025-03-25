@@ -9,18 +9,21 @@ export class AwaitTaskCompletionState extends SubcontrollerTaskState {
     private awaitedTask: SettlementSubcontrollerTask;
     private nextState: SubcontrollerTaskState;
     private timeoutTick: number | null = null;
+    private continueOnTaskFail: boolean;
 
     constructor(
         awaitedTask: SettlementSubcontrollerTask,
         nextState: SubcontrollerTaskState,
-        task: SettlementSubcontrollerTask, 
-        settlementController: MaraSettlementController
+        mainTask: SettlementSubcontrollerTask, 
+        settlementController: MaraSettlementController,
+        continueOnTaskFail: boolean = true
     ) {
-        super(task, settlementController);
+        super(mainTask, settlementController);
 
         this.awaitedTask = awaitedTask;
         this.nextState = nextState;
-        this.timeout = task.ExpectedTimeout;
+        this.timeout = mainTask.ExpectedTimeout;
+        this.continueOnTaskFail = continueOnTaskFail;
     }
     
     OnEntry(): void {
@@ -41,13 +44,25 @@ export class AwaitTaskCompletionState extends SubcontrollerTaskState {
             }
             else if (tickNumber > this.timeoutTick) {
                 this.task.Debug(`Task await timeout, discontinuing`);
-                this.task.SetState(this.nextState);
+                
+                if (this.continueOnTaskFail) {
+                    this.task.SetState(this.nextState);
+                }
+                else {
+                    this.task.Complete(false);
+                }
+                
                 return;
             }
         }
 
         if (this.awaitedTask.IsCompleted) {
-            this.task.SetState(this.nextState);
+            if (this.awaitedTask.IsSuccess || this.continueOnTaskFail) {
+                this.task.SetState(this.nextState);
+            }
+            else {
+                this.task.Complete(false);
+            }
         }
     }
 }

@@ -2,7 +2,9 @@ import { FsmState } from "../../../Common/FiniteStateMachine/FsmState";
 import { MaraLogger } from "../../../Common/MaraLogger";
 import { TargetExpandData } from "../../../Common/Settlement/TargetExpandData";
 import { MaraSettlementController } from "../../../MaraSettlementController";
+import { AwaitTaskCompletionState } from "../../AwaitTaskCompletionState";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
+import { SubcontrollerTaskState } from "../../SubcontrollerTaskState";
 import { ExpandBuildState } from "./ExpandBuildState";
 
 export class ExpandBuildTask extends SettlementSubcontrollerTask {
@@ -25,8 +27,26 @@ export class ExpandBuildTask extends SettlementSubcontrollerTask {
     ) {
         super(priority, settlementController, logger);
         
-        let state = new ExpandBuildState(this, this.SettlementController, targetExpand);
-        this.SetState(state);
+        let buildState = new ExpandBuildState(this, this.SettlementController, targetExpand);
+        let finalState: SubcontrollerTaskState = buildState;
+
+        if (targetExpand.Cluster) {
+            let requestResult = this.SettlementController.StrategyController.CaptureLandmark(targetExpand.Cluster.Center);
+
+            if (!requestResult.IsSuccess) {
+                this.Debug(`Need to capture expand location, awaiting...`);
+                
+                finalState = new AwaitTaskCompletionState(
+                    requestResult.Task!, 
+                    buildState, 
+                    this, 
+                    this.SettlementController, 
+                    false
+                );
+            }
+        }
+
+        this.SetState(finalState);
     }
 
     protected get state(): FsmState {

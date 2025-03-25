@@ -33,8 +33,10 @@ export abstract class FiniteStateMachine implements MaraLogger {
     }
 
     ClearState(): void {
-        this.state.OnExit();
-        this.state = null;
+        if (this.state) {
+            this.state.OnExit();
+            this.state = null;
+        }
     }
 
     protected abstract get state(): FsmState;
