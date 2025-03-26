@@ -20,10 +20,16 @@ import { AttackTask } from "../SettlementSubcontrollerTasks/StrategySubcontrolle
 import { DefendTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/DefendTask/DefendTask";
 import { SubcontrollerRequestResult } from "../Common/SubcontrollerRequestResult";
 import { LandmarkCaptureTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/LandmarkCaptureTask/LandmarkCaptureTask";
+import { DefenceBuildTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/DefenceBuildTask/DefenceBuildTask";
 
 class PathSelectItem implements NonUniformRandomSelectItem {
     Weight: number;
     Path: MaraPath;
+}
+
+class TaskSelectItem implements NonUniformRandomSelectItem {
+    Weight: number;
+    Task: SettlementSubcontrollerTask;
 }
 
 export class StrategySubcontroller extends MaraTaskableSubcontroller {
@@ -151,28 +157,14 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         }
     }
 
-    GetExpandGuardArmyComposition(expandLocation: MaraPoint): UnitComposition {
-        let expandGuardUnits = MaraUtils.GetSettlementUnitsAroundPoint(
-            expandLocation, 
-            this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius,
-            [this.settlementController.Settlement],
-            (unit) => {return MaraUtils.IsCombatConfigId(unit.UnitCfgId) && MaraUtils.IsBuildingConfigId(unit.UnitCfgId)}
-        );
-
-        let currentStrength = 0;
-
-        for (let unit of expandGuardUnits) {
-            currentStrength += MaraUtils.GetUnitStrength(unit);
-        }
-        
-        let requiredStrength = Math.max(this.settlementController.Settings.Combat.ExpandDefenseStrength - currentStrength, 0);
+    GetPointGuardArmyComposition(): UnitComposition {
+        let requiredStrength = this.settlementController.Settings.Combat.PointDefenseBatchStrength;
 
         if (requiredStrength > 0) {
-            this.Debug(`Required Strength to guard expand: ${requiredStrength}`);
             let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
             let composition = this.getGuardingUnitComposition(produceableCfgIds, requiredStrength);
 
-            this.Debug(`Unit composition to guard expand:`);
+            this.Debug(`Unit composition to guard point:`);
             MaraUtils.PrintMap(composition);
             
             return composition;
@@ -492,7 +484,7 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
             return new MaraResourceClusterSelection(null, true, null); //what's the point?..
         }
 
-        let produceableOffensiveCfgIds = this.getOffensiveCfgIds();
+        let produceableOffensiveCfgIds = this.getProduceableOffensiveCfgIds();
         let canAttack = produceableOffensiveCfgIds.length > 0;
 
         let acceptableClusters: Array<any> = [];
@@ -572,21 +564,83 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
     }
 
     protected makeSelfTask(): SettlementSubcontrollerTask | null {
+        let taskCandidates: Array<TaskSelectItem> = [];
+        
+        let isAtLeastOneDefenceCfgIdProduceable = false;
+        let allProduceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
+
+        for (let cfgIdItem of this.globalStrategy.DefensiveBuildingsCfgIds) {
+            let cfgId = allProduceableCfgIds.find((v) => v == cfgIdItem.CfgId);
+
+            if (cfgId) {
+                isAtLeastOneDefenceCfgIdProduceable = true;
+                break;
+            }
+        }
+
+        if (isAtLeastOneDefenceCfgIdProduceable) {
+            let defenceBuildCandidates: Array<MaraPoint> = [];
+
+            for (let point of this.settlementController.Expands) {
+                let guardStrength = this.getPointGuardStrength(point);
+
+                if (guardStrength < this.settlementController.Settings.Combat.PointDefenseBatchStrength) {
+                    defenceBuildCandidates.push(point);
+                }
+            }
+
+            let settlementLocation = this.settlementController.GetSettlementLocation();
+
+            if (settlementLocation) {
+                let guardStrength = this.getPointGuardStrength(settlementLocation.Center);
+
+                if (guardStrength < 10 * this.settlementController.Settings.Combat.PointDefenseBatchStrength) {
+                    defenceBuildCandidates.push(settlementLocation.Center);
+                }
+            }
+
+            if (defenceBuildCandidates.length > 0) {
+                let point = MaraUtils.RandomSelect(this.settlementController.MasterMind, defenceBuildCandidates)!;
+                let defenceBuildTask = new DefenceBuildTask(point, this.settlementController, this);
+                
+                let item = new TaskSelectItem();
+                item.Task = defenceBuildTask;
+                item.Weight = 100 * this.settlementController.Settings.ControllerStates.DefenceConstructionToAttackRatio;
+
+                taskCandidates.push(item);
+            }
+        }
+
         let enemy = this.SelectEnemy();
 
         if (enemy) {
-            let offensiveCfgIds = this.getOffensiveCfgIds();
+            let attackTask: AttackTask | null = null;
+            let produceableOffensiveCfgIds = this.getProduceableOffensiveCfgIds();
 
-            if (offensiveCfgIds.length > 0) {
-                return new AttackTask(enemy, this.settlementController, this);
+            if (produceableOffensiveCfgIds.length > 0) {
+                attackTask = new AttackTask(enemy, this.settlementController, this);
             }
             else {
-                return null;
+                let allUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
+                let offensiveUnits = allUnits.filter((u) => MaraUtils.IsCombatConfigId(u.UnitCfgId) && !MaraUtils.IsBuildingConfigId(u.UnitCfgId));
+                
+                if (offensiveUnits.length > 0) {
+                    attackTask = new AttackTask(enemy, this.settlementController, this);
+                }
+            }
+
+            if (attackTask) {
+                let item = new TaskSelectItem();
+                item.Task = attackTask;
+                item.Weight = 100 * (1 - this.settlementController.Settings.ControllerStates.DefenceConstructionToAttackRatio);
+
+                taskCandidates.push(item);
             }
         }
-        else {
-            return null;
-        }
+
+        let selectResult = MaraUtils.NonUniformRandomSelect(this.settlementController.MasterMind, taskCandidates);
+
+        return selectResult ? selectResult.Task : null;
     }
 
     private selectOptimalCluster(clusterData: any): MaraResourceCluster | null {
@@ -626,14 +680,14 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
     }
 
     private getOffensiveUnitComposition(requiredStrength: number): UnitComposition {
-        let offensiveCfgIds = this.getOffensiveCfgIds();
+        let offensiveCfgIds = this.getProduceableOffensiveCfgIds();
         this.Debug(`Offensive Cfg IDs: ${offensiveCfgIds}`);
         let allowedOffensiveCfgItems = MaraUtils.MakeAllowedCfgItems(offensiveCfgIds, new Map<string, number>(), this.settlementController.Settlement);
 
         return this.makeCombatUnitComposition(allowedOffensiveCfgItems, requiredStrength);
     }
 
-    private getOffensiveCfgIds(): Array<string> {
+    private getProduceableOffensiveCfgIds(): Array<string> {
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
         
         let offensiveCfgIds = produceableCfgIds.filter(
@@ -745,5 +799,22 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         }
 
         return unitComposition;
+    }
+
+    private getPointGuardStrength(point: MaraPoint): number {
+        let expandGuardUnits = MaraUtils.GetSettlementUnitsAroundPoint(
+            point, 
+            this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius,
+            [this.settlementController.Settlement],
+            (unit) => {return MaraUtils.IsCombatConfigId(unit.UnitCfgId) && MaraUtils.IsBuildingConfigId(unit.UnitCfgId)}
+        );
+
+        let guardStrength = 0;
+
+        for (let unit of expandGuardUnits) {
+            guardStrength += MaraUtils.GetUnitStrength(unit);
+        }
+
+        return guardStrength;
     }
 }

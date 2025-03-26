@@ -56,6 +56,8 @@ class ControllerStatesSettings {
     public BuildUpProbabilityWhenOffensePossible = 0.70;
     public BuildUpProbabilityWhenDefensePossible = 0.30;
     public UnnecessaryExpandProbability = 0.20;
+
+    public DefenceConstructionToAttackRatio = 0.4;
     
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;
@@ -78,7 +80,7 @@ class ResourceMiningSettings {
 }
 
 class CombatSettings {
-    public ExpandDefenseStrength: number = 100;
+    public PointDefenseBatchStrength: number = 100;
     public MaxCompositionUnitCount: number = 20;
     public MaxUsedOffensiveCfgIdCount: number = 4;
     public MaxUsedDefensiveCfgIdCount: number = 1;

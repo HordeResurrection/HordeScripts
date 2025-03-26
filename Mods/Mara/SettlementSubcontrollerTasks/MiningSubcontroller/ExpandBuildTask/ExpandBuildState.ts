@@ -316,7 +316,7 @@ export class ExpandBuildState extends ProductionTaskState {
     private orderGuardProduction(): Array<MaraProductionRequest> {
         let result = new Array<MaraProductionRequest>();
 
-        let guardComposition = this.settlementController.StrategyController.GetExpandGuardArmyComposition(this.expandCenter);
+        let guardComposition = this.settlementController.StrategyController.GetPointGuardArmyComposition(this.expandCenter);
 
         guardComposition.forEach(
             (value, key) => {
