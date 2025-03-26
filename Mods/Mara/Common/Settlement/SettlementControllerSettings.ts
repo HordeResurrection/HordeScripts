@@ -32,8 +32,8 @@ class TimeoutsSettings {
     public StrategyActionMinCooldown = 20 * 50;
     public StrategyActionMaxCooldown = 1 * 60 * 50;
 
-    public SettlementEnhanceMinCooldown = 60 * 50;
-    public SettlementEnhanceMaxCooldown = 3 * 60 * 50;
+    public SettlementEnhanceMinCooldown = 3 * 60 * 50;
+    public SettlementEnhanceMaxCooldown = 7 * 60 * 50;
     
     public UnfinishedConstructionThreshold: number = 2 * 60 * 50;
 }

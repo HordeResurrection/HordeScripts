@@ -28,7 +28,7 @@ export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
                 this.Debug(`Task ${this.activeTask.constructor.name} completed with result ${this.activeTask.IsSuccess}`);
 
                 if (this.activeTask.IsSuccess) {
-                    this.nextSelfTaskAttemptTick = this.calcWakeUpTick(tickNumber, this.selfTaskReattemptCooldown);
+                    this.nextSelfTaskAttemptTick = this.calcWakeUpTick(tickNumber, this.successfulSelfTaskCooldown);
                     this.Debug(`Sleeping on self-task until tick ${this.nextSelfTaskAttemptTick} due to successfull task completion`);
                 }
 
