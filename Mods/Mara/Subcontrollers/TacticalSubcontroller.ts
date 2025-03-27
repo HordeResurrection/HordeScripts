@@ -326,7 +326,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     }
 
     UpdateDefenseTargets(attackingSquads: Array<MaraSquad>): void {
-        if (this.settlementController.HostileAttackingSquads.length == 0) {
+        if (attackingSquads.length == 0) {
             return;
         }
         
@@ -653,8 +653,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         this.DefensiveSquads = this.DefensiveSquads.filter((squad) => {return squad.Units.length > 0});
         this.ReinforcementSquads = this.ReinforcementSquads.filter((squad) => {return squad.Units.length > 0});
         this.MilitiaSquads = this.MilitiaSquads.filter((squad) => {return squad.Units.length > 0});
-        this.settlementController.HostileAttackingSquads = this.settlementController.HostileAttackingSquads.filter((squad) => {return squad.Units.length > 0});
-
+        
         if (this.unitsInSquads != null) {
             let filteredUnits = new Map<number, MaraUnitCacheItem>();
             

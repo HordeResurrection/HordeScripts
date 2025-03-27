@@ -4,7 +4,6 @@ import { MaraProductionRequestItem } from "../Common/MaraProductionRequestItem";
 import { MaraUtils } from "Mara/MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
-import { UnitComposition } from "../Common/UnitComposition";
 import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
 import { MaraRepairRequest } from "../Common/MaraRepairRequest";
 import { SettlementClusterLocation } from "../Common/Settlement/SettlementClusterLocation";
@@ -213,60 +212,12 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         this.requestAbsentProductionChainItemsProduction(configId, priority);
     }
 
-    CancelAllProduction(): void {
-        let executingRequests = new SortedSet(this.queueOptions);
-        let queuedRequestsArr = this.queuedRequests.toArray();
-        
-        for (let request of queuedRequestsArr) {
-            if (request.IsExecuting) {
-                executingRequests.insert(request);
-            }
-            else {
-                this.finalizeProductionRequest(request);
-            }
-        }
-        
-        this.queuedRequests = executingRequests;
-        this.Debug(`Cleared target production list`);
-    }
-
     GetProduceableCfgIds(): Array<string> {
         if (!this.productionIndex) {
             this.updateProductionIndex();
         }
         
         return Array.from(this.productionIndex!.keys());
-    }
-
-    EstimateProductionTime(unitComposition: UnitComposition, searchProducers: boolean = false): Map<string, number> {
-        let estimation = new Map<string, number>();
-        
-        if (!this.productionIndex) {
-            this.updateProductionIndex();
-        }
-
-        unitComposition.forEach((value, key) => {
-            let producers = this.productionIndex!.get(key);
-
-            if (!producers) {
-                if (searchProducers) {
-                    estimation.set(key, Infinity);
-                }
-                else {
-                    let config = MaraUtils.GetUnitConfig(key);
-                    estimation.set(key, config.ProductionTime * value); //!!
-                }
-            }
-            else {
-                let producersCount = Math.min(producers.length, value);
-                let config = MaraUtils.GetUnitConfig(key);
-                let productionTime = config.ProductionTime * value / producersCount;
-
-                estimation.set(key, productionTime);
-            }
-        });
-
-        return estimation;
     }
 
     GetProducingCfgIds(cfgId: string): Array<string> {
@@ -290,7 +241,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
     }
 
-    public OnUnitListChanged(unit: MaraUnitCacheItem, isAdded: boolean): void {
+    OnUnitListChanged(unit: MaraUnitCacheItem, isAdded: boolean): void {
         let cacheItem = MaraUnitCache.GetUnitById(unit.UnitId);
 
         if (!cacheItem) {

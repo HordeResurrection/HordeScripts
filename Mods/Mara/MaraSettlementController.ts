@@ -4,21 +4,16 @@
 */
 
 import { Mara, MaraLogLevel } from "./Mara";
-import { MaraSettlementControllerState } from "./SettlementControllerStates/MaraSettlementControllerState";
 import { MiningSubcontroller } from "./Subcontrollers/MiningSubontroller";
 import { MaraSubcontroller } from "./Subcontrollers/MaraSubcontroller";
 import { ProductionSubcontroller } from "./Subcontrollers/ProductionSubcontroller";
-import { MaraSquad } from "./Subcontrollers/Squads/MaraSquad";
 import { StrategySubcontroller } from "./Subcontrollers/StrategySubcontroller";
 import { TacticalSubcontroller } from "./Subcontrollers/TacticalSubcontroller";
 import { MaraPoint } from "./Common/MaraPoint";
 import { MaraUtils } from "./MaraUtils";
 import { UnitComposition } from "./Common/UnitComposition";
 import { MaraSettlementControllerSettings } from "./Common/Settlement/SettlementControllerSettings";
-import { SettlementControllerStateFactory } from "./Common/Settlement/SettlementControllerStateFactory";
 import { SettlementClusterLocation } from "./Common/Settlement/SettlementClusterLocation";
-import { TargetExpandData } from "./Common/Settlement/TargetExpandData";
-import { EconomySnapshotItem } from "./Common/Settlement/EconomySnapshotItem";
 import { MaraRect } from "./Common/MaraRect";
 import { MaraUnitCacheItem } from "./Common/Cache/MaraUnitCacheItem";
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
@@ -108,18 +103,10 @@ export class MaraSettlementController {
     public TacticalController: TacticalSubcontroller;
     public DevelopmentController: DevelopmentSubcontroller;
     
-    public HostileAttackingSquads: Array<MaraSquad> = [];
-    public TargetEconomySnapshot: Array<EconomySnapshotItem> | null = null;
-    public AttackToDefenseUnitRatio: number | null = null;
-    public TargetExpand: TargetExpandData | null = null;
     public Expands: Array<MaraPoint> = [];
     public ReservedUnitsData: ReservedUnitsData = new ReservedUnitsData();
-    public CanMineResources: boolean = true;
-    public ConsequtiveBuildUpCount: number = 0;
     
     private subcontrollers: Array<MaraSubcontroller> = [];
-    private state: MaraSettlementControllerState;
-    private nextState: MaraSettlementControllerState | null;
     private currentUnitComposition: UnitComposition | null;
     private currentDevelopedUnitComposition: UnitComposition | null;
     private settlementLocation: SettlementClusterLocation | null;
@@ -154,15 +141,6 @@ export class MaraSettlementController {
         this.DevelopmentController = new DevelopmentSubcontroller(this);
         this.subcontrollers.push(this.DevelopmentController);
 
-        //this.State = SettlementControllerStateFactory.MakeRoutingState(this);
-    }
-
-    public get State(): MaraSettlementControllerState {
-        return this.state;
-    }
-    
-    public set State(value: MaraSettlementControllerState) {
-        this.nextState = value;
     }
     
     Tick(tickNumber: number): void {
@@ -170,7 +148,7 @@ export class MaraSettlementController {
         this.currentDevelopedUnitComposition = null;
 
         if (tickNumber % 50 == 0) {
-            this.СleanupExpands();
+            this.cleanupExpands();
         }
 
         if (tickNumber % 10 == 0) {
@@ -180,20 +158,6 @@ export class MaraSettlementController {
         for (let subcontroller of this.subcontrollers) {
             subcontroller.Tick(tickNumber);
         }
-        
-        if (this.nextState) {
-            if (this.state) {
-                this.Debug(`Leaving state ${this.state.constructor.name}`);
-                this.state.OnExit();
-            }
-            
-            this.state = this.nextState;
-            this.nextState = null;
-            this.Debug(`Entering state ${this.state.constructor.name}, tick ${tickNumber}`);
-            this.state.OnEntry();
-        }
-
-        //this.state.Tick(tickNumber);
     }
 
     Log(level: MaraLogLevel, message: string): void {
@@ -232,23 +196,6 @@ export class MaraSettlementController {
         return new Map(this.currentUnitComposition);
     }
 
-    GetCurrentEconomySnapshot(): Array<EconomySnapshotItem> {
-        let result: Array<EconomySnapshotItem> = [];
-        let units = MaraUtils.GetAllSettlementUnits(this.Settlement);
-        
-        for (let unit of units) {
-            let snapshotItem = new EconomySnapshotItem(unit.UnitCfgId);
-            
-            if (MaraUtils.IsBuildingConfigId(unit.UnitCfgId)) {
-                snapshotItem.Position = unit.UnitCell;
-            }
-
-            result.push(snapshotItem);
-        }
-
-        return result;
-    }
-
     GetCurrentDevelopedEconomyComposition(): UnitComposition {
         if (!this.currentDevelopedUnitComposition) {
             this.currentDevelopedUnitComposition = new Map<string, number>();
@@ -271,7 +218,21 @@ export class MaraSettlementController {
         return this.settlementLocation;
     }
 
-    СleanupExpands(): void {
+    OnUnitListChanged(unit: MaraUnitCacheItem, isAdded: boolean): void {
+        if (MaraUtils.IsBuildingConfigId(unit.UnitCfgId)) {
+            this.recalcSettlementLocation();
+        }
+
+        this.ProductionController.OnUnitListChanged(unit, isAdded);
+    }
+
+    OnUnitLifeStateChanged(unit: MaraUnitCacheItem): void {
+        if (MaraUtils.IsBuildingConfigId(unit.UnitCfgId)) {
+            this.recalcSettlementLocation();
+        }
+    }
+
+    private cleanupExpands(): void {
         this.Expands = this.Expands.filter(
             (value) => {
                 let expandBuildings = MaraUtils.GetSettlementUnitsAroundPoint(
@@ -284,20 +245,6 @@ export class MaraSettlementController {
                 return expandBuildings.length > 0;
             }
         )
-    }
-
-    public OnUnitListChanged(unit: MaraUnitCacheItem, isAdded: boolean): void {
-        if (MaraUtils.IsBuildingConfigId(unit.UnitCfgId)) {
-            this.recalcSettlementLocation();
-        }
-
-        this.ProductionController.OnUnitListChanged(unit, isAdded);
-    }
-
-    public OnUnitLifeStateChanged(unit: MaraUnitCacheItem): void {
-        if (MaraUtils.IsBuildingConfigId(unit.UnitCfgId)) {
-            this.recalcSettlementLocation();
-        }
     }
 
     private recalcSettlementLocation(): void {

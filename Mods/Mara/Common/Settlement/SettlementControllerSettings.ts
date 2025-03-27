@@ -14,23 +14,20 @@ class UnitSearchSettings {
 }
 
 class TimeoutsSettings {
-    public RebuildEstimationThreshold: number = 2 * 60 * 50;
-    
     public MaxBuildUpProduction: number = 2 * 60 * 50;
     public MinBuildUpProduction: number = 0.5 * 60 * 50;
 
-    public UnitProductionEstimationThreshold: number = 2 * 60 * 50;
     public Exterminate: number = 5 * 60 * 50;
     public Develop: number = 2 * 60 * 50;
     
     public ExpandBuild: number = 1.5 * 60 * 50;
     public ExpandPrepare: number = 5 * 60 * 50;
 
-    public AttackMinCooldown = 30 * 50;
-    public AttackMaxCooldown = 1 * 60 * 50;
+    public StrategyActionSuccessMinCooldown = 30 * 50;
+    public StrategyActionSuccessMaxCooldown = 1 * 60 * 50;
 
-    public StrategyActionMinCooldown = 20 * 50;
-    public StrategyActionMaxCooldown = 1 * 60 * 50;
+    public StrategyActionReattemptMinCooldown = 20 * 50;
+    public StrategyActionReattemptMaxCooldown = 1 * 60 * 50;
 
     public SettlementEnhanceMinCooldown = 1.5 * 60 * 50;
     public SettlementEnhanceMaxCooldown = 6 * 60 * 50;
@@ -45,19 +42,15 @@ class SquadsSettings {
     public MinCombativityIndex: number = 0.25;
     public MinStrength: number = 100;
     public DefaultMovementPrecision: number = 3;
-    public KiteTimeout: number = 8 * 50; // 8 sec
+    public KiteTimeout: number = 8 * 50;
     public KiteThresholdPositionChangeDistance: number = 5;
-    public GatherUpTimeout = 5 * 50; // 5 sec
+    public GatherUpTimeout = 5 * 50;
 
     public DebugSquads: boolean = false;
 }
 
 class ControllerStatesSettings {
-    public BuildUpProbabilityWhenOffensePossible = 0.70;
-    public BuildUpProbabilityWhenDefensePossible = 0.30;
-    public UnnecessaryExpandProbability = 0.20;
-
-    public DefenceConstructionToAttackRatio = 0.4;
+    public DefenceConstructionToAttackProbabilityRatio = 0.4;
     
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;

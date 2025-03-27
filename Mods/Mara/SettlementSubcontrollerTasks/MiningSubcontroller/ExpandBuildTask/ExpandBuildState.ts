@@ -98,10 +98,6 @@ export class ExpandBuildState extends ProductionTaskState {
 
         result.push(...this.orderHarvestersProduction());
 
-        // if (this.isRemoteExpand(this.expandCenter)) {
-        //     result.push(...this.orderGuardProduction());
-        // }
-
         return result;
     }
 
@@ -309,22 +305,6 @@ export class ExpandBuildState extends ProductionTaskState {
         for (let i = 0; i < this.settlementController.Settings.ResourceMining.HousingBatchSize; i++) {
             result.push(this.makeProductionRequest(cfgId, null, null, true));
         }
-
-        return result;
-    }
-
-    private orderGuardProduction(): Array<MaraProductionRequest> {
-        let result = new Array<MaraProductionRequest>();
-
-        let guardComposition = this.settlementController.StrategyController.GetPointGuardArmyComposition(this.expandCenter);
-
-        guardComposition.forEach(
-            (value, key) => {
-                for (let i = 0; i < value; i++) {
-                    result.push(this.makeProductionRequest(key, this.expandCenter, null, true));
-                }
-            }
-        );
 
         return result;
     }

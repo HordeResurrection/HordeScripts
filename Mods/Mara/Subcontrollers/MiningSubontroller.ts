@@ -58,44 +58,6 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         );
     }
 
-    public GetTotalResources(): MaraResources {
-        this.checkForUnaccountedBuildings();
-        
-        let settlement = this.settlementController.Settlement;
-        
-        let totalResources = this.GetStashedResourses();
-
-        let freeHousing = Math.max(settlement.Census.MaxPeople - settlement.Census.BusyAndReservedPeople, 0);
-        totalResources.People += freeHousing;
-
-        for (let mineData of this.mines) {
-            let mineResources = this.getMineResources(mineData.Mine!);
-
-            totalResources.Gold += mineResources.Gold;
-            totalResources.Metal += mineResources.Metal;
-        }
-
-        for (let sawmillData of this.Sawmills) {
-            if (sawmillData.Sawmill) {
-                let clusters = MaraMap.GetResourceClustersAroundPoint(
-                    sawmillData.Sawmill.UnitRect.Center,
-                    this.settlementController.Settings.ResourceMining.WoodcuttingRadius
-                );
-
-                clusters.forEach((c) => totalResources.Wood += c.WoodAmount);
-            }
-        }
-
-        let model = MaraUtils.GetPropertyValue(settlement.Census, "Model");
-        let taxFactor = model.TaxFactor;
-
-        totalResources.Gold += taxFactor.Gold * totalResources.People;
-        totalResources.Wood += taxFactor.Lumber * totalResources.People;
-        totalResources.Metal += taxFactor.Metal * totalResources.People;
-
-        return totalResources;
-    }
-
     public GetFreeHarvesters(): Array<MaraUnitCacheItem> {
         this.engageFreeHarvesters();
         return this.getUnengagedHarvesters();
@@ -210,7 +172,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         let compositionCost = this.calculateCompositionCost(composition);
         this.Debug(`Target composition cost: ${compositionCost.ToString()}`);
 
-        let currentResources = this.settlementController.MiningController.GetTotalResources();
+        let currentResources = this.getTotalResources();
         this.Debug(`Current resources: ${currentResources.ToString()}`);
 
         let insufficientResources = new MaraResources(
@@ -279,6 +241,44 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         else {
             return null;
         }
+    }
+
+    private getTotalResources(): MaraResources {
+        this.checkForUnaccountedBuildings();
+        
+        let settlement = this.settlementController.Settlement;
+        
+        let totalResources = this.GetStashedResourses();
+
+        let freeHousing = Math.max(settlement.Census.MaxPeople - settlement.Census.BusyAndReservedPeople, 0);
+        totalResources.People += freeHousing;
+
+        for (let mineData of this.mines) {
+            let mineResources = this.getMineResources(mineData.Mine!);
+
+            totalResources.Gold += mineResources.Gold;
+            totalResources.Metal += mineResources.Metal;
+        }
+
+        for (let sawmillData of this.Sawmills) {
+            if (sawmillData.Sawmill) {
+                let clusters = MaraMap.GetResourceClustersAroundPoint(
+                    sawmillData.Sawmill.UnitRect.Center,
+                    this.settlementController.Settings.ResourceMining.WoodcuttingRadius
+                );
+
+                clusters.forEach((c) => totalResources.Wood += c.WoodAmount);
+            }
+        }
+
+        let model = MaraUtils.GetPropertyValue(settlement.Census, "Model");
+        let taxFactor = model.TaxFactor;
+
+        totalResources.Gold += taxFactor.Gold * totalResources.People;
+        totalResources.Wood += taxFactor.Lumber * totalResources.People;
+        totalResources.Metal += taxFactor.Metal * totalResources.People;
+
+        return totalResources;
     }
 
     private calculateCompositionCost(composition: UnitComposition): MaraResources {
@@ -360,7 +360,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             }
         }
                 
-        let resources = this.settlementController.MiningController.GetTotalResources();
+        let resources = this.getTotalResources();
         this.Debug(`Total resources: ${resources.ToString()}`);
 
         let result = new NeedExpandResult();

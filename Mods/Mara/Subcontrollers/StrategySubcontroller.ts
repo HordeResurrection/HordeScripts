@@ -36,16 +36,16 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
     protected get selfTaskReattemptCooldown(): number {
         return MaraUtils.Random(
             this.settlementController.MasterMind,
-            this.settlementController.Settings.Timeouts.StrategyActionMaxCooldown,
-            this.settlementController.Settings.Timeouts.StrategyActionMinCooldown
+            this.settlementController.Settings.Timeouts.StrategyActionReattemptMaxCooldown,
+            this.settlementController.Settings.Timeouts.StrategyActionReattemptMinCooldown
         );
     }
     
     protected get successfulSelfTaskCooldown(): number {
         return MaraUtils.Random(
             this.settlementController.MasterMind,
-            this.settlementController.Settings.Timeouts.AttackMaxCooldown,
-            this.settlementController.Settings.Timeouts.AttackMinCooldown
+            this.settlementController.Settings.Timeouts.StrategyActionSuccessMaxCooldown,
+            this.settlementController.Settings.Timeouts.StrategyActionSuccessMinCooldown
         );
     }
     
@@ -88,30 +88,6 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
 
         this.Debug(`Offensive unit composition:`);
         MaraUtils.PrintMap(unitList);
-
-        // let requiredDefensiveStrength = (1 - ratio) * requiredStrength;
-        // let currentDefensiveStrength = this.GetCurrentDefensiveStrength();
-        // let defensiveStrengthToProduce = Math.max(requiredDefensiveStrength - currentDefensiveStrength, 0);
-        // this.settlementController.Debug(`Calculated required defensive strength: ${defensiveStrengthToProduce}`);
-        
-        // let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
-
-        // let defensiveCfgIds = produceableCfgIds.filter(
-        //     (value) => {
-        //         return (
-        //             this.globalStrategy.OffensiveCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0 || 
-        //             this.globalStrategy.DefensiveBuildingsCfgIds.findIndex((item) => {return item.CfgId == value}) >= 0
-        //         );
-        //     }
-        // );
-        // this.settlementController.Debug(`Defensive Cfg IDs: ${defensiveCfgIds}`);
-
-        // let allowedDefensiveCfgItems = MaraUtils.MakeAllowedCfgItems(defensiveCfgIds, unitList, this.settlementController.Settlement);
-        // let defensiveUnitList = this.makeCombatUnitComposition(allowedDefensiveCfgItems, defensiveStrengthToProduce);
-        // this.settlementController.Debug(`Defensive unit composition:`);
-        // MaraUtils.PrintMap(defensiveUnitList);
-
-        // defensiveUnitList.forEach((value, key, map) => MaraUtils.AddToMapItem(unitList, key, value));
         
         return unitList;
     }
@@ -201,36 +177,6 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         }
         
         return combatUnitCfgIds;
-    }
-
-    GetRequiredProductionChainCfgIds(): Set<string> {
-        let result = new Set<string>();
-
-        for (let item of this.globalStrategy.OffensiveCfgIds) {
-            for (let cfgId of item.ProductionChain) {
-                result.add(cfgId);
-            }
-        }
-
-        for (let item of this.globalStrategy.DefensiveBuildingsCfgIds) {
-            for (let cfgId of item.ProductionChain) {
-                result.add(cfgId);
-            }
-        }
-
-        return result;
-    }
-
-    SelectEnemy(): any { //but actually Settlement
-        let undefeatedEnemies: any[] = this.EnemySettlements.filter((value) => {return !MaraUtils.IsSettlementDefeated(value)});
-        let enemy: any = null;
-        
-        if (undefeatedEnemies.length > 0) {
-            let index = MaraUtils.Random(this.settlementController.MasterMind, undefeatedEnemies.length - 1);
-            enemy = undefeatedEnemies[index];
-        }
-
-        return enemy;
     }
 
     GetOffensiveTarget(
@@ -421,19 +367,6 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
             }
         }
 
-        if (this.settlementController.TargetExpand?.BuildCenter) {
-            if (
-                !this.isSafeLocation(
-                    MaraRect.CreateFromPoint(
-                        this.settlementController.TargetExpand.BuildCenter, 
-                        this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius
-                    )
-                )
-            ) {
-                return true;
-            }
-        }
-
         return false;
     }
 
@@ -533,7 +466,7 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         return new MaraResourceClusterSelection(optimalCluster, isReachable, reachableCluster);
     }
 
-    public CaptureLandmark(point: MaraPoint): SubcontrollerRequestResult {
+    CaptureLandmark(point: MaraPoint): SubcontrollerRequestResult {
         let result = new SubcontrollerRequestResult();
         
         let enemies = this.GetEnemiesAroundPoint(point, this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius);
@@ -605,13 +538,13 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
                 
                 let item = new TaskSelectItem();
                 item.Task = defenceBuildTask;
-                item.Weight = 100 * this.settlementController.Settings.ControllerStates.DefenceConstructionToAttackRatio;
+                item.Weight = 100 * this.settlementController.Settings.ControllerStates.DefenceConstructionToAttackProbabilityRatio;
 
                 taskCandidates.push(item);
             }
         }
 
-        let enemy = this.SelectEnemy();
+        let enemy = this.selectEnemy();
 
         if (enemy) {
             let attackTask: AttackTask | null = null;
@@ -632,7 +565,7 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
             if (attackTask) {
                 let item = new TaskSelectItem();
                 item.Task = attackTask;
-                item.Weight = 100 * (1 - this.settlementController.Settings.ControllerStates.DefenceConstructionToAttackRatio);
+                item.Weight = 100 * (1 - this.settlementController.Settings.ControllerStates.DefenceConstructionToAttackProbabilityRatio);
 
                 taskCandidates.push(item);
             }
@@ -641,6 +574,18 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         let selectResult = MaraUtils.NonUniformRandomSelect(this.settlementController.MasterMind, taskCandidates);
 
         return selectResult ? selectResult.Task : null;
+    }
+
+    private selectEnemy(): any { //but actually Settlement
+        let undefeatedEnemies: any[] = this.EnemySettlements.filter((value) => {return !MaraUtils.IsSettlementDefeated(value)});
+        let enemy: any = null;
+        
+        if (undefeatedEnemies.length > 0) {
+            let index = MaraUtils.Random(this.settlementController.MasterMind, undefeatedEnemies.length - 1);
+            enemy = undefeatedEnemies[index];
+        }
+
+        return enemy;
     }
 
     private selectOptimalCluster(clusterData: any): MaraResourceCluster | null {

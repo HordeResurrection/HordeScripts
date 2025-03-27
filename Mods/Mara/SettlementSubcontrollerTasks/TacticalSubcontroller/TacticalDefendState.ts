@@ -24,7 +24,7 @@ export class TacticalDefendState extends FsmState {
         if (
             this.tacticalController.AllSquads.length == 0
         ) {
-            this.tacticalController.ComposeSquads();
+            this.tacticalController.ComposeSquads(0);
         }
         
         if (this.tacticalController.NeedRetreat(this.hostileAttackingSquads)) {
@@ -107,19 +107,6 @@ export class TacticalDefendState extends FsmState {
 
             if (expandAttackers.length > 0) {
                 this.hostileAttackingSquads.push(...expandAttackers);
-            }
-        }
-    
-        if (this.tacticalController.SettlementController.TargetExpand) {
-            if (this.tacticalController.SettlementController.TargetExpand.BuildCenter) {
-                let expandAttackers = this.registerHostileSquadsAroundPoint(
-                    this.tacticalController.SettlementController.TargetExpand.BuildCenter, 
-                    this.tacticalController.SettlementController.Settings.UnitSearch.ExpandEnemySearchRadius
-                );
-    
-                if (expandAttackers.length > 0) {
-                    this.hostileAttackingSquads.push(...expandAttackers);
-                }
             }
         }
     }
