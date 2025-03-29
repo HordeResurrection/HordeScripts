@@ -18,7 +18,7 @@ export class TacticalDefendState extends FsmState {
     }
     
     OnEntry(): void {
-        this.tacticalController.SettlementController.Debug(`Proceeding to defend`);
+        this.tacticalController.Debug(`Proceeding to defend`);
         this.refreshAttackersList();
 
         if (
