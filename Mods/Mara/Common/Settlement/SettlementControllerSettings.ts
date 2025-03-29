@@ -23,14 +23,14 @@ class TimeoutsSettings {
     public ExpandBuild: number = 1.5 * 60 * 50;
     public ExpandPrepare: number = 5 * 60 * 50;
 
-    public StrategyActionSuccessMinCooldown = 30 * 50;
-    public StrategyActionSuccessMaxCooldown = 1 * 60 * 50;
+    public StrategyActionSuccessMinCooldown = 15 * 50;
+    public StrategyActionSuccessMaxCooldown = 40 * 50;
 
     public StrategyActionReattemptMinCooldown = 20 * 50;
-    public StrategyActionReattemptMaxCooldown = 1 * 60 * 50;
+    public StrategyActionReattemptMaxCooldown = 40 * 50;
 
-    public SettlementEnhanceMinCooldown = 1.5 * 60 * 50;
-    public SettlementEnhanceMaxCooldown = 6 * 60 * 50;
+    public SettlementEnhanceMinCooldown = 2 * 60 * 50;
+    public SettlementEnhanceMaxCooldown = 9 * 60 * 50;
     
     public UnfinishedConstructionThreshold: number = 2 * 60 * 50;
 }
@@ -50,7 +50,7 @@ class SquadsSettings {
 }
 
 class ControllerStatesSettings {
-    public DefenceConstructionToAttackProbabilityRatio = 0.4;
+    public DefenceConstructionToAttackProbabilityRatio = 0.33;
     
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;
