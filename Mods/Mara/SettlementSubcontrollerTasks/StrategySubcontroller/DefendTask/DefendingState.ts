@@ -1,10 +1,11 @@
 
 import { MaraPriority } from "../../../Common/MaraPriority";
+import { MaraProductionRequest } from "../../../Common/MaraProductionRequest";
 import { MaraSettlementController } from "../../../MaraSettlementController";
+import { ConstantProductionState } from "../../ConstantProductionState";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
-import { SubcontrollerTaskState } from "../../SubcontrollerTaskState";
 
-export class DefendingState extends SubcontrollerTaskState {
+export class DefendingState extends ConstantProductionState {
     private reinforcementsCfgIds: Array<string>;
     
     constructor(task: SettlementSubcontrollerTask, settlementController: MaraSettlementController) {
@@ -19,24 +20,32 @@ export class DefendingState extends SubcontrollerTaskState {
     OnExit(): void {
         this.settlementController.TacticalController.Idle();
         this.settlementController.StrategyController.CheckForUnderAttack = true;
+        this.finalizeProductionRequests();
     }
 
     Tick(tickNumber: number): void {
         if (tickNumber % 50 == 0) {
+            this.cleanupProductionRequests();
+
             if (!this.settlementController.StrategyController.IsUnderAttack()) {
                 this.task.Debug(`Attack countered`);
                 this.task.Complete(true);
                 return;
             }
             else {
-                this.requestReinforcementsProduction();
+                this.requestProduction();
             }
         }
     }
 
-    private requestReinforcementsProduction() {
+    protected makeProductionRequests(): Array<MaraProductionRequest> {
+        let result: Array<MaraProductionRequest> = []
+
         for (let cfgId of this.reinforcementsCfgIds) {
-            this.settlementController.ProductionController.ForceRequestSingleCfgIdProduction(cfgId, MaraPriority.Absolute);
+            let chain = this.settlementController.ProductionController.ForceRequestSingleCfgIdProduction(cfgId, MaraPriority.Absolute);
+            result.push(...chain);
         }
+        
+        return result;
     }
 }

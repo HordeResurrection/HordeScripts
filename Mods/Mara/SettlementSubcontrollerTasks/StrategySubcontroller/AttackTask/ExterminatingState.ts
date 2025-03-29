@@ -1,10 +1,11 @@
 import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
 import { MaraPriority } from "../../../Common/MaraPriority";
+import { MaraProductionRequest } from "../../../Common/MaraProductionRequest";
 import { MaraSettlementController } from "../../../MaraSettlementController";
+import { ConstantProductionState } from "../../ConstantProductionState";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
-import { SubcontrollerTaskState } from "../../SubcontrollerTaskState";
 
-export class ExterminatingState extends SubcontrollerTaskState {
+export class ExterminatingState extends ConstantProductionState {
     private currentTarget: MaraUnitCacheItem | null;
     private reinforcementsCfgIds: Array<string>;
     private timeoutTick: number | null;
@@ -23,6 +24,7 @@ export class ExterminatingState extends SubcontrollerTaskState {
 
     OnExit(): void {
         this.settlementController.TacticalController.Idle();
+        this.finalizeProductionRequests();
     }
 
     Tick(tickNumber: number): void {
@@ -39,7 +41,8 @@ export class ExterminatingState extends SubcontrollerTaskState {
             return;
         }
 
-        this.requestReinforcementsProduction();
+        this.cleanupProductionRequests();
+        this.requestProduction();
 
         let combativityIndex = this.settlementController.TacticalController.OffenseCombativityIndex;
 
@@ -62,6 +65,20 @@ export class ExterminatingState extends SubcontrollerTaskState {
         }
     }
 
+    protected makeProductionRequests(): Array<MaraProductionRequest> {
+        let result: Array<MaraProductionRequest> = [];
+        
+        for (let cfgId of this.reinforcementsCfgIds) {
+            let request = this.settlementController.ProductionController.RequestSingleCfgIdProduction(cfgId, MaraPriority.Background);
+
+            if (request) {
+                result.push(request);
+            }
+        }
+
+        return result;
+    }
+
     private selectTarget(enemy: any): void {
         this.currentTarget = null;
         let target = this.settlementController.StrategyController.GetOffensiveTarget(enemy);
@@ -72,11 +89,6 @@ export class ExterminatingState extends SubcontrollerTaskState {
         }
     }
 
-    private requestReinforcementsProduction(): void {
-        for (let cfgId of this.reinforcementsCfgIds) {
-            this.settlementController.ProductionController.RequestSingleCfgIdProduction(cfgId, MaraPriority.Background);
-        }
-    }
     private isValidTarget(unit: MaraUnitCacheItem | null): boolean {
         return !(
             !unit || 

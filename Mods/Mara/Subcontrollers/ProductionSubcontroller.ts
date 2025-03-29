@@ -175,13 +175,16 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
     }
 
-    RequestSingleCfgIdProduction(configId: string, priority: MaraPriority): void {
+    RequestSingleCfgIdProduction(configId: string, priority: MaraPriority): MaraProductionRequest | null {
         if (this.productionCfgIdList.indexOf(configId) < 0) {
-            this.requestCfgIdProduction(configId, priority);
+            return this.requestCfgIdProduction(configId, priority);
+        }
+        else {
+            return null;
         }
     }
 
-    ForceRequestSingleCfgIdProduction(configId: string, priority: MaraPriority): void {
+    ForceRequestSingleCfgIdProduction(configId: string, priority: MaraPriority): Array<MaraProductionRequest> {
         if (!this.productionIndex) {
             this.updateProductionIndex();
         }
@@ -206,11 +209,13 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
         
         if (orderedCfgIdsCount >= producersCount) {
-            return;
+            return [];
         }
         
-        this.requestCfgIdProduction(configId, priority);
-        this.requestAbsentProductionChainItemsProduction(configId, priority);
+        let request = this.requestCfgIdProduction(configId, priority);
+        let chain = this.requestAbsentProductionChainItemsProduction(configId, priority);
+
+        return [request, ...chain];
     }
 
     GetProduceableCfgIds(): Array<string> {
@@ -268,15 +273,17 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
     }
 
-    private requestCfgIdProduction(configId: string, priority: MaraPriority): void {
+    private requestCfgIdProduction(configId: string, priority: MaraPriority): MaraProductionRequest {
         let item = new MaraProductionRequestItem(configId, null, null);
         let request = new MaraProductionRequest([item], priority)
         
         this.queuedRequests.insert(request);
         this.Debug(`Added ${configId} to target production list with priority ${request.Priority}`);
+
+        return request;
     }
 
-    private requestAbsentProductionChainItemsProduction(configId: string, priority: MaraPriority): void {
+    private requestAbsentProductionChainItemsProduction(configId: string, priority: MaraPriority): Array<MaraProductionRequest> {
         let requiredConfigs = MaraUtils.GetCfgIdProductionChain(configId, this.settlementController.Settlement);
         
         let existingUnits = MaraUtils.GetAllSettlementUnits(this.settlementController.Settlement);
@@ -286,11 +293,16 @@ export class ProductionSubcontroller extends MaraSubcontroller {
             existingCfgIds.add(unit.UnitCfgId);
         }
 
+        let result: Array<MaraProductionRequest> = [];
+        
         for (let cfg of requiredConfigs) {
             if (!existingCfgIds.has(cfg.Uid) && !this.productionCfgIdList.find((value) => {return value == cfg.Uid})) {
-                this.requestCfgIdProduction(cfg.Uid, priority);
+                let request = this.requestCfgIdProduction(cfg.Uid, priority);
+                result.push(request);
             }
         }
+
+        return result;
     }
 
     private cleanupUnfinishedBuildings(tickNumber: number): void {
