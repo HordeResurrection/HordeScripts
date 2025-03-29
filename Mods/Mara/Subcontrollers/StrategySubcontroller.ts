@@ -49,7 +49,8 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         );
     }
     
-    EnemySettlements: Array<any> = []; //but actually Settlement
+    public EnemySettlements: Array<any> = []; //but actually Settlement
+    public CheckForUnderAttack = true;
 
     private globalStrategy: SettlementGlobalStrategy = new SettlementGlobalStrategy();
     
@@ -489,9 +490,10 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         if (tickNumber % 50 == 0) {
             this.updateEnemiesList();
 
-            if (this.IsUnderAttack()) {
+            if (this.CheckForUnderAttack && this.IsUnderAttack()) {
                 let defendTask = new DefendTask(this.settlementController, this);
                 this.AddTask(defendTask);
+                this.CheckForUnderAttack = false;
             }
         }
     }

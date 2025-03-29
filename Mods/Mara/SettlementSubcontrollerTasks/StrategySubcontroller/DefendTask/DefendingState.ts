@@ -18,6 +18,7 @@ export class DefendingState extends SubcontrollerTaskState {
 
     OnExit(): void {
         this.settlementController.TacticalController.Idle();
+        this.settlementController.StrategyController.CheckForUnderAttack = true;
     }
 
     Tick(tickNumber: number): void {

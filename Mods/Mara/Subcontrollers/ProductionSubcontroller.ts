@@ -189,19 +189,20 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         let producers = this.productionIndex!.get(configId);
         
         let producersCount = 0;
-        let orderedCfgIdsCount = 0;
 
         if (producers) {
             producersCount = producers.length;
-            
-            for (let orderedCfgId of this.productionCfgIdList) {
-                if (orderedCfgId == configId) {
-                    orderedCfgIdsCount ++;
-                }
-            }
         }
         else {
             producersCount = 1;
+        }
+
+        let orderedCfgIdsCount = 0;
+        
+        for (let orderedCfgId of this.productionCfgIdList) {
+            if (orderedCfgId == configId) {
+                orderedCfgIdsCount ++;
+            }
         }
         
         if (orderedCfgIdsCount >= producersCount) {
