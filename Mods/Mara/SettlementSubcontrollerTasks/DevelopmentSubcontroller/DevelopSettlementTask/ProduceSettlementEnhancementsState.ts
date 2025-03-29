@@ -24,7 +24,7 @@ export class ProduceSettlementEnhancementsState extends ProductionTaskState {
     }
 
     protected onProductionTimeout(): void {
-        this.task.Complete(true);
+        this.task.Complete(false);
     }
 
     protected getProductionRequests(): Array<MaraProductionRequest> {

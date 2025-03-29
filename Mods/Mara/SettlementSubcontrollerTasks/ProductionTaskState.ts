@@ -90,7 +90,7 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
             }
             else if (tickNumber > this.timeoutTick) {
                 this.task.Debug(`Production is too long-drawn, discontinuing`);
-                this.onTargetCompositionReached();
+                this.onProductionTimeout();
                 return;
             }
         }
