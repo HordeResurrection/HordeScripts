@@ -266,6 +266,12 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         }
     }
 
+    IsCfgIdProduceable(cfgId: string): boolean {
+        let allProduceableCfgIds = this.GetProduceableCfgIds();
+        
+        return allProduceableCfgIds.findIndex((c) => c == cfgId) >= 0;
+    }
+
     private finalizeProductionRequest(request: MaraProductionRequest): void {
         if (request.Executor) {
             this.settlementController.ReservedUnitsData.FreeUnit(request.Executor);

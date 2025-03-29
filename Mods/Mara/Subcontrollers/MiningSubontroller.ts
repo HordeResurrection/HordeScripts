@@ -15,6 +15,7 @@ import { ExpandBuildTask } from "../SettlementSubcontrollerTasks/MiningSubcontro
 import { UnitComposition } from "../Common/UnitComposition";
 import { SubcontrollerRequestResult } from "../Common/SubcontrollerRequestResult";
 import { MaraPriority } from "../Common/MaraPriority";
+import { ProduceHarvestersTask } from "../SettlementSubcontrollerTasks/MiningSubcontroller/ProduceHarvestersTask/ProduceHarvestersTask";
 
 class MineData {
     public Mine: MaraUnitCacheItem | null = null;
@@ -223,6 +224,22 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
     }
 
     protected makeSelfTask(): SettlementSubcontrollerTask | null {
+        let expandBuildTask = this.makeExpandBuildTask();
+
+        if (expandBuildTask) {
+            return expandBuildTask;
+        }
+
+        let produceHarvestersTask = this.makeProduceHarvestersTask();
+
+        if (produceHarvestersTask) {
+            return produceHarvestersTask;
+        }
+
+        return null;
+    }
+
+    private makeExpandBuildTask(): ExpandBuildTask | null {
         let canMineResources = this.canMineResources();
 
         if (!canMineResources) {
@@ -237,6 +254,39 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             let targetExpand = this.fillExpandData(expandData.ResourcesToMine);
             
             return new ExpandBuildTask(MaraPriority.Normal, this.settlementController, targetExpand, this);
+        }
+        else {
+            return null;
+        }
+    }
+
+    private makeProduceHarvestersTask(): ProduceHarvestersTask | null {
+        let currentComposition = this.settlementController.GetCurrentDevelopedEconomyComposition();
+        let currentHarvesterCount = 0;
+
+        currentComposition.forEach((value, key) => {
+            if (MaraUtils.IsHarvesterConfigId(key)) {
+                currentHarvesterCount += value;
+            }
+        });
+
+        let optimalHarvesterCount = this.GetOptimalHarvesterCount();
+        let requiredHarvesterCount = optimalHarvesterCount - currentHarvesterCount;
+
+        if (requiredHarvesterCount > 0) {
+            let harvesterCfgIds = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
+            harvesterCfgIds = harvesterCfgIds.filter((cfgId) => this.settlementController.ProductionController.IsCfgIdProduceable(cfgId));
+
+            if (harvesterCfgIds.length == 0) {
+                return null;
+            }
+
+            this.Debug(`Required ${requiredHarvesterCount} harvesters, proceeding to produce`);
+            
+            let harvesterCfgId = MaraUtils.RandomSelect(this.settlementController.MasterMind, harvesterCfgIds)!;
+            let task = new ProduceHarvestersTask(MaraPriority.Low, requiredHarvesterCount, harvesterCfgId, this.settlementController, this);
+
+            return task;
         }
         else {
             return null;
