@@ -29,6 +29,9 @@ class TimeoutsSettings {
     public StrategyActionReattemptMinCooldown = 20 * 50;
     public StrategyActionReattemptMaxCooldown = 40 * 50;
 
+    public StrategyReInitMin = 30 * 60 * 50;
+    public StrategyReInitMax = 60 * 60 * 50;
+
     public SettlementEnhanceMinCooldown = 2 * 60 * 50;
     public SettlementEnhanceMaxCooldown = 9 * 60 * 50;
     

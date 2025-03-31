@@ -53,11 +53,14 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
     public CheckForUnderAttack = true;
 
     private globalStrategy: SettlementGlobalStrategy = new SettlementGlobalStrategy();
+    private globalStrategyReInitTick: number;
     
     constructor (parent: MaraSettlementController) {
         super(parent);
         this.updateEnemiesList();
-        this.globalStrategy.Init(this.settlementController);
+
+        this.globalStrategyReInitTick = -Infinity;
+        this.reinitGlobalStrategy(0); //global strategy must be inited on the first tick
     }
 
     public get GlobalStrategy(): SettlementGlobalStrategy {
@@ -489,6 +492,7 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
     protected doRoutines(tickNumber: number): void {
         if (tickNumber % 50 == 0) {
             this.updateEnemiesList();
+            this.reinitGlobalStrategy(tickNumber);
 
             if (this.CheckForUnderAttack && this.IsUnderAttack()) {
                 let defendTask = new DefendTask(this.settlementController, this);
@@ -576,6 +580,21 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         let selectResult = MaraUtils.NonUniformRandomSelect(this.settlementController.MasterMind, taskCandidates);
 
         return selectResult ? selectResult.Task : null;
+    }
+
+    private reinitGlobalStrategy(tickNumber: number) {
+        if (tickNumber > this.globalStrategyReInitTick) {
+            this.Debug(`Global strategy use timeout`);
+            
+            this.globalStrategy = new SettlementGlobalStrategy();
+            this.globalStrategy.Init(this.settlementController);
+            
+            this.globalStrategyReInitTick = tickNumber + MaraUtils.Random(
+                this.settlementController.MasterMind,
+                this.settlementController.Settings.Timeouts.StrategyReInitMax,
+                this.settlementController.Settings.Timeouts.StrategyReInitMin
+            );
+        }
     }
 
     private selectEnemy(): any { //but actually Settlement
