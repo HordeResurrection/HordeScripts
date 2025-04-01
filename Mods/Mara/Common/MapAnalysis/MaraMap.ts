@@ -299,6 +299,10 @@ export class MaraMap {
         return MaraMap.mapNodes.find((n) => n.Region.HasCell(cell));
     }
 
+    static GetAllNodes(nodeType: MaraMapNodeType): Array<MaraMapNode> {
+        return this.mapNodes.filter((n) => n.Type == nodeType);
+    }
+
     static ConnectMapNodesByBridge(nodesPath: Array<MaraMapNode>, bridgeConfigId: string, masterMind: any): Array<MaraRect> {
         return []; //TODO: temporarily disable bridge building, remove this
         

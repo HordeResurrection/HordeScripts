@@ -21,6 +21,7 @@ import { DefendTask } from "../SettlementSubcontrollerTasks/StrategySubcontrolle
 import { SubcontrollerRequestResult } from "../Common/SubcontrollerRequestResult";
 import { LandmarkCaptureTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/LandmarkCaptureTask/LandmarkCaptureTask";
 import { DefenceBuildTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/DefenceBuildTask/DefenceBuildTask";
+import { MaraMapNodeType } from "../Common/MapAnalysis/MaraMapNodeType";
 
 class PathSelectItem implements NonUniformRandomSelectItem {
     Weight: number;
@@ -538,6 +539,19 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
                 }
             }
 
+            let defenceableGates = this.getDefenceableGates();
+
+            for (let gate of defenceableGates) {
+                let guardStrength = this.getPointGuardStrength(
+                    gate,
+                    this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius / 2
+                );
+
+                if (guardStrength < this.settlementController.Settings.Combat.PointDefenseBatchStrength) {
+                    defenceBuildCandidates.push(gate);
+                }
+            }
+
             if (defenceBuildCandidates.length > 0) {
                 let point = MaraUtils.RandomSelect(this.settlementController.MasterMind, defenceBuildCandidates)!;
                 let defenceBuildTask = new DefenceBuildTask(point, this.settlementController, this);
@@ -580,6 +594,45 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         let selectResult = MaraUtils.NonUniformRandomSelect(this.settlementController.MasterMind, taskCandidates);
 
         return selectResult ? selectResult.Task : null;
+    }
+
+    private getDefenceableGates(): Array<MaraPoint> {
+        let settlementLocation = this.settlementController.GetSettlementLocation();
+
+        if (!settlementLocation) {
+            return [];
+        }
+
+        let gateCandidates = MaraMap.GetAllNodes(MaraMapNodeType.Gate);
+        gateCandidates = gateCandidates.filter(
+            (g) => g.Region.Cells.length >= this.settlementController.Settings.ControllerStates.DefendedGateMinSize
+        );
+        
+        let gateData: Array<any> = [];
+        
+        for (let candidate of gateCandidates) {
+            gateData.push({
+                distance: MaraUtils.ChebyshevDistance(candidate.Region.Center, settlementLocation.Center),
+                point: candidate.Region.Center
+            });
+        }
+
+        let maxDistance = 
+            Math.max(settlementLocation.BoundingRect.Heigth, settlementLocation.BoundingRect.Width) + 
+            this.settlementController.Settings.ControllerStates.DefendedGateMaxDistanceFromSettlement;
+
+        gateData = gateData.filter(
+            (g) => !settlementLocation.BoundingRect.IsPointInside(g.point) && g.distance <= maxDistance
+        );
+
+        gateData.sort((a, b) => a.distance - b.distance);
+        gateData = gateData.splice(0, this.settlementController.Settings.ControllerStates.DefendedGatesCount);
+
+        gateData = gateData.filter(
+            (g) => this.GetEnemiesAroundPoint(g.point, this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius).length == 0
+        );
+
+        return gateData.map((g) => g.point);
     }
 
     private reinitGlobalStrategy(tickNumber: number) {
@@ -767,10 +820,10 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         return unitComposition;
     }
 
-    private getPointGuardStrength(point: MaraPoint): number {
+    private getPointGuardStrength(point: MaraPoint, radius?: number): number {
         let expandGuardUnits = MaraUtils.GetSettlementUnitsAroundPoint(
             point, 
-            this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius,
+            radius ?? this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius,
             [this.settlementController.Settlement],
             (unit) => {return MaraUtils.IsCombatConfigId(unit.UnitCfgId) && MaraUtils.IsBuildingConfigId(unit.UnitCfgId)}
         );
