@@ -663,13 +663,23 @@ export class MaraUtils {
         let config = MaraUtils.GetUnitConfig(cfgId);
     
         MaraUtils.getChain(config, settlement, chain, MaraUtils.productionGetter);
-    
+
         if (chain.size == 0) {
             return [];
         }
-    
-        MaraUtils.getChain(config, settlement, chain, MaraUtils.techGetter);
-    
+
+        let techChain = new Map<string, any>();
+
+        MaraUtils.getChain(config, settlement, techChain, MaraUtils.techGetter);
+
+        chain.forEach(
+            (value) => MaraUtils.getChain(value, settlement, techChain, MaraUtils.techGetter)
+        );
+
+        techChain.forEach(
+            (value, key) => chain.set(key, value)
+        );
+
         return Array.from(chain.values());
     }
     //#endregion
