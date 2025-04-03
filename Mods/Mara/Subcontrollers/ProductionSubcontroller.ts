@@ -272,6 +272,21 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         return allProduceableCfgIds.findIndex((c) => c == cfgId) >= 0;
     }
 
+    SelectConfigIdToProduce(configIds: Array<string>): string | null {
+        let economy = this.settlementController.GetCurrentDevelopedEconomyComposition();
+        let allowedItems = MaraUtils.MakeAllowedCfgItems(configIds, economy, this.settlementController.Settlement);
+        
+        let allowedCfgIds: Array<string> = [];
+
+        for (let item of allowedItems) {
+            if (item.MaxCount > 0) {
+                allowedCfgIds.push(item.UnitConfigId);
+            }
+        }
+        
+        return MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, allowedCfgIds);
+    }
+
     private finalizeProductionRequest(request: MaraProductionRequest): void {
         if (request.Executor) {
             this.settlementController.ReservedUnitsData.FreeUnit(request.Executor);

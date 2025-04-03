@@ -16,6 +16,7 @@ import { UnitComposition } from "../Common/UnitComposition";
 import { SubcontrollerRequestResult } from "../Common/SubcontrollerRequestResult";
 import { MaraPriority } from "../Common/MaraPriority";
 import { ProduceHarvestersTask } from "../SettlementSubcontrollerTasks/MiningSubcontroller/ProduceHarvestersTask/ProduceHarvestersTask";
+import { ExpandUpgradeTask } from "../SettlementSubcontrollerTasks/MiningSubcontroller/ExpandUpgradeTask/ExpandUpgradeTask";
 
 class MineData {
     public Mine: MaraUnitCacheItem | null = null;
@@ -224,19 +225,17 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
     }
 
     protected makeSelfTask(): SettlementSubcontrollerTask | null {
-        let expandBuildTask = this.makeExpandBuildTask();
+        let task: SettlementSubcontrollerTask | null = this.makeExpandBuildTask();
 
-        if (expandBuildTask) {
-            return expandBuildTask;
+        if (!task) {
+            task = this.makeProduceHarvestersTask();
         }
 
-        let produceHarvestersTask = this.makeProduceHarvestersTask();
-
-        if (produceHarvestersTask) {
-            return produceHarvestersTask;
+        if (!task) {
+            task = this.makeExpandUpgradeTask();
         }
 
-        return null;
+        return task;
     }
 
     private makeExpandBuildTask(): ExpandBuildTask | null {
@@ -287,6 +286,76 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             let task = new ProduceHarvestersTask(MaraPriority.Low, requiredHarvesterCount, harvesterCfgId, this.settlementController, this);
 
             return task;
+        }
+        else {
+            return null;
+        }
+    }
+
+    private makeExpandUpgradeTask(): ExpandUpgradeTask | null {
+        this.cleanup();
+
+        let mines = this.mines;
+        
+        let settlementLocation = this.settlementController.GetSettlementLocation();
+
+        mines = mines.filter(
+            (m) => 
+                m.Mine &&
+                settlementLocation ? !settlementLocation.BoundingRect.IsPointInside(m.Mine.UnitRect.Center) : true
+        );
+
+        let candidates: Array<MineData> = [];
+
+        for (let mine of mines) {
+            let metalStocks = MaraUtils.GetSettlementUnitsAroundPoint(
+                mine.Mine!.UnitRect.Center, 
+                this.settlementController.Settings.ResourceMining.MiningRadius,
+                [this.settlementController.Settlement],
+                (unit) => {return MaraUtils.IsMetalStockConfigId(unit.UnitCfgId) && unit.UnitIsAlive}
+            );
+
+            if (metalStocks.length == 0) {
+                candidates.push(mine);
+            }
+        }
+
+        if (candidates.length == 0) {
+            return null;
+        }
+
+        let allMetalStockConfigIds = MaraUtils.GetAllMetalStockConfigIds(this.settlementController.Settlement);
+        let metalStockConfigId = this.settlementController.ProductionController.SelectConfigIdToProduce(allMetalStockConfigIds);
+
+        if (!metalStockConfigId) {
+            return null;
+        }
+
+        let metalStockConfig = MaraUtils.GetUnitConfig(metalStockConfigId);
+        let cost = metalStockConfig.CostResources;
+
+        let normalizedMetalStockCost = cost.Gold + cost.Metal;
+
+        candidates = candidates.filter(
+            (c) => {
+                let resourcesLeft = this.getMineResources(c.Mine!);
+                let normalizedResourcesLeft = resourcesLeft.Gold + resourcesLeft.Metal;
+
+                return normalizedResourcesLeft > normalizedMetalStockCost;
+            }
+        );
+
+        if (candidates.length > 0) {
+            let mineData = MaraUtils.RandomSelect(this.settlementController.MasterMind, candidates);
+            this.Debug(`Mine ${mineData!.Mine!.Unit.ToString()} is too far away from metal stock, building a closer one`);
+
+            return new ExpandUpgradeTask(
+                MaraPriority.Background, 
+                metalStockConfigId, 
+                mineData!.Mine!.UnitRect.Center, 
+                this.settlementController, 
+                this
+            );
         }
         else {
             return null;

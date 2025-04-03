@@ -144,20 +144,7 @@ export class ExpandBuildState extends ProductionTaskState {
         }
     }
 
-    private selectConfigId(configIds: Array<string>): string | null {
-        let economy = this.settlementController.GetCurrentDevelopedEconomyComposition();
-        let allowedItems = MaraUtils.MakeAllowedCfgItems(configIds, economy, this.settlementController.Settlement);
-        
-        let allowedCfgIds: Array<string> = [];
 
-        for (let item of allowedItems) {
-            if (item.MaxCount > 0) {
-                allowedCfgIds.push(item.UnitConfigId);
-            }
-        }
-        
-        return MaraUtils.RandomSelect<string>(this.settlementController.MasterMind, allowedCfgIds);
-    }
 
     private orderMineProduction(cluster: MaraResourceCluster, resourceType: MaraResourceType): Array<MaraProductionRequest> {
         if (this.minedMinerals.has(resourceType)) {
@@ -166,7 +153,7 @@ export class ExpandBuildState extends ProductionTaskState {
         }
         
         let mineConfigs = MaraUtils.GetAllMineConfigIds(this.settlementController.Settlement);
-        let cfgId = this.selectConfigId(mineConfigs);
+        let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(mineConfigs);
 
         if (cfgId == null) {
             this.settlementController.Debug(`Unable to order mine production: no mine config available`);
@@ -203,7 +190,7 @@ export class ExpandBuildState extends ProductionTaskState {
         }
 
         let harvesterConfigs = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
-        cfgId = this.selectConfigId(harvesterConfigs);
+        cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(harvesterConfigs);
 
         if (cfgId == null) {
             this.settlementController.Debug(`Unable to order mine production: no harvester config available`);
@@ -237,7 +224,7 @@ export class ExpandBuildState extends ProductionTaskState {
 
         if (metalStocks.length == 0) {
             let metalStockConfigs = MaraUtils.GetAllMetalStockConfigIds(this.settlementController.Settlement);
-            let cfgId = this.selectConfigId(metalStockConfigs);
+            let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(metalStockConfigs);
 
             if (cfgId == null) {
                 this.settlementController.Debug(`Unable to order mining production: no metal stock config available`);
@@ -268,7 +255,7 @@ export class ExpandBuildState extends ProductionTaskState {
 
         if (!isSawmillPresent) {
             let sawmillConfigs = MaraUtils.GetAllSawmillConfigIds(this.settlementController.Settlement);
-            let cfgId = this.selectConfigId(sawmillConfigs);
+            let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(sawmillConfigs);
 
             if (cfgId == null) {
                 this.settlementController.Debug(`Unable to order woodcutting production: no sawmill config available`);
@@ -279,7 +266,7 @@ export class ExpandBuildState extends ProductionTaskState {
         }
 
         let harvesterConfigs = MaraUtils.GetAllHarvesterConfigIds(this.settlementController.Settlement);
-        let cfgId = this.selectConfigId(harvesterConfigs);
+        let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(harvesterConfigs);
 
         if (cfgId == null) {
             this.settlementController.Debug(`Unable to order woodcutting production: no harvester config available`);
@@ -295,7 +282,7 @@ export class ExpandBuildState extends ProductionTaskState {
         let result = new Array<MaraProductionRequest>();
         
         let housingConfigs = MaraUtils.GetAllHousingConfigIds(this.settlementController.Settlement);
-        let cfgId = this.selectConfigId(housingConfigs);
+        let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(housingConfigs);
         
         if (cfgId == null) {
             this.settlementController.Debug(`Unable to order housing production: no housing config available`);
