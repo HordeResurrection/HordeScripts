@@ -350,7 +350,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             this.Debug(`Mine ${mineData!.Mine!.Unit.ToString()} is too far away from metal stock, building a closer one`);
 
             return new ExpandUpgradeTask(
-                MaraPriority.Background, 
+                MaraPriority.Low, 
                 metalStockConfigId, 
                 mineData!.Mine!.UnitRect.Center, 
                 this.settlementController, 
