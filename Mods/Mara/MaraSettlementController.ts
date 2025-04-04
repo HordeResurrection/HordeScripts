@@ -257,7 +257,7 @@ export class MaraSettlementController {
             let squads = MaraUtils.GetSettlementsSquadsFromUnits(
                 [productionBuildingCache], 
                 [this.Settlement], 
-                (unit) => {return MaraUtils.IsBuildingConfigId(unit.UnitCfgId)},
+                (unit) => {return MaraUtils.IsBuildingConfigId(unit.UnitCfgId) && !MaraUtils.IsCombatConfigId(unit.UnitCfgId)},
                 this.Settings.UnitSearch.BuildingSearchRadius
             );
             
