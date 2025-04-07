@@ -73,16 +73,26 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
         
         for (let item of unavailableCfgIdItems) {
             let unavailableChain: Array<string> = [];
+            let atLeastOneItemProduceable = false;
             
             for (let cfgId of item.ProductionChain) {
                 if (!economyComposition.has(cfgId)) {
                     unavailableChain.push(cfgId);
+
+                    let index = produceableCfgIds.findIndex((v) => v == cfgId);
+
+                    if (index >= 0) {
+                        atLeastOneItemProduceable = true;
+                    }
                 }
             }
 
             if (
-                !shortestUnavailableChain || 
-                unavailableChain.length < shortestUnavailableChain.length
+                atLeastOneItemProduceable && 
+                (
+                    !shortestUnavailableChain || 
+                    unavailableChain.length < shortestUnavailableChain.length
+                )    
             ) {
                 shortestUnavailableChain = unavailableChain;
             }
