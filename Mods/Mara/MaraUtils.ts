@@ -632,11 +632,11 @@ export class MaraUtils {
     //#endregion
     
     //#region Tech Chain
-    private static techGetter(cfg: any, settlement: any): any {
+    private static getTechChain(cfg: any, settlement: any): any {
         return settlement.TechTree.GetUnmetRequirements(cfg);
     }
     
-    private static productionGetter(cfg: any, settlement: any): any {
+    private static getProductionChain(cfg: any, settlement: any): any {
         let listType = xHost.type('System.Collections.Generic.List');
         let configType = UnitConfig;
         let list = host.newObj(listType(configType), 0);
@@ -646,41 +646,48 @@ export class MaraUtils {
         return list;
     }
     
-    private static getChain(cfg: any, settlement: any, chain: Map<string, any>, nextLevelGetter: (cfg: any, settlement: any) => Array<any>): void {
-        let nextLevel = nextLevelGetter(cfg, settlement);
-    
-        ForEach(nextLevel, (item) => {
-                if (!chain.has(item.Uid)) {
-                    chain.set(item.Uid, item);
-                    MaraUtils.getChain(item, settlement, chain, nextLevelGetter);
-                }
-            }
-        );
-    }
-    
     public static GetCfgIdProductionChain(cfgId: string, settlement: any): Array<any> {
-        let chain = new Map<string, any>();
         let config = MaraUtils.GetUnitConfig(cfgId);
-    
-        MaraUtils.getChain(config, settlement, chain, MaraUtils.productionGetter);
 
-        if (chain.size == 0) {
-            return [];
+        let chain = new Map<string, any>();
+        let nextLevel = [config];
+
+        do {
+            let currentLevel = nextLevel;
+            nextLevel = [];
+
+            for (let config of currentLevel) {
+                let techItems = MaraUtils.getTechChain(config, settlement);
+
+                ForEach(
+                    techItems, 
+                    (item) => {
+                        if (!chain.has(item.Uid)) {
+                            chain.set(item.Uid, item);
+                            nextLevel.push(item);
+                        }
+                    }
+                );
+
+                let productionItems = MaraUtils.getProductionChain(config, settlement);
+
+                ForEach(
+                    productionItems, 
+                    (item) => {
+                        if (!chain.has(item.Uid)) {
+                            chain.set(item.Uid, item);
+                            nextLevel.push(item);
+                        }
+                    }
+                );
+            }
         }
+        while (nextLevel.length > 0);
 
-        let techChain = new Map<string, any>();
+        let result = Array.from(chain.values());
+        result = result.filter((v) => v.Uid != cfgId);
 
-        MaraUtils.getChain(config, settlement, techChain, MaraUtils.techGetter);
-
-        chain.forEach(
-            (value) => MaraUtils.getChain(value, settlement, techChain, MaraUtils.techGetter)
-        );
-
-        techChain.forEach(
-            (value, key) => chain.set(key, value)
-        );
-
-        return Array.from(chain.values());
+        return result;
     }
     //#endregion
     
