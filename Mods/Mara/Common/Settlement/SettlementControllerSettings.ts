@@ -23,8 +23,8 @@ class TimeoutsSettings {
     public ExpandBuild: number = 1.5 * 60 * 50;
     public ExpandPrepare: number = 5 * 60 * 50;
 
-    public StrategyActionSuccessMinCooldown = 15 * 50;
-    public StrategyActionSuccessMaxCooldown = 40 * 50;
+    public StrategyActionSuccessMinCooldown = 5 * 50;
+    public StrategyActionSuccessMaxCooldown = 20 * 50;
 
     public StrategyActionReattemptMinCooldown = 20 * 50;
     public StrategyActionReattemptMaxCooldown = 40 * 50;

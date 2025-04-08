@@ -45,7 +45,7 @@ export class BuildUpState extends ProductionTaskState {
         armyToProduce.forEach(
             (value, key) => {
                 for (let i = 0; i < value; i++) {
-                    result.push(this.makeProductionRequest(key, null, null, false, MaraPriority.Low));
+                    result.push(this.makeProductionRequest(key, null, null, false, MaraPriority.Normal));
                 }
             }
         );

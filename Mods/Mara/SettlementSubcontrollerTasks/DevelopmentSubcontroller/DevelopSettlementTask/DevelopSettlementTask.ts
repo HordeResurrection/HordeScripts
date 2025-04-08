@@ -21,7 +21,7 @@ export class DevelopSettlementTask extends SettlementSubcontrollerTask {
         settlementController: MaraSettlementController,
         logger: MaraLogger
     ) {
-        super(MaraPriority.Low, settlementController, logger);
+        super(MaraPriority.Normal, settlementController, logger);
         
         let state = new ProduceSettlementEnhancementsState(this, this.SettlementController, cfgIds);
         this.SetState(state);
