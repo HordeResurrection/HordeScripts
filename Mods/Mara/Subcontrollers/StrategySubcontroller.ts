@@ -539,16 +539,18 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
                 }
             }
 
-            let defenceableGates = this.getDefenceableGates();
+            if (defenceBuildCandidates.length == 0) {
+                let defenceableGates = this.getDefenceableGates();
 
-            for (let gate of defenceableGates) {
-                let guardStrength = this.getPointGuardStrength(
-                    gate,
-                    this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius / 2
-                );
+                for (let gate of defenceableGates) {
+                    let guardStrength = this.getPointGuardStrength(
+                        gate,
+                        this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius / 2
+                    );
 
-                if (guardStrength < this.settlementController.Settings.Combat.PointDefenseBatchStrength) {
-                    defenceBuildCandidates.push(gate);
+                    if (guardStrength < this.settlementController.Settings.Combat.PointDefenseBatchStrength) {
+                        defenceBuildCandidates.push(gate);
+                    }
                 }
             }
 
