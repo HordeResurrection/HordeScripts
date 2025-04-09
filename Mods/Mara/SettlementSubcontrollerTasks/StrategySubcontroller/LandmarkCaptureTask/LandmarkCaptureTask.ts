@@ -1,7 +1,6 @@
 import { FsmState } from "../../../Common/FiniteStateMachine/FsmState";
 import { MaraLogger } from "../../../Common/MaraLogger";
 import { MaraPoint } from "../../../Common/MaraPoint";
-import { MaraPriority } from "../../../Common/MaraPriority";
 import { MaraSettlementController } from "../../../MaraSettlementController";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 import { LandmarkCapturePrepareState } from "./LandmarkCapturePrepareState";
@@ -22,7 +21,7 @@ export class LandmarkCaptureTask extends SettlementSubcontrollerTask {
         settlementController: MaraSettlementController,
         logger: MaraLogger
     ) {
-        super(MaraPriority.Normal, settlementController, logger);
+        super(settlementController.Settings.Priorities.LandmarkCapture, settlementController, logger);
         
         let state = new LandmarkCapturePrepareState(point, this, this.SettlementController);
         this.SetState(state);

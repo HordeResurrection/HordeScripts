@@ -1,5 +1,3 @@
-
-import { MaraPriority } from "../../../Common/MaraPriority";
 import { MaraProductionRequest } from "../../../Common/MaraProductionRequest";
 import { MaraSettlementController } from "../../../MaraSettlementController";
 import { ConstantProductionState } from "../../ConstantProductionState";
@@ -42,7 +40,7 @@ export class DefendingState extends ConstantProductionState {
         let result: Array<MaraProductionRequest> = []
 
         for (let cfgId of this.reinforcementsCfgIds) {
-            let chain = this.settlementController.ProductionController.ForceRequestSingleCfgIdProduction(cfgId, MaraPriority.Absolute);
+            let chain = this.settlementController.ProductionController.ForceRequestSingleCfgIdProduction(cfgId, this.settlementController.Settings.Priorities.DefenceUnitsProduction);
             result.push(...chain);
         }
         

@@ -1,3 +1,4 @@
+import { MaraPriority } from "../MaraPriority";
 
 export class MaraSettlementControllerSettings {
     public UnitSearch: UnitSearchSettings = new UnitSearchSettings();
@@ -6,6 +7,7 @@ export class MaraSettlementControllerSettings {
     public ControllerStates: ControllerStatesSettings = new ControllerStatesSettings();
     public ResourceMining: ResourceMiningSettings = new ResourceMiningSettings();
     public Combat: CombatSettings = new CombatSettings();
+    public Priorities: Priorities = new Priorities();
 }
 
 class UnitSearchSettings {
@@ -36,6 +38,27 @@ class TimeoutsSettings {
     public SettlementEnhanceMaxCooldown = 9 * 60 * 50;
     
     public UnfinishedConstructionThreshold: number = 2 * 60 * 50;
+}
+
+class Priorities {
+    // Tasks
+    public SettlementDevelopment: MaraPriority = MaraPriority.Normal;
+    public Attack: MaraPriority = MaraPriority.Normal;
+    public ExpandBuildOnDemand: MaraPriority = MaraPriority.Major;
+    public ExpandBuildOnIdle: MaraPriority = MaraPriority.Normal;
+    public SettlementDefence: MaraPriority = MaraPriority.Absolute;
+    public DefenceBuild: MaraPriority = MaraPriority.Normal;
+    public ProduceAdditionalHarvesters: MaraPriority = MaraPriority.Low;
+    public ExpandUpgrade: MaraPriority = MaraPriority.Low;
+    public LandmarkCapture: MaraPriority = MaraPriority.Normal;
+
+    // Production Requests
+    public HarvesterProduction: MaraPriority = MaraPriority.Normal;
+    public AttackUnitsProduction: MaraPriority = MaraPriority.Normal;
+    public DefenceUnitsProduction: MaraPriority = MaraPriority.Absolute;
+    public LandmarkCaptureUnitsProduction: MaraPriority = MaraPriority.Low;
+    public ReinforcementUnitsProduction: MaraPriority = MaraPriority.Background;
+    public PointGuardProduction: MaraPriority = MaraPriority.Low;
 }
 
 class SquadsSettings {

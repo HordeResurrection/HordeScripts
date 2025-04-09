@@ -1,5 +1,4 @@
 import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
-import { MaraPriority } from "../../../Common/MaraPriority";
 import { MaraProductionRequest } from "../../../Common/MaraProductionRequest";
 import { MaraSettlementController } from "../../../MaraSettlementController";
 import { ConstantProductionState } from "../../ConstantProductionState";
@@ -69,7 +68,7 @@ export class ExterminatingState extends ConstantProductionState {
         let result: Array<MaraProductionRequest> = [];
         
         for (let cfgId of this.reinforcementsCfgIds) {
-            let request = this.settlementController.ProductionController.RequestSingleCfgIdProduction(cfgId, MaraPriority.Background);
+            let request = this.settlementController.ProductionController.RequestSingleCfgIdProduction(cfgId, this.settlementController.Settings.Priorities.ReinforcementUnitsProduction);
 
             if (request) {
                 result.push(request);

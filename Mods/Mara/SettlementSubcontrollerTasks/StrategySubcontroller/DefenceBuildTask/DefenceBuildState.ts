@@ -3,7 +3,6 @@ import { MaraSettlementController } from "../../../MaraSettlementController";
 import { MaraUtils } from "../../../MaraUtils";
 import { ProductionTaskState } from "../../ProductionTaskState";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
-import { MaraPriority } from "../../../Common/MaraPriority";
 import { MaraPoint } from "../../../Common/MaraPoint";
 
 export class DefenceBuildState extends ProductionTaskState {
@@ -43,7 +42,7 @@ export class DefenceBuildState extends ProductionTaskState {
         armyToProduce.forEach(
             (value, key) => {
                 for (let i = 0; i < value; i++) {
-                    result.push(this.makeProductionRequest(key, this.point, null, false, MaraPriority.Low));
+                    result.push(this.makeProductionRequest(key, this.point, null, false, this.settlementController.Settings.Priorities.DefenceUnitsProduction));
                 }
             }
         );

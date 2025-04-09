@@ -5,7 +5,6 @@ import { MaraSettlementController } from "../../../MaraSettlementController";
 import { ProductionTaskState } from "../../ProductionTaskState";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 import { LandmarkCaptureState } from "./LandmarkCaptureState";
-import { MaraPriority } from "../../../Common/MaraPriority";
 import { MaraPoint } from "../../../Common/MaraPoint";
 
 export class LandmarkCapturePrepareState extends ProductionTaskState {
@@ -48,7 +47,7 @@ export class LandmarkCapturePrepareState extends ProductionTaskState {
         armyToProduce.forEach(
             (value, key) => {
                 for (let i = 0; i < value; i++) {
-                    result.push(this.makeProductionRequest(key, null, null, false, MaraPriority.Low));
+                    result.push(this.makeProductionRequest(key, null, null, false, this.settlementController.Settings.Priorities.LandmarkCaptureUnitsProduction));
                 }
             }
         );

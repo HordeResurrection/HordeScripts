@@ -6,7 +6,6 @@ import { MaraUtils } from "../../../MaraUtils";
 import { ProductionTaskState } from "../../ProductionTaskState";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 import { ExterminatingState } from "./ExterminatingState";
-import { MaraPriority } from "../../../Common/MaraPriority";
 
 export class BuildUpState extends ProductionTaskState {
     private enemy: any;
@@ -45,7 +44,7 @@ export class BuildUpState extends ProductionTaskState {
         armyToProduce.forEach(
             (value, key) => {
                 for (let i = 0; i < value; i++) {
-                    result.push(this.makeProductionRequest(key, null, null, false, MaraPriority.Normal));
+                    result.push(this.makeProductionRequest(key, null, null, false, this.settlementController.Settings.Priorities.AttackUnitsProduction));
                 }
             }
         );

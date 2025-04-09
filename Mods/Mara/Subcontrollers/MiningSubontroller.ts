@@ -14,7 +14,6 @@ import { TargetExpandData } from "../Common/Settlement/TargetExpandData";
 import { ExpandBuildTask } from "../SettlementSubcontrollerTasks/MiningSubcontroller/ExpandBuildTask/ExpandBuildTask";
 import { UnitComposition } from "../Common/UnitComposition";
 import { SubcontrollerRequestResult } from "../Common/SubcontrollerRequestResult";
-import { MaraPriority } from "../Common/MaraPriority";
 import { ProduceHarvestersTask } from "../SettlementSubcontrollerTasks/MiningSubcontroller/ProduceHarvestersTask/ProduceHarvestersTask";
 import { ExpandUpgradeTask } from "../SettlementSubcontrollerTasks/MiningSubcontroller/ExpandUpgradeTask/ExpandUpgradeTask";
 
@@ -193,7 +192,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             insufficientResources.People > 0
         ) {
             let targetExpand = this.fillExpandData(insufficientResources);
-            let task = new ExpandBuildTask(MaraPriority.Major, this.settlementController, targetExpand, this);
+            let task = new ExpandBuildTask(this.settlementController.Settings.Priorities.ExpandBuildOnDemand, this.settlementController, targetExpand, this);
 
             result.IsSuccess = false;
             result.Task = task;
@@ -252,7 +251,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             this.Debug(`Proceeding to expand...`);
             let targetExpand = this.fillExpandData(expandData.ResourcesToMine);
             
-            return new ExpandBuildTask(MaraPriority.Normal, this.settlementController, targetExpand, this);
+            return new ExpandBuildTask(this.settlementController.Settings.Priorities.ExpandBuildOnIdle, this.settlementController, targetExpand, this);
         }
         else {
             return null;
@@ -283,7 +282,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             this.Debug(`Required ${requiredHarvesterCount} harvesters, proceeding to produce`);
             
             let harvesterCfgId = MaraUtils.RandomSelect(this.settlementController.MasterMind, harvesterCfgIds)!;
-            let task = new ProduceHarvestersTask(MaraPriority.Low, requiredHarvesterCount, harvesterCfgId, this.settlementController, this);
+            let task = new ProduceHarvestersTask(this.settlementController.Settings.Priorities.ProduceAdditionalHarvesters, requiredHarvesterCount, harvesterCfgId, this.settlementController, this);
 
             return task;
         }
@@ -350,7 +349,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             this.Debug(`Mine ${mineData!.Mine!.Unit.ToString()} is too far away from metal stock, building a closer one`);
 
             return new ExpandUpgradeTask(
-                MaraPriority.Low, 
+                this.settlementController.Settings.Priorities.ExpandUpgrade, 
                 metalStockConfigId, 
                 mineData!.Mine!.UnitRect.Center, 
                 this.settlementController, 
