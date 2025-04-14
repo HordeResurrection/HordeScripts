@@ -1,10 +1,10 @@
 import HordePluginBase from "./base-plugin";
-import { BattleController, WorldGlobals } from "library/game-logic/horde-types";
+import { BattleController, Scena, VisualEffectConfig, VisualEffectFogOfWarMode, WorldConstants } from "library/game-logic/horde-types";
 import * as primitives from "library/common/primitives";
 import * as decorations from "library/game-logic/decoration-spawn";
 
+type AttentionReceivedEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.AttentionReceivedEventArgs;
 
-const VisualEffectFogOfWarMode = HCL.HordeClassLibrary.World.Objects.VisualEffects.VisualEffectFogOfWarMode;
 
 /**
  * Плагин, который создаёт декорацию-метку в том месте на карте, где был зафиксирован Attention-клик (alt-клик)
@@ -37,11 +37,8 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
             this.globalStorage.attentionClickHandler.disconnect();
         }
 
-        let AllUIModules = ScriptUtils.GetTypeByName("HordeResurrection.Game.UI.AllUIModules, HordeResurrection.Game");
-        let MouseScript = ScriptUtils.GetValue(AllUIModules, 'MouseScript');
-
         let that = this;
-        let handler = MouseScript.AttentionClick.connect((sender, args) => that._attentionHandler(sender, args));
+        let handler = BattleController.AttentionSent.connect((sender, args) => that._attentionHandler(sender, args!));
         this.globalStorage.attentionClickHandler = handler;
     }
 
@@ -53,16 +50,13 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
             this.globalStorage.attentionReceivedHandler.disconnect();
         }
 
-        let AllUIModules = ScriptUtils.GetTypeByName("HordeResurrection.Game.UI.AllUIModules, HordeResurrection.Game");
-        let BattleUI = ScriptUtils.GetValue(AllUIModules, 'BattleUI');
-
         let that = this;
-        let handler = BattleUI.AttentionReceived.connect((sender, args) => that._attentionHandler(sender, args));
+        let handler = BattleController.AttentionReceived.connect((sender, args) => that._attentionHandler(sender, args!));
         this.globalStorage.attentionReceivedHandler = handler;
     }
 
 
-    private _attentionHandler(sender, args) {
+    private _attentionHandler(sender: any, args: AttentionReceivedEventArgs) {
         try {
             let info: AttentionClickInfo = {
                 tick: BattleController.GameTimer.GameFramesCounter,
@@ -79,8 +73,8 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
 
     private _createDecoration(attentionInfo: AttentionClickInfo) {
         let position = primitives.createPoint(
-            attentionInfo.cell.X * WorldGlobals.CellSize + WorldGlobals.HalfCellSize,
-            attentionInfo.cell.Y * WorldGlobals.CellSize + WorldGlobals.HalfCellSize);
+            attentionInfo.cell.X * WorldConstants.CellSize + WorldConstants.HalfCellSize,
+            attentionInfo.cell.Y * WorldConstants.CellSize + WorldConstants.HalfCellSize);
 
         let decoration = decorations.spawnDecoration(this.realScena, this.smokeDecorationCfg, position);
         decoration.TintColor = attentionInfo.player.GetRealSettlement().SettlementColor;

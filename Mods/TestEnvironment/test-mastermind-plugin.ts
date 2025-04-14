@@ -1,3 +1,5 @@
+import { Settlement, UnitConfig } from "library/game-logic/horde-types";
+import { MasterMind, ProductionDepartment } from "library/mastermind/mastermind-types";
 import HordePluginBase from "plugins/base-plugin";
 
 
@@ -8,8 +10,8 @@ export class TestMastermindPlugin extends HordePluginBase {
     startTick: number;
     isEnabled: boolean = true;
 
-    productionDepartament: any;
-    settlement: any;
+    productionDepartament: ProductionDepartment;
+    settlement: Settlement;
     buildingsRequestedFlag: boolean = false;
 
     public constructor() {
@@ -83,11 +85,11 @@ export class TestMastermindPlugin extends HordePluginBase {
         this.log.info(`Created (${num}) buildings request for`, this.settlement);
     }
 
-    private _addRequest(uCfg) {
+    private _addRequest(uCfg: UnitConfig) {
         this.productionDepartament.AddRequestToProduce(uCfg, 1, null, false);
     }
     
-    private _activateMasterMind(masterMind): boolean {
+    private _activateMasterMind(masterMind: MasterMind): boolean {
         if (!masterMind) {
             this.log.info('Выбранный игрок не управляется MasterMind.');
             return false;

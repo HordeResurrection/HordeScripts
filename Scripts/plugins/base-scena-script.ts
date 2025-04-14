@@ -5,7 +5,7 @@ import HordePluginBase from "./base-plugin";
  * Базовый класс для скрипта сцены.
  */
 export default class ScenaScriptBase extends HordePluginBase {
-    
+
     // --- Fields -----------------------------------------------
 
     public scenaName: string;
@@ -35,13 +35,13 @@ export class SCENA_SCRIPT_TEMPLATE extends ScenaScriptBase {
      * Метод вызывается при загрузке сцены и после hot-reload.
      */
     public onFirstRun() {
-        
+
     }
 
     /**
      * Метод выполняется каждый игровой такт.
      */
     public onEveryTick(gameTickNum: number) {
-        
+
     }
 }

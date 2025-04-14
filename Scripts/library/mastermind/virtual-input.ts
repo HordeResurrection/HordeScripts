@@ -1,17 +1,30 @@
+import { Point2D } from "library/common/primitives";
 import { ListT } from "library/dotnet/dotnet-types";
+import { Player, UnitCommand } from "library/game-logic/horde-types";
 
-export const VirtualSelectUnitsMode = HordeEngine.HordeResurrection.Engine.Logic.Battle.InputSystem.Enums.VirtualSelectUnitsMode;
-export const AssignOrderMode = HCL.HordeClassLibrary.UnitComponents.OrdersSystem.AssignOrderMode;
-const UnitIdLabel = HCL.HordeClassLibrary.World.Objects.Units.UnitIdLabel;
+export const VirtualSelectUnitsMode = HordeResurrection.Engine.Logic.Battle.InputSystem.Enums.VirtualSelectUnitsMode;
+export type VirtualSelectUnitsMode = HordeResurrection.Engine.Logic.Battle.InputSystem.Enums.VirtualSelectUnitsMode;
+export const AssignOrderMode = HordeClassLibrary.UnitComponents.OrdersSystem.AssignOrderMode;
+export type AssignOrderMode = HordeClassLibrary.UnitComponents.OrdersSystem.AssignOrderMode;
+const UnitIdLabel = HordeClassLibrary.World.Objects.Units.UnitIdLabel;
+type UnitIdLabel = HordeClassLibrary.World.Objects.Units.UnitIdLabel;
 
-const AVirtualInputItem = HordeEngine.HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.AVirtualInputItem;
-const VirtualSelectUnits = HordeEngine.HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSelectUnits;
-const VirtualSelectUnitsById = HordeEngine.HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSelectUnitsById;
-const VirtualSmartMouseClick = HordeEngine.HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSmartMouseClick;
-const VirtualPointBasedCommand = HordeEngine.HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualPointBasedCommand;
-const VirtualOneClickCommand = HordeEngine.HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualOneClickCommand;
-const VirtualProduceBuildingCommand = HordeEngine.HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualProduceBuildingCommand;
-const VirtualProduceUnitCommand = HordeEngine.HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualProduceUnitCommand;
+const AVirtualInputItem = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.AVirtualInputItem;
+type AVirtualInputItem = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.AVirtualInputItem;
+const VirtualSelectUnits = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSelectUnits;
+type VirtualSelectUnits = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSelectUnits;
+const VirtualSelectUnitsById = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSelectUnitsById;
+type VirtualSelectUnitsById = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSelectUnitsById;
+const VirtualSmartMouseClick = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSmartMouseClick;
+type VirtualSmartMouseClick = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSmartMouseClick;
+const VirtualPointBasedCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualPointBasedCommand;
+type VirtualPointBasedCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualPointBasedCommand;
+const VirtualOneClickCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualOneClickCommand;
+type VirtualOneClickCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualOneClickCommand;
+const VirtualProduceBuildingCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualProduceBuildingCommand;
+type VirtualProduceBuildingCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualProduceBuildingCommand;
+const VirtualProduceUnitCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualProduceUnitCommand;
+type VirtualProduceUnitCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualProduceUnitCommand;
 
 
 export class PlayerVirtualInput {
@@ -19,94 +32,94 @@ export class PlayerVirtualInput {
 	inputsList: any;
 	private isEnabled: boolean;
 
-	public constructor(player) {
+	public constructor(player: Player) {
 		this.player = player;
 		this.isEnabled = this.player.IsLocal;
-		this.inputsList = host.newObj(ListT(AVirtualInputItem));;
+		this.inputsList = new ListT<AVirtualInputItem>(AVirtualInputItem);
 	}
 
-	public selectUnits(cellStart, cellEnd, selectMode = VirtualSelectUnitsMode.Select) {
+	public selectUnits(cellStart: Point2D, cellEnd: Point2D, selectMode = VirtualSelectUnitsMode.Select) {
 		if (!this.isEnabled)
 			return null;
-	
-		let vii = host.newObj(VirtualSelectUnits, this.player, selectMode, cellStart, cellEnd);
+
+		let vii = new VirtualSelectUnits(this.player, selectMode, cellStart, cellEnd);
 		this.inputsList.Add(vii);
 		return vii;
 	}
-	
-	public selectUnitsById(ids, selectMode = VirtualSelectUnitsMode.Select) {
+
+	public selectUnitsById(ids: number[], selectMode = VirtualSelectUnitsMode.Select) {
 		if (!this.isEnabled)
 			return null;
-	
-		let csIds = host.newArr(UnitIdLabel, ids.length);
-		for(let i = 0; i < ids.length; i++) {
-			csIds[i] = host.newObj(UnitIdLabel, ids[i], this.player.GetRealSettlement().Uid);
+
+		let csIds = host.newArr(UnitIdLabel, ids.length) as UnitIdLabel[];
+		for (let i = 0; i < ids.length; i++) {
+			csIds[i] = new UnitIdLabel(ids[i], this.player.GetRealSettlement().Uid);
 		}
-	
-		let vii = host.newObj(VirtualSelectUnitsById, this.player, selectMode, csIds);
+
+		let vii = new VirtualSelectUnitsById(this.player, selectMode, csIds);
 		this.inputsList.Add(vii);
 		return vii;
 	}
-	
-	public smartClick(cell, assignMode = AssignOrderMode.Replace) {
+
+	public smartClick(cell: Point2D, assignMode = AssignOrderMode.Replace) {
 		if (!this.isEnabled)
 			return null;
-	
-		let vii = host.newObj(VirtualSmartMouseClick, this.player, cell, assignMode);
+
+		let vii = new VirtualSmartMouseClick(this.player, cell, assignMode);
 		this.inputsList.Add(vii);
 		return vii;
 	}
-	
-	public pointBasedCommand(cell, cmd, assignMode = AssignOrderMode.Replace, ignoreUnits = false) {
+
+	public pointBasedCommand(cell: Point2D, cmd: UnitCommand, assignMode = AssignOrderMode.Replace, ignoreUnits = false) {
 		if (!this.isEnabled)
 			return null;
-	
-		let vii = host.newObj(VirtualPointBasedCommand, this.player, cell, cmd, assignMode);
+
+		let vii = new VirtualPointBasedCommand(this.player, cell, cmd, assignMode);
 		vii.IgnoreUnits = ignoreUnits;
 		this.inputsList.Add(vii);
 		return vii;
 	}
-	
-	public oneClickCommand(cmd, assignMode = AssignOrderMode.Replace) {
+
+	public oneClickCommand(cmd: UnitCommand, assignMode = AssignOrderMode.Replace) {
 		if (!this.isEnabled)
 			return null;
-	
-		let vii = host.newObj(VirtualOneClickCommand, this.player, cmd, assignMode);
+
+		let vii = new VirtualOneClickCommand(this.player, cmd, assignMode);
 		this.inputsList.Add(vii);
 		return vii;
 	}
-	
-	public produceBuildingCommand(productCfg, cellStart, cellEnd, assignMode = AssignOrderMode.Replace) {
+
+	public produceBuildingCommand(productCfgUid: string, cellStart: Point2D, cellEnd: Point2D | null, assignMode = AssignOrderMode.Replace) {
 		if (!this.isEnabled)
 			return null;
-	
-		let vii = host.newObj(VirtualProduceBuildingCommand, this.player);
+
+		let vii = new VirtualProduceBuildingCommand(this.player);
 		vii.CellStart = cellStart;
 		vii.CellEnd = cellEnd;
-		vii.ProductUnitConfigUid = productCfg;
+		vii.ProductUnitConfigUid = productCfgUid;
 		vii.AssignOrderMode = assignMode;
-		if (cellEnd) {vii.CompoundStopOnNumber = 100;}
+		if (cellEnd) { vii.CompoundStopOnNumber = 100; }
 		this.inputsList.Add(vii);
 		return vii;
 	}
-	
-	public produceUnitCommand(productCfg, count, assignMode= AssignOrderMode.Replace) {
+
+	public produceUnitCommand(productCfgUid: string, count: number, assignMode = AssignOrderMode.Replace) {
 		if (!this.isEnabled)
 			return null;
-	
-		let vii = host.newObj(VirtualProduceUnitCommand, this.player);
-		vii.ProductUnitConfigUid = productCfg;
+
+		let vii = new VirtualProduceUnitCommand(this.player);
+		vii.ProductUnitConfigUid = productCfgUid;
 		vii.Count = count;
 		vii.AssignOrderMode = assignMode;
 		this.inputsList.Add(vii);
 		return vii;
 	}
-	
+
 	public commit() {
 		if (this.inputsList.Count == 0)
 			return;
-		
-		ScriptUtils.Invoke(this.player.VirtualInput, "AddLocalInputs", this.inputsList);
+
+		this.player.VirtualInput.AddLocalScriptInputs(this.inputsList);
 		this.inputsList.Clear();
 	}
 }

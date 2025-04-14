@@ -1,6 +1,6 @@
 import { createPoint } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
-import { UnitState, StateMotion, UnitAnimState, AnimatorScriptTasks, WorldGlobals } from "library/game-logic/horde-types";
+import { UnitState, StateMotion, UnitAnimState, AnimatorScriptTasks, WorldConstants } from "library/game-logic/horde-types";
 import { setUnitStateWorker } from "library/game-logic/workers-tools";
 import HordePluginBase from "plugins/base-plugin";
 
@@ -103,8 +103,8 @@ export class BeammanPlugin extends HordePluginBase {
                                          hitBias.Y + u.Position.Y);
 
         // Дружественным воинам урон не наносим
-        let unitInCell = u.Scena.UnitsMap.GetUpperUnit(Math.floor(targetPosition.X / WorldGlobals.CellSize),
-                                                       Math.floor(targetPosition.Y / WorldGlobals.CellSize));
+        let unitInCell = u.Scena.UnitsMap.GetUpperUnit(Math.floor(targetPosition.X / WorldConstants.CellSize),
+                                                       Math.floor(targetPosition.Y / WorldConstants.CellSize));
         if (unitInCell != null && unitInCell.Owner.Diplomacy.IsAllianceStatus(u.Owner)) {
             // Исключение - здания и те, кого юнит атакует умышленно
             if (!unitInCell.Cfg.IsBuilding && unitInCell != motion.Target) {

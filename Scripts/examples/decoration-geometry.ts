@@ -1,14 +1,14 @@
 import { spawnGeometry } from "library/game-logic/decoration-spawn";
 import HordeExampleBase from "./base-example";
-import { createPoint } from "library/common/primitives";
+import { createPoint, Point2D } from "library/common/primitives";
 import { GeometryCanvas, GeometryVisualEffect, Stride_Color, Stride_Vector2, UnitHealthLevel } from "library/game-logic/horde-types";
 
 /**
  * Пример отбражения геометрии на поле боя.
  */
 export class Example_GeometryDecoration extends HordeExampleBase {
-    private geometryDecoration: any;
-    private center: any;
+    private geometryDecoration: GeometryVisualEffect | undefined;
+    private center: Point2D;
     private startTick: number;
 
     /**
@@ -16,6 +16,7 @@ export class Example_GeometryDecoration extends HordeExampleBase {
      */
     public constructor() {
         super("Geometry decoration");
+        this.startTick = DataStorage.gameTickNum;
 
         this.center = createPoint(500, 500);
     }
@@ -26,12 +27,10 @@ export class Example_GeometryDecoration extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
-        this.startTick = DataStorage.gameTickNum;
-
         // Удаляем предыдущую декорацию (если был hotreload)
         if (this.globalStorage.geometryDecoration)
             this.globalStorage.geometryDecoration.Free();
-        
+
         // Создаём буфер геометрии (данные для видеокарты)
         let geometryBuffer = this._makeGeometry();
 
@@ -46,7 +45,11 @@ export class Example_GeometryDecoration extends HordeExampleBase {
      * Метод выполняется каждый игровой такт.
      */
     public onEveryTick(gameTickNum: number) {
-        
+
+        if (!this.geometryDecoration) {
+            return;
+        }
+
         // Перемещение декорации.
         // Здесь код траектории по периметру треугольника
         const dist = 100;
@@ -73,7 +76,7 @@ export class Example_GeometryDecoration extends HordeExampleBase {
         // Пересоздание буфера геометрии с учетом течения времени - имитация движения
         let geometryBuffer = this._makeGeometry();
         this.geometryDecoration.GeometryBuffer = geometryBuffer;
-        
+
         // Внимание!
         // Пересоздание геометрии каждый такт может оказаться тяжелой операцией.
         // По возможности следует кешировать буфер геометрии.
@@ -106,7 +109,7 @@ export class Example_GeometryDecoration extends HordeExampleBase {
 
         // Можно использовать встроенные заготовки, но для них уже заранее заданы цвет, толщина линий и другие параметры.
         // (Таким же образом можно делать и свои заготовки)
-        const UnitInForestTemplates = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Game.Render.GeometryCanvas.UnitInForestTemplates", "HordeResurrection.Game"));
+        const UnitInForestTemplates = HordeResurrection.Game.Render.GeometryCanvas.UnitInForestTemplates;
         let inForestGeometryBuffer = UnitInForestTemplates.GetFigure(UnitHealthLevel.Good);
         for (let i = 0; i < N; i++) {
             position = this._getRadialPosition(i * 40, 10 + (t % 100 + i * 6) % 100);
@@ -114,9 +117,9 @@ export class Example_GeometryDecoration extends HordeExampleBase {
         }
 
         // Рисуем ломаную линию
-        let points = host.newArr(Stride_Vector2, N);
+        let points = host.newArr(Stride_Vector2, N) as Stride_Vector2[];
         for (let i = 0; i < N; i++) {
-            position = this._getRadialPosition((i+t/2) * 10, 120);
+            position = this._getRadialPosition((i + t / 2) * 10, 120);
             points[i] = position;
         }
         color = new Stride_Color(0x88, 0xf0, 0xf0);
@@ -133,7 +136,7 @@ export class Example_GeometryDecoration extends HordeExampleBase {
 
         // Рисуем окружность
         color = new Stride_Color(0x88, 0xf0, 0xf0);
-        position = points[N-1];
+        position = points[N - 1];
         radius = 5;
         geometryCanvas.DrawCircleFast(position, radius, color, thickness, antiAliased);
 

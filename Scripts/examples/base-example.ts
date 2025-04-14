@@ -43,6 +43,6 @@ export class Example_TEMPLATE extends HordeExampleBase {
      * Метод выполняется каждый игровой такт.
      */
     public onEveryTick(gameTickNum: number) {
-        
+
     }
 }

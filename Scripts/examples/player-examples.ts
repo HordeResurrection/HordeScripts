@@ -13,11 +13,11 @@ export class Example_PlayerWorks extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-            
+
         // Глобальная переменная "Players" - это массив с API для доступа к каждому игроку
         this.log.info('Количество игроков:', '"' + Players.length + '"');
 
-        for(let i in Players) {
+        for (let i in Players) {
             let player = Players[i];
 
             // Т.к. API ещё не разработано, ВРЕМЕННО прокинул реальный объект игрока
@@ -32,7 +32,7 @@ export class Example_PlayerWorks extends HordeExampleBase {
 
             // Объект для бота
             let realMasterMind = ScriptUtils.GetValue(realPlayer, "MasterMind");
-            if (realMasterMind){
+            if (realMasterMind) {
                 this.log.info(`  Характер:`, realMasterMind.Character.Description);
             } else {
                 this.log.info(`  Управляется игроком`);

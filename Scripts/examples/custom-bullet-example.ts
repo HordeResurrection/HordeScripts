@@ -1,5 +1,5 @@
 import HordeExampleBase from "./base-example";
-import { BulletState, ShotParams, UnitMapLayer, TilePayload } from "library/game-logic/horde-types"
+import { BulletState, ShotParams, UnitMapLayer, TilePayload, BaseBullet, BulletEmittingArgs, BulletConfig, SoundsCatalog, VisualEffectConfig } from "library/game-logic/horde-types"
 import { createPF, createPoint } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
 import { spawnDecoration, spawnSound } from "library/game-logic/decoration-spawn";
@@ -18,16 +18,22 @@ const WAVES_MAX = 5;
  * - EveryTick-обработчик - обрабатывает снаряд каждый такт.
  */
 export class Example_CustomBullet extends HordeExampleBase {
-    private smokeDecorationCfg: any;
-    private hitSoundCatalog: any;
-    private customBullCfg: any;
-    private shotParams: any;
+    private smokeDecorationCfg: VisualEffectConfig;
+    private hitSoundCatalog: SoundsCatalog;
+    private customBullCfg: BulletConfig;
+    private shotParams: ShotParams;
     private waveNum: number = 0;
 
     public constructor() {
         super("Custom bullet");
         this.smokeDecorationCfg = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_ArrowSmoke");
         this.hitSoundCatalog = HordeContentApi.GetSoundsCatalog("#SoundsCatalog_Hits_Mele_Axe");
+        
+        // Создаём конфиг снаряда
+        this.customBullCfg = createBulletConfig();
+        
+        // Создаём характеристики выстрела
+        this.shotParams = createShotParams();
     }
 
     /**
@@ -35,17 +41,12 @@ export class Example_CustomBullet extends HordeExampleBase {
      */
     public onFirstRun() {
         this.logMessageOnRun();
-        
-        // Создаём конфиг снаряда
-        this.customBullCfg = createBulletConfig();
+
         this.log.info('Конфиг снаряда для теста:', this.customBullCfg);
-        
+
         // Установка функций-обработчиков для созданного снаряда
         setBulletInitializeWorker(this, this.customBullCfg, this.initializeWorker);
         setBulletProcessWorker(this, this.customBullCfg, this.processWorker);
-        
-        // Создаём характеристики выстрела
-        this.shotParams = createShotParams();
     }
 
     /**
@@ -54,7 +55,7 @@ export class Example_CustomBullet extends HordeExampleBase {
     public onEveryTick(gameTickNum: number) {
         if (this.waveNum >= WAVES_MAX || gameTickNum % 50 != 0)
             return;
-            
+
         this.createBullet();
         this.waveNum++;
     }
@@ -63,10 +64,9 @@ export class Example_CustomBullet extends HordeExampleBase {
      * Запускает созданный снаряд.
      */
     private createBullet() {
-        
+
         // Любой юнит, от имени которого будет отправлена стрела
-        let realScena = ActiveScena.GetRealScena();
-        let settlement_0 = realScena.Settlements.Item.get('0');  // Олег
+        let settlement_0 = ActiveScena.Settlements.Item.get('0');  // Олег
         let someUnit = settlement_0.Units.GetCastleOrAnyUnit();
 
         // Создание снаряда
@@ -110,14 +110,14 @@ export class Example_CustomBullet extends HordeExampleBase {
             let pos = createPoint(bull.Position.X, bull.Position.Y - Math.trunc(bull.Z));
             spawnDecoration(bull.Scena, this.smokeDecorationCfg, pos);
         }
-        
+
         // Создание звуковых эффектов
         // Это пример запуска звуков, которые не прописаны в конфиге снаряда
         if (bull.ScriptData.ExampleCustomCounter % 5 == 0) {
             let pos = createPoint(bull.Position.X, bull.Position.Y - Math.trunc(bull.Z));
             spawnSound(bull.Scena, this.hitSoundCatalog, "HitMetal", pos, false);
         }
-        
+
         // Обработка достижения цели или завершения lifetime (для примера)
         if (bull.ScriptData.ExampleCustomCounter >= 1000 || bull.IsTargetReached) {
             // Любое состояние кроме Flying ведет к удалению объекта
@@ -132,7 +132,7 @@ export class Example_CustomBullet extends HordeExampleBase {
 
                 // Изменение тайлов земли при взрыве
                 let explodeCenterCell = positionToCell(bull.Position);
-                if (bull.Scena.PointInScena(explodeCenterCell)){
+                if (bull.Scena.PointInScena(explodeCenterCell)) {
                     bull.Scena.LandscapeMap.ChangeCellPayload(explodeCenterCell, TilePayload.Exploded);
                 }
             }
@@ -145,14 +145,14 @@ export class Example_CustomBullet extends HordeExampleBase {
  */
 function createBulletConfig() {
     const exampleCfgUid = "#BulletConfig_ExampleScriptBullet";
-    let customBullCfg;
+    let customBullCfg: BulletConfig;
     if (HordeContentApi.HasBulletConfig(exampleCfgUid)) {
         // Конфиг уже был создан, берем предыдущий
         customBullCfg = HordeContentApi.GetBulletConfig(exampleCfgUid);
     } else {
         // Создание нового конфига
         const bullCfgTemplate = HordeContentApi.GetBulletConfig("#BulletConfig_ScriptBullet_Template");
-        customBullCfg = HordeContentApi.CloneConfig(bullCfgTemplate, "#BulletConfig_ExampleScriptBullet");
+        customBullCfg = HordeContentApi.CloneConfig(bullCfgTemplate, "#BulletConfig_ExampleScriptBullet") as BulletConfig;
     }
 
     // Установка параметров конфига

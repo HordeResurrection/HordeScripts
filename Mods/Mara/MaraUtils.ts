@@ -7,7 +7,7 @@ import { AssignOrderMode, PlayerVirtualInput, VirtualSelectUnitsMode } from "lib
 import { MaraProductionRequestItem } from "./Common/MaraProductionRequestItem";
 import { MaraPoint } from "./Common/MaraPoint";
 import { generateCellInSpiral } from "library/common/position-tools";
-import { ProduceRequest, ProduceRequestParameters } from "library/mastermind/matermind-types";
+import { ProduceRequest, ProduceRequestParameters } from "library/mastermind/mastermind-types";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { MaraSettlementData } from "./Common/Settlement/MaraSettlementData";
 import { AllowedCompositionItem } from "./Common/AllowedCompositionItem";
@@ -18,14 +18,13 @@ import { spawnGeometry, spawnString } from "library/game-logic/decoration-spawn"
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
 import { MaraUnitConfigCache } from "./Common/Cache/MaraUnitConfigCache";
 import { MaraUnitCacheItem } from "./Common/Cache/MaraUnitCacheItem";
+import { ListT } from "library/dotnet/dotnet-types";
 
 const DEFAULT_UNIT_SEARCH_RADIUS = 3;
 
 const AlmostDefeatCondition = HCL.HordeClassLibrary.World.Settlements.Existence.AlmostDefeatCondition;
 const ResourceType = HCL.HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
 const GeometryPresets = HCL.HordeClassLibrary.World.Geometry.GeometryPresets;
-
-export const BuildTrackerType = xHost.type(ScriptUtils.GetTypeByName("HordeResurrection.Intellect.Requests.Trackers.UnitProducing.BuildTracker", "HordeResurrection.Intellect"));
 
 export { AlmostDefeatCondition }
 export { ResourceType }
@@ -639,7 +638,7 @@ export class MaraUtils {
     private static getProductionChain(cfg: any, settlement: any): any {
         let listType = xHost.type('System.Collections.Generic.List');
         let configType = UnitConfig;
-        let list = host.newObj(listType(configType), 0);
+        let list = new ListT(configType);
     
         settlement.TechTree.HypotheticalProducts.WhoCanProduce(cfg, list);
     
@@ -780,39 +779,11 @@ export class MaraUtils {
     
     //#region Unit Properties
     static GetUnitTarget(unit: MaraUnitCacheItem): any {
-        let action = unit.Unit.OrdersMind.ActiveAct;
-
-        if (!action) {
-            return null;
-        }
-        
-        if (
-            action.GetType() != 
-                ScriptUtils.GetTypeByName("HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActAttackUnit", "HordeClassLibrary")
-        ) {
-            return null;
-        }
-        else {
-            return action.Target;
-        }
+        return unit.Unit.OrdersMind.GetCurrentHitTarget();
     }
 
     static GetUnitPathLength(unit: MaraUnitCacheItem): number | null {
-        let action = unit.Unit.OrdersMind.ActiveAct;
-
-        if (!action) {
-            return null;
-        }
-        
-        if (
-            action.GetType() == 
-                ScriptUtils.GetTypeByName("HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActMoveTo", "HordeClassLibrary")
-        ) {
-            return action.Solution?.Count;
-        }
-        else {
-            return null;
-        }
+        return unit.Unit.OrdersMind.GetCurrentPathLength();
     }
 
     static GetUnitStrength(unit: MaraUnitCacheItem): number {

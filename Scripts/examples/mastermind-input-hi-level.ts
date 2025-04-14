@@ -11,7 +11,7 @@ export class Example_InputHiLevel extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         // Will be soon...
     }
 }

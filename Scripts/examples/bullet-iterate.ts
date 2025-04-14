@@ -1,8 +1,8 @@
-import { mergeFlags } from "library/dotnet/dotnet-utils";
-import { BindingFlags } from "library/dotnet/godmode/reflection";
-import { BaseBullet } from "library/game-logic/horde-types";
 import HordeExampleBase from "./base-example";
 
+
+// Количество обработанных событий, когда будут отключены обработчики
+const HITS_TO_STOP_EVENT_HANDLERS = 20;
 
 /**
  * Пример итерирования текущих снарядов на сцене.
@@ -13,55 +13,61 @@ import HordeExampleBase from "./base-example";
  */
 export class Example_IterateBullets extends HordeExampleBase {
 
-    private bulletsRegistry : any;
-    private bulletsIdProvider : any;
-    private lastNextBulletId = 0;
-    
+    private eventHits = 0;
+
     public constructor() {
         super("Iterate bullets");
-        
-        let realScena = ActiveScena.GetRealScena();
-
-        this.bulletsRegistry = realScena.Bullets;
-        this.bulletsIdProvider = this._getIdProvider();
     }
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
-        this.log.info('Реестр снарядов:', this.bulletsRegistry);
-        this.log.info('IdProvider для снарядов:', this.bulletsIdProvider);
-    }
 
-    public onEveryTick(gameTickNum: number) {
-    
-        // Следующий ID снаряда
-        let currentNextId = ScriptUtils.GetValue(this.bulletsIdProvider, "TotalIds");
-    
-        // Итерируем новые снаряды на сцене
-        let bullVar = host.newVar(BaseBullet);
-        for (let i = this.lastNextBulletId; i < currentNextId; i++) {
-            if(!this.bulletsRegistry.TryGet(i, bullVar.out))
-                continue;
-                let bull = bullVar.value;
-            this.log.info('- Новый снаряд:', '[' + bull.State + ']', bull);
-    
-            // Внимание! Здесь будут только те снаряды, которые имеются на сцене в данный момент.
-            // Т.е. здесь не найти снаряды, которые уже завершили своё движение. Это актуально для снарядов ближнего боя.
+        this.eventHits = 0;
+
+        let bulletsRegistry = ActiveScena.Bullets;
+        this.log.info('Реестр снарядов:', bulletsRegistry);
+
+        let that = this;
+
+        if (this.globalStorage.currentAddedHandler) {
+            this.globalStorage.currentAddedHandler.disconnect();
         }
-    
-        // Запоминаем на каком снаряде остановились в этот раз
-        this.lastNextBulletId = currentNextId;
+        this.globalStorage.currentAddedHandler = bulletsRegistry.ItemAdded.connect(function (sender, args) {
+            try {
+                that.eventHits++;
+                let bull = args!.Item;
+                that.log.info('- Снаряд добавлен:', '[' + bull.State + ']', bull);
+            } catch (ex) {
+                that.log.exception(ex);
+            }
+        });
+
+        if (this.globalStorage.currentRemovedHandler) {
+            this.globalStorage.currentRemovedHandler.disconnect();
+        }
+        this.globalStorage.currentRemovedHandler = bulletsRegistry.ItemRemoved.connect(function (sender, args) {
+            try {
+                that.eventHits++;
+                let bull = args!.Item;
+                that.log.info('- Снаряд удален:', '[' + bull.State + ']', bull);
+            } catch (ex) {
+                that.log.exception(ex);
+            }
+        });
     }
 
-    /**
-     * Магия рефлексии для получения доступа к IdProvider 
-     */
-    private _getIdProvider() {
-        let BaseBulletT = ScriptUtils.GetTypeByName("HordeClassLibrary.World.Objects.Bullets.BaseBullet, HordeClassLibrary");
-        let ScenaObjectsRegistryT = ScriptUtils.GetTypeByName("HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaObjectsRegistry`1").MakeGenericType(BaseBulletT);
-        let propIdProvider = ScenaObjectsRegistryT.GetProperty("IdProvider", mergeFlags(BindingFlags, BindingFlags.Instance, BindingFlags.Public, BindingFlags.NonPublic));
-        let bulletsIdProvider = propIdProvider.GetValue(this.bulletsRegistry);
-        return bulletsIdProvider;
+    public onEveryTick(gameTickNum: number): void {
+
+        // Отписаться от обработки событий через некоторое время
+        if (this.eventHits >= HITS_TO_STOP_EVENT_HANDLERS) {
+            if (this.globalStorage.currentAddedHandler) {
+                this.globalStorage.currentAddedHandler.disconnect();
+                delete this.globalStorage.currentAddedHandler;
+            }
+            if (this.globalStorage.currentRemovedHandler) {
+                this.globalStorage.currentRemovedHandler.disconnect();
+                delete this.globalStorage.currentRemovedHandler;
+            }
+        }
     }
 }

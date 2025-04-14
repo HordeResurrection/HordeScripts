@@ -1,4 +1,4 @@
-import { IDisposableT, IEnumeratorT, Int32 } from "./dotnet-types";
+import { IDisposableT, IEnumerableT, IEnumeratorT, Int32T } from "./dotnet-types";
 
 
 // ===================================================
@@ -11,11 +11,14 @@ import { IDisposableT, IEnumeratorT, Int32 } from "./dotnet-types";
  * @param flagsType тип флага. Задаётся отдельно, т.к. нельзя использовать "GetType()" без GodMode.
  * @param flags массив флагов, которые нужно объединить
  */
-export function mergeFlags(flagsType, ...flagsArray: any[]) {
+export function mergeFlags(flagsType: object, ...flagsArray: any[]): any {
     let flags = 0;
 
-    for(let f of flagsArray) {
-        flags |= host.cast(Int32, f);
+    for (let f of flagsArray) {
+        flags |= host.cast(Int32T, f) as number;
+
+        // Внимание!
+        // Если скрипт-машина падает в этом месте с ошибкой "Error: Cannot convert type", то значит поданы некорректные флаги
     }
 
     return host.cast(flagsType, flags);
@@ -27,19 +30,9 @@ export function mergeFlags(flagsType, ...flagsArray: any[]) {
 
 /**
  * ForEach - специальная функция для перечисления .Net-объектов.
- * 
- * Примеры:
-```
-    ForEach(someList, item => {
-        log.info('-', item);
-    });
-
-    ForEach(someList, (item, i, source) => {
-        log.info('#' + i, item, 'from', source);
-    });
-```
+ * Примеры см. рядом с декларацией ForEach в "common-declarations.d.ts".
  */
-globalThis.ForEach = ScriptExtensions.ForEach;
+globalThis.ForEach = ScriptUtils.ForEach;
 
 /**
  * Делает IEnumerable перечислимым в JS.
@@ -53,14 +46,20 @@ globalThis.ForEach = ScriptExtensions.ForEach;
     }
 ```
  */
-export function* enumerate(enumerable) {
+export function* enumerate<T>(enumerable: IEnumerableT<T>): Generator<T, void, unknown> {
     var enumerator = host.cast(IEnumeratorT, enumerable.GetEnumerator());
     while (enumerator.MoveNext()) {
-        yield enumerator.Current;
+        yield enumerator.Current as T;
     }
     host.cast(IDisposableT, enumerator).Dispose();
 }
-export function eNext(enumerated) {
+
+/**
+ * Получить следующее значение из итерируемого объекта.
+ * @param enumerated итерируемый объект.
+ * @returns возвращает следующее значение.
+ */
+export function eNext<T>(enumerated: Generator<T, void, unknown>): T | undefined {
     var next = enumerated.next();
     if (next.done)
         return undefined;
@@ -70,7 +69,7 @@ export function eNext(enumerated) {
 /**
  * Преобразует JS-массив в .Net-массив заданного типа.
  */
-export function createArray(type, items) {
+export function createArray(type: object, items: any[]): object[] {
     let array = host.newArr(type, items.length);
     for (let i = 0; i < items.length; i++) {
         array[i] = items[i];

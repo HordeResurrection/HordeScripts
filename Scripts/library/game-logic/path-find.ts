@@ -1,12 +1,18 @@
 import { Point2D, createPoint } from "library/common/primitives";
 import { HashSetT } from "library/dotnet/dotnet-types";
+import { Scena, UnitConfig } from "./horde-types";
 
-const AStarPathFinder = HCL.HordeClassLibrary.PathFinders.AStar.AStarPathFinder;
-const CpfMain = HCL.HordeClassLibrary.PathFinders.ContourPathFinder.CpfMain;
-const PathFinderContext = HCL.HordeClassLibrary.PathFinders.PathFinderContext;
+const AStarPathFinder = HordeClassLibrary.PathFinders.AStar.AStarPathFinder;
+type AStarPathFinder = HordeClassLibrary.PathFinders.AStar.AStarPathFinder;
+const CpfMain = HordeClassLibrary.PathFinders.ContourPathFinder.CpfMain;
+type CpfMain = HordeClassLibrary.PathFinders.ContourPathFinder.CpfMain;
+const PathFinderContext = HordeClassLibrary.PathFinders.PathFinderContext;
+type PathFinderContext = HordeClassLibrary.PathFinders.PathFinderContext;
 
-const SpeedAtCellByKnownMapDelegate = HCL.HordeClassLibrary.PathFinders.SpeedAtCellByKnownMapDelegate;
-const SpeedAtCellByRealMapDelegate = HCL.HordeClassLibrary.PathFinders.SpeedAtCellByRealMapDelegate;
+const SpeedAtCellByKnownMapDelegate = HordeClassLibrary.PathFinders.SpeedAtCellByKnownMapDelegate;
+type SpeedAtCellByKnownMapDelegate = HordeClassLibrary.PathFinders.SpeedAtCellByKnownMapDelegate;
+const SpeedAtCellByRealMapDelegate = HordeClassLibrary.PathFinders.SpeedAtCellByRealMapDelegate;
+type SpeedAtCellByRealMapDelegate = HordeClassLibrary.PathFinders.SpeedAtCellByRealMapDelegate;
 
 /**
  * Результат работы поисковика пути.
@@ -19,18 +25,19 @@ const SpeedAtCellByRealMapDelegate = HCL.HordeClassLibrary.PathFinders.SpeedAtCe
     - AttemptsEnded    - Поиск прерван: закончились попытки.
     - SearchError      - Ошибка при поиске пути.
 */
-export const PathFinderStatus = HCL.HordeClassLibrary.PathFinders.PathFinderStatus;
+export const PathFinderStatus = HordeClassLibrary.PathFinders.PathFinderStatus;
+export type PathFinderStatus = HordeClassLibrary.PathFinders.PathFinderStatus;
 
 
 /**
  * Выполняет проверку наличия и поиск пути.
  */
 export class PathFinder {
-    scena: any;
-    uCfg: any;
-    
-    cpf: any;
-    aStar: any;
+    scena: Scena | undefined;
+    uCfg: UnitConfig | undefined;
+
+    cpf: CpfMain | undefined;
+    aStar: AStarPathFinder | undefined;
     aStarPathMap: any;
 
     finishSet: any;
@@ -38,17 +45,17 @@ export class PathFinder {
     /**
      * Конструктор
      */
-    public constructor(scena: any) {
+    public constructor(scena: Scena) {
         this.scena = scena;
 
         // Инициализация колбеков
-        let speedAtCellKnownMap = new SpeedAtCellByKnownMapDelegate((cell, _) => this.speedAtCell.call(this, cell));
-        let speedAtCellRealMap = new SpeedAtCellByRealMapDelegate((cell, _) => this.speedAtCell.call(this, cell));
+        let speedAtCellKnownMap = new SpeedAtCellByKnownMapDelegate((cell: Point2D, _) => this.speedAtCell.call(this, cell));
+        let speedAtCellRealMap = new SpeedAtCellByRealMapDelegate((cell: Point2D, _) => this.speedAtCell.call(this, cell));
         let context = new PathFinderContext(speedAtCellKnownMap, speedAtCellRealMap);
 
         // Вспомогательные объекты
         let tmpPoint = createPoint(0, 0);
-        this.finishSet = host.newObj(HashSetT(Point2D));
+        this.finishSet = new HashSetT<Point2D>(Point2D);
         this.finishSet.Add(tmpPoint);
 
         // Инициализация объекта для проверки наличия пути
@@ -63,22 +70,25 @@ export class PathFinder {
      * Освобождение данных после завершения использования объекта.
      */
     public Dispose() {
-        this.scena.PathMap.StorePathfinderMap(this.aStarPathMap);
-        this.aStar.ReturnToPool();
-        
-        this.scena = null;
-        this.cpf = null;
-        this.aStar = null;
+        this.scena?.PathMap.StorePathfinderMap(this.aStarPathMap);
+        this.aStar?.ReturnToPool();
+
+        this.scena = undefined;
+        this.cpf = undefined;
+        this.aStar = undefined;
     }
 
     /**
      * Выполняет поиск пути из точки в точку.
      * Возвращает коллекцию точек, если путь найден.
      */
-    public findPath(uCfg, start, finish) {
+    public findPath(uCfg: UnitConfig, start: Point2D, finish: Point2D) {
         this.finishSet.Clear();
         this.finishSet.Add(finish);
         this.uCfg = uCfg;
+
+        if (!this.aStar)
+            throw new Error("Can't use disposed pathfinder object.");
 
         this.aStar.Reinitialize(start, this.finishSet);
         this.aStar.FindPath();
@@ -89,32 +99,39 @@ export class PathFinder {
         }
         return solution.Path;
     }
-    
+
     /**
      * Проверяет наличие пути из точки в точку (оптимизированный алгоритм).
      * Возвращает true, если путь найден.
      * Возвращает false, в случаях если путь не существует, или если истекло время поиска.
      */
-    public checkPath(uCfg, start, finish) {
+    public checkPath(uCfg: UnitConfig, start: Point2D, finish: Point2D) {
         this.finishSet.Clear();
         this.finishSet.Add(finish);
         this.uCfg = uCfg;
+
+        if (!this.cpf)
+            throw new Error("Can't use disposed pathfinder object.");
 
         this.cpf.Reinitialize(start, this.finishSet);
         this.cpf.FindPath();
 
         return this.cpf.Status == PathFinderStatus.Found;
     }
-    
+
     /**
      * Проверяет скокрость в указанной клетке для указанного конфига юнита.
      * Примечание:
 В данный момент здесь выполняется CanBePlaced-проверка, которая НЕ определяет непосредственно значение скорости в клетке.
 Это может отразиться на итоговом пути.
      */
-    private speedAtCell(cell) {
+    private speedAtCell(cell: Point2D) {
 
-        if (this.uCfg.CanBePlacedByRealMap(this.scena, cell.X, cell.Y, false, true)){
+        if (!this.uCfg) {
+            return 0;
+        }
+
+        if (this.uCfg.CanBePlacedByRealMap(this.scena!, cell.X, cell.Y, false, true)) {
             return 1;
         }
 

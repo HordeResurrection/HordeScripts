@@ -13,17 +13,17 @@ export class Example_ScenaWorks extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-            
+
         // Глобальная переменная "ActiveScena" - это API для доступа к данным текущей сцены
         // Т.к. API ещё не разработано, ВРЕМЕННО прокинул объект реальной сцены
         // Здесь и далее в функии выполняется работа с реальными объектами (не API)
-        let realScena = ActiveScena.GetRealScena();
-        this.log.info('Сцена:', '"' + realScena.ScenaName + '"');
+        let activeScena = ActiveScena;
+        this.log.info('Сцена:', '"' + activeScena.ScenaName + '"');
 
         // Карта юнитов, ландшафта и ресурсов
-        let unitsMap = realScena.UnitsMap;
-        let landscapeMap = realScena.LandscapeMap;
-        let resourcesMap = realScena.ResourcesMap;
+        let unitsMap = activeScena.UnitsMap;
+        let landscapeMap = activeScena.LandscapeMap;
+        let resourcesMap = activeScena.ResourcesMap;
 
         // Специальный объект для работы с координатами - Point2D
         let cell = createPoint(9, 9);
@@ -68,7 +68,7 @@ export class Example_ScenaWorks extends HordeExampleBase {
         }
 
         // Поселения на сцене
-        let settlements = realScena.Settlements;
+        let settlements = activeScena.Settlements;
 
         // Модуль вИдения
         let settlement_0 = settlements.Item.get('0');  // Олег

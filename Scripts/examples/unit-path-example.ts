@@ -14,7 +14,7 @@ export class Example_UnitCheckPath extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         let unit = getOrCreateTestUnit(this);
         if (unit == null) {
             this.log.info('Не удалось создать юнита для этого примера!');

@@ -1,4 +1,4 @@
-import { createPoint } from "library/common/primitives";
+import { createPoint, Point2D } from "library/common/primitives";
 import { PathFinder } from "library/game-logic/path-find";
 import HordeExampleBase from "./base-example";
 
@@ -6,8 +6,6 @@ import HordeExampleBase from "./base-example";
  * Пример поиска пути.
  */
 export class Example_PathFind extends HordeExampleBase {
-    context: any;
-    scena: any;
 
     /**
      * Конструктор.
@@ -22,12 +20,11 @@ export class Example_PathFind extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
-        let scena = ActiveScena.GetRealScena();
-        let pathChecker = new PathFinder(scena);
+        let pathChecker = new PathFinder(ActiveScena);
 
         // Точки пути
         let startCell = createPoint(39, 31);
-        let finishCell =  createPoint(42, 26);
+        let finishCell = createPoint(42, 26);
 
         // Проверяем наличие пути из точки в точку для всадника (оптимизированный алгоритм)
         let raiderCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Raider");
@@ -43,7 +40,7 @@ export class Example_PathFind extends HordeExampleBase {
         let path = pathChecker.findPath(archerCfg, startCell, finishCell);
         if (path) {
             this.log.info(`Юнит "${archerCfg.Name}" может пройти из ${startCell} в ${finishCell}. Путь:`);
-            ForEach(path, node => {
+            ForEach(path, (node: Point2D) => {
                 this.log.info('-', node);
             });
         } else {

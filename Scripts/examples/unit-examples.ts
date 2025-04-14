@@ -1,6 +1,6 @@
 import { createPoint } from "library/common/primitives";
 import { inspect } from "library/common/introspection";
-import { BattleController, OneClickCommandArgs, PointCommandArgs, ProduceAtCommandArgs, ProduceCommandArgs, UnitCommand, UnitHurtType, UnitDirection } from "library/game-logic/horde-types";
+import { OneClickCommandArgs, PointCommandArgs, ProduceAtCommandArgs, ProduceCommandArgs, UnitCommand, UnitHurtType, UnitDirection } from "library/game-logic/horde-types";
 import { unitCanBePlacedByKnownMap, unitCanBePlacedByRealMap, unitCheckPathTo, unitSpeedAtCellByKnownMap, unitSpeedAtCellByRealMap, unitTeleport } from "library/game-logic/unit-and-map";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import HordeExampleBase from "./base-example";
@@ -17,7 +17,7 @@ export class Example_UnitWorks extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         let unit = getOrCreateTestUnit(this);
         if (unit == null) {
             this.log.info('Не удалось создать юнита для этого примера!');
@@ -51,7 +51,7 @@ export class Example_UnitWorks extends HordeExampleBase {
         //   CauseEffectiveDamage(target, dmg, type) - нанесение урона другому юниту без учета брони
 
         // Отдел приказов
-        let ordersMind = unit.OrdersMind;
+        //let ordersMind = unit.OrdersMind;
         // Подробнее см. в отдельном примере - "Example_UnitOrders"
 
         // Отдел команд
@@ -87,7 +87,7 @@ export class Example_UnitWorks extends HordeExampleBase {
 
         // Телепортация юнита (отключено, чтобы не сбивать другие примеры)
         if (false) {
-            if (unitTeleport(unit, cell)) {
+            if (unitTeleport(unit!, cell)) {
                 this.log.info('Юнит телепортирован в', cell);
             } else {
                 this.log.info('Юнит НЕ может быть телепортирован в', cell);

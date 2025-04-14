@@ -1,6 +1,6 @@
 import { createHordeColor } from "library/common/primitives";
 import { inspect } from "library/common/introspection";
-import { AllContent } from "library/game-logic/horde-types";
+import { AllContent, UnitConfig } from "library/game-logic/horde-types";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import HordeExampleBase from "./base-example";
 
@@ -20,19 +20,19 @@ export class Example_ConfigWorks extends HordeExampleBase {
         this.logMessageOnRun();
         this._configWorks();
     }
-    
+
     private _configWorks() {
         this.log.info("Слепок контента:", HordeContentApi.ContentStamp);
 
         // Перечисление всех доступных конфигов юнитов
         this.log.info("Конфиги рыцарей:");
-        ForEach(AllContent.UnitConfigs.Configs, kv => {
+        ForEach(AllContent.UnitConfigs.Configs, (kv: { Key: string, Value: UnitConfig }) => {
             let uid = kv.Key;
             let uCfg = kv.Value;
             if (uid.includes('men')) {
                 this.log.info('-', '"' + uid + '"', '-', uCfg);
             }
-        })
+        });
 
         // Получаем конфиг катапульты
         let catapultCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Catapult");
@@ -40,7 +40,7 @@ export class Example_ConfigWorks extends HordeExampleBase {
         // Здесь можно убрать if-false, чтобы отобразить поля конфига
         // Здесь не следует копать более чем на 1 уровень в глубину, т.к. получается слишком много данных
         if (false) inspect(catapultCfg, 1, "Конфиг катапульты:");
-        
+
         // Получаем значения из конфига
         let rocks = catapultCfg.MainArmament.EmitBulletsCountMin;
         this.log.info("Текущее количество камней при выстреле:", rocks);
@@ -52,7 +52,7 @@ export class Example_ConfigWorks extends HordeExampleBase {
             rocks = 1;
         ScriptUtils.SetValue(catapultCfg.MainArmament, "EmitBulletsCountMin", rocks);
         ScriptUtils.SetValue(catapultCfg.MainArmament, "EmitBulletsCountMax", rocks);
-        
+
         // Результат можно проверить в игре
         this.log.info("Теперь катапульты кидают", catapultCfg.MainArmament.EmitBulletsCountMin, "камней за выстрел!");
     }
@@ -94,14 +94,14 @@ export class Example_ConfigCreation extends HordeExampleBase {
         this.remover.removeConfig();
 
         // Клонируем конфиг и изменяем
-        let newBallistaCfg = HordeContentApi.CloneConfig(ballistaCfg, newCfgUid);
+        let newBallistaCfg = HordeContentApi.CloneConfig(ballistaCfg, newCfgUid) as UnitConfig;
         ScriptUtils.SetValue(newBallistaCfg, "Name", "Динамическая баллиста");
         ScriptUtils.SetValue(newBallistaCfg, "ProductionTime", 50);
         ScriptUtils.SetValue(newBallistaCfg, "TintColor", createHordeColor(255, 255, 150, 150));
         this.log.info('Создан новый конфиг баллисты:', newBallistaCfg.Uid, `(${newBallistaCfg.Name})`);
 
         // Добавляем новую баллисту в завод
-        let producerParams = factoryCfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        let producerParams = factoryCfg.GetProfessionParams<UnitProducerProfessionParams>(UnitProducerProfessionParams, UnitProfession.UnitProducer);
         let produceList = producerParams.CanProduceList;
         this.log.info('Сейчас завод производит:', produceList.Count, 'вида техники');
         this.log.info('Добавляем только что созданную баллисту в список производства..');
@@ -144,8 +144,8 @@ export class Example_ConfigRemoving extends HordeExampleBase {
 
         this.log.info('Удаление из завода ссылок на конфиг:', targetCfgUid);
         let factoryCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Factory");
-        let producerParams = factoryCfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        let producerParams = factoryCfg.GetProfessionParams<UnitProducerProfessionParams>(UnitProducerProfessionParams, UnitProfession.UnitProducer);
         let produceList = producerParams.CanProduceList;
-        ScriptExtensions.RemoveAll(produceList, targetCfg);
+        ScriptUtils.RemoveAll(produceList, targetCfg);
     }
 }

@@ -128,7 +128,7 @@ class UnitExperienceSystem {
                     if (replacedUnit) {
                         // оповещения всех
                         if (ExperienceSystemGlobalData.Levels_Alerts[this.level + 1]) {
-                            broadcastMessage("ВНИМАНИЕ. " + this.unit.Owner.TownName + " получил " + replacedUnit.Cfg.Name.replace("\n", ""), ExperienceSystemGlobalData.Levels_TintColor[this.level + 1]);
+                            broadcastMessage("БЛАГОВЕСТЬ! " + this.unit.Owner.TownName + " получил " + replacedUnit.Cfg.Name.replace("\n", ""), this.unit.Owner.SettlementColor);
                         }
                     }
                 }
@@ -136,7 +136,7 @@ class UnitExperienceSystem {
         }
 
         // проверяем, что юнит ничего не делает
-        if (this.unit.OrdersMind.ActiveMotion && this.unit.OrdersMind.ActiveMotion.GetType().Name != "MotionDoNothing") {
+        if (!this.unit.OrdersMind.HasMotionDoNothingNow()) {
             this.selfMedication_DoNothingTick = gameTickNum;
         }
 
@@ -161,6 +161,12 @@ class UnitExperienceSystem {
                 * this.configExpCoeff
                 * ExperienceSystemGlobalData.Levels_ExpCoeff[this.level + 1]
                 * LEVEL_SYSTEM_GLOBAL_DATA.GetConfigExpPerHP(victimUnit.Cfg);
+        }
+    }
+
+    public OnDead() {
+        if (ExperienceSystemGlobalData.Levels_Alerts[this.level]) {
+            broadcastMessage("СКОРБИМ! " + this.unit.Owner.TownName + " потерял " + this.unit.Cfg.Name.replace("\n", ""), this.unit.Owner.SettlementColor);
         }
     }
 }
@@ -319,6 +325,13 @@ class ExperienceSystemGlobalData {
                 ScriptUtils.SetValue(nextCfg, "Weight", currCfg.Weight + ExperienceSystemGlobalData.Levels_AdditionalWeight[nextLevel]);
                 ScriptUtils.SetValue(nextCfg, "PressureResist", currCfg.PressureResist + ExperienceSystemGlobalData.Levels_AdditionalPressureResist[nextLevel]);
                 ScriptUtils.SetValue(nextCfg, "TintColor", ExperienceSystemGlobalData.Levels_TintColor[nextLevel]);
+                // иконка в лесу
+                var inForestAnimRef        = ScriptUtils.GetValue(currCfg, "InForestAnimationsCatalogRef");
+                var inForestAnimNextCfgUid = inForestAnimRef.Uid + "_" + (nextLevel + 1);
+                log.info("inForestAnimNextCfgUid = ", inForestAnimNextCfgUid);
+                if (HordeContentApi.HasAnimation(inForestAnimNextCfgUid)) {
+                    ScriptUtils.GetValue(nextCfg, "InForestAnimationsCatalogRef").SetConfig(HordeContentApi.GetAnimationCatalog(inForestAnimNextCfgUid));
+                }
             } else {
                 ScriptUtils.SetValue(nextCfg, "Name",
                     String(currCfg.Name).replace(ExperienceSystemGlobalData.Levels_NamePrefix[unitExperienceSystem.level], ExperienceSystemGlobalData.Levels_NamePrefix[nextLevel]));
@@ -356,6 +369,13 @@ class ExperienceSystemGlobalData {
                     currCfg.PressureResist - ExperienceSystemGlobalData.Levels_AdditionalPressureResist[unitExperienceSystem.level] + ExperienceSystemGlobalData.Levels_AdditionalPressureResist[nextLevel]);
                 ScriptUtils.SetValue(nextCfg, "TintColor",
                     ExperienceSystemGlobalData.Levels_TintColor[nextLevel]);
+                // иконка в лесу
+                var inForestAnimRef        = ScriptUtils.GetValue(currCfg, "InForestAnimationsCatalogRef");
+                var inForestAnimNextCfgUid = (inForestAnimRef.Uid as string).slice(0, inForestAnimRef.Uid.length - 1) + (nextLevel + 1);
+                log.info("inForestAnimNextCfgUid = ", inForestAnimNextCfgUid);
+                if (HordeContentApi.HasAnimation(inForestAnimNextCfgUid)) {
+                    ScriptUtils.GetValue(nextCfg, "InForestAnimationsCatalogRef").SetConfig(HordeContentApi.GetAnimationCatalog(inForestAnimNextCfgUid));
+                }
             }
 
             this._getNextLevelCfgCash.set(currCfgUid, nextCfg);
@@ -373,7 +393,7 @@ class ExperienceSystemPlugin extends HordePluginBase {
 
     public onFirstRun() {
         if (ScriptUtils.GameVersionEqualsOrGreater('v0.71pre')) {
-            HCL.HordeClassLibrary.World.Const.UnitConstants.MaxExperience = ExperienceSystemGlobalData.MaxExp;
+            ActiveScena.Context.Parameters.Units.MaxExperience = ExperienceSystemGlobalData.MaxExp;
         }
     }
 
@@ -422,6 +442,12 @@ class ExperienceSystemPlugin extends HordePluginBase {
                                 levelSystemGlobalData.IsCombatConfig(UnitsListChangedEventArgs.Unit.Cfg) &&
                                 !UnitsListChangedEventArgs.Unit.ScriptData.ExperienceSystem) {
                                 levelSystemGlobalData.unitsExperienceSystem.push(new UnitExperienceSystem(UnitsListChangedEventArgs.Unit));
+                            }
+                            // если юнит удаляется, боевой и с инициализированной системой опыта
+                            else if (!UnitsListChangedEventArgs.IsAdded &&
+                                levelSystemGlobalData.IsCombatConfig(UnitsListChangedEventArgs.Unit.Cfg) &&
+                                UnitsListChangedEventArgs.Unit.ScriptData.ExperienceSystem) {
+                                    UnitsListChangedEventArgs.Unit.ScriptData.ExperienceSystem.OnDead();
                             }
                     });
 

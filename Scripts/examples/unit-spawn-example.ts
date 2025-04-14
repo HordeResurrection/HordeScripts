@@ -14,11 +14,8 @@ export class Example_SpawnUnit extends HordeExampleBase {
 
     public onFirstRun() {
         this.logMessageOnRun();
-        
-        let realScena = ActiveScena.GetRealScena();
-        let settlements = realScena.Settlements;
 
-        let settlement_0 = settlements.Item.get('0');  // Олег
+        let settlement_0 = ActiveScena.Settlements.Item.get('0');  // Олег
         let archerCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Archer");
         let cell = createPoint(5, 5);
         let dir = UnitDirection.RightDown;

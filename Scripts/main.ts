@@ -28,7 +28,7 @@ export function onInitialization() {
 
     // Установка дебаг-параметров
     ScriptMachineDebugApi.SetHotReloadOnFileChanging(false);  // автоматическая перезагрузка скрипта при изменении файла
-    
+
     // Инициализация плагинов
     activePlugins.clear();
     activePlugins.registerDefaultPlugins();

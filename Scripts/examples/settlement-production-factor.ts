@@ -1,7 +1,8 @@
 import HordeExampleBase from "./base-example";
 
 
-const SettlementProductionT = HCL.HordeClassLibrary.World.Settlements.Modules.SettlementProduction;
+const SettlementProduction = HordeClassLibrary.World.Settlements.Modules.SettlementProduction;
+type SettlementProduction = HordeClassLibrary.World.Settlements.Modules.SettlementProduction;
 
 /**
  * Пример работы с уровнем производства поселения.
@@ -25,13 +26,13 @@ export class Example_SettlementProductionFactor extends HordeExampleBase {
      */
     public onFirstRun() {
         this.logMessageOnRun();
-        
+
         let scenaSettlements = ActiveScena.GetRealScena().Settlements;
         for (let settlementId of this.settlements) {
             let settlement = scenaSettlements.GetByUid(settlementId);
 
             let production = settlement.Production;
-            
+
             // Установить кастомные значения уровней производства
             production.DevelopmentLevelSpeedFactors.Clear();
             production.DevelopmentLevelSpeedFactors.Add(1.00); // 0 кузниц  -> 1.00x ускорение
@@ -42,7 +43,7 @@ export class Example_SettlementProductionFactor extends HordeExampleBase {
             production.DevelopmentLevelSpeedFactors.Add(5.00); // 5 кузниц  -> 5.00x ускорение
 
             // Установить дефолтные значения уровней производства
-            ScriptUtils.SetValue(production, "DevelopmentLevelSpeedFactors", SettlementProductionT.GetDefaultDevelopmentLevelSpeedFactors());
+            ScriptUtils.SetValue(production, "DevelopmentLevelSpeedFactors", SettlementProduction.GetDefaultDevelopmentLevelSpeedFactors());
         }
     }
 }

@@ -4,13 +4,13 @@ import { Logger } from "library/common/logging";
  * Базовый класс для плагина.
  */
 export default class HordePluginBase {
-    
+
     // --- Fields -----------------------------------------------
 
     public name: string;
     public displayName: string;
-    protected log: Logger;
-    protected globalStorage: any;  // Хранилище переменных, которое не обнуляется при hot reload
+    public log: Logger;
+    public globalStorage: any;  // Хранилище переменных, которое не обнуляется при hot reload
 
     // --- Initialization -----------------------------------------------
 
@@ -63,13 +63,13 @@ export class PLUGIN_TEMPLATE extends HordePluginBase {
      * Метод вызывается при загрузке сцены и после hot-reload.
      */
     public onFirstRun() {
-        
+
     }
 
     /**
      * Метод выполняется каждый игровой такт.
      */
     public onEveryTick(gameTickNum: number) {
-        
+
     }
 }

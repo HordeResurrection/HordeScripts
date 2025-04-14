@@ -20,7 +20,7 @@ export class Logger {
      * Конструктор.
      */
     public constructor() {
-        
+
     }
 
     /**
@@ -32,7 +32,7 @@ export class Logger {
         }
         this.write(this.prepareMsg("DBG", ...vars));
     }
-    
+
     /**
      * Сделать info-запись.
      */
@@ -42,7 +42,7 @@ export class Logger {
         }
         this.write(this.prepareMsg("Info", ...vars));
     }
-    
+
     /**
      * Сделать warning-запись.
      */
@@ -52,7 +52,7 @@ export class Logger {
         }
         this.write(this.prepareMsg("WARN", ...vars));
     }
-    
+
     /**
      * Сделать error-запись.
      */
@@ -62,11 +62,11 @@ export class Logger {
         }
         this.write(this.prepareMsg("ERR", ...vars));
     }
-    
+
     /**
      * Сделать запись об исключении.
      */
-    public exception(ex) {
+    public exception(ex: any) {
         this.error(ex);
         DebugLogger.WriteLine(ex.stack);
     }
@@ -75,16 +75,16 @@ export class Logger {
      * Вызывается при добавлении записи в лог.
      * Можно переопределить, чтобы перенаправить вывод, например, в игровой чат.
      */
-    private write(line) {
+    private write(line: string) {
         DebugLogger.WriteLine(line);
     }
 
     /**
      * Составляет строку для записи в лог.
      */
-    private prepareMsg(level: string, ...vars: any[]) {
+    private prepareMsg(level: string, ...vars: any[]): string {
         if (vars.length == 0)
-            return;
+            return "";
 
         let msg = vars.join(' ');
         return `[JS: ${level}] ${this.msgPrefix}${msg}`;

@@ -12,7 +12,7 @@ import { log } from "./logging";
  *
  * Source: https://stackoverflow.com/questions/5357442/how-to-inspect-javascript-objects/20513467#20513467
  */
-export function inspectToStr(object, maxDepth, result) {
+export function inspectToStr(object: any, maxDepth: number | undefined, result: string | undefined) {
     if (typeof object != "object")
         return "Invalid object";
     if (typeof result == "undefined")
@@ -27,23 +27,23 @@ export function inspectToStr(object, maxDepth, result) {
     for (let property in object) {
         let datatype = typeof object[property];
 
-        let tempDescription = result+'"'+property+'"';
-        tempDescription += ' ('+datatype+') => ';
+        let tempDescription = result + '"' + property + '"';
+        tempDescription += ' (' + datatype + ') => ';
         if (datatype == "object")
-            tempDescription += 'object: '+inspectToStr(object[property], maxDepth, result+'  ');
+            tempDescription += 'object: ' + inspectToStr(object[property], maxDepth, result + '  ');
         else
             tempDescription += object[property];
 
         rows.push(tempDescription);
     }
 
-    return rows.join(result+"\n");
+    return rows.join(result + "\n");
 }
 
 /**
  * Выводит в лог результат интроспекции.
  */
-export function inspect(object, maxDepth=undefined, msg: string|null=null) {
+export function inspect(object: any, maxDepth: number | undefined = undefined, msg: string | null = null) {
     msg = msg ?? 'Object introspection result:';
     if (!object) {
         log.info(msg, '\nType:', typeof object);
@@ -57,7 +57,7 @@ export function inspect(object, maxDepth=undefined, msg: string|null=null) {
 /**
  * Выводит в лог элементы из enum.
  */
-export function inspectEnum(enumType, n=10) {
+export function inspectEnum(enumType: object, n = 10) {
     for (let i = 0; i < n; i++) {
         log.info(`${i}`, '-', host.cast(enumType, i));
     }
@@ -66,10 +66,10 @@ export function inspectEnum(enumType, n=10) {
 /**
  * Выводит в лог элементы из enum, который Flag.
  */
-export function inspectFlagEnum(enumType, n=31) {
-    let end = 1 << n >>>0;
+export function inspectFlagEnum(enumType: object, n = 31) {
+    let end = 1 << n >>> 0;
     log.info('0'.padStart(n, '0'), '-', host.cast(enumType, 0));
-    for (let i = 1; i < end; i = (i << 1 >>>0)) {
+    for (let i = 1; i < end; i = (i << 1 >>> 0)) {
         log.info(i.toString(2).padStart(n, '0'), '-', host.cast(enumType, i));
     }
 }
@@ -77,7 +77,7 @@ export function inspectFlagEnum(enumType, n=31) {
 /**
  * Вывод всех свойств объекта в глубину depth
  */
-export function printObjectItems(object, depth = 1, shift = "") {
+export function printObjectItems(object: any, depth = 1, shift = "") {
     if (depth == 0) {
         return;
     }
