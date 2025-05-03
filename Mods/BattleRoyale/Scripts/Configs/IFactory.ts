@@ -1,8 +1,9 @@
-import { TileType } from "library/game-logic/horde-types";
+import { TileType, UnitCommand, UnitFlags } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import { Hero_Crusader } from "../Units/Hero_Crusader";
 import { CreateHordeUnitConfig, FactoryConfig, GetConfigsByWorker, IConfig } from "../Units/IConfig";
 import { createHordeColor } from "library/common/primitives";
+import { mergeFlags } from "library/dotnet/dotnet-utils";
 
 export class BuildingTemplate {
     public buildings : Array<IConfig>;
@@ -75,10 +76,6 @@ export class IFactory {
                 unitConfig.hordeConfig.Speeds.Item.set(tileType,
                     Math.max(unitConfig.hordeConfig.Speeds.Item.get(tileType) as number, Hero_Crusader.GetHordeConfig().Speeds.Item(tileType)));
             });
-            // убираем захватываемость
-            if (unitConfig.hordeConfig.ProfessionParams.ContainsKey(UnitProfession.Capturable)) {
-                unitConfig.hordeConfig.ProfessionParams.Remove(UnitProfession.Capturable);
-            }
             ScriptUtils.SetValue(unitConfig.hordeConfig, "Name", config.unitConfig.hordeConfig.Name + "\n" + rarity_NamePrefix[rarity]);
             ScriptUtils.SetValue(unitConfig.hordeConfig, "MaxHealth",
                 Math.round(config.unitConfig.hordeConfig.MaxHealth
@@ -86,9 +83,37 @@ export class IFactory {
                         , 2.0 * config.unitConfig.hordeConfig.MainArmament.ShotParams.Damage / config.unitConfig.hordeConfig.MaxHealth)));
             ScriptUtils.SetValue(unitConfig.hordeConfig.MainArmament.ShotParams, "Damage", Math.round(config.unitConfig.hordeConfig.MainArmament.ShotParams.Damage*(1 + 0.15*rarity)));
             if (rarity_TintColor[rarity]) ScriptUtils.SetValue(unitConfig.hordeConfig, "TintColor", rarity_TintColor[rarity]);
-            
-            // настраиваем строение
+            ScriptUtils.SetValue(unitConfig.hordeConfig, "Flags", mergeFlags(UnitFlags, unitConfig.hordeConfig.Flags, UnitFlags.NotChoosable));
+            // убираем налоги
+            ScriptUtils.SetValue(unitConfig.hordeConfig, "SalarySlots", 0);
+            // делаем 0-ую стоимость
+            ScriptUtils.SetValue(unitConfig.hordeConfig.CostResources, "Gold",   0);
+            ScriptUtils.SetValue(unitConfig.hordeConfig.CostResources, "Metal",  0);
+            ScriptUtils.SetValue(unitConfig.hordeConfig.CostResources, "Lumber", 0);
+            ScriptUtils.SetValue(unitConfig.hordeConfig.CostResources, "People", 0);
+            // убираем дружественный огонь
+            if (unitConfig.hordeConfig.MainArmament) {
+                var bulletCfg = HordeContentApi.GetBulletConfig(unitConfig.hordeConfig.MainArmament.BulletConfig.Uid);
+                ScriptUtils.SetValue(bulletCfg, "CanDamageAllied", false);
+            }
+            // убираем захватываемость
+            if (unitConfig.hordeConfig.ProfessionParams.ContainsKey(UnitProfession.Capturable)) {
+                unitConfig.hordeConfig.ProfessionParams.Remove(UnitProfession.Capturable);
+            }
+            // убираем команду захвата
+            if (unitConfig.hordeConfig.AllowedCommands.ContainsKey(UnitCommand.Capture)) {
+                unitConfig.hordeConfig.AllowedCommands.Remove(UnitCommand.Capture);
+            }
+            // убираем команду удержания позиции
+            if (unitConfig.hordeConfig.AllowedCommands.ContainsKey(UnitCommand.HoldPosition)) {
+                unitConfig.hordeConfig.AllowedCommands.Remove(UnitCommand.HoldPosition);
+            }
+            // убираем профессию добычу
+            if (unitConfig.hordeConfig.ProfessionParams.ContainsKey(UnitProfession.Harvester)) {
+                unitConfig.hordeConfig.ProfessionParams.Remove(UnitProfession.Harvester);
+            }
 
+            // настраиваем строение
             ScriptUtils.SetValue(factoryConfig.hordeConfig, "Name", config.factoryConfig.hordeConfig.Name + "\n(" + unitConfig.hordeConfig.Name + ")");
             ScriptUtils.SetValue(factoryConfig.hordeConfig, "MaxHealth", 100 + 50*rarity);
             ScriptUtils.SetValue(factoryConfig.hordeConfig, "MinHealth", 0);

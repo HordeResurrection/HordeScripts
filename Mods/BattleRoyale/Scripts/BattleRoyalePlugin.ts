@@ -1,7 +1,7 @@
-import { LogLevel } from "library/common/logging";
+import { log, LogLevel } from "library/common/logging";
 import { generateCellInSpiral, generateRandomCellInRect } from "library/common/position-tools";
 import { isReplayMode } from "library/game-logic/game-tools";
-import { UnitDirection, UnitHurtType } from "library/game-logic/horde-types";
+import { Settlement, UnitDirection, UnitHurtType } from "library/game-logic/horde-types";
 import { spawnUnits } from "library/game-logic/unit-spawn";
 import HordePluginBase from "plugins/base-plugin";
 import { Factory_Slavyane } from "./Configs/Factory_Slavyane";
@@ -20,6 +20,12 @@ import { Hero_Crusader } from "./Units/Hero_Crusader";
 import { IUnit } from "./Units/IUnit";
 import { Priest } from "./Units/Priest";
 import { Hero_Hunter } from "./Units/Hero_Hunter";
+import { IHero } from "./Units/IHero";
+import { Hero_Scorpion } from "./Units/Hero_Scorpion";
+import { Hero_Totemist } from "./Units/Hero_Totemist";
+
+const PeopleIncomeLevel = HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
+type PeopleIncomeLevel = HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 
 enum GameState {
     INIT = 0,
@@ -36,7 +42,7 @@ export class BattleRoyalePlugin extends HordePluginBase {
     _gameField:            GameField;
     _gameState:            GameState;
     _buildingsTemplate:    Array<BuildingTemplate>;
-    _heroesTemplate:       Array<typeof IUnit>;
+    _heroesTemplate:       Array<typeof IHero>;
 
     _playerUidToSettlement: Map<number, number>;
 
@@ -80,23 +86,18 @@ export class BattleRoyalePlugin extends HordePluginBase {
         this._gameField.OnEveryTick(gameTickNum);
 
         for (var unitNum = 0; unitNum < this._units.length; unitNum++) {
-            if (gameTickNum % this._units[unitNum].processingTickModule != this._units[unitNum].processingTick) {
-                continue;
+            if (this._units[unitNum].OnEveryTick(gameTickNum)) {
+                if (this._units[unitNum].hordeUnit.IsDead) {
+                    this._units.splice(unitNum--, 1);
+                }
             }
-
-            if (this._units[unitNum].hordeUnit.IsDead) {
-                this._units.splice(unitNum--, 1);
-                continue;
-            }
-
-            this._units[unitNum].OnEveryTick(gameTickNum);
         }
 
         var settlementNum = gameTickNum % 50;
         if (settlementNum < this._playerSettlements.length) {
             if (!this._playerSettlements[settlementNum].isDefeat){
                 //  присуждаем  поражение
-                if (this._playerSettlements[settlementNum].heroUnit.hordeUnit.IsDead){
+                if (this._playerSettlements[settlementNum].heroUnit.IsDead()){
                     this._playerSettlements[settlementNum].isDefeat = true;
                     this._playerSettlements[settlementNum].hordeSettlement.Existence.ForceTotalDefeat();
                     this._playerSettlements.forEach((otSettlement, otSettlementNum)=>{
@@ -190,7 +191,9 @@ export class BattleRoyalePlugin extends HordePluginBase {
             Hero_Crusader,
             Hero_Rider,
             Hero_FireArcher,
-            Hero_Hunter
+            Hero_Hunter,
+            Hero_Scorpion,
+            Hero_Totemist
         ];
 
         // инициализируем строения и юнитов
@@ -204,12 +207,10 @@ export class BattleRoyalePlugin extends HordePluginBase {
             this._buildingsTemplate = this._buildingsTemplate.concat(factory.GetBuildings());
         });
 
-        // выбираем 5 случайных строений для игры
-
-        // for (var i = 0; i < 5; i++) {
-        //     var index = rnd.RandomNumber(0, allBuildingsTemplate.length - 1);
-        //     this._buildingsTemplate.push(allBuildingsTemplate[index]);
-        //     allBuildingsTemplate.splice(index, 1);
+        // убираем дружественный огонь у некоторых снарядов (не работает)
+        // {
+        //     var bulletCfg = HordeContentApi.GetBulletConfig("#BulletConfig_Fire");
+        //     ScriptUtils.SetValue(bulletCfg, "CanDamageAllied", false);
         // }
 
         // создаем игровое поле
@@ -218,13 +219,31 @@ export class BattleRoyalePlugin extends HordePluginBase {
         // удаляем всех юнитов на карте
         // таким образом для игры подходит любая карта
 
-        ForEach(scenaSettlements, (settlement) => {
+        ForEach(scenaSettlements, (settlement : Settlement) => {
             let enumerator = settlement.Units.GetEnumerator();
             while(enumerator.MoveNext()) {
                 var unit = enumerator.Current;
-                unit.Delete();
+                if (unit) unit.Delete();
             }
             enumerator.Dispose();
+
+            // отбираем ресурсы
+            settlement.Resources.TakeResources(settlement.Resources.GetCopy());
+
+            // включаем кастомные условия поражения
+            var existenceRule        = settlement.RulesOverseer.GetExistenceRule();
+            var principalInstruction = ScriptUtils.GetValue(existenceRule, "PrincipalInstruction");
+            ScriptUtils.SetValue(principalInstruction, "AlmostDefeatCondition", HordeClassLibrary.World.Settlements.Existence.AlmostDefeatCondition.Custom);
+            ScriptUtils.SetValue(principalInstruction, "TotalDefeatCondition", HordeClassLibrary.World.Settlements.Existence.TotalDefeatCondition.Custom);
+            ScriptUtils.SetValue(principalInstruction, "VictoryCondition", HordeClassLibrary.World.Settlements.Existence.VictoryCondition.Custom);
+
+            // Отключить прирост населения
+            let censusModel = ScriptUtils.GetValue(settlement.Census, "Model");
+            censusModel.PeopleIncomeLevels.Clear();
+            censusModel.PeopleIncomeLevels.Add(new PeopleIncomeLevel(0, 0, -1));
+            censusModel.LastPeopleIncomeLevel = 0;
+            // Установить период сбора налогов и выплаты жалования (чтобы отключить сбор, необходимо установить 0)
+            censusModel.TaxAndSalaryUpdatePeriod = 0;
         });
 
         // поселение - нейтрал
@@ -255,10 +274,17 @@ export class BattleRoyalePlugin extends HordePluginBase {
                     }
 
                     var generator = generateCellInSpiral(args.Unit.Cell.X, args.Unit.Cell.Y);
+                    // вызываем событие у героя, возможно он что-то переделает
+                    var spawnInfo = playerSettlement.heroUnit.OnDestroyBuilding(
+                        that._buildingsTemplate[building.templateNum],
+                        rarityNum,
+                        that._buildingsTemplate[building.templateNum].units[rarityNum],
+                        that._buildingsTemplate[building.templateNum].spawnCount
+                    );
                     spawnUnits(
                         playerSettlement.hordeSettlement,
-                        that._buildingsTemplate[building.templateNum].units[rarityNum].hordeConfig,
-                        that._buildingsTemplate[building.templateNum].spawnCount,
+                        spawnInfo[0].hordeConfig,
+                        spawnInfo[1],
                         UnitDirection.RightDown,
                         generator);
                 }
@@ -318,9 +344,25 @@ export class BattleRoyalePlugin extends HordePluginBase {
         playerSettlementsUid.sort();
         var playerHordeSettlements = playerSettlementsUid.map((settlementUid) => scenaSettlements.Item.get(settlementUid + ''));
 
+        // настраиваем дипломатию на карте
+
+        for (var playerSettlementNum = 0; playerSettlementNum < playerHordeSettlements.length; playerSettlementNum++) {
+            for (var otherPlayerSettlementNum = playerSettlementNum + 1; otherPlayerSettlementNum < playerHordeSettlements.length; otherPlayerSettlementNum++) {
+                playerHordeSettlements[playerSettlementNum].Diplomacy.DeclareWar(playerHordeSettlements[otherPlayerSettlementNum]);
+                playerHordeSettlements[otherPlayerSettlementNum].Diplomacy.DeclareWar(playerHordeSettlements[playerSettlementNum]);
+            }
+            playerHordeSettlements[playerSettlementNum].Diplomacy.DeclareWar(this._enemySettlement.hordeSettlement);
+            this._enemySettlement.hordeSettlement.Diplomacy.DeclareWar(playerHordeSettlements[playerSettlementNum]);
+
+            playerHordeSettlements[playerSettlementNum].Diplomacy.DeclarePeace(this._neutralSettlement.hordeSettlement);
+            this._neutralSettlement.hordeSettlement.Diplomacy.DeclarePeace(playerHordeSettlements[playerSettlementNum]);
+        }
+        this._neutralSettlement.hordeSettlement.Diplomacy.DeclarePeace(this._enemySettlement.hordeSettlement);
+        this._enemySettlement.hordeSettlement.Diplomacy.DeclarePeace(this._neutralSettlement.hordeSettlement);
+
         // создаем героя в случайном месте карты и послеения
 
-        var playerSettlements_hordeHeroUnit = new Array<IUnit>();
+        var playerSettlements_hordeHeroUnit = new Array<IHero>();
         playerHordeSettlements.forEach(hordeSettlement => {
             var heroConfig = this._heroesTemplate[rnd.RandomNumber(0, this._heroesTemplate.length - 1)];
             var units = spawnUnits(hordeSettlement, heroConfig.GetHordeConfig(), 1, UnitDirection.RightDown, generator);
@@ -354,26 +396,12 @@ export class BattleRoyalePlugin extends HordePluginBase {
                 function (sender, args) {
                     // анализируем юнита
 
-                    var settlementNum = that._playerUidToSettlement.get(args.Unit.Owner.Uid) as number;
-                    that._playerSettlements[settlementNum].formation.AddUnits([new IUnit(args.Unit)]);
+                    var unit = new IUnit(args.Unit);
+                    var settlementNum = that._playerUidToSettlement.get(Number.parseInt(unit.hordeUnit.Owner.Uid)) as number;
+                    that._playerSettlements[settlementNum].formation.AddUnits([unit]);
+                    that._playerSettlements[settlementNum].heroUnit.OnAddToFormation(unit);
             });
         }
-
-        // настраиваем дипломатию на карте
-
-        for (var playerSettlementNum = 0; playerSettlementNum < this._playerSettlements.length; playerSettlementNum++) {
-            for (var otherPlayerSettlementNum = playerSettlementNum + 1; otherPlayerSettlementNum < this._playerSettlements.length; otherPlayerSettlementNum++) {
-                this._playerSettlements[playerSettlementNum].hordeSettlement.Diplomacy.DeclareWar(this._playerSettlements[otherPlayerSettlementNum].hordeSettlement);
-                this._playerSettlements[otherPlayerSettlementNum].hordeSettlement.Diplomacy.DeclareWar(this._playerSettlements[playerSettlementNum].hordeSettlement);
-            }
-            this._playerSettlements[playerSettlementNum].hordeSettlement.Diplomacy.DeclareWar(this._enemySettlement.hordeSettlement);
-            this._enemySettlement.hordeSettlement.Diplomacy.DeclareWar(this._playerSettlements[playerSettlementNum].hordeSettlement);
-
-            this._playerSettlements[playerSettlementNum].hordeSettlement.Diplomacy.DeclarePeace(this._neutralSettlement.hordeSettlement);
-            this._neutralSettlement.hordeSettlement.Diplomacy.DeclarePeace(this._playerSettlements[playerSettlementNum].hordeSettlement);
-        }
-        this._neutralSettlement.hordeSettlement.Diplomacy.DeclarePeace(this._enemySettlement.hordeSettlement);
-        this._enemySettlement.hordeSettlement.Diplomacy.DeclarePeace(this._neutralSettlement.hordeSettlement);
 
         // спавним знахарей на карте
 

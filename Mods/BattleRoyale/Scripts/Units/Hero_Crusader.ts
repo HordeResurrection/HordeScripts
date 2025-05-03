@@ -1,6 +1,6 @@
-import { IUnit } from "./IUnit";
+import { IHero } from "./IHero";
 
-export class Hero_Crusader extends IUnit {
+export class Hero_Crusader extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "Crusader";
     protected static BaseCfgUid  : string = "#UnitConfig_Slavyane_Spearman";
 
@@ -9,7 +9,7 @@ export class Hero_Crusader extends IUnit {
     }
 
     protected static _InitHordeConfig() {
-        IUnit._InitHordeConfig.call(this);
+        IHero._InitHordeConfig.call(this);
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Герой {рыцарь}");
         ScriptUtils.SetValue(this.Cfg, "MaxHealth", 60);

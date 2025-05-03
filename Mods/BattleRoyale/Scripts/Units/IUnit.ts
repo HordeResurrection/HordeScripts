@@ -3,6 +3,7 @@ import { UnitCommand, PointCommandArgs, UnitDirection, UnitConfig } from "librar
 import { Cell } from "../Core/Cell";
 import { IConfig } from "./IConfig";
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
+import { log } from "library/common/logging";
 
 const SpawnUnitParameters = HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
 
@@ -25,9 +26,9 @@ export class IUnit extends IConfig {
 
     public hordeUnit: HordeClassLibrary.World.Objects.Units.Unit;
     /** тик на котором нужно обрабатывать юнита */
-    processingTick: number;
+    private processingTick: number;
     /** модуль на который делится игровой тик, если остаток деления равен processingTick, то юнит обрабатывается */
-    processingTickModule: number;
+    private processingTickModule: number;
 
     constructor(...args: any[]) {
         super(args[0].Cfg);
@@ -65,7 +66,9 @@ export class IUnit extends IConfig {
         this._cfg.GetOrderDelegate(this.hordeUnit, pointCommandArgs);
     }
 
-    public OnEveryTick(gameTickNum:number) {}
+    public OnEveryTick(gameTickNum:number) : boolean {
+        return gameTickNum % this.processingTickModule == this.processingTick;
+    }
 
 // static
 

@@ -1,10 +1,12 @@
 import { createPF } from "library/common/primitives";
 import { IUnit } from "./IUnit";
-import { UnitDirection } from "library/game-logic/horde-types";
+import { UnitDirection, UnitFlags } from "library/game-logic/horde-types";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { spawnUnits } from "library/game-logic/unit-spawn";
+import { mergeFlags } from "library/dotnet/dotnet-utils";
+import { IHero } from "./IHero";
 
-export class Hero_Hunter extends IUnit {
+export class Hero_Hunter extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "Hunter";
     protected static BaseCfgUid  : string = "#UnitConfig_Slavyane_Archer";
 
@@ -21,7 +23,7 @@ export class Hero_Hunter extends IUnit {
     }
 
     protected static _InitHordeConfig() {
-        IUnit._InitHordeConfig.call(this);
+        IHero._InitHordeConfig.call(this);
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Герой {охотник}");
         ScriptUtils.SetValue(this.Cfg, "MaxHealth", 15);
@@ -42,7 +44,11 @@ export class Hero_Hunter extends IUnit {
         // сделать медведя подручного
     }
 
-    public OnEveryTick(gameTickNum: number): void {
+    public OnEveryTick(gameTickNum: number): boolean {
+        if (!IHero.prototype.OnEveryTick.call(this, gameTickNum)) {
+            return false;
+        }
+
         if (this._bear) {
             if (this._bear.hordeUnit.IsDead) {
                 this._bear         = null;
@@ -51,9 +57,14 @@ export class Hero_Hunter extends IUnit {
         } else {
             if (this._bearDeadTick + this._bearRevivePeriod < gameTickNum) {
                 var generator = generateCellInSpiral(this.hordeUnit.Cell.X, this.hordeUnit.Cell.Y);
-                this._bear    = new Bear(spawnUnits(this.hordeUnit.Owner, Bear.GetHordeConfig(), 1, UnitDirection.RightDown, generator));
+                var units     = spawnUnits(this.hordeUnit.Owner, Bear.GetHordeConfig(), 1, UnitDirection.RightDown, generator);
+                if (units.length > 0) {
+                    this._bear    = new Bear(units[0]);
+                }
             }
         }
+
+        return true;
     }
 }
 
@@ -69,5 +80,6 @@ class Bear extends IUnit {
         IUnit._InitHordeConfig.call(this);
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Подручный медведь");
+        ScriptUtils.SetValue(this.Cfg, "Flags", mergeFlags(UnitFlags, this.Cfg.Flags, UnitFlags.NotChoosable));
     }
 }

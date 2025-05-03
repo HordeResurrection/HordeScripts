@@ -1,4 +1,4 @@
-import { GeometryCanvas, Stride_Vector2 } from "library/game-logic/horde-types";
+import { GeometryCanvas, GeometryVisualEffect, Stride_Color, Stride_Vector2 } from "library/game-logic/horde-types";
 import { Cell } from "./Cell";
 import { spawnGeometry } from "library/game-logic/decoration-spawn";
 import { createPoint } from "library/common/primitives";
@@ -6,12 +6,12 @@ import { createPoint } from "library/common/primitives";
 export class GeometryCircle {
     radius: number;
     center: Cell;
-    color: any;
+    color: Stride_Color;
     thickness: number;
 
-    geometry: any;
+    geometry: GeometryVisualEffect;
 
-    constructor(radius: number, center: Cell, color: any, thickness: number, ) {
+    constructor(radius: number, center: Cell, color: Stride_Color, thickness: number, ) {
         this.radius = Math.round(radius);
         this.center = center;
         this.color  = color;

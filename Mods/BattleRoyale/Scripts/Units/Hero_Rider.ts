@@ -1,7 +1,7 @@
 import { TileType } from "library/game-logic/horde-types";
-import { IUnit } from "./IUnit";
+import { IHero } from "./IHero";
 
-export class Hero_Rider extends IUnit {
+export class Hero_Rider extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "Rider";
     protected static BaseCfgUid  : string = "#UnitConfig_Slavyane_Raider";
 
@@ -10,7 +10,7 @@ export class Hero_Rider extends IUnit {
     }
 
     protected static _InitHordeConfig() {
-        IUnit._InitHordeConfig.call(this);
+        IHero._InitHordeConfig.call(this);
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Герой {всадник}");
         ScriptUtils.SetValue(this.Cfg, "MaxHealth", 30);

@@ -45,9 +45,13 @@ export class Priest extends IUnit {
         //ScriptUtils.SetValue(extraWorkers[0], "HealValue", 3);
     }
 
-    public OnEveryTick(gameTickNum: number): void {
+    public OnEveryTick(gameTickNum: number): boolean {
+        if (!IUnit.prototype.OnEveryTick.call(this, gameTickNum)) {
+            return false;
+        }
+
         if (this.hordeUnit.IsDead) {
-            return;
+            return true;
         }
 
         // логика смены поселения
@@ -130,5 +134,7 @@ export class Priest extends IUnit {
                 this._targetCell = generator.next().value;
             }
         }
+
+        return true;
     }
 }

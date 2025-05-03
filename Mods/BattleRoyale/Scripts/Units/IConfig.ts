@@ -1,5 +1,5 @@
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
-import { TileType, UnitConfig, UnitFlags, UnitSpecification } from "library/game-logic/horde-types";
+import { TileType, UnitCommand, UnitConfig, UnitFlags, UnitSpecification } from "library/game-logic/horde-types";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 
 export function CreateHordeUnitConfig(BaseCfgUid: string, newCfgUid: string) : UnitConfig {
@@ -8,9 +8,10 @@ export function CreateHordeUnitConfig(BaseCfgUid: string, newCfgUid: string) : U
     // при наличии конфига удаляем его
     if (HordeContentApi.HasUnitConfig(newCfgUid)) {
         hordeConfig = HordeContentApi.GetUnitConfig(newCfgUid);
-    } else {
+        HordeContentApi.RemoveConfig(hordeConfig);
+    }// else {
         hordeConfig = HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig(BaseCfgUid), newCfgUid) as UnitConfig;
-    }
+    //}
 
     return hordeConfig;
 }
@@ -127,7 +128,7 @@ export class IConfig {
     protected static Cfg         : UnitConfig;
     protected static BaseCfgUid  : string = "";
 
-    public static GetHordeConfig () : any {
+    public static GetHordeConfig () : UnitConfig {
         if (this.Cfg) {
             return this.Cfg;
         } else {
@@ -161,6 +162,18 @@ export class IConfig {
         // убираем захватываемость
         if (this.Cfg.ProfessionParams.ContainsKey(UnitProfession.Capturable)) {
             this.Cfg.ProfessionParams.Remove(UnitProfession.Capturable);
+        }
+        // убираем команду захвата
+        if (this.Cfg.AllowedCommands.ContainsKey(UnitCommand.Capture)) {
+            this.Cfg.AllowedCommands.Remove(UnitCommand.Capture);
+        }
+        // убираем команду удержания позиции
+        if (this.Cfg.AllowedCommands.ContainsKey(UnitCommand.HoldPosition)) {
+            this.Cfg.AllowedCommands.Remove(UnitCommand.HoldPosition);
+        }
+        // убираем профессию добычу
+        if (this.Cfg.ProfessionParams.ContainsKey(UnitProfession.Harvester)) {
+            this.Cfg.ProfessionParams.Remove(UnitProfession.Harvester);
         }
     }
 }
