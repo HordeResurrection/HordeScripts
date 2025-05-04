@@ -224,7 +224,19 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         }
     }
 
-    protected makeSelfTask(): SettlementSubcontrollerTask | null {
+    protected onTaskSuccess(tickNumber: number): void {
+        this.nextTaskAttemptTick = tickNumber
+    }
+
+    protected onTaskFailure(tickNumber: number): void {
+        this.nextTaskAttemptTick = tickNumber + MaraUtils.Random(
+            this.settlementController.MasterMind,
+            60 * 50,
+            0
+        );
+    }
+
+    protected makeSelfTask(tickNumber: number): SettlementSubcontrollerTask | null {
         let task: SettlementSubcontrollerTask | null = this.makeExpandBuildTask();
 
         if (!task) {
@@ -233,6 +245,13 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
 
         if (!task) {
             task = this.makeExpandUpgradeTask();
+        }
+
+        if (!task) {
+            this.nextTaskAttemptTick = tickNumber + MaraUtils.Random(
+                this.settlementController.MasterMind,
+                this.settlementController.Settings.Timeouts.DefaultTaskReattemptMaxCooldown
+            );
         }
 
         return task;

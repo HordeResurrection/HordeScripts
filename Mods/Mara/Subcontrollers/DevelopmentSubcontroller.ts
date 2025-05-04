@@ -6,14 +6,21 @@ import { UnitComposition } from "../Common/UnitComposition";
 import { DevelopSettlementTask } from "../SettlementSubcontrollerTasks/DevelopmentSubcontroller/DevelopSettlementTask/DevelopSettlementTask";
 
 export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
-    protected get successfulSelfTaskCooldown(): number {
-        return MaraUtils.Random(
+    protected onTaskSuccess(tickNumber: number): void {
+        this.nextTaskAttemptTick = tickNumber + MaraUtils.Random(
             this.settlementController.MasterMind,
             this.settlementController.Settings.Timeouts.SettlementEnhanceMaxCooldown,
             this.settlementController.Settings.Timeouts.SettlementEnhanceMinCooldown
         );
     }
-    
+
+    protected onTaskFailure(tickNumber: number): void {
+        this.nextTaskAttemptTick = tickNumber + MaraUtils.Random(
+            this.settlementController.MasterMind,
+            60 * 50
+        );
+    }
+
     constructor (parent: MaraSettlementController) {
         super(parent);
     }
@@ -22,7 +29,7 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
         //do nothing
     }
 
-    protected makeSelfTask(): SettlementSubcontrollerTask | null {
+    protected makeSelfTask(tickNumber: number): SettlementSubcontrollerTask | null {
         let economyComposition = this.settlementController.GetCurrentEconomyComposition();
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
 
@@ -55,6 +62,11 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
             return new DevelopSettlementTask(selectedCfgIds, this.settlementController, this);
         }
         else {
+            this.nextTaskAttemptTick = tickNumber + MaraUtils.Random(
+                this.settlementController.MasterMind,
+                this.settlementController.Settings.Timeouts.DefaultTaskReattemptMaxCooldown
+            );
+
             return null;
         }
     }

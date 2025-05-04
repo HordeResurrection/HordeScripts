@@ -39,19 +39,19 @@ class TaskSelectItem implements NonUniformRandomSelectItem {
 }
 
 export class StrategySubcontroller extends MaraTaskableSubcontroller {
-    protected get selfTaskReattemptCooldown(): number {
-        return MaraUtils.Random(
-            this.settlementController.MasterMind,
-            this.settlementController.Settings.Timeouts.StrategyActionReattemptMaxCooldown,
-            this.settlementController.Settings.Timeouts.StrategyActionReattemptMinCooldown
-        );
-    }
-    
-    protected get successfulSelfTaskCooldown(): number {
-        return MaraUtils.Random(
+    protected onTaskSuccess(tickNumber: number): void {
+        this.nextTaskAttemptTick = tickNumber + MaraUtils.Random(
             this.settlementController.MasterMind,
             this.settlementController.Settings.Timeouts.StrategyActionSuccessMaxCooldown,
             this.settlementController.Settings.Timeouts.StrategyActionSuccessMinCooldown
+        );
+    }
+
+    protected onTaskFailure(tickNumber: number): void {
+        this.nextTaskAttemptTick = tickNumber + MaraUtils.Random(
+            this.settlementController.MasterMind,
+            this.settlementController.Settings.Timeouts.StrategyActionReattemptMaxCooldown,
+            this.settlementController.Settings.Timeouts.StrategyActionReattemptMinCooldown
         );
     }
     
@@ -508,7 +508,7 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         }
     }
 
-    protected makeSelfTask(): SettlementSubcontrollerTask | null {
+    protected makeSelfTask(tickNumber: number): SettlementSubcontrollerTask | null {
         let taskCandidates: Array<TaskSelectItem> = [];
         
         let isAtLeastOneDefenceCfgIdProduceable = false;
@@ -599,6 +599,13 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         }
 
         let selectResult = MaraUtils.NonUniformRandomSelect(this.settlementController.MasterMind, taskCandidates);
+
+        if (!selectResult) {
+            this.nextTaskAttemptTick = tickNumber + MaraUtils.Random(
+                this.settlementController.MasterMind,
+                this.settlementController.Settings.Timeouts.DefaultTaskReattemptMaxCooldown
+            );
+        }
 
         return selectResult ? selectResult.Task : null;
     }

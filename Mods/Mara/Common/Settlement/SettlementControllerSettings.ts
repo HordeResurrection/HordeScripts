@@ -36,6 +36,8 @@ class TimeoutsSettings {
 
     public SettlementEnhanceMinCooldown = 2 * 60 * 50;
     public SettlementEnhanceMaxCooldown = 9 * 60 * 50;
+
+    public DefaultTaskReattemptMaxCooldown: number = 20 * 50;
     
     public UnfinishedConstructionThreshold: number = 2 * 60 * 50;
 }
