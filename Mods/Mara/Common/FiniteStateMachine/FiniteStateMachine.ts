@@ -3,9 +3,14 @@ import { FsmState } from "./FsmState";
 
 export abstract class FiniteStateMachine implements MaraLogger {
     protected logger: MaraLogger;
+    
+    protected state: FsmState | null;
+    protected nextState: FsmState | null;
 
     constructor(logger: MaraLogger) {
         this.logger = logger;
+        this.state = null;
+        this.nextState = null;
     }
     
     Tick(tickNumber: number): void {
@@ -38,12 +43,6 @@ export abstract class FiniteStateMachine implements MaraLogger {
             this.state = null;
         }
     }
-
-    protected abstract get state(): FsmState;
-    protected abstract set state(value: FsmState | null);
-
-    protected abstract get nextState(): FsmState | null;
-    protected abstract set nextState(value: FsmState | null);
     
     protected abstract onTick(tickNumber: number): void;
 
