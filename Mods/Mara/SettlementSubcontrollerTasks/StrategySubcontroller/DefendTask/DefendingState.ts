@@ -4,7 +4,7 @@ import { ConstantProductionState } from "../../ConstantProductionState";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 
 export class DefendingState extends ConstantProductionState {
-    private reinforcementsCfgIds: Array<string>;
+    private reinforcementsCfgIds: Array<string> = [];
     
     constructor(task: SettlementSubcontrollerTask, settlementController: MaraSettlementController) {
         super(task, settlementController);

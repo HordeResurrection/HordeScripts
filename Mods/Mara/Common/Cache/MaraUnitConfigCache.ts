@@ -1,21 +1,21 @@
-import { AllContent } from "library/game-logic/horde-types";
+import { AllContent, UnitConfig } from "library/game-logic/horde-types";
 import { MaraUtils } from "../../MaraUtils";
 import { ConfigPropertyType } from "./ConfigPropertyType";
 import { Mara } from "../../Mara";
 
 class MaraUnitConfigCacheItem {
     Uid: string;
-    Config: any;
+    Config: UnitConfig;
     
     private configProperties: Map<string, ConfigPropertyType>;
 
-    constructor(unitConfig: any) {
+    constructor(unitConfig: UnitConfig) {
         this.Config = unitConfig;
         this.Uid = unitConfig.Uid;
         this.configProperties = new Map<string, ConfigPropertyType>();
     }
 
-    GetConfigProperty(propertyCalculator: (config: any) => ConfigPropertyType, propertyName?: string): ConfigPropertyType {
+    GetConfigProperty(propertyCalculator: (config: UnitConfig) => ConfigPropertyType, propertyName?: string): ConfigPropertyType {
         let propName = propertyName ?? propertyCalculator.name;
         let propertyValue = this.configProperties.get(propName);
 
@@ -56,7 +56,7 @@ export class MaraUnitConfigCache {
 
     static GetConfigProperty(
         configId: string,
-        propertyCalculator: (config: any) => ConfigPropertyType,
+        propertyCalculator: (config: UnitConfig) => ConfigPropertyType,
         propertyName?: string
     ): ConfigPropertyType {
         let cacheItem = MaraUnitConfigCache.configCache.get(configId);
@@ -82,7 +82,7 @@ export class MaraUnitConfigCache {
         Mara.Debug(`set ${sourceConfigId} can attack ${targetConfigId} to ${value}`);
     }
 
-    private static addConfig(unitConfig: any): MaraUnitConfigCacheItem {
+    private static addConfig(unitConfig: UnitConfig): MaraUnitConfigCacheItem {
         let cacheItem = new MaraUnitConfigCacheItem(unitConfig);
         MaraUnitConfigCache.configCache.set(cacheItem.Uid, cacheItem);
 

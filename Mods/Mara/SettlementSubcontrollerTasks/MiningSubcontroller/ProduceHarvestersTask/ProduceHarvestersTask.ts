@@ -5,7 +5,9 @@ import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 import { ProduceHarvestersState } from "./ProduceHarvestersState";
 
 export class ProduceHarvestersTask extends SettlementSubcontrollerTask {
+    // @ts-ignore
     private currentTaskState: FsmState;
+    // @ts-ignore
     private nextTaskState: FsmState | null;
     
     public get ExpectedTimeout(): number {

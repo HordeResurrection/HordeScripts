@@ -61,6 +61,6 @@ export abstract class MaraSquadGatheringUpState extends MaraSquadState {
     private distanceToTargetCell(unit: MaraUnitCacheItem): number {
         let pathLength = MaraUtils.GetUnitPathLength(unit);
 
-        return pathLength ?? MaraUtils.ChebyshevDistance(unit.UnitCell, this.squad.CurrentMovementPoint);
+        return pathLength ?? MaraUtils.ChebyshevDistance(unit.UnitCell, this.squad.CurrentMovementPoint!);
     }
 }

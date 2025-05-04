@@ -1,3 +1,4 @@
+import { Settlement } from "library/game-logic/horde-types";
 import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
 import { MaraProductionRequest } from "../../../Common/MaraProductionRequest";
 import { MaraSettlementController } from "../../../MaraSettlementController";
@@ -5,12 +6,12 @@ import { ConstantProductionState } from "../../ConstantProductionState";
 import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 
 export class ExterminatingState extends ConstantProductionState {
-    private currentTarget: MaraUnitCacheItem | null;
-    private reinforcementsCfgIds: Array<string>;
-    private timeoutTick: number | null;
-    private enemy: any;
+    private currentTarget: MaraUnitCacheItem | null = null;
+    private reinforcementsCfgIds: Array<string> = [];
+    private timeoutTick: number | null = null;
+    private enemy: Settlement;
 
-    constructor(enemySettlement: any, task: SettlementSubcontrollerTask, settlementController: MaraSettlementController) {
+    constructor(enemySettlement: Settlement, task: SettlementSubcontrollerTask, settlementController: MaraSettlementController) {
         super(task, settlementController);
         this.enemy = enemySettlement;
     }
@@ -78,7 +79,7 @@ export class ExterminatingState extends ConstantProductionState {
         return result;
     }
 
-    private selectTarget(enemy: any): void {
+    private selectTarget(enemy: Settlement): void {
         this.currentTarget = null;
         let target = this.settlementController.StrategyController.GetOffensiveTarget(enemy);
 

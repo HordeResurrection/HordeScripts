@@ -5,7 +5,9 @@ import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 import { DefendingState } from "./DefendingState";
 
 export class DefendTask extends SettlementSubcontrollerTask {
+    // @ts-ignore
     private currentTaskState: FsmState;
+    // @ts-ignore
     private nextTaskState: FsmState | null;
 
     public get ExpectedTimeout(): number {

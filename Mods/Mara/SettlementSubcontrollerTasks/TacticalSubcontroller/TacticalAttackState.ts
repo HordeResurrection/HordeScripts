@@ -7,7 +7,7 @@ import { TacticalSubcontroller } from "../../Subcontrollers/TacticalSubcontrolle
 export class TacticalAttackState extends FsmState {
     private currentTarget: MaraUnitCacheItem;
     private tacticalController: TacticalSubcontroller;
-    private attackPath: Array<MaraPoint>;
+    private attackPath: Array<MaraPoint> = [];
 
     constructor(
         target: MaraUnitCacheItem, 

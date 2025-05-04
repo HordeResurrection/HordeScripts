@@ -14,6 +14,7 @@ export class MaraProfiler {
         this.message = message;
         this.callCount = 0;
         this.executionTime = 0;
+        this.startTime = 0;
 
         if (start) {
             this.Start();

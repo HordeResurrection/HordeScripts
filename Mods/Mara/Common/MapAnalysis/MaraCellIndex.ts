@@ -1,18 +1,19 @@
+import { IMaraPoint } from "../IMaraPoint";
 import { MaraCellDataHolder } from "../MaraCellDataHolder";
 import { MaraPoint } from "../MaraPoint";
 
 export class MaraCellIndex extends MaraCellDataHolder {
-    Get(cell: any): any {
+    Get(cell: IMaraPoint): any {
         let index = this.makeIndex(cell);
         return (this.data[index] ?? false);
     }
 
-    Set(cell: any, value: any) {
+    Set(cell: IMaraPoint, value: any) {
         let index = this.makeIndex(cell);
         this.data[index] = value;
     }
 
-    Del(cell: any) {
+    Del(cell: IMaraPoint) {
         let index = this.makeIndex(cell);
         delete this.data[index];
     }

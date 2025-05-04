@@ -8,12 +8,17 @@ import { createHordeColor } from "library/common/primitives";
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
 import { MaraUnitConfigCache } from "./Common/Cache/MaraUnitConfigCache";
 import { MaraProfiler } from "./Common/MaraProfiler";
+import { Settlement } from "library/game-logic/horde-types";
 
 export enum MaraLogLevel {
     Debug = 0,
     Info = 1,
     Warning = 2,
     Error = 3
+}
+
+class MaraProfilersCollection {
+    [key: string]: MaraProfiler;
 }
 
 /*
@@ -24,21 +29,21 @@ export enum MaraLogLevel {
 */
 
 export class Mara {
-    private static profilers = {};
+    private static profilers: MaraProfilersCollection = {};
     
     static LogLevel: MaraLogLevel = MaraLogLevel.Debug;
     static LogTickNumber: boolean = true;
     static CanRun = true;
     
     private static controllers: Array<MaraSettlementController> = [];
-    private static pathfinder: any;
+    private static pathfinder: PathFinder;
     private static currentTick: number;
     
     public static get Controllers(): Array<MaraSettlementController> {
         return Mara.controllers;
     }
 
-    public static get Pathfinder(): any {
+    public static get Pathfinder(): PathFinder {
         if (!Mara.pathfinder) {
             Mara.pathfinder = new PathFinder(MaraUtils.GetScena());
         }
@@ -109,7 +114,7 @@ export class Mara {
             MaraUnitConfigCache.Init();
 
             let tickOffset = 0;
-            let processedSettlements: Array<any> = [];
+            let processedSettlements: Array<Settlement> = [];
 
             for (let item of MaraUtils.GetAllPlayers()) {
                 Mara.AttachToPlayer(item.index, processedSettlements, tickOffset);
@@ -126,7 +131,7 @@ export class Mara {
         Mara.Info(`Mara successfully engaged. Have fun! ^^`);
     };
 
-    static AttachToPlayer(playerId: string, processedSettlements: Array<any>, tickOffset: number = 0): void {
+    static AttachToPlayer(playerId: number, processedSettlements: Array<Settlement>, tickOffset: number = 0): void {
         Mara.Debug(`Begin attach to player ${playerId}`);
         let settlementData = MaraUtils.GetSettlementData(playerId);
 

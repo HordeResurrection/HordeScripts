@@ -45,7 +45,7 @@ export abstract class FiniteStateMachine implements MaraLogger {
     protected abstract get nextState(): FsmState | null;
     protected abstract set nextState(value: FsmState | null);
     
-    protected abstract onTick(tickNumber: number);
+    protected abstract onTick(tickNumber: number): void;
 
     private makeLogMessage(message: string): string {
         return `${this.constructor.name}: ${message}`;

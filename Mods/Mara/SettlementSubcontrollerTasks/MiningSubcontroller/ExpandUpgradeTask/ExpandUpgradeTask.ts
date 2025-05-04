@@ -6,7 +6,9 @@ import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 import { ExpandUpgradeState } from "./ExpandUpgradeState";
 
 export class ExpandUpgradeTask extends SettlementSubcontrollerTask {
+    // @ts-ignore
     private currentTaskState: FsmState;
+    // @ts-ignore
     private nextTaskState: FsmState | null;
 
     public get ExpectedTimeout(): number {

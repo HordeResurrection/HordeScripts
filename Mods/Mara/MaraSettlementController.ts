@@ -18,6 +18,8 @@ import { MaraRect } from "./Common/MaraRect";
 import { MaraUnitCacheItem } from "./Common/Cache/MaraUnitCacheItem";
 import { MaraUnitCache } from "./Common/Cache/MaraUnitCache";
 import { DevelopmentSubcontroller } from "./Subcontrollers/DevelopmentSubcontroller";
+import { Player, Settlement } from "library/game-logic/horde-types";
+import { MasterMind } from "library/mastermind/mastermind-types";
 
 class ReservedUnitsData {
     public ReservableUnits: Array<Map<number, MaraUnitCacheItem>>;
@@ -92,9 +94,9 @@ class ReservedUnitsData {
 export class MaraSettlementController {
     public TickOffset: number = 0;
     
-    public Settlement: any;
-    public MasterMind: any;
-    public Player: any;
+    public Settlement: Settlement;
+    public MasterMind: MasterMind;
+    public Player: Player;
     public Settings: MaraSettlementControllerSettings;
 
     public MiningController: MiningSubcontroller;
@@ -107,11 +109,16 @@ export class MaraSettlementController {
     public ReservedUnitsData: ReservedUnitsData = new ReservedUnitsData();
     
     private subcontrollers: Array<MaraSubcontroller> = [];
-    private currentUnitComposition: UnitComposition | null;
-    private currentDevelopedUnitComposition: UnitComposition | null;
-    private settlementLocation: SettlementClusterLocation | null;
+    private currentUnitComposition: UnitComposition | null = null;
+    private currentDevelopedUnitComposition: UnitComposition | null = null;
+    private settlementLocation: SettlementClusterLocation | null = null;
 
-    constructor (settlement, settlementMM, player, tickOffset) {
+    constructor (
+        settlement: Settlement, 
+        settlementMM: MasterMind, 
+        player: Player, 
+        tickOffset: number
+    ) {
         this.TickOffset = tickOffset;
         
         this.Settlement = settlement;

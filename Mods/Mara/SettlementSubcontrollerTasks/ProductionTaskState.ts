@@ -12,15 +12,15 @@ import { AwaitTaskCompletionState } from "./AwaitTaskCompletionState";
 import { MaraPriority } from "../Common/MaraPriority";
 
 export abstract class ProductionTaskState extends SubcontrollerTaskState {
-    private requests: Array<MaraProductionRequest>;
-    private targetComposition: UnitComposition;
+    private requests: Array<MaraProductionRequest> = [];
+    private targetComposition: UnitComposition = new Map<string, number>();
 
     protected abstract getProductionRequests(): Array<MaraProductionRequest>;
     protected abstract onTargetCompositionReached(): void;
     protected abstract onProductionTimeout(): void;
     protected requestMiningOnInsufficientResources = true;
 
-    private timeoutTick: number | null;
+    private timeoutTick: number | null = null;
     
     OnEntry(): void {
         if (!this.onEntry()) {

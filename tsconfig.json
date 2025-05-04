@@ -11,7 +11,8 @@
         "removeComments": false,
         "sourceMap": true,
         "strictNullChecks": true,
-        "target": "ES6"
+        "target": "ES6",
+        "allowJs": true
     },
 
     "include": [

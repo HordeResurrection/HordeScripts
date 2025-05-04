@@ -5,7 +5,9 @@ import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 import { SubcontrollerTaskState } from "../../SubcontrollerTaskState";
 
 export class LandmarkCaptureState extends SubcontrollerTaskState {
+    // @ts-ignore
     private currentTarget: MaraUnitCacheItem | null;
+    // @ts-ignore
     private timeoutTick: number | null;
     private point: MaraPoint;
 

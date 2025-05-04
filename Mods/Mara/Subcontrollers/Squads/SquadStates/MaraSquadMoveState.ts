@@ -4,7 +4,7 @@ import { MaraSquadIdleState } from "./MaraSquadIdleState";
 import { MaraSquadState } from "./MaraSquadState";
 
 export class MaraSquadMoveState extends MaraSquadState {
-    private timeoutTick: number;
+    private timeoutTick: number = Infinity;
     
     OnEntry(): void {
         this.initiateMovement();

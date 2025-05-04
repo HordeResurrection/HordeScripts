@@ -11,8 +11,9 @@ export class MaraControllableSquad extends MaraSquad {
     
     private controller: TacticalSubcontroller;
     private initialStrength: number;
+    // @ts-ignore
     private state: MaraSquadState;
-    private minSpread: number;
+    private minSpread: number = Infinity;
 
     public get MinSpread(): number {
         return this.minSpread;
@@ -32,11 +33,11 @@ export class MaraControllableSquad extends MaraSquad {
 
     id: number;
 
-    AttackPath: Array<MaraPoint> | null;
-    MovementPath: Array<MaraPoint> | null;
-    CurrentPath: Array<MaraPoint> | null;
-    CurrentMovementPoint: MaraPoint | null;
-    MovementPrecision: number;
+    AttackPath: Array<MaraPoint> | null = null;
+    MovementPath: Array<MaraPoint> | null = null;
+    CurrentPath: Array<MaraPoint> | null = null;
+    CurrentMovementPoint: MaraPoint | null = null;
+    MovementPrecision: number = 0;
 
     constructor(units: Array<MaraUnitCacheItem>, controller: TacticalSubcontroller) {
         super(units);

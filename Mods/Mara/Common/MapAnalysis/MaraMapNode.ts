@@ -1,3 +1,4 @@
+import { TileType } from "library/game-logic/horde-types";
 import { MaraMap } from "./MaraMap";
 import { MaraMapNodeLink } from "./MaraMapNodeLink";
 import { MaraMapNodeType } from "./MaraMapNodeType";
@@ -9,7 +10,7 @@ export class MaraMapNode {
     Region: MaraRegion;
     Links: Array<MaraMapNodeLink>;
     Type: MaraMapNodeType;
-    TileType: any;
+    TileType: TileType;
     Id: number;
 
     // pathfinding options, probably need to be moved
@@ -17,7 +18,7 @@ export class MaraMapNode {
     Weigth: number;
     ShortestDistance: number;
     AStarHeuristic: number;
-    PrevNode: MaraMapNode;
+    PrevNode: MaraMapNode | null;
 
     constructor (region: MaraRegion, links: Array<MaraMapNodeLink>, type: MaraMapNodeType) {
         this.Region = region;
@@ -25,7 +26,9 @@ export class MaraMapNode {
         this.Type = type;
         this.Weigth = 0;
         this.ShortestDistance = Infinity;
-        this.TileType = MaraMap.GetTileType(this.Region.Cells[0]);
+        this.TileType = MaraMap.GetTileType(this.Region.Cells[0])!;
+        this.AStarHeuristic = Infinity;
+        this.PrevNode = null;
 
         this.Id = MaraMapNode.maxId;
         MaraMapNode.maxId ++;

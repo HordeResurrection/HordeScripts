@@ -2,20 +2,20 @@ import { MaraSettlementController } from "../../MaraSettlementController";
 import { MaraUtils } from "../../MaraUtils";
 
 class SelectionResult {
-    ConfigData: Map<string, CfgIdSelectionItem>;
+    ConfigData: Map<string, CfgIdSelectionItem> = new Map<string, CfgIdSelectionItem>();
     LowestTechCfgId: string = "";
 }
 
 class CfgIdSelectionItem {
-    CfgId: string;
-    ProductionChain: Array<string>;
+    CfgId: string = "";
+    ProductionChain: Array<string> = [];
 }
 
 export class SettlementGlobalStrategy {
-    OffensiveCfgIds: Array<CfgIdSelectionItem>;
-    DefensiveBuildingsCfgIds: Array<CfgIdSelectionItem>;
-    AuxCfgIds: Array<CfgIdSelectionItem>;
-    LowestTechOffensiveCfgId: string;
+    OffensiveCfgIds: Array<CfgIdSelectionItem> = [];
+    DefensiveBuildingsCfgIds: Array<CfgIdSelectionItem> = [];
+    AuxCfgIds: Array<CfgIdSelectionItem> = [];
+    LowestTechOffensiveCfgId: string = "";
     
     private isInited: boolean = false;
 

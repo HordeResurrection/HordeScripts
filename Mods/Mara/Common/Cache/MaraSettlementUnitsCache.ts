@@ -1,48 +1,51 @@
 import { MaraPoint } from "../MaraPoint";
 import { MaraUnitBushItem } from "./MaraUnitBushItem";
 import { MaraUnitCacheItem } from "./MaraUnitCacheItem";
-import RBush from "../RBush/rbush.js"
+import RBush from "./../RBush/rbush.js"
 import { MaraSettlementController } from "../../MaraSettlementController";
 import { Mara } from "../../Mara";
+import { Settlement, Unit, UnitDummyStateChangedEventArgs, UnitHealthChangedEventArgs, UnitLifeStateChangedEventArgs, UnitMovedToCellEventArgs } from "library/game-logic/horde-types";
+
+type UnitsListChangedEventArgs = HordeClassLibrary.World.Settlements.Modules.SettlementUnits.UnitsListChangedEventArgs;
 
 export class MaraSettlementUnitsCache {
-    Settlement: any;
-    SettlementController: MaraSettlementController;
+    Settlement: Settlement;
+    SettlementController: MaraSettlementController | null = null;
     
     private bush: RBush;
     private cacheItemIndex: Map<number, MaraUnitCacheItem>;
 
-    constructor(settlement: any) {
+    constructor(settlement: Settlement) {
         this.Settlement = settlement;
         this.bush = new RBush();
         this.cacheItemIndex = new Map<number, MaraUnitCacheItem>();
         
         settlement.Units.UnitsListChanged.connect(
-            (sender, UnitsListChangedEventArgs) => {
+            (sender: any, UnitsListChangedEventArgs: UnitsListChangedEventArgs) => {
                 this.unitListChangedProcessor(sender, UnitsListChangedEventArgs);
             }
         );
 
         settlement.Units.UnitUnitMovedToCell.connect(
-            (sender, args) => {
+            (sender: any, args: UnitMovedToCellEventArgs) => {
                 this.unitPositionChangedProcessor(args);
             }
         );
 
         settlement.Units.UnitHealthChanged.connect(
-            (sender, args) => {
+            (sender: any, args: UnitHealthChangedEventArgs) => {
                 this.unitHealthChangedProcessor(args);
             }
         );
 
         settlement.Units.UnitLifeStateChanged.connect(
-            (sender, args) => {
+            (sender: any, args: UnitLifeStateChangedEventArgs) => {
                 this.unitLifeStateChangedProcessor(args);
             }
         );
 
         settlement.Units.UnitDummyStateChangedEvent.connect(
-            (sender, args) => {
+            (sender: any, args: UnitDummyStateChangedEventArgs) => {
                 this.unitDummyStateChangedProcessor(args);
             }
         );
@@ -89,7 +92,7 @@ export class MaraSettlementUnitsCache {
         item.Parent = null;
     }
 
-    private unitListChangedProcessor(sender, UnitsListChangedEventArgs): void {
+    private unitListChangedProcessor(sender: any, UnitsListChangedEventArgs: UnitsListChangedEventArgs): void {
         let unit = UnitsListChangedEventArgs.Unit;
         let unitId = unit.Id;
         let isUnitAdded = UnitsListChangedEventArgs.IsAdded;
@@ -109,7 +112,7 @@ export class MaraSettlementUnitsCache {
         }
     }
 
-    private subscribeToUnit(unit: any): MaraUnitCacheItem {
+    private subscribeToUnit(unit: Unit): MaraUnitCacheItem {
         let cacheItem = new MaraUnitCacheItem(unit, this);
         let bushItem = new MaraUnitBushItem(cacheItem);
         cacheItem.UnitBushItem = bushItem;
@@ -120,7 +123,7 @@ export class MaraSettlementUnitsCache {
         return cacheItem;
     }
 
-    private unitPositionChangedProcessor(args): void {
+    private unitPositionChangedProcessor(args: UnitMovedToCellEventArgs): void {
         let cacheItem = this.cacheItemIndex.get(args.TriggeredUnit.Id);
 
         if (!cacheItem) {
@@ -135,7 +138,7 @@ export class MaraSettlementUnitsCache {
         cacheItem.UnitBushItem = newBushItem;
     }
 
-    private unitHealthChangedProcessor(args): void {
+    private unitHealthChangedProcessor(args: UnitHealthChangedEventArgs): void {
         let unit = args.TriggeredUnit;
         let cacheItem = this.cacheItemIndex.get(unit.Id);
         
@@ -144,7 +147,7 @@ export class MaraSettlementUnitsCache {
         }
     }
 
-    private unitLifeStateChangedProcessor(args): void {
+    private unitLifeStateChangedProcessor(args: UnitLifeStateChangedEventArgs): void {
         let unit = args.TriggeredUnit;
         let cacheItem = this.cacheItemIndex.get(unit.Id);
         
@@ -157,7 +160,7 @@ export class MaraSettlementUnitsCache {
         }
     }
 
-    private unitDummyStateChangedProcessor(args): void {
+    private unitDummyStateChangedProcessor(args: UnitDummyStateChangedEventArgs): void {
         let unit = args.TriggeredUnit;
         let cacheItem = this.cacheItemIndex.get(unit.Id);
         

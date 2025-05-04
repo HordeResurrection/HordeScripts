@@ -22,14 +22,19 @@ import { SubcontrollerRequestResult } from "../Common/SubcontrollerRequestResult
 import { LandmarkCaptureTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/LandmarkCaptureTask/LandmarkCaptureTask";
 import { DefenceBuildTask } from "../SettlementSubcontrollerTasks/StrategySubcontroller/DefenceBuildTask/DefenceBuildTask";
 import { MaraMapNodeType } from "../Common/MapAnalysis/MaraMapNodeType";
+import { Player, Settlement } from "library/game-logic/horde-types";
 
 class PathSelectItem implements NonUniformRandomSelectItem {
+    // @ts-ignore
     Weight: number;
+    // @ts-ignore
     Path: MaraPath;
 }
 
 class TaskSelectItem implements NonUniformRandomSelectItem {
+    // @ts-ignore
     Weight: number;
+    // @ts-ignore
     Task: SettlementSubcontrollerTask;
 }
 
@@ -50,7 +55,7 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         );
     }
     
-    public EnemySettlements: Array<any> = []; //but actually Settlement
+    public EnemySettlements: Array<Settlement> = []; //but actually Settlement
     public CheckForUnderAttack = true;
 
     private globalStrategy: SettlementGlobalStrategy = new SettlementGlobalStrategy();
@@ -68,11 +73,11 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         return this.globalStrategy;
     }
 
-    public get Player(): any {
+    public get Player(): Player {
         return this.settlementController.Player;
     }
 
-    GetSettlementAttackArmyComposition(settlement: any): UnitComposition {
+    GetSettlementAttackArmyComposition(settlement: Settlement): UnitComposition {
         let requiredStrength = this.settlementController.Settings.Combat.AttackStrengthToEnemyStrengthRatio * 
             Math.max(
                 this.calcSettlementStrength(settlement), 
@@ -185,7 +190,7 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
     }
 
     GetOffensiveTarget(
-        enemySettlement: any //but actually Settlement
+        enemySettlement: Settlement
     ): MaraUnitCacheItem | undefined {
         if (MaraUtils.IsSettlementDefeated(enemySettlement)) {
             return undefined;
@@ -375,7 +380,7 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         return false;
     }
 
-    IsSafeExpand(point: any): boolean {
+    IsSafeExpand(point: MaraPoint): boolean {
         return this.isSafeLocation(
             MaraRect.CreateFromPoint(
                 point, 
@@ -415,7 +420,7 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
             let freeCell = MaraUtils.FindFreeCell(settlementLocation.Center);
 
             if (freeCell) {
-                settlementCenter = new MaraPoint(freeCell.X, freeCell.Y);
+                settlementCenter = freeCell;
             }
         }
         else {
@@ -652,9 +657,9 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         }
     }
 
-    private selectEnemy(): any { //but actually Settlement
-        let undefeatedEnemies: any[] = this.EnemySettlements.filter((value) => {return !MaraUtils.IsSettlementDefeated(value)});
-        let enemy: any = null;
+    private selectEnemy(): Settlement | null {
+        let undefeatedEnemies: Settlement[] = this.EnemySettlements.filter((value) => {return !MaraUtils.IsSettlementDefeated(value)});
+        let enemy: Settlement | null = null;
         
         if (undefeatedEnemies.length > 0) {
             let index = MaraUtils.Random(this.settlementController.MasterMind, undefeatedEnemies.length - 1);
@@ -742,7 +747,7 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         );
     }
 
-    private calcSettlementStrength(settlement: any): number {
+    private calcSettlementStrength(settlement: Settlement): number {
         let units = MaraUtils.GetAllSettlementUnits(settlement);
         let settlementStrength = 0;
         

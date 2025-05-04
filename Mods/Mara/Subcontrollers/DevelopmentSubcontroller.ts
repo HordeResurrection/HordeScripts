@@ -112,7 +112,7 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
 
         let censusModel = MaraUtils.GetSettlementCensusModel(this.settlementController.Settlement);
         let peopleLevels = censusModel.PeopleIncomeLevels;
-        let maxDevelopmentBoosters = peopleLevels.Item(peopleLevels.Count - 1).GrowthBuildings;
+        let maxDevelopmentBoosters = peopleLevels.Item.get(peopleLevels.Count - 1)!.GrowthBuildings;
 
         if (developmentBoosterCount < maxDevelopmentBoosters) {
             let possibleEconomyBoosters = MaraUtils.GetAllEconomyBoosterConfigIds(this.settlementController.Settlement);

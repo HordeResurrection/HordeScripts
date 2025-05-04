@@ -4,8 +4,8 @@ import { MaraPriority } from "../Common/MaraPriority";
 import { MaraSettlementController } from "../MaraSettlementController";
 
 export abstract class SettlementSubcontrollerTask extends FiniteStateMachine {
-    IsCompleted: boolean;
-    IsSuccess: boolean;
+    IsCompleted: boolean = false;
+    IsSuccess: boolean = false;
     Priority: MaraPriority;
     readonly SettlementController: MaraSettlementController;
 

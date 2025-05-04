@@ -1,4 +1,4 @@
-import { TileType } from "library/game-logic/horde-types";
+import { Settlement, TileType } from "library/game-logic/horde-types";
 import { MaraMap } from "../../../Common/MapAnalysis/MaraMap";
 import { MaraProductionRequest } from "../../../Common/MaraProductionRequest";
 import { MaraSettlementController } from "../../../MaraSettlementController";
@@ -8,10 +8,10 @@ import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 import { ExterminatingState } from "./ExterminatingState";
 
 export class BuildUpState extends ProductionTaskState {
-    private enemy: any;
+    private enemy: Settlement;
     
     constructor(
-        enemy: any,
+        enemy: Settlement,
         task: SettlementSubcontrollerTask, 
         settlementController: MaraSettlementController,
     ) {

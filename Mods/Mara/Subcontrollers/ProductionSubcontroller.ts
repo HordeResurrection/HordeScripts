@@ -16,6 +16,8 @@ import SortedSet from "../Common/SortedSet.js";
 import InsertConflictResolvers from "../Common/SortedSet/InsertConflictResolvers.js"
 import { MaraPriority } from "../Common/MaraPriority";
 
+type MotionBuildSelf = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producing.MotionBuildSelf;
+
 export class ProductionSubcontroller extends MaraSubcontroller {
     private queuedRequests: SortedSet;
     private queueOptions: any;
@@ -38,7 +40,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
 
         this.queueOptions = {};
         
-        this.queueOptions.comparator = (a, b) => {
+        this.queueOptions.comparator = (a: MaraProductionRequest, b: MaraProductionRequest) => {
             let priorityCompareResult = -(a.Priority - b.Priority);
             
             if (isNaN(priorityCompareResult) || priorityCompareResult == 0) {
@@ -57,10 +59,10 @@ export class ProductionSubcontroller extends MaraSubcontroller {
     private get productionCfgIdList(): Array<string> {
         let list: Array<string> = [];
 
-        let queuedRequestsArr = this.queuedRequests.toArray();
+        let queuedRequestsArr = this.queuedRequests.toArray() as MaraProductionRequest[];
         
         for (let request of queuedRequestsArr) {
-            let itemsCfgIds = request.Items.map((i) => i.ConfigId);
+            let itemsCfgIds = request.Items.map((i: MaraProductionRequestItem) => i.ConfigId);
             list.push(...itemsCfgIds);
         }
 
@@ -68,8 +70,8 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         let requests = enumerate(masterMind.Requests);
         let request;
 
-        while ((request = eNext(requests)) !== undefined) {
-            if (request.RequestedCfg) {
+        while ((request = eNext(requests) as any) !== undefined) {
+            if (request!.RequestedCfg) {
                 list.push(request.RequestedCfg.Uid);
             }
         }
@@ -332,7 +334,7 @@ export class ProductionSubcontroller extends MaraSubcontroller {
         
         for (let building of unfinishedBuildings) {
             // 2 is needed since units are processed every second tick in the core logic
-            let lastBuildingTick = building.Unit.OrdersMind.ActiveMotion.LastBuildTick * 2;
+            let lastBuildingTick = (building.Unit.OrdersMind.ActiveMotion as MotionBuildSelf).LastBuildTick * 2;
 
             if (lastBuildingTick) {
                 if (tickNumber - lastBuildingTick > this.settlementController.Settings.Timeouts.UnfinishedConstructionThreshold) {

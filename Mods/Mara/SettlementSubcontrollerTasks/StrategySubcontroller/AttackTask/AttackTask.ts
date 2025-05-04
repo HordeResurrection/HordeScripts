@@ -1,3 +1,4 @@
+import { Settlement } from "library/game-logic/horde-types";
 import { FsmState } from "../../../Common/FiniteStateMachine/FsmState";
 import { MaraLogger } from "../../../Common/MaraLogger";
 import { MaraSettlementController } from "../../../MaraSettlementController";
@@ -5,7 +6,9 @@ import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 import { BuildUpState } from "./BuildUpState";
 
 export class AttackTask extends SettlementSubcontrollerTask {
+    // @ts-ignore
     private currentTaskState: FsmState;
+    // @ts-ignore
     private nextTaskState: FsmState | null;
 
     public get ExpectedTimeout(): number {
@@ -16,7 +19,7 @@ export class AttackTask extends SettlementSubcontrollerTask {
     }
     
     constructor(
-        enemySettlement: any,
+        enemySettlement: Settlement,
         settlementController: MaraSettlementController,
         logger: MaraLogger
     ) {

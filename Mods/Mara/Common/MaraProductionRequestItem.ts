@@ -1,12 +1,17 @@
-import { MaraUtils, BuildTrackerType } from "../MaraUtils";
+import { ARequest, BuildTracker } from "library/mastermind/mastermind-types";
+import { MaraUtils } from "../MaraUtils";
 import { MaraPoint } from "./MaraPoint";
 import { MaraProductionRequest } from "./MaraProductionRequest";
+import { Unit } from "library/game-logic/horde-types";
+
+type TrackerChangedEventArgs = HordeResurrection.Intellect.Requests.ARequest.TrackerChangedEventArgs;
 
 export class MaraProductionRequestItem {
     public ConfigId: string;
     public Point: MaraPoint | null;
     public Precision: number | null;
-    public ProducedUnit: any = null;
+    public ProducedUnit: Unit | null = null;
+    // @ts-ignore
     public ParentRequest: MaraProductionRequest;
 
     public get MasterMindRequest(): any {
@@ -27,12 +32,12 @@ export class MaraProductionRequestItem {
         let that = this;
 
         this.trackerChangedHandler = this.masterMindRequest.TrackerChanged.connect(
-            function (sender, args) {
-                let tracker = MaraUtils.GetPropertyValue(args, "NewTracker");
-                let buildTracker;
+            function (sender: any, args: TrackerChangedEventArgs) {
+                let tracker = args.NewTracker;
+                let buildTracker: BuildTracker;
 
                 try {
-                    buildTracker = MaraUtils.CastToType(tracker, BuildTrackerType);
+                    buildTracker = MaraUtils.CastToType(tracker, BuildTracker);
 
                     if (!buildTracker) {
                         return;
@@ -42,7 +47,7 @@ export class MaraProductionRequestItem {
                     return;
                 }
 
-                let unit = MaraUtils.GetPropertyValue(buildTracker, "TrackUnit");
+                let unit = buildTracker.TrackUnit;
                 that.ProducedUnit = unit;
             }
         );
@@ -68,7 +73,12 @@ export class MaraProductionRequestItem {
         }
         
         if (this.MasterMindRequest) {
-            return !this.MasterMindRequest.State.IsUnfinished();
+            //TODO: remove this dirty hack once State is made available in the core
+            //@ts-ignore
+            let requestState = ScriptReflection.GetValueAs(host.typeOf(ARequest), this.MasterMindRequest, "State");
+            return !ScriptReflection.Invoke(requestState, "IsUnfinished");
+            
+            //return !this.MasterMindRequest.State.IsUnfinished();
         }
         else {
             return false;
@@ -81,7 +91,12 @@ export class MaraProductionRequestItem {
         }
         
         if (this.MasterMindRequest) {
-            return this.MasterMindRequest.State.IsSuccessfullyCompleted();
+            //TODO: remove this dirty hack once State is made available in the core
+            //@ts-ignore
+            let requestState = ScriptReflection.GetValueAs(host.typeOf(ARequest), this.MasterMindRequest, "State");
+            return ScriptReflection.Invoke(requestState, "IsSuccessfullyCompleted");
+            
+            //return this.MasterMindRequest.State.IsSuccessfullyCompleted();
         }
         else {
             return false;

@@ -16,6 +16,7 @@ import { UnitComposition } from "../Common/UnitComposition";
 import { SubcontrollerRequestResult } from "../Common/SubcontrollerRequestResult";
 import { ProduceHarvestersTask } from "../SettlementSubcontrollerTasks/MiningSubcontroller/ProduceHarvestersTask/ProduceHarvestersTask";
 import { ExpandUpgradeTask } from "../SettlementSubcontrollerTasks/MiningSubcontroller/ExpandUpgradeTask/ExpandUpgradeTask";
+import { Settlement } from "library/game-logic/horde-types";
 
 class MineData {
     public Mine: MaraUnitCacheItem | null = null;
@@ -28,10 +29,10 @@ class SawmillData {
 }
 
 class NeedExpandResult {
-    NeedExpand: boolean;
-    MinResourceAmount: number;
-    MinResourceThreshold: number;
-    ResourcesToMine: MaraResources;
+    NeedExpand: boolean = false;
+    MinResourceAmount: number = 0;
+    MinResourceThreshold: number = 0;
+    ResourcesToMine: MaraResources = new MaraResources(0, 0, 0, 0);
 }
 
 export class MiningSubcontroller extends MaraTaskableSubcontroller {
@@ -727,7 +728,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         return true;
     }
 
-    private checkConfigIdsLimits(configIdsGetter: (any) => Array<string>): boolean {
+    private checkConfigIdsLimits(configIdsGetter: (settlement: Settlement) => Array<string>): boolean {
         let availableCfgIds = configIdsGetter(this.settlementController.Settlement);
 
         if (availableCfgIds.length == 0) {
@@ -875,7 +876,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             sawmill.UnitRect.Center,
             this.settlementController.Settings.ResourceMining.WoodcuttingRadius + MaraMap.RESOURCE_CLUSTER_SIZE / 2,
             (cell) => {return MaraMap.GetCellTreesCount(cell.X, cell.Y) > 0;}
-        )
+        );
         
         return cell;
     }
@@ -957,7 +958,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
                     understaffedSawmillData.Woodcutters.push(...woodcuttersToAdd);
                     this.settlementController.ReservedUnitsData.AddReservableUnits(woodcuttersToAdd, 0);
                     
-                    let woodCell = this.findWoodCell(understaffedSawmillData.Sawmill!);
+                    let woodCell = this.findWoodCell(understaffedSawmillData.Sawmill!)!;
                     MaraUtils.IssueHarvestLumberCommand(woodcuttersToAdd, this.settlementController.Player, woodCell);
                     freeHarvesterIndex = lastHarvesterIndex;
 

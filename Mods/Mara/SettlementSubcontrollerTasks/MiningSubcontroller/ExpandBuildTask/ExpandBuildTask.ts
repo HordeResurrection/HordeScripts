@@ -8,7 +8,9 @@ import { SubcontrollerTaskState } from "../../SubcontrollerTaskState";
 import { ExpandBuildState } from "./ExpandBuildState";
 
 export class ExpandBuildTask extends SettlementSubcontrollerTask {
+    // @ts-ignore
     private currentTaskState: FsmState;
+    // @ts-ignore
     private nextTaskState: FsmState | null;
 
     public get ExpectedTimeout(): number {

@@ -1,10 +1,11 @@
+import { Settlement } from "library/game-logic/horde-types";
 import { MaraUtils } from "../../MaraUtils";
 import { MaraRect } from "../MaraRect";
 import { MaraSettlementUnitsCache } from "./MaraSettlementUnitsCache";
 import { MaraUnitCacheItem } from "./MaraUnitCacheItem";
 
 export class MaraUnitCache {
-    public static AllSettlements: Array<any>;
+    public static AllSettlements: Array<Settlement>;
 
     private static settlementCaches: Array<MaraSettlementUnitsCache> = [];
 
@@ -18,8 +19,8 @@ export class MaraUnitCache {
 
     public static GetSettlementsUnitsInArea(
         area: MaraRect,
-        settlements: Array<any>,
-        unitFilter? : (unit) => boolean
+        settlements: Array<Settlement>,
+        unitFilter? : (unit: MaraUnitCacheItem) => boolean
     ): Array<MaraUnitCacheItem> {
         let caches: Array<MaraSettlementUnitsCache> = [];
 
@@ -36,13 +37,13 @@ export class MaraUnitCache {
         }
 
         if (unitFilter) {
-            result = result.filter((unit) => unitFilter(unit));
+            result = result.filter((unit: MaraUnitCacheItem) => unitFilter(unit));
         }
 
         return result;
     }
 
-    public static GetAllUnitsInArea(area: MaraRect, unitFilter? : (unit) => boolean): Array<MaraUnitCacheItem> {
+    public static GetAllUnitsInArea(area: MaraRect, unitFilter? : (unit: MaraUnitCacheItem) => boolean): Array<MaraUnitCacheItem> {
         return MaraUnitCache.GetSettlementsUnitsInArea(
             area,
             MaraUnitCache.AllSettlements,
@@ -50,7 +51,7 @@ export class MaraUnitCache {
         );
     }
 
-    public static GetAllSettlementUnits(settlement: any): Array<MaraUnitCacheItem> {
+    public static GetAllSettlementUnits(settlement: Settlement): Array<MaraUnitCacheItem> {
         let settlementCache = MaraUnitCache.settlementCaches.find((c) => c.Settlement == settlement);
 
         if (settlementCache) {
@@ -73,11 +74,11 @@ export class MaraUnitCache {
         return undefined;
     }
 
-    public static GetSettlementCache(settlement: any): MaraSettlementUnitsCache | undefined {
+    public static GetSettlementCache(settlement: Settlement): MaraSettlementUnitsCache | undefined {
         return MaraUnitCache.settlementCaches.find((v) => v.Settlement == settlement);
     }
 
-    private static watchSettlement(settlement: any): void {
+    private static watchSettlement(settlement: Settlement): void {
         let cache = new MaraSettlementUnitsCache(settlement);
         this.settlementCaches.push(cache);
     }

@@ -12,8 +12,9 @@ import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 export class ExpandBuildState extends ProductionTaskState {
     protected requestMiningOnInsufficientResources = false;
     
+    // @ts-ignore
     private expandCenter: MaraPoint;
-    private harvestersToOrder: UnitComposition;
+    private harvestersToOrder: UnitComposition = new Map<string, number>();
     private minedMinerals: Set<MaraResourceType> = new Set<MaraResourceType>();
     private targetExpand: TargetExpandData;
 

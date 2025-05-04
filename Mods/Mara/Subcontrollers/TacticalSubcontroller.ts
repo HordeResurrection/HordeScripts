@@ -7,7 +7,7 @@ import { MaraRect } from "../Common/MaraRect";
 import { MaraPoint } from "../Common/MaraPoint";
 import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";
 import { MaraUnitConfigCache } from "../Common/Cache/MaraUnitConfigCache";
-import { TileType } from "library/game-logic/horde-types";
+import { Player, Settlement, TileType, UnitConfig } from "library/game-logic/horde-types";
 import { MaraMap } from "../Common/MapAnalysis/MaraMap";
 import { FsmState } from "../Common/FiniteStateMachine/FsmState";
 import { TacticalAttackState } from "../SettlementSubcontrollerTasks/TacticalSubcontroller/TacticalAttackState";
@@ -21,21 +21,23 @@ export class TacticalSubcontroller extends MaraSubcontroller {
     MilitiaSquads: Array<MaraControllableSquad> = [];
     ReinforcementSquads: Array<MaraControllableSquad> = [];
     
-    private initialOffensiveSquadCount: number;
+    private initialOffensiveSquadCount: number = 0;
     private unitsInSquads: Map<number, MaraUnitCacheItem> = new Map<number, MaraUnitCacheItem>();
 
+    // @ts-ignore
     private state: FsmState;
+    // @ts-ignore
     private nextState: FsmState | null;
 
     constructor (parent: MaraSettlementController) {
         super(parent);
     }
 
-    public get Player(): any {
+    public get Player(): Player {
         return this.settlementController.Player;
     }
 
-    public get Settlement(): any {
+    public get Settlement(): Settlement {
         return this.settlementController.Settlement;
     }
 
@@ -49,7 +51,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         return combativityIndex / this.initialOffensiveSquadCount;
     }
 
-    public get EnemySettlements(): Array<any> {
+    public get EnemySettlements(): Array<Settlement> {
         return this.settlementController.StrategyController.EnemySettlements;
     }
 
@@ -419,7 +421,7 @@ export class TacticalSubcontroller extends MaraSubcontroller {
             }
         );
 
-        if (!squad.CurrentMovementPoint || !MaraUtils.IsPointsEqual(squad.CurrentMovementPoint, closestLocation!.Center)) {
+        if (!squad.CurrentMovementPoint || !squad.CurrentMovementPoint.EqualsTo(closestLocation!.Center)) {
             if (!closestLocation!.BoundingRect.IsPointInside(squadLocation.Point)) {
                 let spread = squad.MinSpread * 3;
                 let minDimension = Math.min(closestLocation!.BoundingRect.Width, closestLocation!.BoundingRect.Heigth);
@@ -569,10 +571,10 @@ export class TacticalSubcontroller extends MaraSubcontroller {
         ) as string;
     }
 
-    private static calcConfigMovementClass(unitConfig: any, speedsThresholds: Array<number>): string {
+    private static calcConfigMovementClass(unitConfig: UnitConfig, speedsThresholds: Array<number>): string {
         let unitCfgId = unitConfig.Uid;
         
-        let unitSpeed = MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item(TileType.Grass) as number, "GrassSpeed") as number;
+        let unitSpeed = MaraUnitConfigCache.GetConfigProperty(unitCfgId, (cfg) => cfg.Speeds.Item.get(TileType.Grass)!, "GrassSpeed") as number;
         let speedGroupCode: number | null = null;
 
         for (let i = 0; i < speedsThresholds.length; i++) {

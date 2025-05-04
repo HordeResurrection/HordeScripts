@@ -16,7 +16,7 @@ export class MaraSquadLocation {
 
 export class MaraSquad {
     Units: Array<MaraUnitCacheItem>;
-    protected location: MaraSquadLocation | null;
+    protected location: MaraSquadLocation | null = null;
 
     public get Strength(): number {
         this.cleanup();
