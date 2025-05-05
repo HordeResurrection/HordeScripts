@@ -1286,7 +1286,7 @@ export class MaraUtils {
         let addedRequest = host.newVar(ProduceRequest) as HostVariable<ProduceRequest>;
         
         if (masterMind.ProductionDepartment.AddRequestToProduce(produceRequestParameters, addedRequest.out)) {
-            productionRequestItem.MasterMindRequest = addedRequest;
+            productionRequestItem.MasterMindRequest = addedRequest.value;
             return true;
         }
         else {

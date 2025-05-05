@@ -1,4 +1,4 @@
-import { ARequest, BuildTracker } from "library/mastermind/mastermind-types";
+import { ARequest, BuildTracker, ProduceRequest } from "library/mastermind/mastermind-types";
 import { MaraUtils } from "../MaraUtils";
 import { MaraPoint } from "./MaraPoint";
 import { MaraProductionRequest } from "./MaraProductionRequest";
@@ -14,7 +14,7 @@ export class MaraProductionRequestItem {
     // @ts-ignore
     public ParentRequest: MaraProductionRequest;
 
-    public get MasterMindRequest(): any {
+    public get MasterMindRequest(): ProduceRequest | null {
         return this.masterMindRequest;
     }
 
@@ -22,10 +22,10 @@ export class MaraProductionRequestItem {
         return this.masterMindRequest != null && !this.IsCompleted;
     }
 
-    public set MasterMindRequest(value: any) {
+    public set MasterMindRequest(value: ProduceRequest | null) {
         this.masterMindRequest = value;
 
-        if (value == null) {
+        if (this.masterMindRequest == null) {
             return;
         }
 
@@ -53,7 +53,7 @@ export class MaraProductionRequestItem {
         );
     }
 
-    private masterMindRequest: any = null;
+    private masterMindRequest: ProduceRequest | null = null;
     private trackerChangedHandler: any = null;
     private isForceFailed: boolean = false;
 
