@@ -44,23 +44,23 @@ class TimeoutsSettings {
 
 class Priorities {
     // Tasks
+    public SettlementDefence: MaraPriority = MaraPriority.Absolute;
+    public ExpandBuildOnDemand: MaraPriority = MaraPriority.Major;
     public SettlementDevelopment: MaraPriority = MaraPriority.Normal;
     public Attack: MaraPriority = MaraPriority.Normal;
-    public ExpandBuildOnDemand: MaraPriority = MaraPriority.Major;
     public ExpandBuildOnIdle: MaraPriority = MaraPriority.Normal;
-    public SettlementDefence: MaraPriority = MaraPriority.Absolute;
+    public LandmarkCapture: MaraPriority = MaraPriority.Normal;
     public DefenceBuild: MaraPriority = MaraPriority.Normal;
     public ProduceAdditionalHarvesters: MaraPriority = MaraPriority.Low;
     public ExpandUpgrade: MaraPriority = MaraPriority.Low;
-    public LandmarkCapture: MaraPriority = MaraPriority.Normal;
 
     // Production Requests
+    public DefenceUnitsProduction: MaraPriority = MaraPriority.Absolute;
     public HarvesterProduction: MaraPriority = MaraPriority.Normal;
     public AttackUnitsProduction: MaraPriority = MaraPriority.Normal;
-    public DefenceUnitsProduction: MaraPriority = MaraPriority.Absolute;
     public LandmarkCaptureUnitsProduction: MaraPriority = MaraPriority.Low;
-    public ReinforcementUnitsProduction: MaraPriority = MaraPriority.Background;
     public PointGuardProduction: MaraPriority = MaraPriority.Low;
+    public ReinforcementUnitsProduction: MaraPriority = MaraPriority.Background;
 }
 
 class SquadsSettings {
