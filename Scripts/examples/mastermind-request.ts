@@ -1,5 +1,5 @@
 import { createPoint } from "library/common/primitives";
-import { ARequest, ProduceRequest, ProduceRequestParameters } from "library/mastermind/mastermind-types";
+import { ARequest, MasterMind, ProduceRequest, ProduceRequestParameters, ProductionDepartment } from "library/mastermind/mastermind-types";
 import HordeExampleBase from "./base-example";
 
 /**
@@ -8,14 +8,16 @@ import HordeExampleBase from "./base-example";
 export class Example_MasterMindRequest extends HordeExampleBase {
     workPlayerNum: number;
     printRequestsPeriod: number;
-    masterMind: any;
-    productionDepartament: any;
+    masterMind: MasterMind | null;
+    productionDepartament: ProductionDepartment | null;
 
     public constructor() {
         super("Request for MasterMind");
 
         this.workPlayerNum = 1;
         this.printRequestsPeriod = 1000;
+        this.masterMind = null;
+        this.productionDepartament = null;
     }
 
     public onFirstRun() {
@@ -55,7 +57,7 @@ export class Example_MasterMindRequest extends HordeExampleBase {
     }
 
     public onEveryTick(gameTickNum: number) {
-        if (this.masterMind == 0) {
+        if (!this.masterMind) {
             return;
         }
         if (this.printRequestsPeriod == 0) {
@@ -129,12 +131,17 @@ export class Example_MasterMindRequest extends HordeExampleBase {
     }
 
     private addProduceRequest(produceRequestParameters: ProduceRequestParameters) {
-        let requestVar = host.newVar(ProduceRequest);
+        if (this.productionDepartament == null) {
+            return null;
+        }
+
+        let requestVar = host.newVar(ProduceRequest) as HostVariable<ProduceRequest>;
         if (this.productionDepartament.AddRequestToProduce(produceRequestParameters, requestVar.out)) {
             this.log.info('Добавлен запрос на производство:', requestVar);
         } else {
             this.log.info('Не удалось добавить запрос на производство.');
         }
+
         return requestVar;
     }
 }
