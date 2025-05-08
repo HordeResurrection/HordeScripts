@@ -256,16 +256,12 @@ declare namespace HordeResurrection.Engine.Logic.Battle.Camera {
 			delta: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): void;
 
-		SetCenterPosition(
-			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
-		): void;
-
-		SetCenterPosition(
+		SetCenterToCell(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		): void;
 
-		SetPositionInCells(
-			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
+		SetCenterToPosition(
+			pos: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		): void;
 
 		UpdateVariables(

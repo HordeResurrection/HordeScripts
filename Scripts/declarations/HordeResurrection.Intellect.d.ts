@@ -632,6 +632,7 @@ declare namespace HordeResurrection.Intellect.Requests {
 		readonly Id: number;
 		readonly ReferencedRequest: HordeResurrection.Intellect.Requests.ARequest;
 		readonly Tracker: HordeResurrection.Intellect.Requests.Trackers.ARequestTracker;
+		readonly State: HordeResurrection.Intellect.Requests.State.RequestStateMachine;
 		readonly LastHandledGameFrame: number;
 
 		// Methods:
@@ -751,6 +752,41 @@ declare namespace HordeResurrection.Intellect.Requests.State {
 		/** RequestState.Unsuccessful = 5 */ static readonly Unsuccessful: RequestState;
 		/** RequestState.CantBeCompleted = 6 */ static readonly CantBeCompleted: RequestState;
 		/** RequestState.AttemptsIsOver = 7 */ static readonly AttemptsIsOver: RequestState;
+	}
+}
+//#endregion
+
+//#region RequestStateMachine
+declare namespace HordeResurrection.Intellect.Requests.State {
+	class RequestStateMachine extends System.Object {
+
+		// Constructors:
+		constructor(
+			request: HordeResurrection.Intellect.Requests.ARequest | null
+		);
+
+		// Properties:
+		readonly Request: HordeResurrection.Intellect.Requests.ARequest;
+
+		// Methods:
+		Process(
+			masterMind: HordeResurrection.Intellect.MasterMind | null,
+			gameTick: number
+		): HordeResurrection.Intellect.Requests.State.StateProcessResult;
+
+		IsInitial(): boolean;
+
+		IsUnfinished(): boolean;
+
+		IsSuccessfullyCompleted(): boolean;
+
+		IsUnsuccessfullyCompleted(): boolean;
+
+		IsWorkStarted(): boolean;
+
+		IsSuspended(): boolean;
+
+		IsUnsuccessful(): boolean;
 	}
 }
 //#endregion
@@ -990,6 +1026,8 @@ export const ProduceRequest = HordeResurrection.Intellect.Requests.ProduceReques
 export type ProduceRequest = HordeResurrection.Intellect.Requests.ProduceRequest;
 export const RequestState = HordeResurrection.Intellect.Requests.State.RequestState;
 export type RequestState = HordeResurrection.Intellect.Requests.State.RequestState;
+export const RequestStateMachine = HordeResurrection.Intellect.Requests.State.RequestStateMachine;
+export type RequestStateMachine = HordeResurrection.Intellect.Requests.State.RequestStateMachine;
 export const StateProcessResult = HordeResurrection.Intellect.Requests.State.StateProcessResult;
 export type StateProcessResult = HordeResurrection.Intellect.Requests.State.StateProcessResult;
 export const RequestPerformPossibility = HordeResurrection.Intellect.Requests.Stuff.RequestPerformPossibility;
