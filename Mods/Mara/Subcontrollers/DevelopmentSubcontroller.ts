@@ -4,6 +4,8 @@ import { SettlementSubcontrollerTask } from "../SettlementSubcontrollerTasks/Set
 import { MaraUtils } from "../MaraUtils";
 import { UnitComposition } from "../Common/UnitComposition";
 import { DevelopSettlementTask } from "../SettlementSubcontrollerTasks/DevelopmentSubcontroller/DevelopSettlementTask/DevelopSettlementTask";
+import { MaraPoint } from "../Common/MaraPoint";
+import { DefenceBuildTask } from "../SettlementSubcontrollerTasks/DevelopmentSubcontroller/DefenceBuildTask/DefenceBuildTask";
 
 export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
     protected onTaskSuccess(tickNumber: number): void {
@@ -30,6 +32,34 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
     }
 
     protected makeSelfTask(tickNumber: number): SettlementSubcontrollerTask | null {
+        let taskCandidates = new Array<SettlementSubcontrollerTask>();
+        
+        let settlementDevelopTask = this.makeSettlementDevelopTask();
+
+        if (settlementDevelopTask) {
+            taskCandidates.push(settlementDevelopTask);
+        }
+        
+        let defenceBuildTask = this.makeDefenceBuildTask();
+
+        if (defenceBuildTask) {
+            taskCandidates.push(defenceBuildTask);
+        }
+
+        if (taskCandidates.length > 0) {
+            return MaraUtils.RandomSelect(this.settlementController.MasterMind, taskCandidates);
+        }
+        else {
+            this.nextTaskAttemptTick = tickNumber + MaraUtils.Random(
+                this.settlementController.MasterMind,
+                this.settlementController.Settings.Timeouts.DefaultTaskReattemptMaxCooldown
+            );
+
+            return null;
+        }
+    }
+
+    private makeSettlementDevelopTask(): SettlementSubcontrollerTask | null {
         let economyComposition = this.settlementController.GetCurrentEconomyComposition();
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
 
@@ -62,11 +92,6 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
             return new DevelopSettlementTask(selectedCfgIds, this.settlementController, this);
         }
         else {
-            this.nextTaskAttemptTick = tickNumber + MaraUtils.Random(
-                this.settlementController.MasterMind,
-                this.settlementController.Settings.Timeouts.DefaultTaskReattemptMaxCooldown
-            );
-
             return null;
         }
     }
@@ -216,5 +241,65 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
         }
 
         return result;
+    }
+
+    private makeDefenceBuildTask(): SettlementSubcontrollerTask | null {
+        let isAtLeastOneDefenceCfgIdProduceable = false;
+        let allProduceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
+        let strategyController = this.settlementController.StrategyController;
+
+        for (let cfgIdItem of strategyController.GlobalStrategy.DefensiveBuildingsCfgIds) {
+            let cfgId = allProduceableCfgIds.find((v) => v == cfgIdItem.CfgId);
+
+            if (cfgId) {
+                isAtLeastOneDefenceCfgIdProduceable = true;
+                break;
+            }
+        }
+
+        if (isAtLeastOneDefenceCfgIdProduceable) {
+            let defenceBuildCandidates: Array<MaraPoint> = [];
+
+            for (let point of this.settlementController.Expands) {
+                let guardStrength = strategyController.GetPointGuardStrength(point);
+
+                if (guardStrength < this.settlementController.Settings.Combat.PointDefenseBatchStrength) {
+                    defenceBuildCandidates.push(point);
+                }
+            }
+
+            let settlementLocation = this.settlementController.GetSettlementLocation();
+
+            if (settlementLocation) {
+                let guardStrength = strategyController.GetPointGuardStrength(settlementLocation.Center);
+
+                if (guardStrength < 10 * this.settlementController.Settings.Combat.PointDefenseBatchStrength) {
+                    defenceBuildCandidates.push(settlementLocation.Center);
+                }
+            }
+
+
+            if (defenceBuildCandidates.length == 0) {
+                let defenceableGates = strategyController.GetDefenceableGates();
+
+                for (let gate of defenceableGates) {
+                    let guardStrength = strategyController.GetPointGuardStrength(
+                        gate,
+                        this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius / 2
+                    );
+
+                    if (guardStrength < this.settlementController.Settings.Combat.PointDefenseBatchStrength) {
+                        defenceBuildCandidates.push(gate);
+                    }
+                }
+            }
+
+            if (defenceBuildCandidates.length > 0) {
+                let point = MaraUtils.RandomSelect(this.settlementController.MasterMind, defenceBuildCandidates)!;
+                return new DefenceBuildTask(point, this.settlementController, this);
+            }
+        }
+
+        return null;
     }
 }

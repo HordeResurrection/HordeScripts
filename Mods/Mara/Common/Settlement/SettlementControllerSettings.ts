@@ -78,8 +78,6 @@ class SquadsSettings {
 }
 
 class ControllerStatesSettings {
-    public DefenceConstructionToAttackProbabilityRatio = 0.33;
-    
     public DefendedGatesCount = 5;
     public DefendedGateMinSize = 3;
     public DefendedGateMaxDistanceFromSettlement = 15;
