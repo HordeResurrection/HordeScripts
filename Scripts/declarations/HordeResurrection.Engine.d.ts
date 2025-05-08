@@ -674,6 +674,11 @@ declare namespace HordeResurrection.Engine.Logic.Battle.Cheats.Implementations {
 	{
 		// Constructors:
 		constructor();
+
+		// Methods:
+		static GetDamageFor(
+			u: HordeClassLibrary.World.Objects.Units.Unit | null
+		): number;
 	}
 }
 //#endregion

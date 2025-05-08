@@ -760,20 +760,7 @@ declare namespace HordeResurrection.Intellect.Requests.State {
 declare namespace HordeResurrection.Intellect.Requests.State {
 	class RequestStateMachine extends System.Object {
 
-		// Constructors:
-		constructor(
-			request: HordeResurrection.Intellect.Requests.ARequest | null
-		);
-
-		// Properties:
-		readonly Request: HordeResurrection.Intellect.Requests.ARequest;
-
 		// Methods:
-		Process(
-			masterMind: HordeResurrection.Intellect.MasterMind | null,
-			gameTick: number
-		): HordeResurrection.Intellect.Requests.State.StateProcessResult;
-
 		IsInitial(): boolean;
 
 		IsUnfinished(): boolean;

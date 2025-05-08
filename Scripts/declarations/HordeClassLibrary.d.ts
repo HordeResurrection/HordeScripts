@@ -6157,6 +6157,10 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 			target: HordeClassLibrary.World.Objects.Units.Unit | null
 		): boolean;
 
+		CanAutoCaptureNow(
+			target: HordeClassLibrary.World.Objects.Units.Unit | null
+		): boolean;
+
 		GetCapturer(): HordeClassLibrary.World.Objects.Units.Unit;
 
 		IsCaptureInProgress(): boolean;
