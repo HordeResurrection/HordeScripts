@@ -106,7 +106,7 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
             }
         )
 
-        let shortestUnavailableChain: Array<string> | null = null;
+        let produceableUnavailableChains: Array<Array<string>> = [];
         
         for (let item of unavailableCfgIdItems) {
             let unavailableChain: Array<string> = [];
@@ -124,16 +124,18 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
                 }
             }
 
-            if (
-                atLeastOneItemProduceable && 
-                (
-                    !shortestUnavailableChain || 
-                    unavailableChain.length < shortestUnavailableChain.length
-                )    
-            ) {
-                shortestUnavailableChain = unavailableChain;
+            if (atLeastOneItemProduceable) {
+                produceableUnavailableChains.push(unavailableChain);
             }
         }
+
+        produceableUnavailableChains.sort((a, b) => a.length - b.length);
+        produceableUnavailableChains = produceableUnavailableChains.splice(0, 2);
+
+        let shortestUnavailableChain: Array<string> | null = MaraUtils.RandomSelect(
+            this.settlementController.MasterMind, 
+            produceableUnavailableChains
+        );
 
         return shortestUnavailableChain;
     }
