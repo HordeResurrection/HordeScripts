@@ -290,7 +290,7 @@ export class ExpandBuildState extends ProductionTaskState {
         }
 
         for (let i = 0; i < this.settlementController.Settings.ResourceMining.HousingBatchSize; i++) {
-            result.push(this.makeProductionRequest(cfgId, null, null, true));
+            result.push(this.makeProductionRequest(cfgId, null, null, true, this.settlementController.Settings.Priorities.HousingProduction));
         }
 
         return result;

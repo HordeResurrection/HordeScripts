@@ -28,27 +28,32 @@ class TimeoutsSettings {
     public StrategyActionSuccessMinCooldown = 5 * 50;
     public StrategyActionSuccessMaxCooldown = 20 * 50;
 
-    public StrategyActionReattemptMinCooldown = 20 * 50;
-    public StrategyActionReattemptMaxCooldown = 40 * 50;
+    public StrategyActionFailReattemptMinCooldown = 20 * 50;
+    public StrategyActionFailReattemptMaxCooldown = 40 * 50;
+    
+    public StrategyActionUnavailReattemptMaxCooldown: number = 3 * 60 * 50;
+    public StrategyActionUnavailReattemptMinCooldown: number = 1 * 60 * 50;
+
+    public DefaultTaskReattemptMaxCooldown: number = 20 * 50;
 
     public StrategyReInitMin = 30 * 60 * 50;
     public StrategyReInitMax = 60 * 60 * 50;
 
     public SettlementEnhanceMinCooldown = 2 * 60 * 50;
     public SettlementEnhanceMaxCooldown = 9 * 60 * 50;
-
-    public DefaultTaskReattemptMaxCooldown: number = 20 * 50;
     
     public UnfinishedConstructionThreshold: number = 2 * 60 * 50;
+
+    public ResourceRequestDuration: number = 2 * 60 * 50;
 }
 
 class Priorities {
     // Tasks
     public SettlementDefence: MaraPriority = MaraPriority.Absolute;
-    public ExpandBuildOnDemand: MaraPriority = MaraPriority.Major;
+    //public ExpandBuildOnDemand: MaraPriority = MaraPriority.Major;
+    public ExpandBuild: MaraPriority = MaraPriority.Normal;
     public SettlementDevelopment: MaraPriority = MaraPriority.Normal;
     public Attack: MaraPriority = MaraPriority.Normal;
-    public ExpandBuildOnIdle: MaraPriority = MaraPriority.Normal;
     public LandmarkCapture: MaraPriority = MaraPriority.Normal;
     public DefenceBuild: MaraPriority = MaraPriority.Normal;
     public ProduceAdditionalHarvesters: MaraPriority = MaraPriority.Low;
@@ -57,6 +62,7 @@ class Priorities {
     // Production Requests
     public DefenceUnitsProduction: MaraPriority = MaraPriority.Absolute;
     public HarvesterProduction: MaraPriority = MaraPriority.Normal;
+    public HousingProduction: MaraPriority = MaraPriority.Normal;
     public AttackUnitsProduction: MaraPriority = MaraPriority.Normal;
     public LandmarkCaptureUnitsProduction: MaraPriority = MaraPriority.Low;
     public PointGuardProduction: MaraPriority = MaraPriority.Low;

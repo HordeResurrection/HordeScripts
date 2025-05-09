@@ -31,8 +31,17 @@ class SawmillData {
 class NeedExpandResult {
     NeedExpand: boolean = false;
     MinResourceAmount: number = 0;
-    MinResourceThreshold: number = 0;
     ResourcesToMine: MaraResources = new MaraResources(0, 0, 0, 0);
+}
+
+class ResourceRequest {
+    RequestedResources: MaraResources;
+    RequestTick: number | null;
+
+    constructor(resources: MaraResources) {
+        this.RequestedResources = resources;
+        this.RequestTick = null;
+    }
 }
 
 export class MiningSubcontroller extends MaraTaskableSubcontroller {
@@ -43,6 +52,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
 
     private metalStocks: Array<MaraUnitCacheItem> | null = null;
     private mines: Array<MineData> = [];
+    private resourceRequests = new Map<string, ResourceRequest>();
     
     constructor (parent: MaraSettlementController) {
         super(parent);
@@ -170,40 +180,18 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
             this.Sawmills.length * this.settlementController.Settings.ResourceMining.WoodcutterBatchSize;
     }
 
-    public ProvideResourcesForUnitComposition(composition: UnitComposition): SubcontrollerRequestResult {
+    public ProvideResourcesForUnitComposition(requestor: string, composition: UnitComposition): SubcontrollerRequestResult {
         let compositionCost = this.calculateCompositionCost(composition);
-        this.Debug(`Target composition cost: ${compositionCost.ToString()}`);
+        let resourceRequest = new ResourceRequest(compositionCost);
 
-        let currentResources = this.getTotalResources();
-        this.Debug(`Current resources: ${currentResources.ToString()}`);
-
-        let insufficientResources = new MaraResources(
-            Math.max(compositionCost.Wood - currentResources.Wood, 0), 
-            Math.max(compositionCost.Metal - currentResources.Metal, 0), 
-            Math.max(compositionCost.Gold - currentResources.Gold, 0), 
-            Math.max(compositionCost.People - currentResources.People, 0)
-        );
+        this.resourceRequests.set(requestor, resourceRequest);
+        this.Debug(`Added resource request from ${requestor} for ${compositionCost.ToString()}`);
 
         let result = new SubcontrollerRequestResult();
+        result.IsSuccess = true;
+        result.Task = null;
 
-        if (
-            insufficientResources.Gold > 0 ||
-            insufficientResources.Metal > 0 ||
-            insufficientResources.Wood > 0 ||
-            insufficientResources.People > 0
-        ) {
-            let targetExpand = this.fillExpandData(insufficientResources);
-            let task = new ExpandBuildTask(this.settlementController.Settings.Priorities.ExpandBuildOnDemand, this.settlementController, targetExpand, this);
-
-            result.IsSuccess = false;
-            result.Task = task;
-            
-            this.AddTask(task);
-        }
-        else {
-            result.IsSuccess = true;
-            result.Task = null;
-        }
+        this.nextTaskAttemptTick = 0;
 
         return result;
     }
@@ -237,7 +225,28 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
     }
 
     protected makeSelfTask(tickNumber: number): SettlementSubcontrollerTask | null {
-        let task: SettlementSubcontrollerTask | null = this.makeExpandBuildTask();
+        this.resourceRequests.forEach(
+            (v) => {
+                if (!v.RequestTick) {
+                    v.RequestTick = tickNumber;
+                }
+            }
+        );
+
+        let requestedResources = new MaraResources(0, 0, 0, 0);
+
+        this.resourceRequests.forEach(
+            (v) => {
+                if (
+                    tickNumber - v.RequestTick! < 
+                        this.settlementController.Settings.Timeouts.ResourceRequestDuration
+                ) {
+                    requestedResources.Add(v.RequestedResources);
+                }
+            }
+        );
+        
+        let task: SettlementSubcontrollerTask | null = this.makeExpandBuildTask(requestedResources);
 
         if (!task) {
             task = this.makeProduceHarvestersTask();
@@ -257,21 +266,21 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         return task;
     }
 
-    private makeExpandBuildTask(): ExpandBuildTask | null {
+    private makeExpandBuildTask(requestedResources: MaraResources): ExpandBuildTask | null {
         let canMineResources = this.canMineResources();
 
         if (!canMineResources) {
             return null;
         }
 
-        let expandData = this.isExpandNeeded();
+        let expandData = this.isExpandNeeded(requestedResources);
         
         if (expandData.NeedExpand) {
             this.Debug(`Low on one or more resource, required resources: ${expandData.ResourcesToMine.ToString()}`);
             this.Debug(`Proceeding to expand...`);
             let targetExpand = this.fillExpandData(expandData.ResourcesToMine);
             
-            return new ExpandBuildTask(this.settlementController.Settings.Priorities.ExpandBuildOnIdle, this.settlementController, targetExpand, this);
+            return new ExpandBuildTask(this.settlementController.Settings.Priorities.ExpandBuild, this.settlementController, targetExpand, this);
         }
         else {
             return null;
@@ -477,7 +486,7 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         return true;
     }
     
-    private isExpandNeeded(): NeedExpandResult {
+    private isExpandNeeded(requestedResources: MaraResources): NeedExpandResult {
         let leftResources = new Set<MaraResourceType>();
         
         for (let cluster of MaraMap.ResourceClusters) {
@@ -499,71 +508,72 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         }
                 
         let resources = this.getTotalResources();
-        this.Debug(`Total resources: ${resources.ToString()}`);
+        this.Debug(`Current resources: ${resources.ToString()}`);
+        this.Debug(`Requested resources: ${requestedResources.ToString()}`);
 
         let result = new NeedExpandResult();
         result.NeedExpand = false;
         result.ResourcesToMine = new MaraResources(0, 0, 0, 0);
         result.MinResourceAmount = Infinity;
-        result.MinResourceThreshold = 0;
 
         let minResourceToThresholdRatio = Infinity;
 
         //TODO: rewrite code below to get rid of certain resource names
         //TODO: also go to expand if currently not mining some resource
+
+        let peopleThreshold = Math.max(this.PEOPLE_THRESHOLD, requestedResources.People);
+        let woodThreshold = Math.max(this.RESOURCE_THRESHOLD, requestedResources.Wood);
+        let metalThreshold = Math.max(this.RESOURCE_THRESHOLD, requestedResources.Metal);
+        let goldThreshold = Math.max(this.RESOURCE_THRESHOLD, requestedResources.Gold);
         
-        if (resources.People < this.PEOPLE_THRESHOLD) {
+        if (resources.People < peopleThreshold) {
             this.Debug(`Low people`);
             result.NeedExpand = true;
-            result.ResourcesToMine.People = this.PEOPLE_THRESHOLD - resources.People;
+            result.ResourcesToMine.People = peopleThreshold - resources.People;
 
-            let ratio = resources.People / this.PEOPLE_THRESHOLD;
+            let ratio = resources.People / peopleThreshold;
 
             if (minResourceToThresholdRatio > ratio) {
                 result.MinResourceAmount = resources.People;
-                result.MinResourceThreshold = this.PEOPLE_THRESHOLD;
                 minResourceToThresholdRatio = ratio;
             }
         }
         
-        if (resources.Gold < this.RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Gold)) {
+        if (resources.Gold < goldThreshold && leftResources.has(MaraResourceType.Gold)) {
             this.Debug(`Low gold`);
             result.NeedExpand = true;
-            result.ResourcesToMine.Gold = this.RESOURCE_THRESHOLD - resources.Gold;
+            result.ResourcesToMine.Gold = goldThreshold - resources.Gold;
 
-            let ratio = resources.Gold / this.RESOURCE_THRESHOLD;
+            let ratio = resources.Gold / goldThreshold;
 
             if (minResourceToThresholdRatio > ratio) {
                 result.MinResourceAmount = resources.Gold;
-                result.MinResourceThreshold = this.RESOURCE_THRESHOLD;
                 minResourceToThresholdRatio = ratio;
             }
         }
         
-        if (resources.Metal < this.RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Metal)) {
+        if (resources.Metal < metalThreshold && leftResources.has(MaraResourceType.Metal)) {
             this.Debug(`Low metal`);
             result.NeedExpand = true;
-            result.ResourcesToMine.Metal = this.RESOURCE_THRESHOLD - resources.Metal;
+            result.ResourcesToMine.Metal = metalThreshold - resources.Metal;
 
-            let ratio = resources.Metal / this.RESOURCE_THRESHOLD;
+            let ratio = resources.Metal / metalThreshold;
 
             if (minResourceToThresholdRatio > ratio) {
                 result.MinResourceAmount = resources.Metal;
-                result.MinResourceThreshold = this.RESOURCE_THRESHOLD;
                 minResourceToThresholdRatio = ratio;
             }
         }
 
-        if (resources.Wood < this.RESOURCE_THRESHOLD && leftResources.has(MaraResourceType.Wood)) {
+        if (resources.Wood < woodThreshold && leftResources.has(MaraResourceType.Wood)) {
             this.Debug(`Low lumber`);
             result.NeedExpand = true;
-            result.ResourcesToMine.Wood = this.RESOURCE_THRESHOLD - resources.Wood;
+            result.ResourcesToMine.Wood = woodThreshold - resources.Wood;
 
-            let ratio = resources.Wood / this.RESOURCE_THRESHOLD;
+            let ratio = resources.Wood / woodThreshold;
 
             if (minResourceToThresholdRatio > ratio) {
                 result.MinResourceAmount = resources.Wood;
-                result.MinResourceThreshold = this.RESOURCE_THRESHOLD;
                 minResourceToThresholdRatio = ratio;
             }
         }
@@ -944,10 +954,18 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
         while (freeHarvesterIndex < freeHarvesters.length) {
             let understaffedMineData = this.mines.find(
                 (value) => {
-                    let requiredMiners = this.getMinerCount(value.Mine!);
-                    return value.Miners.length < requiredMiners;
+                    return value.Miners.length < this.settlementController.Settings.ResourceMining.MinMinersPerMine;
                 }
             );
+            
+            if (!understaffedMineData) {
+                understaffedMineData = this.mines.find(
+                    (value) => {
+                        let requiredMiners = this.getMinerCount(value.Mine!);
+                        return value.Miners.length < requiredMiners;
+                    }
+                );
+            }
 
             if (understaffedMineData) {
                 let requiredMiners = this.getMinerCount(understaffedMineData.Mine!);

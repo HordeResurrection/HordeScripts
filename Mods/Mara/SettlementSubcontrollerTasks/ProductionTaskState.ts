@@ -42,7 +42,10 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
         MaraUtils.PrintMap(compositionToProduce);
         
         if (this.requestMiningOnInsufficientResources) {
-            let requestResult = this.settlementController.MiningController.ProvideResourcesForUnitComposition(compositionToProduce);
+            let requestResult = this.settlementController.MiningController.ProvideResourcesForUnitComposition(
+                this.task.constructor.name, 
+                compositionToProduce
+            );
 
             if (!requestResult.IsSuccess) {
                 this.task.Debug(`Not enough resources to produce target composition. Awaiting completion of mining subcontroller task`);

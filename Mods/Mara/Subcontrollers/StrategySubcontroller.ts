@@ -42,8 +42,8 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
     protected onTaskFailure(tickNumber: number): void {
         this.nextTaskAttemptTick = tickNumber + MaraUtils.Random(
             this.settlementController.MasterMind,
-            this.settlementController.Settings.Timeouts.StrategyActionReattemptMaxCooldown,
-            this.settlementController.Settings.Timeouts.StrategyActionReattemptMinCooldown
+            this.settlementController.Settings.Timeouts.StrategyActionFailReattemptMaxCooldown,
+            this.settlementController.Settings.Timeouts.StrategyActionFailReattemptMinCooldown
         );
     }
     
@@ -561,7 +561,6 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         let enemy = this.selectEnemy();
 
         if (enemy) {
-            
             let produceableOffensiveCfgIds = this.getProduceableOffensiveCfgIds();
 
             if (produceableOffensiveCfgIds.length > 0) {
@@ -583,7 +582,8 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
         else {
             this.nextTaskAttemptTick = tickNumber + MaraUtils.Random(
                 this.settlementController.MasterMind,
-                this.settlementController.Settings.Timeouts.DefaultTaskReattemptMaxCooldown
+                this.settlementController.Settings.Timeouts.StrategyActionUnavailReattemptMaxCooldown,
+                this.settlementController.Settings.Timeouts.StrategyActionUnavailReattemptMinCooldown
             );
 
             return null;
