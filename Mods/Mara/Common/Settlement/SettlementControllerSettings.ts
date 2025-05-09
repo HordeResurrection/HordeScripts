@@ -92,6 +92,8 @@ class ControllerStatesSettings {
 
     public MaxHarvesterProductionBatch: number = 6;
     public MaxSameCfgIdProducerCount: number = 3;
+
+    public DevelopmentToReinforcementRatio: number = 40;
 }
 
 class ResourceMiningSettings {

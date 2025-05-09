@@ -78,14 +78,30 @@ export class DevelopmentSubcontroller extends MaraTaskableSubcontroller {
 
             let healerChain: Array<string> = this.getHealerAndChain(economyComposition);
             this.Debug(`Healers & chain: ${healerChain.join(", ")}`);
+            
+            let settlementDevelopers = [economyBoosterChain, healerChain];
+            settlementDevelopers = settlementDevelopers.filter((item) => item.length > 0);
 
             let reinforcementProducer: Array<string> = this.getReinforcementProducer(economyComposition);
-            this.Debug(`Reinforcements producers: ${reinforcementProducer.join(", ")}`);
-            
-            let cfgIdSet = [economyBoosterChain, healerChain, reinforcementProducer];
-            cfgIdSet.filter((item) => item.length > 0);
+            reinforcementProducer = reinforcementProducer.filter((item) => item.length > 0);
+            this.Debug(`Reinforcements producer: ${reinforcementProducer.join(", ")}`);
 
-            selectedCfgIds = MaraUtils.RandomSelect(this.settlementController.MasterMind, cfgIdSet);
+            if (settlementDevelopers.length > 0 && reinforcementProducer.length > 0) {
+                let pick = MaraUtils.Random(this.settlementController.MasterMind, 100);
+
+                if (pick < this.settlementController.Settings.ControllerStates.DevelopmentToReinforcementRatio) {
+                    selectedCfgIds = MaraUtils.RandomSelect(this.settlementController.MasterMind, settlementDevelopers)!;
+                }
+                else {
+                    selectedCfgIds = reinforcementProducer;
+                }
+            }
+            else {
+                let cfgIds = [...settlementDevelopers, reinforcementProducer];
+                cfgIds = cfgIds.filter((item) => item.length > 0);
+                
+                selectedCfgIds = MaraUtils.RandomSelect(this.settlementController.MasterMind, cfgIds);
+            }
         }
 
         if (selectedCfgIds) {
