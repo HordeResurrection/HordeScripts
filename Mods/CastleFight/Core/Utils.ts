@@ -1,9 +1,9 @@
 import { generateCellInSpiral } from "library/common/position-tools";
 import { createBox, createPoint } from "library/common/primitives";
-import { PointCommandArgs, UnitCommand } from "library/game-logic/horde-types";
-import { getUnitProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
+import { PointCommandArgs, TileType, UnitCommand, UnitConfig } from "library/game-logic/horde-types";
+import { getUnitProfessionParams, UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 
-const SpawnUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
+const SpawnUnitParameters = HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
 
 /** метрика измерения расстояния */
 export enum MetricType {
@@ -29,20 +29,36 @@ export function getCurrentTime () {
     return new Date().getTime();
 }
 
-/** добавить профессию найма юнитов */
+export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
+    // при наличии конфига удаляем его
+    if (HordeContentApi.HasUnitConfig(newConfigUid)) {
+        //HordeContentApi.RemoveConfig(HordeContentApi.GetUnitConfig(newConfigUid));
+        return HordeContentApi.GetUnitConfig(newConfigUid);
+    }
+    return HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig(baseConfigUid), newConfigUid);
+}
+
+/** добавить профессию найма юнитов, если была добавлена, то установит точки выхода и очистит список построек */
 export function CfgAddUnitProducer(Cfg: any) {
     // даем профессию найм войнов при отсутствии
     if (!getUnitProfessionParams(Cfg, UnitProfession.UnitProducer)) {
-        var donorCfg = HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Barrack"));
+        var donorCfg = HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Barrack")) as UnitConfig;
         var prof_unitProducer = getUnitProfessionParams(donorCfg, UnitProfession.UnitProducer);
         Cfg.ProfessionParams.Item.set(UnitProfession.UnitProducer, prof_unitProducer);
         
+        // добавляем точки выхода
         if (Cfg.BuildingConfig.EmergePoint == null) {
             ScriptUtils.SetValue(Cfg.BuildingConfig, "EmergePoint", createPoint(0, 0));
         }
         if (Cfg.BuildingConfig.EmergePoint2 == null) {
             ScriptUtils.SetValue(Cfg.BuildingConfig, "EmergePoint2", createPoint(0, 0));
         }
+
+        // очищаем список
+        var producerParams = Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        var produceList    = producerParams.CanProduceList;
+        produceList.Clear();
+
         HordeContentApi.RemoveConfig(donorCfg);
     }
 }
@@ -179,8 +195,8 @@ export class Rectangle {
 export function GetUnitsInArea(rect: Rectangle): Array<any> {
     let box = createBox(rect.xs, rect.ys, 0, rect.xe, rect.ye, 2);
     let unitsInBox = ActiveScena.UnitsMap.UnitsTree.GetUnitsInBox(box);
-    let count = unitsInBox.Count;
-    let units = unitsInBox.Units;
+    let count = ScriptUtils.GetValue(unitsInBox, "Count");
+    let units = ScriptUtils.GetValue(unitsInBox, "Units");
 
     let unitsIds = new Set<number>();
     let result = new Array<any>();

@@ -1,9 +1,13 @@
-import { log } from "library/common/logging";
 import { UnitCommand, UnitSpecification } from "library/game-logic/horde-types";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
-import { Entity, COMPONENT_TYPE, UnitComponent, AttackingAlongPathComponent, BuffOptTargetType } from "../Components/ESC_components";
 import { Cell, distance_Chebyshev, UnitGiveOrderToCell, UnitGiveOrderToNearEmptyCell } from "../Utils";
 import { World } from "../World";
+import { OpCfgUidToCfg } from "../Configs/IConfig";
+import { Config_Castle } from "../Configs/Config_Castle";
+import { AttackingAlongPathComponent } from "../Components/AttackingAlongPathComponent";
+import { COMPONENT_TYPE } from "../Components/IComponent";
+import { UnitComponent } from "../Components/UnitComponent";
+import { Entity } from "../Entity";
 
 class CellOfEnemyAttackingCastle {
     cell: Cell;
@@ -28,17 +32,17 @@ export function AttackingAlongPathSystem_stage1(world: World, gameTickNum: numbe
     // подготавливаем массив
 
     if (settlements_sortedCellsOfEnemiesAttackingCastle == null) {
-        settlements_sortedCellsOfEnemiesAttackingCastle = new Array<Array<CellOfEnemyAttackingCastle>>(world.settlementsCount);
-        for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+        settlements_sortedCellsOfEnemiesAttackingCastle = new Array<Array<CellOfEnemyAttackingCastle>>(world.scena.settlementsCount);
+        for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
             settlements_sortedCellsOfEnemiesAttackingCastle[settlementId] = new Array<CellOfEnemyAttackingCastle>();
         }
     } else {
-        for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+        for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
             settlements_sortedCellsOfEnemiesAttackingCastle[settlementId].splice(0);
         }
     }
 
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.IsSettlementInGame(settlementId)) {
             continue;
         }
@@ -81,7 +85,7 @@ export function AttackingAlongPathSystem_stage1(world: World, gameTickNum: numbe
 
             var targetCastleUnit = unitComponent.unit.OrdersMind.ActiveOrder.Target;
             // проверяем, что это чей-то замок
-            if (targetCastleUnit.Cfg.Uid != world.configs["castle"].Uid) {
+            if (targetCastleUnit.Cfg.Uid != Config_Castle.CfgUid) {
                 continue;
             }
             // проверяем, что замок в радиусе атаки
@@ -90,7 +94,7 @@ export function AttackingAlongPathSystem_stage1(world: World, gameTickNum: numbe
                 unitComponent.unit.Cell.Y,
                 targetCastleUnit.Cell.X,
                 targetCastleUnit.Cell.Y);
-            if (distanceToCastle > 1.5*world.configs[unitComponent.cfgId].OrderDistance) {
+            if (distanceToCastle > 1.5*OpCfgUidToCfg[unitComponent.cfgUid].OrderDistance) {
                 continue;
             }
 
@@ -135,16 +139,16 @@ export function AttackingAlongPathSystem_stage2(world: World, gameTickNum: numbe
     // подготавливаем массивы
 
     if (!settlements_currCellNum) {
-        settlements_currCellNum = new Array<number>(world.settlementsCount);
+        settlements_currCellNum = new Array<number>(world.scena.settlementsCount);
     } else {
-        for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+        for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
             settlements_currCellNum[settlementId] = 0;
         }
     }
 
     // отдаем приказы
 
-    for (var settlementId = 0; settlementId < world.settlementsCount; settlementId++) {
+    for (var settlementId = 0; settlementId < world.scena.settlementsCount; settlementId++) {
         if (!world.IsSettlementInGame(settlementId)) {
             continue;
         }
@@ -171,8 +175,8 @@ export function AttackingAlongPathSystem_stage2(world: World, gameTickNum: numbe
             // если юнит вообще не знает куда идти, то выбираем путь атаки
             
             if (isAttackPathNull) {
-                attackingAlongPathComponent.selectedAttackPathNum = world.settlements_attackPathChoiser[settlementId].choiseAttackPath(unitComponent.unit, world);
-                attackingAlongPathComponent.attackPath            = Array.from(world.settlements_attack_paths[settlementId][attackingAlongPathComponent.selectedAttackPathNum]);
+                attackingAlongPathComponent.selectedAttackPathNum = world.scena.settlements_attackPathChoiser[settlementId].choiseAttackPath(unitComponent.unit, world);
+                attackingAlongPathComponent.attackPath            = Array.from(world.scena.settlements_attack_paths[settlementId][attackingAlongPathComponent.selectedAttackPathNum]);
                 attackingAlongPathComponent.currentPathPointNum   = 0;
             }
             
@@ -185,8 +189,8 @@ export function AttackingAlongPathSystem_stage2(world: World, gameTickNum: numbe
                 // проверка, что в ячейке нету вражеского замка
                 var unitInCell = unitsMap.GetUpperUnit(attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].X, attackingAlongPathComponent.attackPath[attackingAlongPathComponent.currentPathPointNum].Y);
                 if (unitInCell &&
-                    unitInCell.Cfg.Uid == world.configs["castle"].Uid &&
-                    unitInCell.Owner.Uid < world.settlementsCount &&
+                    unitInCell.Cfg.Uid == Config_Castle.CfgUid &&
+                    unitInCell.Owner.Uid < world.scena.settlementsCount &&
                     world.settlements_settlements_warFlag[settlementId][unitInCell.Owner.Uid]) {
                     continue;
                 }
@@ -199,8 +203,8 @@ export function AttackingAlongPathSystem_stage2(world: World, gameTickNum: numbe
 
                     // выбираем новый путь
 
-                    attackingAlongPathComponent.selectedAttackPathNum = world.settlements_attackPathChoiser[settlementId].choiseAttackPath(unitComponent.unit, world);
-                    attackingAlongPathComponent.attackPath            = Array.from(world.settlements_attack_paths[settlementId][attackingAlongPathComponent.selectedAttackPathNum]);
+                    attackingAlongPathComponent.selectedAttackPathNum = world.scena.settlements_attackPathChoiser[settlementId].choiseAttackPath(unitComponent.unit, world);
+                    attackingAlongPathComponent.attackPath            = Array.from(world.scena.settlements_attack_paths[settlementId][attackingAlongPathComponent.selectedAttackPathNum]);
                     attackingAlongPathComponent.currentPathPointNum   = 0;
 
                     // чтобы юниты не слонялись по карте, то юнитов отсылаем назад по предыдущему пути + замок
@@ -212,7 +216,7 @@ export function AttackingAlongPathSystem_stage2(world: World, gameTickNum: numbe
 
                         // добавляем вначало путь обратно
 
-                    var prevAttackPath = world.settlements_attack_paths[settlementId][prevSelectedAttackPathNum];
+                    var prevAttackPath = world.scena.settlements_attack_paths[settlementId][prevSelectedAttackPathNum];
                     for (var j = 0; j < prevAttackPath.length; j++) {
                         attackingAlongPathComponent.attackPath.unshift(prevAttackPath[j]);
                     }
@@ -243,8 +247,8 @@ export function AttackingAlongPathSystem_stage2(world: World, gameTickNum: numbe
                     attackVector.Y *= vectorInvLength;
                     /** тип атаки юнита 0 - дальник, 1 ближник, 2 - всадник */
                     var unitAttackType = 
-                        world.configs[unitComponent.cfgId].MainArmament.Range > 1 ? 0
-                        : world.configs[unitComponent.cfgId].Specification.HasFlag(UnitSpecification.Rider) ? 1
+                        OpCfgUidToCfg[unitComponent.cfgUid].MainArmament.Range > 1 ? 0
+                        : OpCfgUidToCfg[unitComponent.cfgUid].Specification.HasFlag(UnitSpecification.Rider) ? 1
                         : 2;
 
                     // ищем врага, атакующего наш замок
@@ -356,7 +360,7 @@ export function AttackingAlongPathSystem_stage2(world: World, gameTickNum: numbe
                     else if (isAttackPathNull) {
                         // сначала идем на базу
                         UnitGiveOrderToNearEmptyCell(unitComponent.unit,
-                            world.settlements_castle_cell[settlementId],
+                            world.scena.settlements_castle_cell[settlementId],
                             UnitCommand.Attack,
                             AssignOrderMode.Replace);
                         // потом на следующую точку
@@ -374,7 +378,7 @@ export function AttackingAlongPathSystem_stage2(world: World, gameTickNum: numbe
                 } else if (isAttackPathNull) {
                     // сначала идем на базу
                     UnitGiveOrderToNearEmptyCell(unitComponent.unit,
-                        world.settlements_castle_cell[settlementId],
+                        world.scena.settlements_castle_cell[settlementId],
                         UnitCommand.Attack,
                         AssignOrderMode.Replace);
                     // потом на следующую точку

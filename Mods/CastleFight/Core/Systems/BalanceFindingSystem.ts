@@ -6,10 +6,15 @@ import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
-import { world } from "../CastleFightPlugin";
-import { Entity, COMPONENT_TYPE, SpawnBuildingComponent, UpgradableBuildingComponent, UnitComponent } from "../Components/ESC_components";
 import { GameState, World } from "../World";
 import { GetUnitsInArea, Rectangle, getCurrentTime } from "../Utils";
+import { OpCfgUidToCfg, OpCfgUidToEntity } from "../Configs/IConfig";
+import { Config_Worker } from "../Configs/Config_Worker";
+import { COMPONENT_TYPE } from "../Components/IComponent";
+import { SpawnBuildingComponent } from "../Components/SpawnBuildingComponent";
+import { UnitComponent } from "../Components/UnitComponent";
+import { UpgradableBuildingComponent } from "../Components/UpgradableBuildingComponent";
+import { Entity } from "../Entity";
 
 enum Stage {
     Init = 0, Testing, Result, End
@@ -86,7 +91,7 @@ class Arena {
                 var swapCount = this.CalcBattleFieldLeftUnitsSwapCount(fieldNum, i);
                 for (var x = this.battleFields[fieldNum].leftSpawnRect.xs; x <= this.battleFields[fieldNum].leftSpawnRect.xe; x++) {
                     for (var y = this.battleFields[fieldNum].leftSpawnRect.ys; y <= this.battleFields[fieldNum].leftSpawnRect.ye; y++) {
-                        left_units.push(spawnUnit(settlement_left, world.configs[unitInfo.cfgId], createPoint(x, y), UnitDirection.Down));
+                        left_units.push(spawnUnit(settlement_left, OpCfgUidToCfg[unitInfo.cfgId], createPoint(x, y), UnitDirection.Down));
                         if (++currCount >= swapCount) {
                             break;
                         }
@@ -106,7 +111,7 @@ class Arena {
                 var swapCount = this.CalcBattleFieldRightUnitsSwapCount(fieldNum, i);
                 for (var x = this.battleFields[fieldNum].rightSpawnRect.xe; x >= this.battleFields[fieldNum].rightSpawnRect.xs; x--) {
                     for (var y = this.battleFields[fieldNum].rightSpawnRect.ye; y >= this.battleFields[fieldNum].rightSpawnRect.ys; y--) {
-                        right_units.push(spawnUnit(settlement_right, world.configs[unitInfo.cfgId], createPoint(x, y), UnitDirection.Down));
+                        right_units.push(spawnUnit(settlement_right, OpCfgUidToCfg[unitInfo.cfgId], createPoint(x, y), UnitDirection.Down));
                         if (++currCount >= swapCount) {
                             break;
                         }
@@ -248,11 +253,11 @@ var set_TableUnitsLeft : Map<number, Array<Array<number>>>;
 
 function Init(world: World) : boolean {
     const recurciveGetUnitInfo = (cfgId: string, shiftStr: string, accGold: number, accMetal: number, accLumber: number, accPeople: number) => {
-        var Uid : string = world.configs[cfgId].Uid;
-        if (!world.cfgUid_entity.has(Uid)) {
+        var Uid : string = OpCfgUidToCfg[cfgId].Uid;
+        if (!OpCfgUidToEntity.has(Uid)) {
             return;
         }
-        var entity = world.cfgUid_entity.get(Uid) as Entity;
+        var entity = OpCfgUidToEntity.get(Uid) as Entity;
 
         // проверяем, что здание спавнит юнитов
         if (!entity.components.has(COMPONENT_TYPE.SPAWN_BUILDING_COMPONENT)) {
@@ -262,7 +267,7 @@ function Init(world: World) : boolean {
 
         // обновляем накопленную стоимость здания
         
-        var CostResources = world.configs[cfgId].CostResources;
+        var CostResources = OpCfgUidToCfg[cfgId].CostResources;
         accGold   += CostResources.Gold;
         accMetal  += CostResources.Metal;
         accLumber += CostResources.Lumber;
@@ -271,8 +276,8 @@ function Init(world: World) : boolean {
         // извлекаем текущего юнита
         
         var unitInfo = new UnitInfo();
-        unitInfo.cfgId   = spawnBuildingComponent.spawnUnitConfigId;
-        unitInfo.Name    = world.configs[unitInfo.cfgId].Name;
+        unitInfo.cfgId   = spawnBuildingComponent.spawnUnitConfigUid;
+        unitInfo.Name    = OpCfgUidToCfg[unitInfo.cfgId].Name;
         unitInfo.Gold    = accGold;
         unitInfo.Metal   = accMetal;
         unitInfo.Lumber  = accLumber;
@@ -289,7 +294,7 @@ function Init(world: World) : boolean {
         var upgradableBuildingComponent = entity.components.get(COMPONENT_TYPE.UPGRADABLE_BUILDING_COMPONENT) as 
             UpgradableBuildingComponent;
         
-        for (var nextCfgId of upgradableBuildingComponent.upgradeCfgIds) {
+        for (var nextCfgId of upgradableBuildingComponent.upgradesCfgUid) {
             recurciveGetUnitInfo(nextCfgId, shiftStr + "\t", accGold, accMetal, accLumber, accPeople);
         }
     };
@@ -298,22 +303,22 @@ function Init(world: World) : boolean {
     
     opCfgUidToUnitInfo = new Map<string, UnitInfo>();
 
-    var producerParams = world.configs["worker"].GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+    var producerParams = OpCfgUidToCfg[Config_Worker.CfgUid].GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
     var produceList    = producerParams.CanProduceList;
     for (var i = 0; i < produceList.Count; i++) {
         var produceUnit = produceList.Item.get(i);
         log.info(i, " = ", produceUnit.Name);
-        if (!world.cfgUid_entity.has(produceUnit.Uid)) {
+        if (!OpCfgUidToEntity.has(produceUnit.Uid)) {
             continue;
         }
-        var entity = world.cfgUid_entity.get(produceUnit.Uid) as Entity;
+        var entity = OpCfgUidToEntity.get(produceUnit.Uid) as Entity;
 
         if (!entity.components.has(COMPONENT_TYPE.SPAWN_BUILDING_COMPONENT)) {
             continue;
         }
 
         var unitComponent = entity.components.get(COMPONENT_TYPE.UNIT_COMPONENT) as UnitComponent;
-        recurciveGetUnitInfo(unitComponent.cfgId, "", 0, 0, 0, 0);
+        recurciveGetUnitInfo(unitComponent.cfgUid, "", 0, 0, 0, 0);
     }
 
     unitsUid = Array.from(opCfgUidToUnitInfo.keys());
