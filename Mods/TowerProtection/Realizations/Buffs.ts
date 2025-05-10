@@ -1,10 +1,9 @@
-import { PointCommandArgs, TilePayload, TileType, UnitArmament, UnitCommand, UnitDirection, UnitFlags, UnitHurtType, UnitMapLayer } from "library/game-logic/horde-types";
+import { PointCommandArgs, UnitArmament, UnitCommand, UnitDirection, UnitFlags, UnitMapLayer } from "library/game-logic/horde-types";
 import { CFGPrefix, DeleteUnitParameters, GlobalVars } from "../GlobalData";
 import { IBuff } from "../Types/IBuff";
 import { Player_TOWER_BASE, PlayerTowersClass } from "./Player_units";
 import { createHordeColor, createPF, createPoint } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
-import { log } from "library/common/logging";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { IUnit } from "../Types/IUnit";
 import { createGameMessageWithNoSound } from "library/common/messages";
@@ -13,7 +12,6 @@ import { ChebyshevDistance, spawnUnits } from "../Utils";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
-import { printObjectItems } from "library/common/introspection";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
 import { Rectangle } from "../Types/Geometry";
 
@@ -70,74 +68,75 @@ export class Buff_DigMoat extends IBuff {
         } 
 
         // 1 линия // 122 151 152 123 125
-        this._SetTile(createPoint(waterRectangle.X - 2, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[122]);
-        this._SetTile(createPoint(waterRectangle.X - 1, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[151]);
+        this._SetTile(createPoint(waterRectangle.X - 2, waterRectangle.Y - 2), ActiveScena.GetRealScena().Tileset.TileConfigs[122]);
+        this._SetTile(createPoint(waterRectangle.X - 1, waterRectangle.Y - 2), ActiveScena.GetRealScena().Tileset.TileConfigs[151]);
         for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++)
-        this._SetTile(createPoint(x, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[152]);
-        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[123]);
-        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y - 2), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[125]);
+        this._SetTile(createPoint(x, waterRectangle.Y - 2), ActiveScena.GetRealScena().Tileset.TileConfigs[152]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y - 2), ActiveScena.GetRealScena().Tileset.TileConfigs[123]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y - 2), ActiveScena.GetRealScena().Tileset.TileConfigs[125]);
         // 2 линия // 126  22  10  23 128
-        this._SetTile(createPoint(waterRectangle.X - 2, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[126]);
-        this._SetTile(createPoint(waterRectangle.X - 1, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[22]);
+        this._SetTile(createPoint(waterRectangle.X - 2, waterRectangle.Y - 1), ActiveScena.GetRealScena().Tileset.TileConfigs[126]);
+        this._SetTile(createPoint(waterRectangle.X - 1, waterRectangle.Y - 1), ActiveScena.GetRealScena().Tileset.TileConfigs[22]);
         for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++)
-        this._SetTile(createPoint(x, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[10]);
-        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[23]);
-        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y - 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[128]);
+        this._SetTile(createPoint(x, waterRectangle.Y - 1), ActiveScena.GetRealScena().Tileset.TileConfigs[10]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y - 1), ActiveScena.GetRealScena().Tileset.TileConfigs[23]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y - 1), ActiveScena.GetRealScena().Tileset.TileConfigs[128]);
         // 3 линия // 126  38   3  16 147
         for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++)
-        this._SetTile(createPoint(waterRectangle.X - 2, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[126]);
+        this._SetTile(createPoint(waterRectangle.X - 2, y), ActiveScena.GetRealScena().Tileset.TileConfigs[126]);
         for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++)
-        this._SetTile(createPoint(waterRectangle.X - 1, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[38]);
+        this._SetTile(createPoint(waterRectangle.X - 1, y), ActiveScena.GetRealScena().Tileset.TileConfigs[38]);
         for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++) {
             for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++) {
-                this._SetTile(createPoint(x, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[1]);
+                this._SetTile(createPoint(x, y), ActiveScena.GetRealScena().Tileset.TileConfigs[1]);
             }
         }
         for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++)
-        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[16]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, y), ActiveScena.GetRealScena().Tileset.TileConfigs[16]);
         for (var y = waterRectangle.Y; y < waterRectangle.Y + waterRectangle.H; y++)
-        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, y), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[147]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, y), ActiveScena.GetRealScena().Tileset.TileConfigs[147]);
         // 4 линия // 127  18  20  25 128
-        this._SetTile(createPoint(waterRectangle.X - 2, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[127]);
-        this._SetTile(createPoint(waterRectangle.X - 1, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[18]);
+        this._SetTile(createPoint(waterRectangle.X - 2, waterRectangle.Y + waterRectangle.H), ActiveScena.GetRealScena().Tileset.TileConfigs[127]);
+        this._SetTile(createPoint(waterRectangle.X - 1, waterRectangle.Y + waterRectangle.H), ActiveScena.GetRealScena().Tileset.TileConfigs[18]);
         for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++)
-        this._SetTile(createPoint(x, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[20]);
-        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[25]);
-        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y + waterRectangle.H), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[128]);
+        this._SetTile(createPoint(x, waterRectangle.Y + waterRectangle.H), ActiveScena.GetRealScena().Tileset.TileConfigs[20]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y + waterRectangle.H), ActiveScena.GetRealScena().Tileset.TileConfigs[25]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y + waterRectangle.H), ActiveScena.GetRealScena().Tileset.TileConfigs[128]);
         // 5 линия // 130 143 144 143 134
-        this._SetTile(createPoint(waterRectangle.X - 2, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[130]);
-        this._SetTile(createPoint(waterRectangle.X - 1, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[143]);
+        this._SetTile(createPoint(waterRectangle.X - 2, waterRectangle.Y + waterRectangle.H + 1), ActiveScena.GetRealScena().Tileset.TileConfigs[130]);
+        this._SetTile(createPoint(waterRectangle.X - 1, waterRectangle.Y + waterRectangle.H + 1), ActiveScena.GetRealScena().Tileset.TileConfigs[143]);
         for (var x = waterRectangle.X; x < waterRectangle.X + waterRectangle.W; x++)
-        this._SetTile(createPoint(x, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[144]);
-        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[143]);
-        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y + waterRectangle.H + 1), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[134]);
+        this._SetTile(createPoint(x, waterRectangle.Y + waterRectangle.H + 1), ActiveScena.GetRealScena().Tileset.TileConfigs[144]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W, waterRectangle.Y + waterRectangle.H + 1), ActiveScena.GetRealScena().Tileset.TileConfigs[143]);
+        this._SetTile(createPoint(waterRectangle.X + waterRectangle.W + 1, waterRectangle.Y + waterRectangle.H + 1), ActiveScena.GetRealScena().Tileset.TileConfigs[134]);
 
         // не работает
 
-        //GlobalVars.ActiveScena.LandscapeMap.ChangeTileConfig(createPoint(16, 22), GlobalVars.ActiveScena.GetRealScena().Tileset.TileConfigs[1]);
+        //ScriptUtils.Invoke(ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", [createPoint(16, 22), ActiveScena.GetRealScena().Tileset.TileConfigs[1], true]);
 
         // не работает 
 
         // var cellX = 19, cellY = 20;
         // for (var x = cellX - 1; x <= cellX + 1; x++) {
         //     for (var y = cellY - 1; y <= cellY + 1; y++) {
-        //         GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(x, y), TileType.Sand, TilePayload.Exploded);
+        //         ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(x, y), TileType.Sand, TilePayload.Exploded);
         //     }
         // }
-        // GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(cellX, cellY), TileType.Water, TilePayload.Exploded);
+        // ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(cellX, cellY), TileType.Water, TilePayload.Exploded);
 
         // не работает
 
-        //GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(16, 22), TileType.Sand, TilePayload.None);
-        //GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(17, 22), TileType.Water, TilePayload.Scorched);
-        //GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(18, 22), TileType.Water, TilePayload.Chopped);
-        //GlobalVars.ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(19, 22), TileType.Water, TilePayload.Exploded);
+        //ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(16, 22), TileType.Sand, TilePayload.None);
+        //ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(17, 22), TileType.Water, TilePayload.Scorched);
+        //ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(18, 22), TileType.Water, TilePayload.Chopped);
+        //ActiveScena.GetRealScena().LandscapeMap.ReplaceTileAt(createPoint(19, 22), TileType.Water, TilePayload.Exploded);
     }
 
     private _SetTile(cell: any, tileCfg: any) {
-        this.prevTilesCfg.push(GlobalVars.ActiveScena.GetRealScena().LandscapeMap.Item.get(cell).Cfg);
+        this.prevTilesCfg.push(ActiveScena.GetRealScena().LandscapeMap.Item.get(cell).Cfg);
         this.prevTilesCell.push(cell);
-        GlobalVars.ActiveScena.LandscapeMap.ChangeTileConfig(cell, tileCfg);
+        ActiveScena.GetRealScena().LandscapeMap.ChangeTileConfig(cell, tileCfg);
+        //ScriptUtils.Invoke(ActiveScena.GetRealScena().LandscapeMap, "ChangeTileByConfig", cell, tileCfg, true);
     }
 
     static InitConfig() {
@@ -150,14 +149,15 @@ export class Buff_DigMoat extends IBuff {
         // стоимость
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Gold", 300);
 
-        ScriptUtils.GetValue(GlobalVars.configs[this.CfgUid], "PortraitCatalogRef").SetConfig(GlobalVars.HordeContentApi.GetAnimationCatalog("#AnimCatalog_digMoatBuffPortrait"));
+        ScriptUtils.GetValue(GlobalVars.configs[this.CfgUid], "PortraitCatalogRef").SetConfig(HordeContentApi.GetAnimationCatalog("#AnimCatalog_digMoatBuffPortrait"));
     }
 
     public OnDead(gameTickNum: number) {
         // убираем изменения ланшафта
-        var landscapeMap = GlobalVars.ActiveScena.LandscapeMap;
+        var landscapeMap = ActiveScena.GetRealScena().LandscapeMap;
         for (var tileNum = 0; tileNum < this.prevTilesCfg.length; tileNum++) {
             landscapeMap.ChangeTileConfig(this.prevTilesCell[tileNum], this.prevTilesCfg[tileNum]);
+            //ScriptUtils.Invoke(landscapeMap, "ChangeTileByConfig", this.prevTilesCell[tileNum], this.prevTilesCfg[tileNum], true);
         }
     }
 };
@@ -527,7 +527,7 @@ export class DefenderUnit extends IUnit {
             for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
                 var _unit = u.value;
 
-                if (_unit.IsDead || _unit.Id == this.unit.Id || _unit.Owner.Uid == GlobalVars.teams[this.teamNum].settlementIdx) {
+                if (_unit.IsDead || _unit.Id == this.unit.Id || Number.parseInt(_unit.Owner.Uid) == GlobalVars.teams[this.teamNum].settlementIdx) {
                     continue;
                 }
 
@@ -667,7 +667,7 @@ export class IBuff_Defender_Unit extends IBuff {
             deleteParams.UnitToDelete   = this.defenderUnit.unit;
             units.DeleteUnit(deleteParams);
 
-            spawnDecoration(GlobalVars.ActiveScena.GetRealScena(), GlobalVars.HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), this.defenderUnit.unit.Position);
+            spawnDecoration(ActiveScena.GetRealScena(), HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), this.defenderUnit.unit.Position);
 
             this.defenderUnit.needDeleted = true;
             this.defenderDeadTickNum      = gameTickNum - this.constructor['DefenderRespawnTime'];
@@ -688,10 +688,10 @@ export class IBuff_Defender_Unit extends IBuff {
                 if (!HordeContentApi.HasUnitConfig(defenderCfgUid)) {
                     defenderCfg = HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig(this.constructor['DefenderCfgBaseUid']), defenderCfgUid);
 
-                    GlobalVars.ScriptUtils.SetValue(defenderCfg, "MaxHealth", Math.floor(defenderLevel*this.constructor['Upgrade_HP']));
-                    GlobalVars.ScriptUtils.SetValue(defenderCfg.MainArmament.ShotParams, "Damage", Math.floor(defenderLevel*this.constructor['Upgrade_Damage']));
+                    ScriptUtils.SetValue(defenderCfg, "MaxHealth", Math.floor(defenderLevel*this.constructor['Upgrade_HP']));
+                    ScriptUtils.SetValue(defenderCfg.MainArmament.ShotParams, "Damage", Math.floor(defenderLevel*this.constructor['Upgrade_Damage']));
                     if (this.constructor['Upgrade_Shield'] > 0) {
-                        GlobalVars.ScriptUtils.SetValue(defenderCfg, "Shield", Math.floor(defenderLevel*this.constructor['Upgrade_Shield']));
+                        ScriptUtils.SetValue(defenderCfg, "Shield", Math.floor(defenderLevel*this.constructor['Upgrade_Shield']));
                     }
                     if (this.constructor['Upgrade_ImmuneFire'] <= defenderLevel) {
                         ScriptUtils.SetValue(defenderCfg, "Flags", mergeFlags(UnitFlags, defenderCfg.Flags, UnitFlags.FireResistant));
@@ -1024,8 +1024,6 @@ export class Buff_Improvements extends IBuff {
         //Buff_SellEnemyBuff
     ];
 
-    onProducedHandler: any;
-
     impPlanCurrNum   : number;
     towerProduceList : any;
 
@@ -1035,27 +1033,6 @@ export class Buff_Improvements extends IBuff {
         this.impPlanCurrNum   = 0;
         var producerParams    = GlobalVars.configs[PlayerTowersClass[this.teamNum].CfgUid].GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
         this.towerProduceList = producerParams.CanProduceList;
-
-        // var that = this;
-        // подписываемся на событие о постройке юнитов
-        // this.onProducedHandler = GlobalVars.teams[teamNum].settlement.Units.UnitProduced.connect(function (sender, UnitProducedEventArgs) {
-        //     try {
-        //         // проверяем, что построил нужный юнит
-        //         if (UnitProducedEventArgs.ProducerUnit.Id != GlobalVars.teams[that.teamNum].tower.unit.Id) {
-        //             return;
-        //         }
-
-        //         // добавляем бафф
-        //         that.TryBuyBuff(UnitProducedEventArgs.Unit.Cfg.Uid);
-
-        //         // удаляем юнита
-        //         var deleteParams          = new DeleteUnitParameters();
-        //         deleteParams.UnitToDelete = UnitProducedEventArgs.Unit;
-        //         GlobalVars.teams[that.teamNum].settlement.Units.DeleteUnit(deleteParams);
-        //     } catch (ex) {
-        //         log.exception(ex);
-        //     }
-        // });
 
         // сохраняем ссылку для всех
         Buff_Improvements.TowersBuffImprRef[this.teamNum] = this;
@@ -1188,20 +1165,39 @@ export class Buff_Improvements extends IBuff {
                 towerProduceList.Add(GlobalVars.configs[Buff_Improvements.ImprovementsBuffsClass[buffClassIdx].CfgUid]);
             }
         }
+
+        // подписываемся на события постройки у башни
+        for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+            // if (!GlobalVars.teams[teamNum].inGame ||
+            //     GlobalVars.teams[teamNum].tower.unit.IsDead) {
+            //     continue;
+            // }
+
+            //log.info("Подписываемся на produceCallbacks у teamNum = ", teamNum, " cfgUid ", PlayerTowersClass[teamNum].CfgUid, " classname ", PlayerTowersClass[teamNum].name);
+            //var _teamNum = teamNum;
+            PlayerTowersClass[teamNum].produceCallbacks.push(this.ProduceCallback);
+            // PlayerTowersClass[teamNum].produceCallbacks.push(function (u: any) {
+            //     log.info("Я колбэк от teamNum = ", _teamNum);
+            // });
+
+            //log.info("teamNum ", teamNum, " PlayerTowersClass[teamNum].produceCallbacks = ", PlayerTowersClass[teamNum].produceCallbacks.length);
+        }
     }
 
-    public OnEveryTick(gameTickNum: number): void {
-        if (GlobalVars.teams[this.teamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig && GlobalVars.teams[this.teamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig != null) {
-            this.TryBuyBuff(GlobalVars.teams[this.teamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig.Uid);
-            delete GlobalVars.teams[this.teamNum].tower.unit.ScriptData.TowerProtection_ProductUnitConfig;
+    public static ProduceCallback(u: any) {
+        // ищем номер команды 
+        var teamNum : number;
+        for (teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+            if (GlobalVars.teams[teamNum].settlement.Uid == u.Owner.Uid) {
+                break;
+            }
         }
+        //log.info("пытаемся добавить бафф для teamNum = ", teamNum);
+        // добавляем бафф
+        Buff_Improvements.TowersBuffImprRef[teamNum].TryBuyBuff(u.OrdersMind.ActiveOrder.ProductUnitConfig.Uid);
     }
 
     public OnDead(gameTickNum: number) {
-        // отписываемся от события
-        if (this.onProducedHandler) {
-            this.onProducedHandler.disconnect();
-        }
         // выводим игроку его баффы
         // var str         = "Вами были куплены следующие баффы:\n";
         // var spentGold   = 0;

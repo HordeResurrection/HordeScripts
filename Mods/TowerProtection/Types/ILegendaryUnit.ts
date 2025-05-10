@@ -12,7 +12,7 @@ export abstract class ILegendaryUnit extends ITeimurUnit {
         ITeimurUnit.InitConfig.call(this);
 
         if (this.Description != "") {
-            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", this.Description);
+            ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", this.Description);
         }
     }
 
