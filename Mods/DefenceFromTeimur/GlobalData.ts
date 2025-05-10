@@ -23,18 +23,11 @@ export class GlobalVars {
     public static startGameTickNum: number;
     /** рандомайзер */
     public static rnd: any;
-    /** ScriptUtils */
-    public static ScriptUtils: any;
-    /** ActiveScena */
-    public static ActiveScena: any;
-    /** HordeContentApi */
-    public static HordeContentApi: any;
-    /** HordeEngine */
-    public static HordeEngine: any;
     /** Players */
     public static Players: any;
     public static scenaWidth : number;
     public static scenaHeight : number;
     /** юниты на карте */
     public static unitsMap : any;
+    public static plugin : any;
 }

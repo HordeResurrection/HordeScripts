@@ -1,7 +1,7 @@
 import { createHordeColor, createPF, createPoint, createResourcesAmount } from "library/common/primitives";
-import { UnitFlags, UnitCommand, UnitDirection, ProduceAtCommandArgs, UnitHurtType, UnitSpecification, BattleController, BulletState, UnitMapLayer, UnitEffectFlag, TileType } from "library/game-logic/horde-types";
+import { UnitFlags, UnitCommand, UnitDirection, UnitHurtType, UnitSpecification, BattleController, BulletState, UnitMapLayer, UnitEffectFlag, TileType } from "library/game-logic/horde-types";
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
-import { ChebyshevDistance, CreateBulletConfig, CreateUnitConfig, EuclidDistance, L1Distance, generateRandomCellInRect, spawnUnit, spawnUnits, unitCanBePlacedByRealMap } from "../Utils";
+import { ChebyshevDistance, CreateBulletConfig, CreateUnitConfig, EuclidDistance, generateRandomCellInRect, spawnUnit, spawnUnits, unitCanBePlacedByRealMap } from "../Utils";
 import { ILegendaryUnit } from "../Types/ILegendaryUnit";
 import { ITeimurUnit } from "../Types/ITeimurUnit";
 import { generateCellInSpiral } from "library/common/position-tools";
@@ -11,12 +11,10 @@ import { IUnit } from "../Types/IUnit";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { log } from "library/common/logging";
 import { iterateOverUnitsInBox, unitCheckPathTo } from "library/game-logic/unit-and-map";
-import { printObjectItems } from "library/common/introspection";
 import { setBulletInitializeWorker, setBulletProcessWorker } from "library/game-logic/workers-tools";
-import { Cell } from "../Types/Geometry";
 import { createGameMessageWithSound } from "library/common/messages";
 
-const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
+const ReplaceUnitParameters = HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 
 export class Teimur_Swordmen extends ITeimurUnit {
     static CfgUid      : string = "#DefenceTeimur_Swordmen";
@@ -86,9 +84,9 @@ export class Teimur_Mag_2 extends ITeimurUnit {
         ITeimurUnit.InitConfig.call(this);
 
         // задаем количество здоровья
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 40);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 40);
         // задаем количество брони
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
     }
 }
 export class Teimur_Villur extends ITeimurUnit {
@@ -103,9 +101,9 @@ export class Teimur_Villur extends ITeimurUnit {
         ITeimurUnit.InitConfig.call(this);
 
         // задаем количество здоровья
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 40);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 40);
         // задаем количество брони
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
     }
 }
 export class Teimur_Olga extends ITeimurUnit {
@@ -120,9 +118,9 @@ export class Teimur_Olga extends ITeimurUnit {
         ITeimurUnit.InitConfig.call(this);
 
         // задаем количество здоровья
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 40);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 40);
         // задаем количество брони
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 0);
     }
 
     static GetSpawnCount(spawnCount: number) {
@@ -130,10 +128,10 @@ export class Teimur_Olga extends ITeimurUnit {
 
         if (spawnCount <= 4) {
             // задаем количество здоровья
-            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(40));
+            ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(40));
         } else {
             // задаем количество здоровья
-            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(40 * spawnCount * 0.25));
+            ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(40 * spawnCount * 0.25));
         }
 
         return Math.min(spawnCount, 4);
@@ -151,9 +149,9 @@ export class Teimur_Scorpion extends ITeimurUnit {
         ITeimurUnit.InitConfig.call(this);
 
         // задаем количество здоровья
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 15);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 15);
         // задаем количество брони
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 4);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 4);
     }
 }
 
@@ -175,11 +173,11 @@ export class Teimur_Legendary_SWORDMEN extends ILegendaryUnit {
         ILegendaryUnit.InitConfig.call(this);
 
         // назначаем имя
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный рыцарь");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный рыцарь");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(100 * Math.sqrt(GlobalVars.difficult)));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(100 * Math.sqrt(GlobalVars.difficult)));
         // создаем конфиги для клонов
         this.MaxCloneDepth = Math.ceil(Math.log2(GlobalVars.configs[this.CfgUid].MaxHealth / 10)) + 1;
         for (var i = 1; i < this.MaxCloneDepth; i++) {
@@ -188,9 +186,9 @@ export class Teimur_Legendary_SWORDMEN extends ILegendaryUnit {
             // копируем базового рыцаря
             GlobalVars.configs[uid] = CreateUnitConfig(this.CfgUid, uid);
             // задаем количество здоровья
-            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[uid], "MaxHealth", Math.ceil(GlobalVars.configs[this.CfgUid].MaxHealth / Math.pow(2, i + 1)));
+            ScriptUtils.SetValue(GlobalVars.configs[uid], "MaxHealth", Math.ceil(GlobalVars.configs[this.CfgUid].MaxHealth / Math.pow(2, i + 1)));
             // задаем цвет
-            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[uid], "TintColor", createHordeColor(255, 255, Math.floor(255 * (i + 1) / this.MaxCloneDepth), Math.floor(255 * (i + 1) / this.MaxCloneDepth)));
+            ScriptUtils.SetValue(GlobalVars.configs[uid], "TintColor", createHordeColor(255, 255, Math.floor(255 * (i + 1) / this.MaxCloneDepth), Math.floor(255 * (i + 1) / this.MaxCloneDepth)));
         }
     }
 
@@ -209,7 +207,7 @@ export class Teimur_Legendary_SWORDMEN extends ILegendaryUnit {
                 var unitInfo = new Teimur_Legendary_SWORDMEN(spawnedUnit, this.teamNum);
                 unitInfo.currCloneDepth = this.currCloneDepth + 1;
                 GlobalVars.units.push(unitInfo);
-                spawnDecoration(GlobalVars.ActiveScena.GetRealScena(), GlobalVars.HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), spawnedUnit.Position);
+                spawnDecoration(ActiveScena.GetRealScena(), HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), spawnedUnit.Position);
             }
         }
     }
@@ -226,12 +224,12 @@ export class Teimur_Legendary_HEAVYMAN extends ILegendaryUnit {
     static InitConfig() {
         ILegendaryUnit.InitConfig.call(this);
         
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный тяжелый рыцарь");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный тяжелый рыцарь");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
         // увеличиваем хп
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(400 * Math.sqrt(GlobalVars.difficult)));
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 3);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(400 * Math.sqrt(GlobalVars.difficult)));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 3);
     }
 }
 export class Teimur_Legendary_ARCHER extends ILegendaryUnit {
@@ -247,22 +245,22 @@ export class Teimur_Legendary_ARCHER extends ILegendaryUnit {
         ILegendaryUnit.InitConfig.call(this);
         
         // назначаем имя
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный лучник");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный лучник");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
         // стреляет сразу 10 стрелами
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "EmitBulletsCountMin", 10);
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "EmitBulletsCountMax", 10);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "EmitBulletsCountMin", 10);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "EmitBulletsCountMax", 10);
         // увеличиваем разброс
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "BaseAccuracy", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "BaseAccuracy", 0);
         // увеличиваем дальность
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "Range", 10);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "Range", 10);
         // делаем так, чтобы не давили всадники
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 21);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 21);
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
         // делаем имунитет к огню
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Flags", UnitFlags.FireResistant);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Flags", UnitFlags.FireResistant);
     }
 }
 export class Teimur_Legendary_ARCHER_2 extends ILegendaryUnit {
@@ -278,22 +276,22 @@ export class Teimur_Legendary_ARCHER_2 extends ILegendaryUnit {
         ILegendaryUnit.InitConfig.call(this);
         
         // назначаем имя
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный поджигатель");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный поджигатель");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
         // стреляет сразу 10 стрелами
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "EmitBulletsCountMin", 5);
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "EmitBulletsCountMax", 5);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "EmitBulletsCountMin", 5);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "EmitBulletsCountMax", 5);
         // увеличиваем разброс
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "BaseAccuracy", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "BaseAccuracy", 0);
         // увеличиваем дальность
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "Range", 10);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament, "Range", 10);
         // делаем так, чтобы не давили всадники
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 21);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 21);
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
         // делаем имунитет к огню
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Flags", UnitFlags.FireResistant);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Flags", UnitFlags.FireResistant);
     }
 }
 export class Teimur_Legendary_RAIDER extends ILegendaryUnit {
@@ -314,13 +312,13 @@ export class Teimur_Legendary_RAIDER extends ILegendaryUnit {
         ILegendaryUnit.InitConfig.call(this);
 
         // назначаем имя
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный всадник");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный всадник");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
         // делаем урон = 0
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", 0);
         // устанавливаем скорость
         GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Grass, 14);
         GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Marsh, 14);
@@ -355,7 +353,7 @@ export class Teimur_Legendary_RAIDER extends ILegendaryUnit {
             for (var spawnedUnit of spawnedUnits) {
                 var unitInfo = new teimurUnitClass(spawnedUnit, this.teamNum);
                 GlobalVars.units.push(unitInfo);
-                spawnDecoration(GlobalVars.ActiveScena.GetRealScena(), GlobalVars.HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), spawnedUnit.Position);
+                spawnDecoration(ActiveScena.GetRealScena(), HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), spawnedUnit.Position);
             }
         }
 
@@ -415,16 +413,16 @@ export class Teimur_Legendary_WORKER extends ILegendaryUnit {
         var towerUid = this.CfgUid + "_tower";
         GlobalVars.configs[towerUid] = CreateUnitConfig("#UnitConfig_Slavyane_Tower", towerUid);
         // назначаем имя
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid], "Name", "Легендарная башня");
+        ScriptUtils.SetValue(GlobalVars.configs[towerUid], "Name", "Легендарная башня");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid], "TintColor", createHordeColor(255, 255, 100, 100));
+        ScriptUtils.SetValue(GlobalVars.configs[towerUid], "TintColor", createHordeColor(255, 255, 100, 100));
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid], "MaxHealth", Math.floor(50 * Math.sqrt(GlobalVars.difficult)));
+        ScriptUtils.SetValue(GlobalVars.configs[towerUid], "MaxHealth", Math.floor(50 * Math.sqrt(GlobalVars.difficult)));
         // делаем башню бесплатной
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid].CostResources, "Gold",   0);
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid].CostResources, "Metal",  0);
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid].CostResources, "Lumber", 0);
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid].CostResources, "People", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[towerUid].CostResources, "Gold",   0);
+        ScriptUtils.SetValue(GlobalVars.configs[towerUid].CostResources, "Metal",  0);
+        ScriptUtils.SetValue(GlobalVars.configs[towerUid].CostResources, "Lumber", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[towerUid].CostResources, "People", 0);
         // делаем починку бесплатной
         var towerRepableProf = GlobalVars.configs[towerUid].ProfessionParams.Item.get(UnitProfession.Reparable);
         towerRepableProf.RecoverCost.Gold   = 0;
@@ -434,20 +432,20 @@ export class Teimur_Legendary_WORKER extends ILegendaryUnit {
         // убираем требования у башни
         GlobalVars.configs[towerUid].TechConfig.Requirements.Clear();
         // ускоряем время постройки
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[towerUid], "ProductionTime", 200);
+        ScriptUtils.SetValue(GlobalVars.configs[towerUid], "ProductionTime", 200);
         // убираем возможность захвата
         GlobalVars.configs[towerUid].ProfessionParams.Remove(UnitProfession.Capturable);
         
         // (легендарный) крестьянин
 
         // назначаем имя
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный инженер");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный инженер");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
         // делаем так, чтобы не давили всадники
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 21);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 21);
         // удаляем команду атаки
         GlobalVars.configs[this.CfgUid].AllowedCommands.Remove(UnitCommand.Attack);
         // добавляем в список построек легендарную башню
@@ -543,7 +541,7 @@ export class Teimur_CapturedUnit extends ITeimurUnit {
 
     RegainControlOwner() {
         this.unit_ordersMind.CancelOrdersSafe();
-        this.unit.ChangeOwner(GlobalVars.ActiveScena.GetRealScena().Settlements.GetByUid(this.ownerSettlementUid));
+        this.unit.ChangeOwner(ActiveScena.GetRealScena().Settlements.GetByUid(this.ownerSettlementUid));
         this.needDeleted = true;
     }
 }
@@ -571,15 +569,15 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
         ILegendaryUnit.InitConfig.call(this);
 
         // назначаем имя
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный всадник разума");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный всадник разума");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 100, 100, 255));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 100, 100, 255));
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(120 * Math.sqrt(GlobalVars.difficult)));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(120 * Math.sqrt(GlobalVars.difficult)));
         // делаем урон = 0
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", 0);
         // делаем не давящимся
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 22);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 22);
         // устанавливаем скорость
         GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Grass, 14);
         GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Marsh, 14);
@@ -613,7 +611,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
                 const _unitOwnerUid = _unit.Owner.Uid;
                 
                 // пропускаем союзников и здания
-                if (_unitOwnerUid == GlobalVars.teams[this.teamNum].teimurSettlementId || _unit.Cfg.IsBuilding) {
+                if (Number.parseInt(_unitOwnerUid) == GlobalVars.teams[this.teamNum].teimurSettlementId || _unit.Cfg.IsBuilding) {
                     continue;
                 }
                 // достигнут предел захвата за раз
@@ -631,7 +629,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
 
                 GlobalVars.units.push(unitInfo);
                 this.captureUnits.push(unitInfo);
-                spawnDecoration(GlobalVars.ActiveScena.GetRealScena(), GlobalVars.HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), _unit.Position);
+                spawnDecoration(ActiveScena.GetRealScena(), HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), _unit.Position);
                 captureUnitsLimit--;
             }
         }
@@ -657,7 +655,7 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
             }
 
             unitInfo.RegainControlOwner();
-            spawnDecoration(GlobalVars.ActiveScena.GetRealScena(), GlobalVars.HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), unitInfo.unit.Position);
+            spawnDecoration(ActiveScena.GetRealScena(), HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), unitInfo.unit.Position);
         }
     }
 }
@@ -712,11 +710,11 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
         ILegendaryUnit.InitConfig.call(this);
 
         // назначаем имя
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный всадник тьмы");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный всадник тьмы");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 50, 50, 50));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 50, 50, 50));
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(250 * Math.sqrt(GlobalVars.difficult)));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(250 * Math.sqrt(GlobalVars.difficult)));
         // устанавливаем скорость
         GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Grass, 14);
         GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Marsh, 14);
@@ -728,7 +726,7 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
         //var portraitCatalogUid = GlobalVars.HordeContentApi.GetUnitConfig("#UnitConfig_Nature_Draider").PortraitCatalog as string;
         //printObjectItems(GlobalVars.HordeContentApi.GetUnitConfig("#UnitConfig_Nature_Draider").PortraitCatalog);
         //portraitCatalogUid = portraitCatalogUid.substring(portraitCatalogUid.indexOf("Uid:") + 4);
-        //GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PortraitCatalog", GlobalVars.HordeContentApi.GetUnitConfig("#UnitConfig_Nature_Draider").PortraitCatalog.Uid);
+        //ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PortraitCatalog", GlobalVars.HordeContentApi.GetUnitConfig("#UnitConfig_Nature_Draider").PortraitCatalog.Uid);
 
         this.ReviveUnitsLimit = Math.floor(this.ReviveUnitsLimit * Math.sqrt(GlobalVars.difficult));
     }
@@ -776,9 +774,9 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
                 } else {
                     GlobalVars.configs[revivedCfgUid] = HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig(_unit.Cfg.Uid), revivedCfgUid);
                     // назначаем имя
-                    GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[revivedCfgUid], "Name", "{Восставший} " + GlobalVars.configs[revivedCfgUid].Name);
+                    ScriptUtils.SetValue(GlobalVars.configs[revivedCfgUid], "Name", "{Восставший} " + GlobalVars.configs[revivedCfgUid].Name);
                     // меняем цвет
-                    GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[revivedCfgUid], "TintColor", createHordeColor(255, 50, 50, 50));
+                    ScriptUtils.SetValue(GlobalVars.configs[revivedCfgUid], "TintColor", createHordeColor(255, 50, 50, 50));
                 }
                 
                 // пытаемся поднять трупа в клетке его смерти
@@ -788,7 +786,7 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
                     var unitInfo = new Teimur_RevivedUnit(reviveUnit, this.teamNum);
                     GlobalVars.units.push(unitInfo);
                     this.reviveUnits.push(unitInfo);
-                    spawnDecoration(GlobalVars.ActiveScena.GetRealScena(), GlobalVars.HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), _unit.Position);
+                    spawnDecoration(ActiveScena.GetRealScena(), HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), _unit.Position);
                 }
             }
         }
@@ -828,34 +826,34 @@ export class Teimur_Legendary_FIRE_MAGE extends ILegendaryUnit {
     static InitConfig() {
         ILegendaryUnit.InitConfig.call(this);
 
-        this.FireCfg = GlobalVars.HordeContentApi.GetBulletConfig(this.FireCfgUid);
+        this.FireCfg = HordeContentApi.GetBulletConfig(this.FireCfgUid);
 
         // создаем снаряд
         this.FireballCfg = CreateBulletConfig("#BulletConfig_ScriptBullet_Template", this.FireballCfgUid);
         // кастомные обработчики снаряда
-        setBulletInitializeWorker(this, this.FireballCfg, this.Fireball_initializeWorker);
-        setBulletProcessWorker(this, this.FireballCfg, this.Fireball_processWorker);
+        setBulletInitializeWorker(GlobalVars.plugin, this.FireballCfg, this.Fireball_initializeWorker);
+        setBulletProcessWorker(GlobalVars.plugin, this.FireballCfg, this.Fireball_processWorker);
         // Установка скорости полета
-        GlobalVars.ScriptUtils.SetValue(this.FireballCfg, "BaseBulletSpeed", createPF(2, 0));
+        ScriptUtils.SetValue(this.FireballCfg, "BaseBulletSpeed", createPF(2, 0));
         // отключаем баллистику
-        GlobalVars.ScriptUtils.SetValue(this.FireballCfg, "IsBallistic", false);
-        GlobalVars.ScriptUtils.SetValue(this.FireballCfg, "LoopAnimation", true);
+        ScriptUtils.SetValue(this.FireballCfg, "IsBallistic", false);
+        ScriptUtils.SetValue(this.FireballCfg, "LoopAnimation", true);
         // включаем нужную анимацию
-        GlobalVars.ScriptUtils.GetValue(this.FireballCfg, "BulletAnimationsCatalogRef").SetConfig(GlobalVars.HordeContentApi.GetAnimationCatalog("#AnimCatalog_Bullets_DragonFire"));
+        ScriptUtils.GetValue(this.FireballCfg, "BulletAnimationsCatalogRef").SetConfig(HordeContentApi.GetAnimationCatalog("#AnimCatalog_Bullets_DragonFire"));
         // количество направлений
-        GlobalVars.ScriptUtils.SetValue(this.FireballCfg, "DirectionsCount", 8);
+        ScriptUtils.SetValue(this.FireballCfg, "DirectionsCount", 8);
         // огонь
-        //GlobalVars.ScriptUtils.GetValue(this.FireballCfg.SpecialParams, "FireConfigRef").SetConfig(GlobalVars.HordeContentApi.GetBulletConfig(this.FireCfgUid));
+        //ScriptUtils.GetValue(this.FireballCfg.SpecialParams, "FireConfigRef").SetConfig(GlobalVars.HordeContentApi.GetBulletConfig(this.FireCfgUid));
 
         // назначаем имя
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный маг огня");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный маг огня");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 255, 100, 100));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 255, 100, 100));
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(120 * Math.sqrt(GlobalVars.difficult)));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(120 * Math.sqrt(GlobalVars.difficult)));
         // задаем кастомный снаряд
-        GlobalVars.ScriptUtils.GetValue(GlobalVars.configs[this.CfgUid].MainArmament, "BulletConfigRef").SetConfig(this.FireballCfg);
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "ReloadTime", 300);
+        ScriptUtils.GetValue(GlobalVars.configs[this.CfgUid].MainArmament, "BulletConfigRef").SetConfig(this.FireballCfg);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "ReloadTime", 300);
     }
 
     public OnEveryTick(gameTickNum: number): void {
@@ -873,7 +871,7 @@ export class Teimur_Legendary_FIRE_MAGE extends ILegendaryUnit {
             const ye        = Math.min(GlobalVars.scenaHeight - 1, cellY + 2);
             for (var x = xs; x <= xe; x++) {
                 for (var y = ys; y <= ye; y++) {
-                    HCL.HordeClassLibrary.World.Objects.Bullets.Implementations.Fire.BaseFireBullet.MakeFire(
+                    HordeClassLibrary.World.Objects.Bullets.Implementations.Fire.BaseFireBullet.MakeFire(
                         this.unit, createPoint(x << 5, y << 5), UnitMapLayer.Main, Teimur_Legendary_FIRE_MAGE.FireCfg);
                 }
             }
@@ -966,7 +964,7 @@ export class Teimur_Legendary_FIRE_MAGE extends ILegendaryUnit {
 
                 if (isCellUnique) {
                     var firePosition = createPoint(x << 5, y << 5);
-                    HCL.HordeClassLibrary.World.Objects.Bullets.Implementations.Fire.BaseFireBullet.MakeFire(
+                    HordeClassLibrary.World.Objects.Bullets.Implementations.Fire.BaseFireBullet.MakeFire(
                         bull.SourceUnit, firePosition, UnitMapLayer.Main, Teimur_Legendary_FIRE_MAGE.FireCfg);
                     if (x == y) {
                         bull.DamageArea(1);
@@ -1010,7 +1008,7 @@ export class Teimur_Legendary_FIRE_MAGE extends ILegendaryUnit {
             // точки нет, снаряд долетел
             else {
                 // ставим состояние, что снаряд долетел
-                GlobalVars.ScriptUtils.SetValue(bull, "State", BulletState.ReachedTheGoal);
+                ScriptUtils.SetValue(bull, "State", BulletState.ReachedTheGoal);
             }
         }
     }
@@ -1032,13 +1030,13 @@ export class Teimur_Legendary_GREED_HORSE extends ILegendaryUnit {
         ILegendaryUnit.InitConfig.call(this);
 
         // назначаем имя
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный конь алчности");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный конь алчности");
         // меняем цвет
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 255, 155, 0));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(150, 255, 155, 0));
         // задаем количество здоровья от числа игроков
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(130 * Math.sqrt(GlobalVars.difficult)));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(130 * Math.sqrt(GlobalVars.difficult)));
         // делаем так, чтобы не давили всадники
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 21);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 21);
     }
 
     public OnEveryTick(gameTickNum: number): void {
@@ -1066,7 +1064,7 @@ export class Teimur_Legendary_GREED_HORSE extends ILegendaryUnit {
                         settlement.Resources.TakeResources(Teimur_Legendary_GREED_HORSE.PaymentResources);
                     }
                 } else {
-                    var FPS         = GlobalVars.HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
+                    var FPS         = HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
                     var secondsLeft = Math.round((this.countdownStartTick + Teimur_Legendary_GREED_HORSE.CountdownTicks - gameTickNum) / FPS);
 
                     if (secondsLeft <= 5 || secondsLeft % 5 == 0) {
@@ -1104,7 +1102,7 @@ export class Teimur_Legendary_GREED_HORSE extends ILegendaryUnit {
         // Коня спавним всегда 1, но его здоровье скайлируем
 
         // задаем количество здоровья
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(130 * Math.sqrt(GlobalVars.difficult) * spawnCount));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(130 * Math.sqrt(GlobalVars.difficult) * spawnCount));
 
         return 1;
     }

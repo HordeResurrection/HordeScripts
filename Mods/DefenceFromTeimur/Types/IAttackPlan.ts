@@ -1,6 +1,6 @@
 import { ITeimurUnit } from "./ITeimurUnit";
 import { GlobalVars } from "../GlobalData";
-import { IncomePlan_0, IncomePlan_1 } from "../Realizations/IncomePlans";
+import { IncomePlan_0 } from "../Realizations/IncomePlans";
 import { IIncomePlan } from "./IIncomePlan";
 
 export class WaveUnit {

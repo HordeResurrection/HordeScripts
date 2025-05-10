@@ -3,7 +3,7 @@ import HordePluginBase from "plugins/base-plugin";
 import { AttackPlansClass } from "./Realizations/AttackPlans";
 import { Cell, Rectangle } from "./Types/Geometry";
 import { Team } from "./Types/Team";
-import { createHordeColor, createPoint, createResourcesAmount } from "library/common/primitives";
+import { createHordeColor, createPoint } from "library/common/primitives";
 import { UnitHurtType, UnitDirection } from "library/game-logic/horde-types";
 import { spawnUnit } from "library/game-logic/unit-spawn";
 import { PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_GOALCASTLE } from "./Realizations/Player_units";
@@ -14,9 +14,9 @@ import { IUnit } from "./Types/IUnit";
 import { RandomSpawner, RectangleSpawner, RingSpawner } from "./Realizations/Spawners";
 import { ITeimurUnit } from "./Types/ITeimurUnit";
 
-const DeleteUnitParameters  = HCL.HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
-const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
-const PeopleIncomeLevelT    = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
+const DeleteUnitParameters  = HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
+const ReplaceUnitParameters = HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
+const PeopleIncomeLevelT    = HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 
 // \TODO
 // DefenceFromTeimurPlugin.GlobalStorage - сохранение
@@ -31,18 +31,16 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
         GlobalVars.units           = new Array<IUnit>();
 
-        GlobalVars.ScriptUtils     = ScriptUtils;
-        GlobalVars.ActiveScena     = ActiveScena;
-        GlobalVars.HordeContentApi = HordeContentApi;
-        GlobalVars.HordeEngine     = HordeEngine;
         GlobalVars.Players         = Players;
-        GlobalVars.scenaWidth      = GlobalVars.ActiveScena.GetRealScena().Size.Width;
-        GlobalVars.scenaHeight     = GlobalVars.ActiveScena.GetRealScena().Size.Height;
-        GlobalVars.unitsMap        = GlobalVars.ActiveScena.GetRealScena().UnitsMap;
+        GlobalVars.scenaWidth      = ActiveScena.GetRealScena().Size.Width;
+        GlobalVars.scenaHeight     = ActiveScena.GetRealScena().Size.Height;
+        GlobalVars.unitsMap        = ActiveScena.GetRealScena().UnitsMap;
+
+        GlobalVars.plugin          = this;
     }
 
     public onFirstRun() {
-        var scenaName = GlobalVars.ActiveScena.GetRealScena().ScenaName;
+        var scenaName = ActiveScena.GetRealScena().ScenaName;
 
         if (scenaName == "Оборона от Теймура - узкий проход (1-5)") {
             GlobalVars.teams = new Array<Team>(1);
@@ -141,7 +139,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
     }
 
     private Init(gameTickNum: number) {
-        GlobalVars.rnd = GlobalVars.ActiveScena.GetRealScena().Context.Randomizer;
+        GlobalVars.rnd = ActiveScena.GetRealScena().Context.Randomizer;
         
         //////////////////////////////////////////
         // инициализируем игроков в командах
@@ -150,7 +148,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
             GlobalVars.teams[teamNum].settlementsIdx = new Array<number>();
             GlobalVars.teams[teamNum].settlements    = new Array<any>();
-            GlobalVars.teams[teamNum].teimurSettlement = GlobalVars.ActiveScena.GetRealScena().Settlements.GetByUid('' + GlobalVars.teams[teamNum].teimurSettlementId);
+            GlobalVars.teams[teamNum].teimurSettlement = ActiveScena.GetRealScena().Settlements.GetByUid('' + GlobalVars.teams[teamNum].teimurSettlementId);
         }
 
         for (var player of GlobalVars.Players) {
@@ -197,7 +195,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             GlobalVars.teams[teamNum].settlements.push(settlement);
 
             // убираем налоги
-            var censusModel = GlobalVars.ScriptUtils.GetValue(settlement.Census, "Model");
+            var censusModel = ScriptUtils.GetValue(settlement.Census, "Model");
             // Установить период сбора налогов и выплаты жалования (чтобы отключить сбор, необходимо установить 0)
             censusModel.TaxAndSalaryUpdatePeriod = 0;
 
@@ -233,7 +231,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
                 GlobalVars.teams[teamNum].castle = new IUnit(spawnUnit(
                     GlobalVars.teams[teamNum].settlements[0],
                     //GlobalVars.configs[Player_CASTLE_CHOISE_DIFFICULT.BaseCfgUid],
-                    GlobalVars.HordeContentApi.GetUnitConfig(Player_CASTLE_CHOISE_DIFFICULT.BaseCfgUid),
+                    HordeContentApi.GetUnitConfig(Player_CASTLE_CHOISE_DIFFICULT.BaseCfgUid),
                     createPoint(GlobalVars.teams[teamNum].castleCell.X, GlobalVars.teams[teamNum].castleCell.Y),
                     UnitDirection.Down
                 ), teamNum);
@@ -345,7 +343,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
     }
 
     private ChoiseWave(gameTickNum: number) {
-        var FPS = GlobalVars.HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
+        var FPS = HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
 
         //////////////////////////////////////////
         // выбор волны
@@ -431,7 +429,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
         // подписываемся на событие о замене юнита (поддержка LevelSystem)
 
-        let scenaSettlements = GlobalVars.ActiveScena.GetRealScena().Settlements;
+        let scenaSettlements = ActiveScena.GetRealScena().Settlements;
         for (var settlementNum = 0; settlementNum < scenaSettlements.Count; settlementNum++) {
             var settlementUnits = scenaSettlements.Item.get(settlementNum + '').Units;
 
@@ -467,7 +465,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         // смещаем номер такта, чтобы время считалось относительно начала игры
         gameTickNum -= GlobalVars.startGameTickNum;
 
-        var FPS = GlobalVars.HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
+        var FPS = HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
 
         // проверяем не конец игры ли
 
@@ -620,34 +618,34 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
         // усредняем ресурсы игроков
 
-        if (gameTickNum % 500 == 0) {
-            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-                // проверяем, что поселение в игре
-                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
-                    continue;
-                }
+        // if (gameTickNum % 500 == 0) {
+        //     for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+        //         // проверяем, что поселение в игре
+        //         if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
+        //             continue;
+        //         }
 
-                var avgGold   : number = 0;
-                var avgMetal  : number = 0;
-                var avgLumber : number = 0;
-                var avgPeople : number = 0;
-                for (var settlement of GlobalVars.teams[teamNum].settlements) {
-                    avgGold   += settlement.Resources.Gold;
-                    avgMetal  += settlement.Resources.Metal;
-                    avgLumber += settlement.Resources.Lumber;
-                    avgPeople += settlement.Resources.FreePeople;
-                }
-                avgGold   = Math.round(avgGold   / GlobalVars.teams[teamNum].settlements.length);
-                avgMetal  = Math.round(avgMetal  / GlobalVars.teams[teamNum].settlements.length);
-                avgLumber = Math.round(avgLumber / GlobalVars.teams[teamNum].settlements.length);
-                avgPeople = Math.round(avgPeople / GlobalVars.teams[teamNum].settlements.length);
+        //         var avgGold   : number = 0;
+        //         var avgMetal  : number = 0;
+        //         var avgLumber : number = 0;
+        //         var avgPeople : number = 0;
+        //         for (var settlement of GlobalVars.teams[teamNum].settlements) {
+        //             avgGold   += settlement.Resources.Gold;
+        //             avgMetal  += settlement.Resources.Metal;
+        //             avgLumber += settlement.Resources.Lumber;
+        //             avgPeople += settlement.Resources.FreePeople;
+        //         }
+        //         avgGold   = Math.round(avgGold   / GlobalVars.teams[teamNum].settlements.length);
+        //         avgMetal  = Math.round(avgMetal  / GlobalVars.teams[teamNum].settlements.length);
+        //         avgLumber = Math.round(avgLumber / GlobalVars.teams[teamNum].settlements.length);
+        //         avgPeople = Math.round(avgPeople / GlobalVars.teams[teamNum].settlements.length);
                 
-                for (var settlement of GlobalVars.teams[teamNum].settlements) {
-                    settlement.Resources.TakeResources(settlement.Resources.GetCopy());
-                    settlement.Resources.AddResources(createResourcesAmount(avgGold, avgMetal, avgLumber, avgPeople));
-                }
-            }
-        }
+        //         for (var settlement of GlobalVars.teams[teamNum].settlements) {
+        //             settlement.Resources.TakeResources(settlement.Resources.GetCopy());
+        //             settlement.Resources.AddResources(createResourcesAmount(avgGold, avgMetal, avgLumber, avgPeople));
+        //         }
+        //     }
+        // }
     }
 
     private End(gameTickNum: number) {

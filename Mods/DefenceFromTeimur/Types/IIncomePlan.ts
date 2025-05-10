@@ -1,4 +1,3 @@
-import { createResourcesAmount } from "library/common/primitives";
 import { GlobalVars } from "../GlobalData";
 
 export class IIncomePlan {
