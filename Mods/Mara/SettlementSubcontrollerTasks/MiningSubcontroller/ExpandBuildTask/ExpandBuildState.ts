@@ -123,7 +123,7 @@ export class ExpandBuildState extends ProductionTaskState {
             }
         }
 
-        this.settlementController.Debug(`Expand center calculated: ${expandCenter.ToString()}`);
+        this.task.Debug(`Expand center calculated: ${expandCenter.ToString()}`);
         return expandCenter;
     }
 
@@ -144,11 +144,9 @@ export class ExpandBuildState extends ProductionTaskState {
         }
     }
 
-
-
     private orderMineProduction(cluster: MaraResourceCluster, resourceType: MaraResourceType): Array<MaraProductionRequest> {
         if (this.minedMinerals.has(resourceType)) {
-            this.settlementController.Debug(`Resource type '${resourceType}' mining is already ordered`);
+            this.task.Debug(`Resource type '${resourceType}' mining is already ordered`);
             return [];
         }
         
@@ -156,7 +154,7 @@ export class ExpandBuildState extends ProductionTaskState {
         let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(mineConfigs);
 
         if (cfgId == null) {
-            this.settlementController.Debug(`Unable to order mine production: no mine config available`);
+            this.task.Debug(`Unable to order mine production: no mine config available`);
             return [];
         }
         
@@ -167,7 +165,7 @@ export class ExpandBuildState extends ProductionTaskState {
         );
 
         if (!minePosition) {
-            this.settlementController.Debug(`Unable to order mine production: no suitable place for mine found`);
+            this.task.Debug(`Unable to order mine production: no suitable place for mine found`);
             return [];
         }
 
@@ -193,7 +191,7 @@ export class ExpandBuildState extends ProductionTaskState {
         cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(harvesterConfigs);
 
         if (cfgId == null) {
-            this.settlementController.Debug(`Unable to order mine production: no harvester config available`);
+            this.task.Debug(`Unable to order mine production: no harvester config available`);
             return [];
         }
 
@@ -227,7 +225,7 @@ export class ExpandBuildState extends ProductionTaskState {
             let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(metalStockConfigs);
 
             if (cfgId == null) {
-                this.settlementController.Debug(`Unable to order mining production: no metal stock config available`);
+                this.task.Debug(`Unable to order mining production: no metal stock config available`);
                 return result;
             }
 
@@ -258,7 +256,7 @@ export class ExpandBuildState extends ProductionTaskState {
             let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(sawmillConfigs);
 
             if (cfgId == null) {
-                this.settlementController.Debug(`Unable to order woodcutting production: no sawmill config available`);
+                this.task.Debug(`Unable to order woodcutting production: no sawmill config available`);
                 return [];
             }
 
@@ -269,7 +267,7 @@ export class ExpandBuildState extends ProductionTaskState {
         let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(harvesterConfigs);
 
         if (cfgId == null) {
-            this.settlementController.Debug(`Unable to order woodcutting production: no harvester config available`);
+            this.task.Debug(`Unable to order woodcutting production: no harvester config available`);
             return [];
         }
 
@@ -285,7 +283,7 @@ export class ExpandBuildState extends ProductionTaskState {
         let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(housingConfigs);
         
         if (cfgId == null) {
-            this.settlementController.Debug(`Unable to order housing production: no housing config available`);
+            this.task.Debug(`Unable to order housing production: no housing config available`);
             return [];
         }
 
