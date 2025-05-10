@@ -1,4 +1,4 @@
-import { ARequest, BuildTracker, ProduceRequest } from "library/mastermind/mastermind-types";
+import { BuildTracker, ProduceRequest } from "library/mastermind/mastermind-types";
 import { MaraUtils } from "../MaraUtils";
 import { MaraPoint } from "./MaraPoint";
 import { MaraProductionRequest } from "./MaraProductionRequest";
@@ -73,12 +73,7 @@ export class MaraProductionRequestItem {
         }
         
         if (this.MasterMindRequest) {
-            //TODO: remove this dirty hack once State is made available in the core
-            //@ts-ignore
-            let requestState = ScriptReflection.GetValueAs(host.typeOf(ARequest), this.MasterMindRequest, "State");
-            return !ScriptReflection.Invoke(requestState, "IsUnfinished");
-            
-            //return !this.MasterMindRequest.State.IsUnfinished();
+            return !this.MasterMindRequest.State.IsUnfinished();
         }
         else {
             return false;
@@ -91,12 +86,7 @@ export class MaraProductionRequestItem {
         }
         
         if (this.MasterMindRequest) {
-            //TODO: remove this dirty hack once State is made available in the core
-            //@ts-ignore
-            let requestState = ScriptReflection.GetValueAs(host.typeOf(ARequest), this.MasterMindRequest, "State");
-            return ScriptReflection.Invoke(requestState, "IsSuccessfullyCompleted");
-            
-            //return this.MasterMindRequest.State.IsSuccessfullyCompleted();
+            return this.MasterMindRequest.State.IsSuccessfullyCompleted();
         }
         else {
             return false;
