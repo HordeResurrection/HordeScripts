@@ -1714,14 +1714,14 @@ declare namespace HordeResurrection.Engine.Logic.Battle.ReplaySystem {
 	class RecordInfo extends System.Object {
 
 		// Properties:
-		readonly PlayersList: System.Collections.Generic.IReadOnlyList<HordeResurrection.Engine.Logic.Main.Players.PlayerReplayModel>;
-		readonly RecorderSlot: number;
-		readonly RandomSeed: number;
+		readonly GameVersion: string;
 		readonly Scena: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaStamp;
 		readonly BattleSettings: HordeClassLibrary.World.Context.BattleSettings;
-		readonly ContentPackStamps: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStampsCollection;
-		readonly GameVersion: string;
+		readonly RandomSeed: number;
 		readonly InputExecutionPeriod: number;
+		readonly RecorderSlot: number;
+		readonly PlayersList: System.Collections.Generic.IReadOnlyList<HordeResurrection.Engine.Logic.Main.Players.PlayerReplayModel>;
+		readonly ContentPackStamps: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStampsCollection;
 
 		// Methods:
 		static MakeRecordInfo(

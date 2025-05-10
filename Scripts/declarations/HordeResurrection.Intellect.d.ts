@@ -19,13 +19,15 @@ declare namespace HordeResurrection.Intellect.Actions {
 		constructor(
 			producerUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
 			productConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
-			position: HordeResurrection.Basic.Primitives.Geometry.Point2D
+			cellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D,
+			cellEnd: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		);
 
 		// Properties:
 		readonly ProducerUnit: HordeClassLibrary.World.Objects.Units.Unit;
 		readonly ProductConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
-		readonly Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly CellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly CellEnd: HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 	}
 }
 //#endregion
@@ -704,6 +706,7 @@ declare namespace HordeResurrection.Intellect.Requests.CreationArgs {
 		Count: number;
 		AllowAuxiliaryProduceRequests: boolean;
 		TargetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
+		TargetEndCell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 		DisableBuildPlaceChecking: boolean;
 		MaxRetargetAttempts: number | null;
 		ProductEntranceCheckRadius: number;
@@ -732,6 +735,7 @@ declare namespace HordeResurrection.Intellect.Requests {
 		Count: number;
 		AllowAuxiliaryProduceRequests: boolean;
 		TargetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
+		TargetEndCell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 		DisableBuildPlaceChecking: boolean;
 		SearchBuildingPlaceAttempts: number;
 		ProductEntranceCheckRadius: number;
