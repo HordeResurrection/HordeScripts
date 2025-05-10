@@ -9,8 +9,6 @@ export class Hero_FireArcher extends IHero {
     }
 
     protected static _InitHordeConfig() {
-        IHero._InitHordeConfig.call(this);
-
         ScriptUtils.SetValue(this.Cfg, "Name", "Герой {поджигатель}");
         ScriptUtils.SetValue(this.Cfg, "MaxHealth", 20);
         ScriptUtils.SetValue(this.Cfg, "Shield", 0);
@@ -18,5 +16,10 @@ export class Hero_FireArcher extends IHero {
         ScriptUtils.SetValue(this.Cfg, "Sight", 8);
         ScriptUtils.SetValue(this.Cfg, "PressureResist", 20);
         //ScriptUtils.SetValue(config, "Flags", mergeFlags(UnitFlags, config.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
+
+        ScriptUtils.SetValue(this.Cfg, "Weight", 9);
+        ScriptUtils.SetValue(this.Cfg, "PressureResist", 20);
+        
+        IHero._InitHordeConfig.call(this);
     }
 }

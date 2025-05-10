@@ -1,10 +1,9 @@
-import { IUnit } from "./IUnit";
+import { IUnit } from "../Units/IUnit";
 import { BattleController, BulletConfig, GeometryCanvas, GeometryVisualEffect, ShotParams, Stride_Color, Stride_Vector2, Unit, UnitMapLayer } from "library/game-logic/horde-types";
 import { IHero } from "./IHero";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 import { createHordeColor, createPF, createPoint, createResourcesAmount } from "library/common/primitives";
 import { Cell } from "../Core/Cell";
-import { spawnGeometry } from "library/game-logic/decoration-spawn";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
 
 export class Hero_Totemist extends IHero {
@@ -19,8 +18,8 @@ export class Hero_Totemist extends IHero {
     private _formation_cells                    : Array<Cell>;
     private _formation_generator                : Generator<Cell>;
 
-    private _peopleIncome_max    : number = 11;
-    private _peopleIncome_period : number = 250;
+    private static _peopleIncome_max    : number = 11;
+    private static _peopleIncome_period : number = 250;
     private _peopleIncome_next   : number = 0;
 
     constructor(hordeUnit: HordeClassLibrary.World.Objects.Units.Unit) {
@@ -34,25 +33,37 @@ export class Hero_Totemist extends IHero {
     }
 
     protected static _InitHordeConfig() {
-        IHero._InitHordeConfig.call(this);
-
-        ScriptUtils.SetValue(this.Cfg, "Name", "Герой тотемщик");
+        ScriptUtils.SetValue(this.Cfg, "Name", "Герой {тотемщик}");
         ScriptUtils.SetValue(this.Cfg, "MaxHealth", 22);
         ScriptUtils.SetValue(this.Cfg, "Shield", 0);
         ScriptUtils.SetValue(this.Cfg.MainArmament.ShotParams, "Damage", 1);
+
+        ScriptUtils.SetValue(this.Cfg, "Weight", 9);
+        ScriptUtils.SetValue(this.Cfg, "PressureResist", 20);
     
         // добавляем постройки
         var producerParams = this.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer) as UnitProducerProfessionParams;
         var produceList    = producerParams.CanProduceList;
         produceList.Clear();
-        produceList.Add(Totem_defence.GetHordeConfig());
-        produceList.Add(FormationTotem_fire.GetHordeConfig());
-        //produceList.Add(FormationTotem_ballista.GetHordeConfig());
-        produceList.Add(FormationTotem_fireball.GetHordeConfig());
+        var totemDefenceConfig = Totem_defence.GetHordeConfig();
+        var formationTotemFireConfig = FormationTotem_fire.GetHordeConfig();
+        var formationTotemFireBallConfig = FormationTotem_fireball.GetHordeConfig();
+        produceList.Add(totemDefenceConfig);
+        produceList.Add(formationTotemFireConfig);
+        produceList.Add(formationTotemFireBallConfig);
+
+        IHero._InitHordeConfig.call(this);
+
+        ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n" +
+            "Сражается с помощью тотемов защиты (" + totemDefenceConfig.MaxHealth + " здоровья " + totemDefenceConfig.MainArmament.ShotParams.Damage + " урона, требуют "
+            + totemDefenceConfig.CostResources.People + " населения) и тотемов формации (" + formationTotemFireConfig.MaxHealth +  " здоровья, требуют " 
+            + formationTotemFireConfig.CostResources.People + " населения). Всего тотемщик имеет "
+            + this._peopleIncome_max + " населения, скорость прироста " + (this._peopleIncome_period/50) + " сек"
+        );
     }
 
-    public OnAddToFormation(unit: IUnit): void {
-        IHero.prototype.OnAddToFormation.call(this, unit);
+    public AddUnitToFormation(unit: IUnit): void {
+        IHero.prototype.AddUnitToFormation.call(this, unit);
 
         if (unit.hordeConfig.Uid == FormationTotem_fire.GetHordeConfig().Uid) {
             this._formation_totems.push(new FormationTotem_fire(unit.hordeUnit));
@@ -75,9 +86,9 @@ export class Hero_Totemist extends IHero {
 
         // инком людей
         if (this._peopleIncome_next < gameTickNum) {
-            this._peopleIncome_next += this._peopleIncome_period;
+            this._peopleIncome_next += Hero_Totemist._peopleIncome_period;
 
-            if (this.hordeUnit.Owner.Resources.FreePeople + ScriptUtils.GetValue(this.hordeUnit.Owner.Census, "Model").BusyPeople < this._peopleIncome_max) {
+            if (this.hordeUnit.Owner.Resources.FreePeople + ScriptUtils.GetValue(this.hordeUnit.Owner.Census, "Model").BusyPeople < Hero_Totemist._peopleIncome_max) {
                 var amount = createResourcesAmount(0, 0, 0, 1);
                 this.hordeUnit.Owner.Resources.AddResources(amount);
             }

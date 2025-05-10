@@ -1,42 +1,53 @@
-import { IUnit } from "./IUnit";
+import { IUnit } from "../Units/IUnit";
 import { ReplaceUnitParameters, TileType, UnitFlags } from "library/game-logic/horde-types";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { IHero } from "./IHero";
-import { BuildingTemplate } from "../Configs/IFactory";
-import { IConfig } from "./IConfig";
+import { IConfig } from "../Units/IConfig";
+import { BuildingTemplate } from "../Units/IFactory";
 
 export class Hero_Scorpion extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "HeroScorpion";
     protected static BaseCfgUid  : string = "#UnitConfig_Nature_ScorpionMed";
+
+    // настройки формации - начальный радиус
+    protected static _formationStartRadius : number = 2;
+    // настройки формации - плотность орбит
+    protected static _formationDestiny : number = 2 / 3;
 
     private _scorpions : Array<IUnit>;
 
     constructor(hordeUnit: HordeClassLibrary.World.Objects.Units.Unit) {
         super(hordeUnit);
 
-        this.formationStartRadius = 2;
-        this.formationDestiny = 2 / 3;
-
         this._scorpions = new Array<IUnit>();
     }
 
     protected static _InitHordeConfig() {
-        IHero._InitHordeConfig.call(this);
-
-        ScriptUtils.SetValue(this.Cfg, "Name", "Герой скорпион");
+        ScriptUtils.SetValue(this.Cfg, "Name", "Герой {скорпион}");
         ScriptUtils.SetValue(this.Cfg, "MaxHealth", 11);
         ScriptUtils.SetValue(this.Cfg, "Shield", 0);
         ScriptUtils.SetValue(this.Cfg.MainArmament.ShotParams, "Damage", 3);
         this.Cfg.Speeds.Item.set(TileType.Forest, 4);
         this.Cfg.Speeds.Item.set(TileType.Grass, 13);
+        ScriptUtils.SetValue(this.Cfg, "Weight", 9);
+        ScriptUtils.SetValue(this.Cfg, "PressureResist", 18);
+        
+        IHero._InitHordeConfig.call(this);
+
+        var scorpionConfig = Scorpion.GetHordeConfig();
+        ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n" +
+            "Из зданий на карте вместо ожидаемых юнитов появляются скорпионы ("
+            + scorpionConfig.MaxHealth + " здоровья " + scorpionConfig.MainArmament.ShotParams.Damage
+            + " урона), их количество зависит от редкости здания. После смерти главного скорпиона выбирается новый."
+        );
     }
 
     public OnDestroyBuilding(buildingTemplate: BuildingTemplate, rarity: number, spawnUnitConfig: IConfig, spawnCount: number): [IConfig, number] {
         return [new IConfig(Scorpion.GetHordeConfig()), rarity + 1 + 1];    
     }
 
-    public OnAddToFormation(unit: IUnit): void {
-        IHero.prototype.OnAddToFormation.call(this, unit);
+    public AddUnitToFormation(unit: IUnit): void {
+        IHero.prototype.AddUnitToFormation.call(this, unit);
 
         if (unit.hordeConfig.Uid == Scorpion.GetHordeConfig().Uid) {
             this._scorpions.push(unit);
@@ -72,12 +83,12 @@ export class Hero_Scorpion extends IHero {
             replaceParams.PreserveKillsCounter = true;  // Нужно ли передать счетчик убийств?
             replaceParams.Silent = true;                // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
     
-            // Замена
+            // повышаем выбранного скорпа до лидера
             this.hordeUnit = this._scorpions[0].hordeUnit.Owner.Units.ReplaceUnit(replaceParams);
             this._scorpions.splice(0, 1);
 
-            // удаляем из формации
-            this.formation.RemoveUnits([ this ]);
+            // удаляем из формации выбранного лидера
+            this._formation.RemoveUnits([ this ]);
         }
 
         return true;
@@ -102,5 +113,8 @@ class Scorpion extends IUnit {
         ScriptUtils.SetValue(this.Cfg, "Flags", mergeFlags(UnitFlags, this.Cfg.Flags, UnitFlags.NotChoosable));
         this.Cfg.Speeds.Item.set(TileType.Forest, 4);
         this.Cfg.Speeds.Item.set(TileType.Grass, 13);
+
+        ScriptUtils.SetValue(this.Cfg, "Weight", 9);
+        ScriptUtils.SetValue(this.Cfg, "PressureResist", 18);
     }
 }

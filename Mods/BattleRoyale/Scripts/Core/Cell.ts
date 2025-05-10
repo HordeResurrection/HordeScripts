@@ -1,4 +1,5 @@
 import { log } from "library/common/logging";
+import { createPoint, Point2D } from "library/common/primitives";
 
 export class Cell {
     X: number;
@@ -36,6 +37,12 @@ export class Cell {
     }
     VectProd(a: Cell) : number {
         return this.X * a.Y - this.Y * a.X;
+    }
+    Round() {
+        return new Cell(Math.round(this.X), Math.round(this.Y));
+    }
+    ToHordePoint() : Point2D {
+        return createPoint(this.X, this.Y);
     }
     static IsEquals(a: Cell, b: Cell): boolean {
         return Math.abs(a.X - b.X) < 1e-6 && Math.abs(a.Y - b.Y) < 1e-6;

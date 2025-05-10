@@ -1,4 +1,4 @@
-import { UnitCommand } from "library/game-logic/horde-types";
+import { Unit, UnitCommand } from "library/game-logic/horde-types";
 import { Cell } from "../Core/Cell";
 import { GameField } from "../Core/GameField";
 import { GameSettlement } from "../Core/GameSettlement";
@@ -6,7 +6,6 @@ import { IUnit } from "./IUnit";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
 import { PlayerSettlement } from "../Core/PlayerSettlement";
-import { log } from "library/common/logging";
 
 export class Priest extends IUnit {
     protected static CfgUid      : string = this.CfgPrefix + "Priest";
@@ -24,7 +23,7 @@ export class Priest extends IUnit {
 
     private _healPeriod: number;
 
-    constructor(hordeUnit: HordeClassLibrary.World.Objects.Units.Unit, gameField: GameField, enemySettlement: GameSettlement, playerSettlements: Array<PlayerSettlement>) {
+    constructor(hordeUnit: Unit, gameField: GameField, enemySettlement: GameSettlement, playerSettlements: Array<PlayerSettlement>) {
         super(hordeUnit);
         this._gameField         = gameField;
         this._enemySettlement   = enemySettlement;
@@ -39,10 +38,6 @@ export class Priest extends IUnit {
         IUnit._InitHordeConfig.call(this);
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Ворожей");
-        
-        //const extraWorkers = ScriptUtils.GetValue(this.Cfg, "EveryTickExtraWorkers");
-        //ScriptUtils.SetValue(extraWorkers[0], "HealRange", 6);
-        //ScriptUtils.SetValue(extraWorkers[0], "HealValue", 3);
     }
 
     public OnEveryTick(gameTickNum: number): boolean {
@@ -74,7 +69,7 @@ export class Priest extends IUnit {
                     });
                     if (playerSettlementNum >= 0) {
                         this.hordeUnit.ChangeOwner(u.value.Owner);
-                        this._playerSettlements[playerSettlementNum].formation.AddUnits([ this ]);
+                        this._playerSettlements[playerSettlementNum].heroUnit.AddUnitToFormation(this);
                         this._state = 2;
                         break;
                     }

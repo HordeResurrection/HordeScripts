@@ -5,7 +5,7 @@ import { IUnit } from "../Units/IUnit";
 import { Cell } from "./Cell";
 import { log } from "library/common/logging";
 import { printObjectItems } from "library/common/introspection";
-import { IHero } from "../Units/IHero";
+import { IHero } from "../Heroes/IHero";
 
 class Agent {
     unit: IUnit;
@@ -87,12 +87,12 @@ class Orbit {
     private static _CreatedOrbitsCount = 0;
     private static _UpdatePeriodSize = 0;
 
-    // юнит - центр колонии
-    unitCenter: IHero;
     // предыдущее положение центра
-    unitCenterPrevCell: Cell;
+    private prevCenterFormation: Cell;
     // текущее положение центра
-    unitCenterCell: Cell;
+    private centerFormation: Cell;
+    // атакованный юнит
+    private attackTarget: IUnit | null;
 
     // отсортированный список юнитов
     agents: Array<Agent>;
@@ -104,10 +104,7 @@ class Orbit {
     // такт для обновления
     updateTact: number;
 
-    private _unitsMap : any;
-
-    constructor(unitCenter : IHero, radius : number, orbitDestiny : number) {
-        this.unitCenter = unitCenter;
+    constructor(center : Cell, radius : number, orbitDestiny : number) {
         this.agents    = new Array<Agent>();
         this.radius   = radius;
 
@@ -134,10 +131,29 @@ class Orbit {
         Orbit._CreatedOrbitsCount++;
         Orbit._UpdatePeriodSize = this.updateTact + 1;
 
-        this.unitCenterPrevCell = new Cell(0, 0);
-        this.unitCenterCell     = new Cell(0, 0);
+        this.prevCenterFormation = center;
+        this.centerFormation     = center;
+        this.attackTarget        = null;
+    }
 
-        this._unitsMap = ActiveScena.GetRealScena().UnitsMap;
+    public SetAttackTarget(unit: IUnit | null) {
+        this.attackTarget = unit;
+        // обновляем атакованного юнита
+        this.agents.forEach((agent) => {
+            agent.attackTarget = this.attackTarget;
+        });
+    }
+
+    public SetCenter(center: Cell) {
+        this.centerFormation = center;
+        
+        // обновляем целевую клетку у агентов
+        if (!Cell.IsEquals(this.centerFormation, this.prevCenterFormation)) {
+            this.agents.forEach((agent) => {
+                agent.targetCell = this.centerFormation.Add(this.cells[agent.cellNum]);
+            });
+            this.prevCenterFormation = this.centerFormation;
+        }
     }
 
     AddAgents(agents: Array<Agent>) {
@@ -156,13 +172,13 @@ class Orbit {
             for (var unitNum = 0; unitNum < this.agents.length; unitNum++) {
                 this.agents[unitNum].cellNum    = Math.round(orbitAccCellStep) % this.cellsCount;
                 orbitAccCellStep               += orbitCellStep;
-                this.agents[unitNum].targetCell = this.unitCenterCell.Add(this.cells[this.agents[unitNum].cellNum]);;
+                this.agents[unitNum].targetCell = this.centerFormation.Add(this.cells[this.agents[unitNum].cellNum]);;
             }
         }
     }
 
     AddAgent(inAgent: Agent) {
-        var inUnitRelativePos = new Cell(inAgent.unit.hordeUnit.Cell.X, inAgent.unit.hordeUnit.Cell.Y).Minus(this.unitCenterCell);
+        var inUnitRelativePos = new Cell(inAgent.unit.hordeUnit.Cell.X, inAgent.unit.hordeUnit.Cell.Y).Minus(this.centerFormation);
 
         if (this.agents.length > 2) {
             // ищем ближайших двух юнитов
@@ -203,7 +219,7 @@ class Orbit {
                 inAgentNum = Math.min(nearAgent_num, prevNearAgent_num) + 1;
             }
                 // добавляем агента
-            inAgent.targetCell = this.unitCenterCell.Add(this.cells[inAgent.cellNum]);
+            inAgent.targetCell = this.centerFormation.Add(this.cells[inAgent.cellNum]);
             this.agents.splice(inAgentNum, 0, inAgent);
             
             // перевычисляем ячейки всех юнитов относительно нового юнита
@@ -255,42 +271,16 @@ class Orbit {
         if (gameTickNum % Orbit._UpdatePeriodSize != this.updateTact) {
             return false;
         }
-
-        // герой кого-то атаковал
-        if (this.unitCenter.lastAttackTargetUnit) {
-            this.agents.forEach((agent) => {
-                agent.attackTarget = this.unitCenter.lastAttackTargetUnit;
-            });
-        }
-        // if (this.unitCenter.hordeUnit.OrdersMind
-        //     && this.unitCenter.hordeUnit.OrdersMind.ActiveOrder
-        //     && this.unitCenter.hordeUnit.OrdersMind.ActiveOrder.GetType().Name == "OrderAttackUnit") {
-        //     var attackOrder        = this.unitCenter.hordeUnit.OrdersMind.ActiveOrder as OrderAttackUnit;
-        //     var targetAttackedUnit = new IUnit(attackOrder.Target);
-        //     this.agents.forEach((agent) => {
-        //         agent.attackTarget = targetAttackedUnit;
-        //     });
-        // }
         
-        // обновляем целевую клетку у агентов
-        this.unitCenterPrevCell = this.unitCenterCell;
-        this.unitCenterCell     = new Cell(this.unitCenter.hordeUnit.Cell.X, this.unitCenter.hordeUnit.Cell.Y);
-        if (!Cell.IsEquals(this.unitCenterCell, this.unitCenterPrevCell)) {
+        // обновляем информацию об атакованном юните
+        if (this.attackTarget
+            && (this.attackTarget.hordeUnit.IsDead
+                || (this.agents.length > 0
+                    && this.agents[0].unit.hordeUnit.Owner.Uid == this.attackTarget.hordeUnit.Owner.Uid))) {
+            this.attackTarget = null;
             this.agents.forEach((agent) => {
-                agent.targetCell = this.unitCenterCell.Add(this.cells[agent.cellNum]);
+                agent.attackTarget = null;
             });
-        }
-
-        if (this.agents.length > 0) {
-            // обновляем информацию об атакованном юните
-            if (this.agents[0].attackTarget) {
-                if (this.agents[0].attackTarget.hordeUnit.IsDead
-                    || this.agents[0].attackTarget.hordeUnit.Owner.Uid == this.unitCenter.hordeUnit.Owner.Uid) {
-                    this.agents.forEach((agent) => {
-                        agent.attackTarget = null;
-                    });
-                }
-            }
         }
 
         this.agents.forEach((agent) => agent.OnEveryTick(gameTickNum));
@@ -300,8 +290,8 @@ class Orbit {
 };
 
 export class Formation2 {
-    // юнит - центр колонии
-    private _unitCenter: IHero;
+    // центр формации
+    private _center: Cell;
     // орбиты
     private _orbits: Array<Orbit>;
     // номер такта, когда была заказана реформация
@@ -311,12 +301,12 @@ export class Formation2 {
     // плотность орбит
     private _orbitsDestiny: number;
 
-    constructor(unitCenter: IHero, startRadius: number, orbitsDestiny: number) {
-        this._unitCenter = unitCenter;
+    constructor(center: Cell, startRadius: number, orbitsDestiny: number) {
+        this._center = center;
         this._orbitsDestiny = orbitsDestiny;
 
         this._orbits = new Array<Orbit>();
-        this._orbits.push(new Orbit(this._unitCenter, startRadius, this._orbitsDestiny));
+        this._orbits.push(new Orbit(this._center, startRadius, this._orbitsDestiny));
 
         this._reformationOrderTact = -1;
         this._gameTickNum = 0;
@@ -389,6 +379,19 @@ export class Formation2 {
         }
     }
 
+    public SetAttackTarget(unit: IUnit | null) {
+        this._orbits.forEach((orbit) => {
+            orbit.SetAttackTarget(unit);
+        });
+    }
+
+    public SetCenter(center: Cell) {
+        this._center = center;
+        this._orbits.forEach((orbit) => {
+            orbit.SetCenter(center);
+        });
+    }
+
     private _Reformation() {
         var agents = new Array<Agent>();
 
@@ -420,7 +423,7 @@ export class Formation2 {
             while (this._orbits[orbitNum].maxAgents <= this._orbits[orbitNum].agents.length) {
                 orbitNum++;
                 if (this._orbits.length == orbitNum) {
-                    this._orbits.push(new Orbit(this._unitCenter, this._orbits[orbitNum - 1].radius + 1, this._orbitsDestiny));
+                    this._orbits.push(new Orbit(this._center, this._orbits[orbitNum - 1].radius + 1, this._orbitsDestiny));
                     orbitsAgents.push(new Array<Agent>());
                 }
             }

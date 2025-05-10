@@ -175,5 +175,8 @@ export class IConfig {
         if (this.Cfg.ProfessionParams.ContainsKey(UnitProfession.Harvester)) {
             this.Cfg.ProfessionParams.Remove(UnitProfession.Harvester);
         }
+
+        // убираем дружественный огонь у огня
+        ScriptUtils.SetValue(HordeContentApi.GetBulletConfig("#BulletConfig_Fire"), "CanDamageAllied", false);
     }
 }

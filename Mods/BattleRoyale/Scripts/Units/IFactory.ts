@@ -1,6 +1,6 @@
 import { TileType, UnitCommand, UnitFlags } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
-import { Hero_Crusader } from "../Units/Hero_Crusader";
+import { Hero_Crusader } from "../Heroes/Hero_Crusader";
 import { CreateHordeUnitConfig, FactoryConfig, GetConfigsByWorker, IConfig } from "../Units/IConfig";
 import { createHordeColor } from "library/common/primitives";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
@@ -74,7 +74,7 @@ export class IFactory {
             ];
             tilesType.forEach((tileType) => {
                 unitConfig.hordeConfig.Speeds.Item.set(tileType,
-                    Math.max(unitConfig.hordeConfig.Speeds.Item.get(tileType) as number, Hero_Crusader.GetHordeConfig().Speeds.Item(tileType)));
+                    Math.max(unitConfig.hordeConfig.Speeds.Item.get(tileType) as number, Hero_Crusader.GetHordeConfig().Speeds.Item.get(tileType) as number));
             });
             ScriptUtils.SetValue(unitConfig.hordeConfig, "Name", config.unitConfig.hordeConfig.Name + "\n" + rarity_NamePrefix[rarity]);
             ScriptUtils.SetValue(unitConfig.hordeConfig, "MaxHealth",

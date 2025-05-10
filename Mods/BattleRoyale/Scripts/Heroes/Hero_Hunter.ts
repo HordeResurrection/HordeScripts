@@ -1,5 +1,5 @@
 import { createPF } from "library/common/primitives";
-import { IUnit } from "./IUnit";
+import { IUnit } from "../Units/IUnit";
 import { UnitDirection, UnitFlags } from "library/game-logic/horde-types";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { spawnUnits } from "library/game-logic/unit-spawn";
@@ -11,20 +11,17 @@ export class Hero_Hunter extends IHero {
     protected static BaseCfgUid  : string = "#UnitConfig_Slavyane_Archer";
 
     private _bear : IUnit | null;
-    private _bearRevivePeriod : number;
+    private static _bearRevivePeriod : number = 500;
     private _bearDeadTick : number;
 
     constructor(hordeUnit: HordeClassLibrary.World.Objects.Units.Unit) {
         super(hordeUnit);
 
         this._bearDeadTick     = 0;
-        this._bearRevivePeriod = 500;
         this._bear = null;
     }
 
     protected static _InitHordeConfig() {
-        IHero._InitHordeConfig.call(this);
-
         ScriptUtils.SetValue(this.Cfg, "Name", "Герой {охотник}");
         ScriptUtils.SetValue(this.Cfg, "MaxHealth", 15);
         ScriptUtils.SetValue(this.Cfg, "Shield", 0);
@@ -38,10 +35,19 @@ export class Hero_Hunter extends IHero {
         ScriptUtils.SetValue(this.Cfg, "OrderDistance", 16);
         ScriptUtils.SetValue(this.Cfg.MainArmament, "DisableDispersion", true);
         ScriptUtils.SetValue(this.Cfg.MainArmament.ShotParams, "AdditiveBulletSpeed", createPF(30, 0));
+
+        ScriptUtils.SetValue(this.Cfg, "Weight", 9);
         ScriptUtils.SetValue(this.Cfg, "PressureResist", 20);
 
+        IHero._InitHordeConfig.call(this);
+
         //ScriptUtils.SetValue(config, "Flags", mergeFlags(UnitFlags, config.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
-        // сделать медведя подручного
+        
+        var bearConfig = Bear.GetHordeConfig();
+
+        ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n" +
+            "Имеет подручного медведя (" + bearConfig.MaxHealth + " здоровья " + bearConfig.MainArmament.ShotParams.Damage + " урона), который респавнится после смерти в течении " + (this._bearRevivePeriod/50) + " сек"
+        );
     }
 
     public OnEveryTick(gameTickNum: number): boolean {
@@ -55,11 +61,11 @@ export class Hero_Hunter extends IHero {
                 this._bearDeadTick = gameTickNum;
             }
         } else {
-            if (this._bearDeadTick + this._bearRevivePeriod < gameTickNum) {
+            if (this._bearDeadTick + Hero_Hunter._bearRevivePeriod < gameTickNum) {
                 var generator = generateCellInSpiral(this.hordeUnit.Cell.X, this.hordeUnit.Cell.Y);
                 var units     = spawnUnits(this.hordeUnit.Owner, Bear.GetHordeConfig(), 1, UnitDirection.RightDown, generator);
                 if (units.length > 0) {
-                    this._bear    = new Bear(units[0]);
+                    this._bear = new Bear(units[0]);
                 }
             }
         }
