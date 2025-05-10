@@ -12,8 +12,7 @@ import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 export class ExpandBuildState extends ProductionTaskState {
     protected requestMiningOnInsufficientResources = false;
     
-    // @ts-ignore
-    private expandCenter: MaraPoint;
+    private expandCenter: MaraPoint | null;
     private harvestersToOrder: UnitComposition = new Map<string, number>();
     private minedMinerals: Set<MaraResourceType> = new Set<MaraResourceType>();
     private targetExpand: TargetExpandData;
@@ -21,6 +20,7 @@ export class ExpandBuildState extends ProductionTaskState {
     constructor(task: SettlementSubcontrollerTask, settlementController: MaraSettlementController, targetExpand: TargetExpandData) {
         super(task, settlementController);
         this.targetExpand = targetExpand;
+        this.expandCenter = null;
     }
 
     protected onEntry(): boolean {
@@ -38,23 +38,25 @@ export class ExpandBuildState extends ProductionTaskState {
     }
 
     protected onExit(): void {
-        let expandUnits = MaraUtils.GetSettlementUnitsAroundPoint(
-            this.expandCenter,
-            Math.max(this.settlementController.Settings.ResourceMining.WoodcuttingRadius, this.settlementController.Settings.ResourceMining.MiningRadius),
-            [this.settlementController.Settlement],
-            (unit) => 
-                MaraUtils.IsMetalStockConfigId(unit.UnitCfgId) ||
-                MaraUtils.IsMineConfigId(unit.UnitCfgId) ||
-                MaraUtils.IsSawmillConfigId(unit.UnitCfgId)
-        );
-        
-        if (expandUnits.length > 0 && this.isRemoteExpand(this.expandCenter)) {
-            if ( 
-                !this.settlementController.Expands.find( 
-                    (value) => {return value.EqualsTo(this.expandCenter)} 
-                ) 
-            ) {
-                this.settlementController.Expands.push(this.expandCenter);
+        if (this.expandCenter) {
+            let expandUnits = MaraUtils.GetSettlementUnitsAroundPoint(
+                this.expandCenter,
+                Math.max(this.settlementController.Settings.ResourceMining.WoodcuttingRadius, this.settlementController.Settings.ResourceMining.MiningRadius),
+                [this.settlementController.Settlement],
+                (unit) => 
+                    MaraUtils.IsMetalStockConfigId(unit.UnitCfgId) ||
+                    MaraUtils.IsMineConfigId(unit.UnitCfgId) ||
+                    MaraUtils.IsSawmillConfigId(unit.UnitCfgId)
+            );
+            
+            if (expandUnits.length > 0 && this.isRemoteExpand(this.expandCenter)) {
+                if ( 
+                    !this.settlementController.Expands.find( 
+                        (value) => {return value.EqualsTo(this.expandCenter!)} 
+                    ) 
+                ) {
+                    this.settlementController.Expands.push(this.expandCenter);
+                }
             }
         }
     }
@@ -214,7 +216,7 @@ export class ExpandBuildState extends ProductionTaskState {
         }
         
         let metalStocks = MaraUtils.GetSettlementUnitsAroundPoint(
-            this.expandCenter, 
+            this.expandCenter!, 
             this.settlementController.Settings.ResourceMining.MiningRadius,
             [this.settlementController.Settlement],
             (unit) => {return MaraUtils.IsMetalStockConfigId(unit.UnitCfgId) && unit.UnitIsAlive}
@@ -241,7 +243,7 @@ export class ExpandBuildState extends ProductionTaskState {
         let isSawmillPresent = false;
 
         for (let sawmillData of this.settlementController.MiningController.Sawmills) {
-            let distance = MaraUtils.ChebyshevDistance(sawmillData.Sawmill!.UnitRect.Center, this.expandCenter);
+            let distance = MaraUtils.ChebyshevDistance(sawmillData.Sawmill!.UnitRect.Center, this.expandCenter!);
             
             if (distance < this.settlementController.Settings.ResourceMining.WoodcuttingRadius) {
                 isSawmillPresent = true;
