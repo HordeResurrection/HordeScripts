@@ -1,0 +1,2375 @@
+{
+  "FormatVersion": "0.41pre",
+  "Items": [
+    {
+      "$type": "HordeClassLibrary::UnitAnimationsCatalog",
+      "Uid": "#AnimCatalog_Slavyane_Blacksmith",
+      "Description": "Blacksmith",
+      "InternalEditorPath": "Units\\2_Slavyane\\Blacksmith",
+      "RootSection": {
+        "States": {
+          "Building": {
+            "Directions": {
+              "NoDirection": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Building_Stage0"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Building_Stage1"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Building_Stage2"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Building_Stage3"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Building_Stage4"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Building_Stage5"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Building_Stage6"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Building_Stage7"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Building_Stage8"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Building_Stage9"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Building_Stage10"
+                    ]
+                  }                  
+                ]
+              }
+            }
+          },
+          "Stand": {
+            "Directions": {
+              "NoDirection": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Stand"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Destruction": {
+            "Directions": {
+              "NoDirection": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage0"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage1"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage2"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage3"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage4"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage5"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage6"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage7"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage8"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage9"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::DecayAnimationsCatalog",
+      "Uid": "#AnimCatalog_Slavyane_BlacksmithRuins",
+      "Description": "Blacksmith ruins",
+      "InternalEditorPath": "Units\\2_Slavyane\\Blacksmith",
+      "RootSection": {
+        "DeathTypes": {
+          "Mele": {
+            "Directions": {
+              "NoDirection": {
+                "Variations": [
+                  "#AnimAtlas_Slavyane_Blacksmith_Ruins"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_BlacksmithPortrait",
+      "Description": "Blacksmith's portraits",
+      "InternalEditorPath": "Units\\Portraits\\Blacksmith_portrait",
+      "RootSection": {
+        "States": {
+          "Regular": "#AnimAtlas_Portrait_Blacksmith_Regular",
+          "Focused": "#AnimAtlas_Portrait_Blacksmith_Focused",
+          "Pressed": "#AnimAtlas_Portrait_Blacksmith_Pressed",
+          "Disabled": "#AnimAtlas_Portrait_Blacksmith_Disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::UnitAnimationsCatalog",
+      "Uid": "#AnimCatalog_Slavyane_Crossbowman",
+      "Description": "crossbowman",
+      "InternalEditorPath": "Units\\2_Slavyane\\Crossbowman",
+      "RootSection": {
+        "States": {
+          "Stand": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Stand_Up"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Stand_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Stand_Right"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Stand_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Stand_Down"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Stand_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Stand_Left"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Stand_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Move": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Move_Up"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Move_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Move_Right"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Move_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Move_Down"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Move_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Move_Left"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Move_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Attack": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Attack_Up"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Attack_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Attack_Right"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Attack_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Attack_Down"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Attack_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Attack_Left"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Attack_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Death": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "ArrowDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_ArrowDeath_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_ArrowDeath_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_ArrowDeath_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_ArrowDeath_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "HeavyDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_HeavyDeath_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_HeavyDeath_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_HeavyDeath_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_HeavyDeath_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "FireDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_FireDeath_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_FireDeath_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_FireDeath_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Crossbowman_FireDeath_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_CrossbowmanPortrait",
+      "Description": "crossbowman's portraits",
+      "InternalEditorPath": "Units\\Portraits\\crossbowman_portrait",
+      "RootSection": {
+        "States": {
+          "Regular": "#AnimAtlas_Portrait_Crossbowman_Regular",
+          "Focused": "#AnimAtlas_Portrait_Crossbowman_Focused",
+          "Pressed": "#AnimAtlas_Portrait_Crossbowman_Pressed",
+          "Disabled": "#AnimAtlas_Portrait_Crossbowman_Disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::UnitAnimationsCatalog",
+      "Uid": "#AnimCatalog_Mage_Minotaur",
+      "Description": "minotaur",
+      "InternalEditorPath": "Units\\3_Mage\\Minotaur",
+      "RootSection": {
+        "States": {
+          "Stand": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Stand_Up"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Stand_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Stand_Right"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Stand_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Stand_Down"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Stand_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Stand_Left"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Stand_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Move": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Move_Up"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Move_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Move_Right"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Move_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Move_Down"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Move_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Move_Left"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Move_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Attack": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Attack_Up"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Attack_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Attack_Right"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Attack_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Attack_Down"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Attack_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Attack_Left"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Attack_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Death": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "ArrowDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "HeavyDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "FireDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Minotaur_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_MinotaurPortrait",
+      "Description": "minotaur's portraits",
+      "InternalEditorPath": "Units\\Portraits\\minotaur_portrait",
+      "RootSection": {
+        "States": {
+          "Regular": "#AnimAtlas_Portrait_Minotaur_Regular",
+          "Focused": "#AnimAtlas_Portrait_Minotaur_Focused",
+          "Pressed": "#AnimAtlas_Portrait_Minotaur_Pressed",
+          "Disabled": "#AnimAtlas_Portrait_Minotaur_Disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::UnitAnimationsCatalog",
+      "Uid": "#AnimCatalog_Mage_Skeleton",
+      "Description": "skeleton",
+      "InternalEditorPath": "Units\\3_Mage\\Skeleton",
+      "RootSection": {
+        "States": {
+          "Stand": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Stand_Up"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Stand_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Stand_Right"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Stand_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Stand_Down"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Stand_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Stand_Left"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Stand_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Move": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Move_Up"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Move_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Move_Right"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Move_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Move_Down"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Move_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Move_Left"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Move_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Attack": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Attack_Up"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Attack_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Attack_Right"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Attack_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Attack_Down"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Attack_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Attack_Left"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Attack_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Death": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "ArrowDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "HeavyDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "FireDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Skeleton_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_SkeletonPortrait",
+      "Description": "skeleton's portraits",
+      "InternalEditorPath": "Units\\Portraits\\skeleton_portrait",
+      "RootSection": {
+        "States": {
+          "Regular": "#AnimAtlas_Portrait_Skeleton_Regular",
+          "Focused": "#AnimAtlas_Portrait_Skeleton_Focused",
+          "Pressed": "#AnimAtlas_Portrait_Skeleton_Pressed",
+          "Disabled": "#AnimAtlas_Portrait_Skeleton_Disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::UnitAnimationsCatalog",
+      "Uid": "#AnimCatalog_Mage_MageHouse",
+      "Description": "Mage house ruins",
+      "InternalEditorPath": "Units\\3_Mage\\mage_house",
+      "RootSection": {
+        "States": {
+          "Building": {
+            "Directions": {
+              "NoDirection": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Building_Stage0"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Building_Stage1"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Building_Stage2"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Building_Stage3"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Building_Stage4"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Building_Stage5"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Building_Stage6"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Building_Stage7"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Stand": {
+            "Directions": {
+              "NoDirection": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Stand"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Destruction": {
+            "Directions": {
+              "NoDirection": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Destruction_Stage0"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Destruction_Stage1"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Destruction_Stage2"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Destruction_Stage3"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Destruction_Stage4"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Destruction_Stage5"
+                    ]
+                  },
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Mage_MageHouse_Destruction_Stage6"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::DecayAnimationsCatalog",
+      "Uid": "#AnimCatalog_Mage_MageHouseRuins",
+      "Description": "Mage house ruins",
+      "InternalEditorPath": "Units\\3_Mage\\mage_house",
+      "RootSection": {
+        "DeathTypes": {
+          "Mele": {
+            "Directions": {
+              "NoDirection": {
+                "Variations": [
+                  "#AnimAtlas_Mage_MageHouse_Ruins"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_MageHousePortrait",
+      "Description": "MageHouse's portraits",
+      "InternalEditorPath": "Units\\Portraits\\MageHouse_portrait",
+      "RootSection": {
+        "States": {
+          "Regular": "#AnimAtlas_Portrait_MageHouse_Regular",
+          "Focused": "#AnimAtlas_Portrait_MageHouse_Focused",
+          "Pressed": "#AnimAtlas_Portrait_MageHouse_Pressed",
+          "Disabled": "#AnimAtlas_Portrait_MageHouse_Disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::UnitAnimationsCatalog",
+      "Uid": "#AnimCatalog_Slavyane_FireforgedWarrior",
+      "Description": "Fireforged warrior",
+      "InternalEditorPath": "Units\\2_Slavyane\\FireforgedWarrior",
+      "RootSection": {
+        "States": {
+          "Stand": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_StandUp"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_StandRightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_StandRight"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_StandRightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_StandDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_StandLeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_StandLeft"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_StandLeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Move": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_MoveUp"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_MoveRightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_MoveRight"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_MoveRightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_MoveDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_MoveLeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_MoveLeft"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_MoveLeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Attack": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_AttackUp"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_AttackRightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_AttackRight"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_AttackRightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_AttackDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_AttackLeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_AttackLeft"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_AttackLeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Death": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_DeathRightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_DeathRightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_DeathLeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_DeathLeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "ArrowDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_ArrowDeathRightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_ArrowDeathRightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_ArrowDeathLeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_ArrowDeathLeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "HeavyDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_HeavyDeathRightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_HeavyDeathRightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_HeavyDeathLeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_HeavyDeathLeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "FireDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_FireDeathRightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_FireDeathRightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_FireDeathLeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Slavyane_FireforgedWarrior_FireDeathLeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::UnitAnimationsCatalog",
+      "Uid": "#AnimCatalog_Mage_Bearmen",
+      "Description": "bearmen",
+      "InternalEditorPath": "Units\\3_Mage\\Bearmen",
+      "RootSection": {
+        "States": {
+          "Stand": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Stand_Up"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Stand_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Stand_Right"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Stand_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Stand_Down"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Stand_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Stand_Left"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Stand_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Move": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Move_Up"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Move_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Move_Right"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Move_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Move_Down"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Move_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Move_Left"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Move_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Attack": {
+            "Directions": {
+              "Up": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Attack_Up"
+                    ]
+                  }
+                ]
+              },
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Attack_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "Right": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Attack_Right"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Attack_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "Down": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Attack_Down"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Attack_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "Left": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Attack_Left"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Attack_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "Death": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "ArrowDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "HeavyDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "FireDeath": {
+            "Directions": {
+              "RightUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_RightUp"
+                    ]
+                  }
+                ]
+              },
+              "RightDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_RightDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftDown": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_LeftDown"
+                    ]
+                  }
+                ]
+              },
+              "LeftUp": {
+                "Stages": [
+                  {
+                    "Variations": [
+                      "#AnimAtlas_Bearmen_Death_LeftUp"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_BearmenPortrait",
+      "Description": "Bearmen's portraits",
+      "InternalEditorPath": "Units\\Portraits\\bearmen_portrait",
+      "RootSection": {
+        "States": {
+          "Regular": "#AnimAtlas_Portrait_Bearmen_Regular",
+          "Focused": "#AnimAtlas_Portrait_Bearmen_Focused",
+          "Pressed": "#AnimAtlas_Portrait_Bearmen_Pressed",
+          "Disabled": "#AnimAtlas_Portrait_Bearmen_Disabled"
+        }
+      }
+    }
+  ]
+}

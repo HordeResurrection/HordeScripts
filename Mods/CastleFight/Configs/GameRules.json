@@ -1,0 +1,17 @@
+{
+  "FormatVersion": "3",
+  "Items": [
+    {
+      "Uid": "#GameRule_CastleFight_Limits",
+      "Description": "Ограничение количества юнитов",
+      "Name": "Лимиты",
+      "Instruction": {
+        "$type": "HordeClassLibrary::UnitsAtSameTimeLimitInstruction",
+        "UnitLimits": {
+          "#UnitConfig_Slavyane_HeroAltar": 1
+        }
+      },
+      "SettlementNumbers": null
+    }
+  ]
+}

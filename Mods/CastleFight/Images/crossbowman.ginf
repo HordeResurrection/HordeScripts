@@ -1,0 +1,677 @@
+{
+    "Description": "crossbowman",
+    "Items": [
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Stand_Up",
+            "Description": "crossbowman, state: Stand, dir8: Up",
+            "Location": {
+                "X": 0,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 1,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Move_Up",
+            "Description": "crossbowman, state: Move, dir8: Up",
+            "Location": {
+                "X": 62,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Stand_RightUp",
+            "Description": "crossbowman, state: Stand, dir8: RightUp",
+            "Location": {
+                "X": 682,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 1,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Move_RightUp",
+            "Description": "crossbowman, state: Move, dir8: RightUp",
+            "Location": {
+                "X": 744,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Stand_Right",
+            "Description": "crossbowman, state: Stand, dir8: Right",
+            "Location": {
+                "X": 1364,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 1,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Move_Right",
+            "Description": "crossbowman, state: Move, dir8: Right",
+            "Location": {
+                "X": 1426,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Stand_RightDown",
+            "Description": "crossbowman, state: Stand, dir8: RightDown",
+            "Location": {
+                "X": 2046,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 1,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Move_RightDown",
+            "Description": "crossbowman, state: Move, dir8: RightDown",
+            "Location": {
+                "X": 2108,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Stand_Down",
+            "Description": "crossbowman, state: Stand, dir8: Down",
+            "Location": {
+                "X": 2728,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 1,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Move_Down",
+            "Description": "crossbowman, state: Move, dir8: Down",
+            "Location": {
+                "X": 2790,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Stand_LeftDown",
+            "Description": "crossbowman, state: Stand, dir8: LeftDown",
+            "Location": {
+                "X": 3410,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 1,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Move_LeftDown",
+            "Description": "crossbowman, state: Move, dir8: LeftDown",
+            "Location": {
+                "X": 3472,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Stand_Left",
+            "Description": "crossbowman, state: Stand, dir8: Left",
+            "Location": {
+                "X": 4092,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 1,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Move_Left",
+            "Description": "crossbowman, state: Move, dir8: Left",
+            "Location": {
+                "X": 4154,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Stand_LeftUp",
+            "Description": "crossbowman, state: Stand, dir8: LeftUp",
+            "Location": {
+                "X": 4774,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 1,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Move_LeftUp",
+            "Description": "crossbowman, state: Move, dir8: LeftUp",
+            "Location": {
+                "X": 4836,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Death_RightUp",
+            "Description": "crossbowman, state: Death, dir8: RightUp",
+            "Location": {
+                "X": 0,
+                "Y": 124
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 7,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Death_RightDown",
+            "Description": "crossbowman, state: Death, dir8: RightDown",
+            "Location": {
+                "X": 434,
+                "Y": 124
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 7,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Death_LeftDown",
+            "Description": "crossbowman, state: Death, dir8: LeftDown",
+            "Location": {
+                "X": 868,
+                "Y": 124
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 7,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_Death_LeftUp",
+            "Description": "crossbowman, state: Death, dir8: LeftUp",
+            "Location": {
+                "X": 1302,
+                "Y": 124
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 7,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_ArrowDeath_RightUp",
+            "Description": "crossbowman, state: ArrowDeath, dir8: RightUp",
+            "Location": {
+                "X": 0,
+                "Y": 186
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 7,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_ArrowDeath_RightDown",
+            "Description": "crossbowman, state: ArrowDeath, dir8: RightDown",
+            "Location": {
+                "X": 434,
+                "Y": 186
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 7,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_ArrowDeath_LeftDown",
+            "Description": "crossbowman, state: ArrowDeath, dir8: LeftDown",
+            "Location": {
+                "X": 868,
+                "Y": 186
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 7,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_ArrowDeath_LeftUp",
+            "Description": "crossbowman, state: ArrowDeath, dir8: LeftUp",
+            "Location": {
+                "X": 1302,
+                "Y": 186
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 7,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_HeavyDeath_RightUp",
+            "Description": "crossbowman, state: HeavyDeath, dir8: RightUp",
+            "Location": {
+                "X": 0,
+                "Y": 248
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_HeavyDeath_RightDown",
+            "Description": "crossbowman, state: HeavyDeath, dir8: RightDown",
+            "Location": {
+                "X": 620,
+                "Y": 248
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_HeavyDeath_LeftDown",
+            "Description": "crossbowman, state: HeavyDeath, dir8: LeftDown",
+            "Location": {
+                "X": 1240,
+                "Y": 248
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_HeavyDeath_LeftUp",
+            "Description": "crossbowman, state: HeavyDeath, dir8: LeftUp",
+            "Location": {
+                "X": 1860,
+                "Y": 248
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_FireDeath_RightUp",
+            "Description": "crossbowman, state: FireDeath, dir8: RightUp",
+            "Location": {
+                "X": 0,
+                "Y": 310
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_FireDeath_RightDown",
+            "Description": "crossbowman, state: FireDeath, dir8: RightDown",
+            "Location": {
+                "X": 620,
+                "Y": 310
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_FireDeath_LeftDown",
+            "Description": "crossbowman, state: FireDeath, dir8: LeftDown",
+            "Location": {
+                "X": 1240,
+                "Y": 310
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Crossbowman_FireDeath_LeftUp",
+            "Description": "crossbowman, state: FireDeath, dir8: LeftUp",
+            "Location": {
+                "X": 1860,
+                "Y": 310
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 10,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        }
+    ]
+}

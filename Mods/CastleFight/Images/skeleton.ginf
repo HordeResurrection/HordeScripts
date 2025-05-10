@@ -1,0 +1,733 @@
+{
+    "Description": "skeleton",
+    "Items": [
+        {
+            "Uid": "#AnimAtlas_Skeleton_Stand_Left",
+            "Description": "skeleton, state: Stand, dir8: Left",
+            "Location": {
+                "X": 0,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 4,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 2
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Move_Left",
+            "Description": "skeleton, state: Move, dir8: Left",
+            "Location": {
+                "X": 248,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Attack_Left",
+            "Description": "skeleton, state: Attack, dir8: Left",
+            "Location": {
+                "X": 744,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": {
+                  "3": {
+                    "Tasks": {
+                      "Hit": null
+                    },
+                    "BlockTime": 0
+                  }
+                }
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Death_Left",
+            "Description": "skeleton, state: Death, dir8: Left",
+            "Location": {
+                "X": 1240,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Stand_LeftUp",
+            "Description": "skeleton, state: Stand, dir8: LeftUp",
+            "Location": {
+                "X": 0,
+                "Y": 62
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 4,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 2
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Move_LeftUp",
+            "Description": "skeleton, state: Move, dir8: LeftUp",
+            "Location": {
+                "X": 248,
+                "Y": 62
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Attack_LeftUp",
+            "Description": "skeleton, state: Attack, dir8: LeftUp",
+            "Location": {
+                "X": 744,
+                "Y": 62
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": {
+                  "3": {
+                    "Tasks": {
+                      "Hit": null
+                    },
+                    "BlockTime": 0
+                  }
+                }
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Death_LeftUp",
+            "Description": "skeleton, state: Death, dir8: LeftUp",
+            "Location": {
+                "X": 1240,
+                "Y": 62
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Stand_Up",
+            "Description": "skeleton, state: Stand, dir8: Up",
+            "Location": {
+                "X": 0,
+                "Y": 124
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 4,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 2
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Move_Up",
+            "Description": "skeleton, state: Move, dir8: Up",
+            "Location": {
+                "X": 248,
+                "Y": 124
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Attack_Up",
+            "Description": "skeleton, state: Attack, dir8: Up",
+            "Location": {
+                "X": 744,
+                "Y": 124
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": {
+                  "3": {
+                    "Tasks": {
+                      "Hit": null
+                    },
+                    "BlockTime": 0
+                  }
+                }
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Death_Up",
+            "Description": "skeleton, state: Death, dir8: Up",
+            "Location": {
+                "X": 1240,
+                "Y": 124
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Stand_RightUp",
+            "Description": "skeleton, state: Stand, dir8: RightUp",
+            "Location": {
+                "X": 0,
+                "Y": 186
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 4,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 2
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Move_RightUp",
+            "Description": "skeleton, state: Move, dir8: RightUp",
+            "Location": {
+                "X": 248,
+                "Y": 186
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Attack_RightUp",
+            "Description": "skeleton, state: Attack, dir8: RightUp",
+            "Location": {
+                "X": 744,
+                "Y": 186
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": {
+                  "3": {
+                    "Tasks": {
+                      "Hit": null
+                    },
+                    "BlockTime": 0
+                  }
+                }
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Death_RightUp",
+            "Description": "skeleton, state: Death, dir8: RightUp",
+            "Location": {
+                "X": 1240,
+                "Y": 186
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Stand_Right",
+            "Description": "skeleton, state: Stand, dir8: Right",
+            "Location": {
+                "X": 0,
+                "Y": 248
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 4,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 2
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Move_Right",
+            "Description": "skeleton, state: Move, dir8: Right",
+            "Location": {
+                "X": 248,
+                "Y": 248
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Attack_Right",
+            "Description": "skeleton, state: Attack, dir8: Right",
+            "Location": {
+                "X": 744,
+                "Y": 248
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": {
+                  "3": {
+                    "Tasks": {
+                      "Hit": null
+                    },
+                    "BlockTime": 0
+                  }
+                }
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Death_Right",
+            "Description": "skeleton, state: Death, dir8: Right",
+            "Location": {
+                "X": 1240,
+                "Y": 248
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Stand_RightDown",
+            "Description": "skeleton, state: Stand, dir8: RightDown",
+            "Location": {
+                "X": 0,
+                "Y": 310
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 4,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 2
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Move_RightDown",
+            "Description": "skeleton, state: Move, dir8: RightDown",
+            "Location": {
+                "X": 248,
+                "Y": 310
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Attack_RightDown",
+            "Description": "skeleton, state: Attack, dir8: RightDown",
+            "Location": {
+                "X": 744,
+                "Y": 310
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": {
+                  "3": {
+                    "Tasks": {
+                      "Hit": null
+                    },
+                    "BlockTime": 0
+                  }
+                }
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Death_RightDown",
+            "Description": "skeleton, state: Death, dir8: RightDown",
+            "Location": {
+                "X": 1240,
+                "Y": 310
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Stand_Down",
+            "Description": "skeleton, state: Stand, dir8: Down",
+            "Location": {
+                "X": 0,
+                "Y": 372
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 4,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 2
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Move_Down",
+            "Description": "skeleton, state: Move, dir8: Down",
+            "Location": {
+                "X": 248,
+                "Y": 372
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Attack_Down",
+            "Description": "skeleton, state: Attack, dir8: Down",
+            "Location": {
+                "X": 744,
+                "Y": 372
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": {
+                  "3": {
+                    "Tasks": {
+                      "Hit": null
+                    },
+                    "BlockTime": 0
+                  }
+                }
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Death_Down",
+            "Description": "skeleton, state: Death, dir8: Down",
+            "Location": {
+                "X": 1240,
+                "Y": 372
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Stand_LeftDown",
+            "Description": "skeleton, state: Stand, dir8: LeftDown",
+            "Location": {
+                "X": 0,
+                "Y": 434
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 4,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 2
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Move_LeftDown",
+            "Description": "skeleton, state: Move, dir8: LeftDown",
+            "Location": {
+                "X": 248,
+                "Y": 434
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Attack_LeftDown",
+            "Description": "skeleton, state: Attack, dir8: LeftDown",
+            "Location": {
+                "X": 744,
+                "Y": 434
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": {
+                  "3": {
+                    "Tasks": {
+                      "Hit": null
+                    },
+                    "BlockTime": 0
+                  }
+                }
+            }
+        },
+        {
+            "Uid": "#AnimAtlas_Skeleton_Death_LeftDown",
+            "Description": "skeleton, state: Death, dir8: LeftDown",
+            "Location": {
+                "X": 1240,
+                "Y": 434
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 8,
+            "MaskColors": [{"A": 71, "R": 219, "G": 27, "B": 10},{"A": 84, "R": 241, "G": 64, "B": 48},{"A": 255, "R": 161, "G": 65, "B": 56},{"A": 255, "R": 243, "G": 53, "B": 36},{"A": 206, "R": 218, "G": 51, "B": 36},{"A": 76, "R": 234, "G": 44, "B": 27},{"A": 252, "R": 191, "G": 57, "B": 45},{"A": 255, "R": 226, "G": 48, "B": 33},{"A": 255, "R": 223, "G": 44, "B": 28}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            }
+        }
+    ]
+}

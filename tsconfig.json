@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-        "baseUrl": "./Scripts/",
-        "rootDirs": ["Scripts", "Mods"],
+        "baseUrl": "./Mods/Scripts",
+        "rootDirs": ["Mods/Scripts", "Mods"],
         "module": "es2015",
         "noImplicitReturns": true,
         "noImplicitThis": true,

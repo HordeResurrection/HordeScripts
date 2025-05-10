@@ -1,0 +1,24 @@
+{
+  "FormatVersion": "v0.60dev",
+  "Items": [
+    {
+      "Uid": "#SoundsCatalog_Units_Mage_Skeleton",
+      "Description": "(not completed)",
+      "InternalEditorPath": "Units\\Mage\\skeleton",
+      "RootSection": {
+        "Categories": {
+          "Death": {
+            "Variations": [
+              "#SoundInfo_NoSound"
+            ]
+          },
+          "Scream": {
+            "Variations": [
+              "#SoundInfo_NoSound"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

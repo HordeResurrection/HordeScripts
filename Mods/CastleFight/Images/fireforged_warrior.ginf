@@ -1,0 +1,1078 @@
+{
+  "FormatVersion": "3",
+  "Description": "Fireforged warrior",
+  "Items": [
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_StandUp",
+      "Description": "Fireforged warrior, state: Stand, dir8: Up",
+      "Location": {
+        "X": 0,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_MoveUp",
+      "Description": "Fireforged warrior, state: Move, dir8: Up",
+      "Location": {
+        "X": 62,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Human",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Human_99b8c33bd292",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 1,
+                  "Y": 11
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_StandRightUp",
+      "Description": "Fireforged warrior, state: Stand, dir8: RightUp",
+      "Location": {
+        "X": 682,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_MoveRightUp",
+      "Description": "Fireforged warrior, state: Move, dir8: RightUp",
+      "Location": {
+        "X": 744,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Human",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Human_99b8c33bd292",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 1,
+                  "Y": 11
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_StandRight",
+      "Description": "Fireforged warrior, state: Stand, dir8: Right",
+      "Location": {
+        "X": 1364,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_MoveRight",
+      "Description": "Fireforged warrior, state: Move, dir8: Right",
+      "Location": {
+        "X": 1426,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Human",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Human_99b8c33bd292",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 1,
+                  "Y": 11
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_StandRightDown",
+      "Description": "Fireforged warrior, state: Stand, dir8: RightDown",
+      "Location": {
+        "X": 2046,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_MoveRightDown",
+      "Description": "Fireforged warrior, state: Move, dir8: RightDown",
+      "Location": {
+        "X": 2108,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Human",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Human_99b8c33bd292",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 1,
+                  "Y": 11
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_StandDown",
+      "Description": "Fireforged warrior, state: Stand, dir8: Down",
+      "Location": {
+        "X": 2728,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_MoveDown",
+      "Description": "Fireforged warrior, state: Move, dir8: Down",
+      "Location": {
+        "X": 2790,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Human",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Human_99b8c33bd292",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 1,
+                  "Y": 11
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_StandLeftDown",
+      "Description": "Fireforged warrior, state: Stand, dir8: LeftDown",
+      "Location": {
+        "X": 3410,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_MoveLeftDown",
+      "Description": "Fireforged warrior, state: Move, dir8: LeftDown",
+      "Location": {
+        "X": 3472,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Human",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Human_99b8c33bd292",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 1,
+                  "Y": 11
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_StandLeft",
+      "Description": "Fireforged warrior, state: Stand, dir8: Left",
+      "Location": {
+        "X": 4092,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_MoveLeft",
+      "Description": "Fireforged warrior, state: Move, dir8: Left",
+      "Location": {
+        "X": 4154,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Human",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Human_99b8c33bd292",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 1,
+                  "Y": 11
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_StandLeftUp",
+      "Description": "Fireforged warrior, state: Stand, dir8: LeftUp",
+      "Location": {
+        "X": 4774,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_MoveLeftUp",
+      "Description": "Fireforged warrior, state: Move, dir8: LeftUp",
+      "Location": {
+        "X": 4836,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Human",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Human_99b8c33bd292",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 1,
+                  "Y": 11
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_AttackUp",
+      "Description": "Fireforged warrior, state: Attack, dir8: Up",
+      "Location": {
+        "X": 0,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "6": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 0
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_AttackRightUp",
+      "Description": "Fireforged warrior, state: Attack, dir8: RightUp",
+      "Location": {
+        "X": 434,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "6": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 0
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_AttackRight",
+      "Description": "Fireforged warrior, state: Attack, dir8: Right",
+      "Location": {
+        "X": 868,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "6": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 0
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_AttackRightDown",
+      "Description": "Fireforged warrior, state: Attack, dir8: RightDown",
+      "Location": {
+        "X": 1302,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "6": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 0
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_AttackDown",
+      "Description": "Fireforged warrior, state: Attack, dir8: Down",
+      "Location": {
+        "X": 1736,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "6": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 0
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_AttackLeftDown",
+      "Description": "Fireforged warrior, state: Attack, dir8: LeftDown",
+      "Location": {
+        "X": 2170,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "6": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 0
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_AttackLeft",
+      "Description": "Fireforged warrior, state: Attack, dir8: Left",
+      "Location": {
+        "X": 2604,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "6": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 0
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_AttackLeftUp",
+      "Description": "Fireforged warrior, state: Attack, dir8: LeftUp",
+      "Location": {
+        "X": 3038,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "6": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 0
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_DeathRightUp",
+      "Description": "Fireforged warrior, state: Death, dir8: RightUp",
+      "Location": {
+        "X": 0,
+        "Y": 124
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_DeathRightDown",
+      "Description": "Fireforged warrior, state: Death, dir8: RightDown",
+      "Location": {
+        "X": 434,
+        "Y": 124
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_DeathLeftDown",
+      "Description": "Fireforged warrior, state: Death, dir8: LeftDown",
+      "Location": {
+        "X": 868,
+        "Y": 124
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_DeathLeftUp",
+      "Description": "Fireforged warrior, state: Death, dir8: LeftUp",
+      "Location": {
+        "X": 1302,
+        "Y": 124
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_ArrowDeathRightUp",
+      "Description": "Fireforged warrior, state: ArrowDeath, dir8: RightUp",
+      "Location": {
+        "X": 0,
+        "Y": 186
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_ArrowDeathRightDown",
+      "Description": "Fireforged warrior, state: ArrowDeath, dir8: RightDown",
+      "Location": {
+        "X": 434,
+        "Y": 186
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_ArrowDeathLeftDown",
+      "Description": "Fireforged warrior, state: ArrowDeath, dir8: LeftDown",
+      "Location": {
+        "X": 868,
+        "Y": 186
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_ArrowDeathLeftUp",
+      "Description": "Fireforged warrior, state: ArrowDeath, dir8: LeftUp",
+      "Location": {
+        "X": 1302,
+        "Y": 186
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 7,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_HeavyDeathRightUp",
+      "Description": "Fireforged warrior, state: HeavyDeath, dir8: RightUp",
+      "Location": {
+        "X": 0,
+        "Y": 248
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_HeavyDeathRightDown",
+      "Description": "Fireforged warrior, state: HeavyDeath, dir8: RightDown",
+      "Location": {
+        "X": 620,
+        "Y": 248
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_HeavyDeathLeftDown",
+      "Description": "Fireforged warrior, state: HeavyDeath, dir8: LeftDown",
+      "Location": {
+        "X": 1240,
+        "Y": 248
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_HeavyDeathLeftUp",
+      "Description": "Fireforged warrior, state: HeavyDeath, dir8: LeftUp",
+      "Location": {
+        "X": 1860,
+        "Y": 248
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_FireDeathRightUp",
+      "Description": "Fireforged warrior, state: FireDeath, dir8: RightUp",
+      "Location": {
+        "X": 0,
+        "Y": 310
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_FireDeathRightDown",
+      "Description": "Fireforged warrior, state: FireDeath, dir8: RightDown",
+      "Location": {
+        "X": 620,
+        "Y": 310
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_FireDeathLeftDown",
+      "Description": "Fireforged warrior, state: FireDeath, dir8: LeftDown",
+      "Location": {
+        "X": 1240,
+        "Y": 310
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_FireforgedWarrior_FireDeathLeftUp",
+      "Description": "Fireforged warrior, state: FireDeath, dir8: LeftUp",
+      "Location": {
+        "X": 1860,
+        "Y": 310
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    }
+  ]
+}

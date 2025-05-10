@@ -1,0 +1,37 @@
+{
+  "FormatVersion": "v0.68dev",
+  "Items": [
+    {
+      "Uid": "#CastleFight_MindCharacter_Random",
+      "Description": "Рандомный бот",
+      "DisplayName": "Random",
+      "DisplayNicknameMask": "[Random] {0}",
+      "ForInternalUsingOnly": false,
+      "ProductionScript": []
+    },
+    {
+      "Uid": "#CastleFight_MindCharacter_Random_Melle",
+      "Description": "Рандомный бот, только ближники",
+      "DisplayName": "Random\\melle",
+      "DisplayNicknameMask": "[Random\\melle] {0}",
+      "ForInternalUsingOnly": false,
+      "ProductionScript": []
+    },
+    {
+      "Uid": "#CastleFight_MindCharacter_Random_Range",
+      "Description": "Рандомный бот, только дальники",
+      "DisplayName": "Random\\range",
+      "DisplayNicknameMask": "[Random\\range] {0}",
+      "ForInternalUsingOnly": false,
+      "ProductionScript": []
+    },
+    {
+      "Uid": "#CastleFight_MindCharacter_Random_WithChurch",
+      "Description": "Рандомный с церковью",
+      "DisplayName": "Random\\church",
+      "DisplayNicknameMask": "[Random\\church] {0}",
+      "ForInternalUsingOnly": false,
+      "ProductionScript": []
+    }
+  ]
+}

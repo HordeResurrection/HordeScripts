@@ -1,0 +1,95 @@
+{
+    "Items": [
+        {
+            "Location": {
+                "X": 0,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 80,
+                "Height": 50
+            },
+            "FramesCount": 1,
+            "MaskColors": null,
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            },
+            "Uid": "#AnimAtlas_Portrait_Bearmen_Regular",
+            "InfoFormatVersion": "3",
+            "Description": "bearmen's Regular portrait"
+        },
+        {
+            "Location": {
+                "X": 0,
+                "Y": 50
+            },
+            "FrameSize": {
+                "Width": 80,
+                "Height": 50
+            },
+            "FramesCount": 1,
+            "MaskColors": null,
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            },
+            "Uid": "#AnimAtlas_Portrait_Bearmen_Focused",
+            "InfoFormatVersion": "3",
+            "Description": "bearmen's Focused portrait"
+        },
+        {
+            "Location": {
+                "X": 0,
+                "Y": 100
+            },
+            "FrameSize": {
+                "Width": 80,
+                "Height": 50
+            },
+            "FramesCount": 1,
+            "MaskColors": null,
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            },
+            "Uid": "#AnimAtlas_Portrait_Bearmen_Pressed",
+            "InfoFormatVersion": "3",
+            "Description": "bearmen's Pressed portrait"
+        },
+        {
+            "Location": {
+                "X": 0,
+                "Y": 150
+            },
+            "FrameSize": {
+                "Width": 80,
+                "Height": 50
+            },
+            "FramesCount": 1,
+            "MaskColors": null,
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 0
+                },
+                "TaskBlocks": null
+            },
+            "Uid": "#AnimAtlas_Portrait_Bearmen_Disabled",
+            "InfoFormatVersion": "3",
+            "Description": "bearmen's Disabled portrait"
+        }
+    ],
+    "Count": 4,
+    "InfoFormatVersion": "3",
+    "Description": "bearmen's portraits"
+}

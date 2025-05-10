@@ -1,0 +1,15 @@
+{
+  "FormatVersion": "v0.68dev",
+  "Items": [
+    {
+      "Uid": "#Force_Barbarian",
+      "Archetype": "#Force_Barbarian",
+      "DefaultCharacter": "#CastleFight_MindCharacter_Random"
+    },
+    {
+      "Uid": "#Force_Slavyane",
+      "Archetype": "#Force_Slavyane",
+      "DefaultCharacter": "#CastleFight_MindCharacter_Random"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "FormatVersion": "v0.64pre",
+  "Items": [
+    {
+      "Archetype": "#BulletConfig_CommonMele",
+      "Uid": "#BulletConfig_BeamHitMele",
+      "Description": "Удар дубины",
+      "Name": "Удар дубины",
+      "UnitHurtType": "Heavy",
+      "CanDamageAllied": true,
+      "BulletSoundsCatalog": "#SoundsCatalog_Hits_Mele_Sword_c8dd27461fef"
+    }
+  ]
+}

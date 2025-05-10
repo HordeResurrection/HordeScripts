@@ -1,0 +1,507 @@
+{
+  "FormatVersion": "3",
+  "Description": "mage_house",
+  "Items": [
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Building_Stage0",
+      "Description": "mage_house, state: Building, dir8: NoDirection, stage: 0",
+      "Location": {
+        "X": 0,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Building_Stage1",
+      "Description": "mage_house, state: Building, dir8: NoDirection, stage: 1",
+      "Location": {
+        "X": 128,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Building_Stage2",
+      "Description": "mage_house, state: Building, dir8: NoDirection, stage: 2",
+      "Location": {
+        "X": 256,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Building_Stage3",
+      "Description": "mage_house, state: Building, dir8: NoDirection, stage: 3",
+      "Location": {
+        "X": 384,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Building_Stage4",
+      "Description": "mage_house, state: Building, dir8: NoDirection, stage: 4",
+      "Location": {
+        "X": 512,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Building_Stage5",
+      "Description": "mage_house, state: Building, dir8: NoDirection, stage: 5",
+      "Location": {
+        "X": 640,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Building_Stage6",
+      "Description": "mage_house, state: Building, dir8: NoDirection, stage: 6",
+      "Location": {
+        "X": 768,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Building_Stage7",
+      "Description": "mage_house, state: Building, dir8: NoDirection, stage: 7",
+      "Location": {
+        "X": 896,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Stand",
+      "Description": "mage_house, state: Stand, dir8: NoDirection",
+      "Location": {
+        "X": 0,
+        "Y": 150
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 15,
+      "Script": {
+        "TaskBlocks": {},
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 5
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Destruction_Stage0",
+      "Description": "mage_house, state: Destruction, dir8: NoDirection, stage: 0",
+      "Location": {
+        "X": 0,
+        "Y": 300
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": {},
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Destruction_Stage1",
+      "Description": "mage_house, state: Destruction, dir8: NoDirection, stage: 1",
+      "Location": {
+        "X": 128,
+        "Y": 300
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": {},
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Destruction_Stage2",
+      "Description": "mage_house, state: Destruction, dir8: NoDirection, stage: 2",
+      "Location": {
+        "X": 256,
+        "Y": 300
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": {},
+        "DefaultBlock": {
+          "Tasks": {
+            "ProduceNoise": {
+              "$type": "HordeClassLibrary::ProduceNoiseTaskParameters",
+              "NoiseSoundsCatalog": "#SoundsCatalog_Units_Slavyane_FarmNoise",
+              "TicksPeriod": 32,
+              "Probability": 0.1
+            }
+          },
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Destruction_Stage3",
+      "Description": "mage_house, state: Destruction, dir8: NoDirection, stage: 3",
+      "Location": {
+        "X": 384,
+        "Y": 300
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Destruction_Stage4",
+      "Description": "mage_house, state: Destruction, dir8: NoDirection, stage: 4",
+      "Location": {
+        "X": 512,
+        "Y": 300
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Destruction_Stage5",
+      "Description": "mage_house, state: Destruction, dir8: NoDirection, stage: 5",
+      "Location": {
+        "X": 640,
+        "Y": 300
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Destruction_Stage6",
+      "Description": "mage_house, state: Destruction, dir8: NoDirection, stage: 6",
+      "Location": {
+        "X": 768,
+        "Y": 300
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Destruction_Stage7",
+      "Description": "mage_house, state: Destruction, dir8: NoDirection, stage: 7",
+      "Location": {
+        "X": 896,
+        "Y": 300
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 0,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Destruction_Stage8",
+      "Description": "mage_house, state: Destruction, dir8: NoDirection, stage: 8",
+      "Location": {
+        "X": 1024,
+        "Y": 300
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 0,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Mage_MageHouse_Ruins",
+      "Description": "MageHouse ruins",
+      "Location": {
+        "X": 896,
+        "Y": 300
+      },
+      "FrameSize": {
+        "Width": 128,
+        "Height": 150
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -27
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 5000
+        }
+      },
+      "MaskColors": null
+    }
+  ]
+}

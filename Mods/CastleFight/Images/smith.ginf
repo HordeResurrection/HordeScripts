@@ -1,0 +1,680 @@
+{
+  "FormatVersion": "3",
+  "Description": "Blacksmith",
+  "Items": [
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Building_Stage0",
+      "Description": "Blacksmith, state: Building, dir8: NoDirection, stage: 0",
+      "Location": {
+        "X": 49,
+        "Y": 9
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Building_Stage1",
+      "Description": "Blacksmith, state: Building, dir8: NoDirection, stage: 1",
+      "Location": {
+        "X": 204,
+        "Y": 9
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Building_Stage2",
+      "Description": "Blacksmith, state: Building, dir8: NoDirection, stage: 2",
+      "Location": {
+        "X": 363,
+        "Y": 9
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Building_Stage3",
+      "Description": "Blacksmith, state: Building, dir8: NoDirection, stage: 3",
+      "Location": {
+        "X": 521,
+        "Y": 9
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Building_Stage4",
+      "Description": "Blacksmith, state: Building, dir8: NoDirection, stage: 4",
+      "Location": {
+        "X": 680,
+        "Y": 9
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Building_Stage5",
+      "Description": "Blacksmith, state: Building, dir8: NoDirection, stage: 5",
+      "Location": {
+        "X": 837,
+        "Y": 9
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Building_Stage6",
+      "Description": "Blacksmith, state: Building, dir8: NoDirection, stage: 6",
+      "Location": {
+        "X": 996,
+        "Y": 9
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Building_Stage7",
+      "Description": "Blacksmith, state: Building, dir8: NoDirection, stage: 7",
+      "Location": {
+        "X": 1152,
+        "Y": 9
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Building_Stage8",
+      "Description": "Blacksmith, state: Building, dir8: NoDirection, stage: 8",
+      "Location": {
+        "X": 1310,
+        "Y": 9
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Building_Stage9",
+      "Description": "Blacksmith, state: Building, dir8: NoDirection, stage: 9",
+      "Location": {
+        "X": 1467,
+        "Y": 9
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Building_Stage10",
+      "Description": "Blacksmith, state: Building, dir8: NoDirection, stage: 10",
+      "Location": {
+        "X": 1624,
+        "Y": 9
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Stand",
+      "Description": "Blacksmith, state: Stand, dir8: NoDirection",
+      "Location": {
+        "X": 47,
+        "Y": 147
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 8,
+      "Script": {
+        "TaskBlocks": {},
+        "DefaultBlock": {
+          "Tasks": {
+            "ProduceSmoke": {
+              "$type": "HordeClassLibrary::ProduceSmokeTaskParameters",
+              "SmokeLocations": [
+                {
+                  "X": -36,
+                  "Y": -76
+                }
+              ],
+              "SmokeEffect": "#VisualEffectConfig_Smoke",
+              "TicksPeriod": 0,
+              "Probability": 0.0625
+            },
+            "ProduceNoise": {
+              "$type": "HordeClassLibrary::ProduceNoiseTaskParameters",
+              "NoiseSoundsCatalog": "#SoundsCatalog_Units_Slavyane_FactoryNoise",
+              "TicksPeriod": 32,
+              "Probability": 0.1
+            }
+          },
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage0",
+      "Description": "Blacksmith, state: Destruction, dir8: NoDirection, stage: 0",
+      "Location": {
+        "X": 52,
+        "Y": 319
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": {},
+        "DefaultBlock": {
+          "Tasks": {
+            "ProduceSmoke": {
+              "$type": "HordeClassLibrary::ProduceSmokeTaskParameters",
+              "SmokeLocations": [
+                {
+                  "X": -36,
+                  "Y": -76
+                }
+              ],
+              "SmokeEffect": "#VisualEffectConfig_Smoke",
+              "TicksPeriod": 0,
+              "Probability": 0.05
+            },
+            "ProduceNoise": {
+              "$type": "HordeClassLibrary::ProduceNoiseTaskParameters",
+              "NoiseSoundsCatalog": "#SoundsCatalog_Units_Slavyane_FactoryNoise",
+              "TicksPeriod": 32,
+              "Probability": 0.1
+            }
+          },
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage1",
+      "Description": "Blacksmith, state: Destruction, dir8: NoDirection, stage: 1",
+      "Location": {
+        "X": 205,
+        "Y": 319
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": {},
+        "DefaultBlock": {
+          "Tasks": {
+            "ProduceSmoke": {
+              "$type": "HordeClassLibrary::ProduceSmokeTaskParameters",
+              "SmokeLocations": [
+                {
+                  "X": -36,
+                  "Y": -72
+                }
+              ],
+              "SmokeEffect": "#VisualEffectConfig_Smoke",
+              "TicksPeriod": 0,
+              "Probability": 0.0375
+            },
+            "ProduceNoise": {
+              "$type": "HordeClassLibrary::ProduceNoiseTaskParameters",
+              "NoiseSoundsCatalog": "#SoundsCatalog_Units_Slavyane_FactoryNoise",
+              "TicksPeriod": 32,
+              "Probability": 0.1
+            }
+          },
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage2",
+      "Description": "Blacksmith, state: Destruction, dir8: NoDirection, stage: 2",
+      "Location": {
+        "X": 363,
+        "Y": 319
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": {},
+        "DefaultBlock": {
+          "Tasks": {
+            "ProduceSmoke": {
+              "$type": "HordeClassLibrary::ProduceSmokeTaskParameters",
+              "SmokeLocations": [
+                {
+                  "X": -36,
+                  "Y": -60
+                }
+              ],
+              "SmokeEffect": "#VisualEffectConfig_Smoke",
+              "TicksPeriod": 0,
+              "Probability": 0.025
+            },
+            "ProduceNoise": {
+              "$type": "HordeClassLibrary::ProduceNoiseTaskParameters",
+              "NoiseSoundsCatalog": "#SoundsCatalog_Units_Slavyane_FactoryNoise",
+              "TicksPeriod": 32,
+              "Probability": 0.1
+            }
+          },
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage3",
+      "Description": "Blacksmith, state: Destruction, dir8: NoDirection, stage: 3",
+      "Location": {
+        "X": 521,
+        "Y": 319
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage4",
+      "Description": "Blacksmith, state: Destruction, dir8: NoDirection, stage: 4",
+      "Location": {
+        "X": 680,
+        "Y": 319
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage5",
+      "Description": "Blacksmith, state: Destruction, dir8: NoDirection, stage: 5",
+      "Location": {
+        "X": 837,
+        "Y": 319
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage6",
+      "Description": "Blacksmith, state: Destruction, dir8: NoDirection, stage: 6",
+      "Location": {
+        "X": 996,
+        "Y": 319
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage7",
+      "Description": "Blacksmith, state: Destruction, dir8: NoDirection, stage: 7",
+      "Location": {
+        "X": 1152,
+        "Y": 319
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage8",
+      "Description": "Blacksmith, state: Destruction, dir8: NoDirection, stage: 8",
+      "Location": {
+        "X": 1310,
+        "Y": 319
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Destruction_Stage9",
+      "Description": "Blacksmith, state: Destruction, dir8: NoDirection, stage: 9",
+      "Location": {
+        "X": 1468,
+        "Y": 319
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        }
+      },
+      "MaskColors": null
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Slavyane_Blacksmith_Ruins",
+      "Description": "Blacksmith ruins",
+      "Location": {
+        "X": 1626,
+        "Y": 319
+      },
+      "FrameSize": {
+        "Width": 132,
+        "Height": 132
+      },
+      "Bias": {
+        "X": 0,
+        "Y": -15
+      },
+      "FramesCount": 1,
+      "Script": {
+        "TaskBlocks": null,
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 5000
+        }
+      },
+      "MaskColors": null
+    }
+  ]
+}

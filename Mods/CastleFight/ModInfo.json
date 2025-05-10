@@ -1,0 +1,9 @@
+{
+  "Uid": "#ContentPack_CastleFight",
+  "DisplayName": "Битва замков",
+  "Description": "Используется для карты Битва Замков. Добавляет много юнитов с других модов. Добавляет скрипт для работы карты.",
+  "Authors": "Dikysa",
+  "BuiltIn": false,
+  "StandAlone": true,
+  "Params": null
+}

@@ -1,0 +1,239 @@
+{
+    "Items": [
+        {
+            "Location": {
+                "X": 0,
+                "Y": 0
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 11,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 1
+                },
+                "TaskBlocks": {
+                    "3": {
+                        "Tasks": {
+                "Hit": null
+            },
+                        "BlockTime": 3
+                    }
+                }
+            },
+            "Uid": "#AnimAtlas_Crossbowman_Attack_Up",
+            "InfoFormatVersion": "3",
+            "Description": "crossbowman, state: Attack, dir8: Up"
+        },
+        {
+            "Location": {
+                "X": 0,
+                "Y": 62
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 11,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 1
+                },
+                "TaskBlocks": {
+                    "3": {
+                        "Tasks": {
+                "Hit": null
+            },
+                        "BlockTime": 3
+                    }
+                }
+            },
+            "Uid": "#AnimAtlas_Crossbowman_Attack_RightUp",
+            "InfoFormatVersion": "3",
+            "Description": "crossbowman, state: Attack, dir8: RightUp"
+        },
+        {
+            "Location": {
+                "X": 0,
+                "Y": 124
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 11,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 1
+                },
+                "TaskBlocks": {
+                    "3": {
+                        "Tasks": {
+                "Hit": null
+            },
+                        "BlockTime": 3
+                    }
+                }
+            },
+            "Uid": "#AnimAtlas_Crossbowman_Attack_Right",
+            "InfoFormatVersion": "3",
+            "Description": "crossbowman, state: Attack, dir8: Right"
+        },
+        {
+            "Location": {
+                "X": 0,
+                "Y": 186
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 11,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 1
+                },
+                "TaskBlocks": {
+                    "3": {
+                        "Tasks": {
+                "Hit": null
+            },
+                        "BlockTime": 3
+                    }
+                }
+            },
+            "Uid": "#AnimAtlas_Crossbowman_Attack_RightDown",
+            "InfoFormatVersion": "3",
+            "Description": "crossbowman, state: Attack, dir8: RightDown"
+        },
+        {
+            "Location": {
+                "X": 0,
+                "Y": 248
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 11,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 1
+                },
+                "TaskBlocks": {
+                    "3": {
+                        "Tasks": {
+                "Hit": null
+            },
+                        "BlockTime": 3
+                    }
+                }
+            },
+            "Uid": "#AnimAtlas_Crossbowman_Attack_Down",
+            "InfoFormatVersion": "3",
+            "Description": "crossbowman, state: Attack, dir8: Down"
+        },
+        {
+            "Location": {
+                "X": 0,
+                "Y": 310
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 11,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 1
+                },
+                "TaskBlocks": {
+                    "3": {
+                        "Tasks": {
+                "Hit": null
+            },
+                        "BlockTime": 3
+                    }
+                }
+            },
+            "Uid": "#AnimAtlas_Crossbowman_Attack_LeftDown",
+            "InfoFormatVersion": "3",
+            "Description": "crossbowman, state: Attack, dir8: LeftDown"
+        },
+        {
+            "Location": {
+                "X": 0,
+                "Y": 372
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 11,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 1
+                },
+                "TaskBlocks": {
+                    "3": {
+                        "Tasks": {
+                "Hit": null
+            },
+                        "BlockTime": 3
+                    }
+                }
+            },
+            "Uid": "#AnimAtlas_Crossbowman_Attack_Left",
+            "InfoFormatVersion": "3",
+            "Description": "crossbowman, state: Attack, dir8: Left"
+        },
+        {
+            "Location": {
+                "X": 0,
+                "Y": 434
+            },
+            "FrameSize": {
+                "Width": 62,
+                "Height": 62
+            },
+            "FramesCount": 11,
+            "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}],
+            "Script": {
+                "DefaultBlock": {
+                    "Tasks": null,
+                    "BlockTime": 1
+                },
+                "TaskBlocks": {
+                    "3": {
+                        "Tasks": {
+                "Hit": null
+            },
+                        "BlockTime": 3
+                    }
+                }
+            },
+            "Uid": "#AnimAtlas_Crossbowman_Attack_LeftUp",
+            "InfoFormatVersion": "3",
+            "Description": "crossbowman, state: Attack, dir8: LeftUp"
+        }
+    ],
+    "Count": 8,
+    "InfoFormatVersion": "3",
+    "Description": "Crossbowman attack"
+}

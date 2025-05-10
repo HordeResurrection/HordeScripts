@@ -1,0 +1,1110 @@
+{
+  "FormatVersion": "3",
+  "Description": "raider",
+  "Items": [
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Stand_Up",
+      "Description": "raider, state: Stand, dir8: Up",
+      "Location": {
+        "X": 0,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Move_Up",
+      "Description": "raider, state: Move, dir8: Up",
+      "Location": {
+        "X": 62,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Horse",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Horse_d42aa68a777a",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 0,
+                  "Y": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Stand_RightUp",
+      "Description": "raider, state: Stand, dir8: RightUp",
+      "Location": {
+        "X": 682,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Move_RightUp",
+      "Description": "raider, state: Move, dir8: RightUp",
+      "Location": {
+        "X": 744,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Horse",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Horse_d42aa68a777a",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 0,
+                  "Y": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Stand_Right",
+      "Description": "raider, state: Stand, dir8: Right",
+      "Location": {
+        "X": 1364,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Move_Right",
+      "Description": "raider, state: Move, dir8: Right",
+      "Location": {
+        "X": 1426,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Horse",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Horse_d42aa68a777a",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 0,
+                  "Y": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Stand_RightDown",
+      "Description": "raider, state: Stand, dir8: RightDown",
+      "Location": {
+        "X": 2046,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Move_RightDown",
+      "Description": "raider, state: Move, dir8: RightDown",
+      "Location": {
+        "X": 2108,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Horse",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Horse_d42aa68a777a",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 0,
+                  "Y": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Stand_Down",
+      "Description": "raider, state: Stand, dir8: Down",
+      "Location": {
+        "X": 2728,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Move_Down",
+      "Description": "raider, state: Move, dir8: Down",
+      "Location": {
+        "X": 2790,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Horse",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Horse_d42aa68a777a",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 0,
+                  "Y": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Stand_LeftDown",
+      "Description": "raider, state: Stand, dir8: LeftDown",
+      "Location": {
+        "X": 3410,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Move_LeftDown",
+      "Description": "raider, state: Move, dir8: LeftDown",
+      "Location": {
+        "X": 3472,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Horse",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Horse_d42aa68a777a",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 0,
+                  "Y": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Stand_Left",
+      "Description": "raider, state: Stand, dir8: Left",
+      "Location": {
+        "X": 4092,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Move_Left",
+      "Description": "raider, state: Move, dir8: Left",
+      "Location": {
+        "X": 4154,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Horse",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Horse_d42aa68a777a",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 0,
+                  "Y": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Stand_LeftUp",
+      "Description": "raider, state: Stand, dir8: LeftUp",
+      "Location": {
+        "X": 4774,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 1,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Move_LeftUp",
+      "Description": "raider, state: Move, dir8: LeftUp",
+      "Location": {
+        "X": 4836,
+        "Y": 0
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 10,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "9": {
+            "Tasks": {
+              "ProduceTrace": {
+                "$type": "HordeClassLibrary::ProduceTraceTaskParameters",
+                "TraceEffect": "#VisualEffectConfig_Trace_Horse",
+                "TraceSoundsCatalog": "#SoundsCatalog_Steps_Horse_d42aa68a777a",
+                "AllowedTileTypes": [
+                  "Sand"
+                ],
+                "Bias": {
+                  "X": 0,
+                  "Y": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Attack_Up",
+      "Description": "raider, state: Attack, dir8: Up",
+      "Location": {
+        "X": 0,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 13,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "0": {
+            "Tasks": null,
+            "BlockTime": 1
+          },
+          "1": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 1
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Attack_RightUp",
+      "Description": "raider, state: Attack, dir8: RightUp",
+      "Location": {
+        "X": 806,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 13,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "0": {
+            "Tasks": null,
+            "BlockTime": 1
+          },
+          "1": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 1
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Attack_Right",
+      "Description": "raider, state: Attack, dir8: Right",
+      "Location": {
+        "X": 1612,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 13,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "0": {
+            "Tasks": null,
+            "BlockTime": 1
+          },
+          "1": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 1
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Attack_RightDown",
+      "Description": "raider, state: Attack, dir8: RightDown",
+      "Location": {
+        "X": 2418,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 13,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "0": {
+            "Tasks": null,
+            "BlockTime": 1
+          },
+          "1": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 1
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Attack_Down",
+      "Description": "raider, state: Attack, dir8: Down",
+      "Location": {
+        "X": 3224,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 13,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "0": {
+            "Tasks": null,
+            "BlockTime": 1
+          },
+          "1": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 1
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Attack_LeftDown",
+      "Description": "raider, state: Attack, dir8: LeftDown",
+      "Location": {
+        "X": 4030,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 13,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "0": {
+            "Tasks": null,
+            "BlockTime": 1
+          },
+          "1": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 1
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Attack_Left",
+      "Description": "raider, state: Attack, dir8: Left",
+      "Location": {
+        "X": 4836,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 13,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "0": {
+            "Tasks": null,
+            "BlockTime": 1
+          },
+          "1": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 1
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Attack_LeftUp",
+      "Description": "raider, state: Attack, dir8: LeftUp",
+      "Location": {
+        "X": 5642,
+        "Y": 62
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 13,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": {
+          "0": {
+            "Tasks": null,
+            "BlockTime": 1
+          },
+          "1": {
+            "Tasks": {
+              "Hit": null
+            },
+            "BlockTime": 1
+          }
+        }
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_RightUp",
+      "Description": "raider, state: Death, dir8: RightUp",
+      "Location": {
+        "X": 0,
+        "Y": 124
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_RightDown",
+      "Description": "raider, state: Death, dir8: RightDown",
+      "Location": {
+        "X": 744,
+        "Y": 124
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_LeftDown",
+      "Description": "raider, state: Death, dir8: LeftDown",
+      "Location": {
+        "X": 1488,
+        "Y": 124
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_LeftUp",
+      "Description": "raider, state: Death, dir8: LeftUp",
+      "Location": {
+        "X": 2232,
+        "Y": 124
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_RightUp",
+      "Description": "raider, state: ArrowDeath, dir8: RightUp",
+      "Location": {
+        "X": 0,
+        "Y": 186
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_RightDown",
+      "Description": "raider, state: ArrowDeath, dir8: RightDown",
+      "Location": {
+        "X": 744,
+        "Y": 186
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_LeftDown",
+      "Description": "raider, state: ArrowDeath, dir8: LeftDown",
+      "Location": {
+        "X": 1488,
+        "Y": 186
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_LeftUp",
+      "Description": "raider, state: ArrowDeath, dir8: LeftUp",
+      "Location": {
+        "X": 2232,
+        "Y": 186
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_RightUp",
+      "Description": "raider, state: HeavyDeath, dir8: RightUp",
+      "Location": {
+        "X": 0,
+        "Y": 248
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_RightDown",
+      "Description": "raider, state: HeavyDeath, dir8: RightDown",
+      "Location": {
+        "X": 744,
+        "Y": 248
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_LeftDown",
+      "Description": "raider, state: HeavyDeath, dir8: LeftDown",
+      "Location": {
+        "X": 1488,
+        "Y": 248
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_LeftUp",
+      "Description": "raider, state: HeavyDeath, dir8: LeftUp",
+      "Location": {
+        "X": 2232,
+        "Y": 248
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_RightUp",
+      "Description": "raider, state: FireDeath, dir8: RightUp",
+      "Location": {
+        "X": 0,
+        "Y": 310
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_RightDown",
+      "Description": "raider, state: FireDeath, dir8: RightDown",
+      "Location": {
+        "X": 744,
+        "Y": 310
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_LeftDown",
+      "Description": "raider, state: FireDeath, dir8: LeftDown",
+      "Location": {
+        "X": 1488,
+        "Y": 310
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    },
+    {
+      "InfoFormatVersion": "3",
+      "Uid": "#AnimAtlas_Bearmen_Death_LeftUp",
+      "Description": "raider, state: FireDeath, dir8: LeftUp",
+      "Location": {
+        "X": 2232,
+        "Y": 310
+      },
+      "FrameSize": {
+        "Width": 62,
+        "Height": 62
+      },
+      "FramesCount": 12,
+      "Script": {
+        "DefaultBlock": {
+          "Tasks": null,
+          "BlockTime": 0
+        },
+        "TaskBlocks": null
+      },
+      "MaskColors": [{"A": 255, "R": 255, "G": 46, "B": 31}, {"A": 255, "R": 241, "G": 43, "B": 29}, {"A": 255, "R": 227, "G": 40, "B": 27}, {"A": 255, "R": 213, "G": 37, "B": 25}, {"A": 255, "R": 198, "G": 34, "B": 23}, {"A": 255, "R": 184, "G": 31, "B": 21}, {"A": 255, "R": 170, "G": 28, "B": 19}, {"A": 255, "R": 156, "G": 25, "B": 17}, {"A": 255, "R": 142, "G": 21, "B": 14}, {"A": 255, "R": 128, "G": 18, "B": 12}, {"A": 255, "R": 114, "G": 15, "B": 10}, {"A": 255, "R": 99, "G": 12, "B": 8}, {"A": 255, "R": 85, "G": 9, "B": 6}, {"A": 255, "R": 71, "G": 6, "B": 4}, {"A": 255, "R": 57, "G": 3, "B": 2}, {"A": 255, "R": 254, "G": 253, "B": 253}]
+    }
+  ]
+}

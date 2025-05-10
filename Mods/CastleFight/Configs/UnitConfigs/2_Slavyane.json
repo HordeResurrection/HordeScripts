@@ -1,0 +1,601 @@
+{
+  "FormatVersion": "v0.64pre",
+  "Force": "#Force_Slavyane",
+  "Items": [
+    {
+      "Archetype": "#UnitConfig_Slavyane_Bridge",
+      "Uid": "#UnitConfig_Slavyane_Bridge",
+      "Shield": 400,
+      "MaxHealth": 20000,
+      "MinHealth": 1500,
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Beamman",
+      "Uid": "#UnitConfig_Slavyane_Beamman",
+      "Shield": 1,
+      "MaxHealth": 30,
+      "MainArmament": {
+        "BulletConfig": "#BulletConfig_BeamHitMele",
+        "ShotParams": {
+          "Damage": 6
+        },
+        "ReloadTime": 6
+      },
+      "CostResources": {
+        "Gold": 50,
+        "Metal": 100,
+        "Lumber": 0,
+        "People": 1
+      },
+      "ProductionTime": 400,
+      "TechConfig": {
+        "Requirements": {
+          "$add": [
+            "#UnitConfig_Slavyane_Mill"
+          ]
+        }
+      },
+      "StateWorkers": {
+        "$chg": {
+          "Hit": {
+            "$type": "HordeClassLibrary::ScriptUnitWorkerState",
+            "FuncName": "__DYNAMIC_VALUE__"
+          }
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Beamman",
+      "Uid": "#UnitConfig_Slavyane_Beamman",
+      "ContentPackRequirements": [
+        "#ContentPack_BlacksmithMod"
+      ],
+      "TechConfig": {
+        "Requirements": {
+          "$add": [
+            "#UnitConfig_Slavyane_Blacksmith"
+          ]
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Barrack",
+      "Uid": "#UnitConfig_Slavyane_Barrack",
+      "ProfessionParams": {
+        "$chg": {
+          "UnitProducer": {
+            "$type": "HordeClassLibrary::UnitProducerProfessionParams",
+            "CanProduceList": {
+              "$add": [
+                "#UnitConfig_Slavyane_Beamman"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "Uid": "#UnitConfig_Slavyane_Worker1",
+      "Archetype": "#UnitConfig_Slavyane_Worker1",
+      "ProfessionParams": {
+        "$chg": {
+          "UnitProducer": {
+            "$type": "HordeClassLibrary::UnitProducerProfessionParams",
+            "CanProduceList": {
+              "$add": [
+                "#UnitConfig_Slavyane_Blacksmith"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "Uid": "#UnitConfig_Slavyane_Blacksmith",
+      "Description": "Здание необходимо для тренировки тяжелых воинов.\r\nВторая и третья кузницы уменьшают время тренировки воинов на 20% и 33% соответственно.",
+      "Name": "Кузница",
+      "Hotkey": "H",
+      "PreferredProductListPosition": {
+        "X": 0,
+        "Y": 9
+      },
+      "CitadelId": -1,
+      "Size": {
+        "Width": 5,
+        "Height": 3
+      },
+      "MainAnimationsCatalog": "#AnimCatalog_Slavyane_Blacksmith",
+      "InForestAnimationsCatalog": null,
+      "PortraitCatalog": "#AnimCatalog_BlacksmithPortrait",
+      "DecayCatalog": "#AnimCatalog_Slavyane_BlacksmithRuins",
+      "SoundsCatalog": "#SoundsCatalog_Units_Slavyane_Factory_fd4c5c9b9d14",
+      "TintColor": null,
+      "Weight": 250,
+      "PressureResist": 500,
+      "Flags": "Building, Lifeless",
+      "Specification": "DevelopmentBooster",
+      "Shield": 4,
+      "MaxHealth": 120,
+      "MinHealth": 20,
+      "Sight": 8,
+      "ForestVision": 0,
+      "OrderDistance": 8,
+      "ChaseDistance": 0,
+      "RevengeAttackDistance": 8,
+      "Speeds": {
+        "Grass": 10,
+        "Forest": 0,
+        "Water": 0,
+        "Marsh": 10,
+        "Sand": 10,
+        "Mounts": 0,
+        "Road": 10,
+        "Ice": 0
+      },
+      "MoveType": "OnlyPlain",
+      "ReloadTime": 0,
+      "Rating": 0,
+      "MapLayer": "Main",
+      "DefaultDrawLayer": "Units",
+      "GrayFogBehavior": "KeepState",
+      "CostResources": {
+        "Gold": 0,
+        "Metal": 0,
+        "Lumber": 0,
+        "People": 0
+      },
+      "ProductionTime": 1200,
+      "SalarySlots": 0,
+      "ProducedPeople": 0,
+      "AllowedCommands": {
+        "DestroySelf": "#UnitCommandConfig_DestroySelf"
+      },
+      "BuildingConfig": {
+        "EmergePoint": {
+          "X": 0,
+          "Y": 3
+        },
+        "EmergePoint2": {
+          "X": 1,
+          "Y": 4
+        },
+        "LifeDistance": 8,
+        "DestructionDustEffectConfig": "#VisualEffectConfig_BigDust",
+        "DestructionBeamsNumber": 5
+      },
+      "TechConfig": {
+        "Requirements": [
+          "#UnitConfig_Slavyane_Castle",
+          "#UnitConfig_Slavyane_Barrack"
+        ]
+      },
+      "ProfessionParams": {
+        "Reparable": {
+          "$type": "HordeClassLibrary::ReparableProfessionParams",
+          "AllowRepairSelf": false,
+          "RecoverCost": {
+            "Gold": 0,
+            "Metal": 0,
+            "Lumber": 0,
+            "People": 0
+          },
+          "RecoverTime": 1800,
+          "RepairCommandConfig": "#UnitCommandConfig_RepairSelf"
+        }
+      },
+      "MainArmament": null,
+      "ExtraArmament": null,
+      "GetCommandTypeWorker": {
+        "$type": "HordeClassLibrary::BaseBuildingGetCommandType"
+      },
+      "GetOrderWorker": {
+        "$type": "HordeClassLibrary::BaseBuildingGetOrder"
+      },
+      "GetSpeedAtCellWorker": {
+        "$type": "HordeClassLibrary::BaseBuildingGetSpeedAtCell"
+      },
+      "CanBePlacedWorker": {
+        "$type": "HordeClassLibrary::BaseBuildingCanBePlaced"
+      },
+      "CancelWorker": {
+        "$type": "HordeClassLibrary::BaseBuildingCancel"
+      },
+      "AnalyzeSituationWorker": {
+        "$type": "HordeClassLibrary::UnitWorkerAnalyzeSituationStub"
+      },
+      "EveryTickWorker": {
+        "$type": "HordeClassLibrary::BaseBuildingEveryTick"
+      },
+      "EveryTickExtraWorkers": null,
+      "StateWorkers": {
+        "Stay": {
+          "$type": "HordeClassLibrary::BaseBuildingDoNothing"
+        },
+        "Death": {
+          "$type": "HordeClassLibrary::BaseBuildingDeath"
+        },
+        "BuildSelf": {
+          "$type": "HordeClassLibrary::BaseBuildingBuildSelf"
+        },
+        "RepairSelf": {
+          "$type": "HordeClassLibrary::BaseBuildingRepairSelf"
+        },
+        "Produce": {
+          "$type": "HordeClassLibrary::BaseBuildingProduce"
+        },
+        "ProduceAt": {
+          "$type": "HordeClassLibrary::BaseBuildingProduceAt"
+        }
+      },
+      "CitadelAnimPhases": {
+        "Building": 8,
+        "Death": 8,
+        "Stand": 10
+      }
+    },
+    {
+      "Uid": "#UnitConfig_Slavyane_Heavymen",
+      "Archetype": "#UnitConfig_Slavyane_Heavymen",
+      "TechConfig": {
+        "Requirements": {
+          "$add": [
+            "#UnitConfig_Slavyane_Blacksmith"
+          ]
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Archer",
+      "Uid": "#UnitConfig_Slavyane_Crossbowman",
+      "Description": "Тяжелый воин дальнего боя.",
+      "Name": "Самострельщик",
+      "Hotkey": "C",
+      "PreferredProductListPosition": {
+        "X": 0,
+        "Y": 5
+      },
+      "CitadelId": 35,
+      "MainAnimationsCatalog": "#AnimCatalog_Slavyane_Crossbowman",
+      "PortraitCatalog": "#AnimCatalog_CrossbowmanPortrait",
+      "DecayCatalog": "#AnimCatalog_Slavyane_CommonDecay",
+      "SoundsCatalog": "#SoundsCatalog_Units_Slavyane_Swordsman",
+      "Weight": 13,
+      "PressureResist": 22,
+      "Flags": "CanCapture",
+      "Specification": "Range",
+      "Shield": 1,
+      "MaxHealth": 10,
+      "MinHealth": 0,
+      "Sight": 8,
+      "ForestVision": 3,
+      "OrderDistance": 8,
+      "ChaseDistance": 20,
+      "RevengeAttackDistance": 16,
+      "Speeds": {
+        "Grass": 8,
+        "Forest": 4,
+        "Water": 0,
+        "Marsh": 7,
+        "Sand": 7,
+        "Mounts": 0,
+        "Road": 10,
+        "Ice": 10
+      },
+      "ReloadTime": 22,
+      "Rating": 20,
+      "CostResources": {
+        "Gold": 60,
+        "Metal": 15,
+        "Lumber": 40,
+        "People": 1
+      },
+      "SalarySlots": 2,
+      "TechConfig": {
+        "Requirements": [
+          "#UnitConfig_Slavyane_Sawmill"
+        ]
+      },
+      "ProductionTime": 400,
+      "MainArmament": {
+        "BulletConfig": "#BulletConfig_Arrow",
+        "ShotParams": {
+          "Damage": 5,
+          "AdditiveBulletSpeed": "6.000"
+        },
+        "Range": 8,
+        "ForestRange": 3,
+        "RangeMin": 0,
+        "Levels": 6,
+        "ReloadTime": 22,
+        "BaseAccuracy": 8,
+        "MaxDistanceDispersion": 47,
+        "DisableDispersion": false,
+        "GunCoord": {
+          "Up": {
+            "X": 3,
+            "Y": -10
+          },
+          "RightUp": {
+            "X": 5,
+            "Y": -5
+          },
+          "Right": {
+            "X": 8,
+            "Y": -4
+          },
+          "RightDown": {
+            "X": 0,
+            "Y": 0
+          },
+          "Down": {
+            "X": 0,
+            "Y": 0
+          },
+          "LeftDown": {
+            "X": 0,
+            "Y": 0
+          },
+          "Left": {
+            "X": -8,
+            "Y": -4
+          },
+          "LeftUp": {
+            "X": -10,
+            "Y": -10
+          }
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Barrack",
+      "Uid": "#UnitConfig_Slavyane_Barrack",
+      "ProfessionParams": {
+        "$chg": {
+          "UnitProducer": {
+            "$type": "HordeClassLibrary::UnitProducerProfessionParams",
+            "CanProduceList": {
+              "$add": [
+                "#UnitConfig_Slavyane_Crossbowman"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Crossbowman",
+      "Uid": "#UnitConfig_Slavyane_Crossbowman",
+      "ContentPackRequirements": [
+        "#ContentPack_BlacksmithMod"
+      ],
+      "TechConfig": {
+        "Requirements": {
+          "$add": [
+            "#UnitConfig_Slavyane_Blacksmith"
+          ]
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Worker1",
+      "Uid": "#UnitConfig_Slavyane_Worker1",
+      "ProfessionParams": {
+        "$chg": {
+          "UnitProducer": {
+            "$type": "HordeClassLibrary::UnitProducerProfessionParams",
+            "CanProduceList": {
+              "$add": [
+                "#UnitConfig_Mage_MageHouse"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Worker1",
+      "Uid": "#UnitConfig_Slavyane_Worker1",
+      "ContentPackRequirements": [
+        "#ContentPack_CastleBuildBuildings"
+      ],
+      "ProfessionParams": {
+        "$chg": {
+          "UnitProducer": {
+            "$type": "HordeClassLibrary::UnitProducerProfessionParams",
+            "CanProduceList": {
+              "$rem": [
+                "#UnitConfig_Mage_MageHouse"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Castle",
+      "Uid": "#UnitConfig_Slavyane_Castle",
+      "ContentPackRequirements": [
+        "#ContentPack_CastleBuildBuildings"
+      ],
+      "ProfessionParams": {
+        "$chg": {
+          "UnitProducer": {
+            "$type": "HordeClassLibrary::UnitProducerProfessionParams",
+            "CanProduceList": {
+              "$add": [
+                "#UnitConfig_Mage_MageHouse"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Church",
+      "Uid": "#UnitConfig_Slavyane_Church",
+      "BuildingConfig": {
+        "EmergePoint": null,
+        "EmergePoint2": null
+      },
+      "ProfessionParams": {
+        "$add": {
+          "UnitProducer": {
+            "$type": "HordeClassLibrary::UnitProducerProfessionParams",
+            "CanProduceList": [
+              "#UnitConfig_Slavyane_FireforgedWarrior"
+            ],
+            "ProductDirection": "Down",
+            "ProduceCommandConfig": "#UnitCommandConfig_Produce",
+            "IgnoreLifeDistance": false
+          }
+        }
+      },
+      "ProductionTime": 2000,
+      "EveryTickExtraWorkers": {
+        "$add": [
+          {
+            "$type": "HordeClassLibrary::KickAwayFromEntranceEveryTick"
+          }
+        ]
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Spearman",
+      "Uid": "#UnitConfig_Slavyane_FireforgedWarrior",
+      "Description": "",
+      "Name": "Паладин",
+      "MainAnimationsCatalog": "#AnimCatalog_Slavyane_FireforgedWarrior",
+      "Flags": "CanCapture",
+      "SalarySlots": 7,
+      "Shield": 3,
+      "MaxHealth": 30,
+      "ProductionTime": 2400,
+      "CostResources": {
+        "Gold": 300,
+        "Metal": 500,
+        "Lumber": 100,
+        "People": 3
+      },
+      "AllowedCommands": {
+        "$rem": [
+          "Capture"
+        ]
+      },
+      "MainArmament": {
+        "ShotParams": {
+          "Damage": 5
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Tower",
+      "Uid": "#UnitConfig_Slavyane_Tower",
+      "CostResources": {
+        "Gold": 200,
+        "Metal": 100,
+        "Lumber": 180,
+        "People": 4
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Fence",
+      "Uid": "#UnitConfig_Slavyane_Fence",
+      "CostResources": {
+        "Gold": 5,
+        "Metal": 0,
+        "Lumber": 10,
+        "People": 0
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Sawmill",
+      "Uid": "#UnitConfig_Slavyane_Sawmill",
+      "Description": "",
+      "Name": "Лесопилка",
+      "Size": {
+        "Width": 5,
+        "Height": 3
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Labor",
+      "Uid": "#UnitConfig_Slavyane_Labor",
+      "Description": "",
+      "Name": "Лаборатория",
+      "Size": {
+        "Width": 5,
+        "Height": 3
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_StoneLabor",
+      "Uid": "#UnitConfig_Slavyane_StoneLabor",
+      "Description": "",
+      "Name": "Лаборатория",
+      "Size": {
+        "Width": 5,
+        "Height": 3
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Factory",
+      "Uid": "#UnitConfig_Slavyane_Factory",
+      "Description": "",
+      "Name": "Завод",
+      "Size": {
+        "Width": 5,
+        "Height": 3
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Farm",
+      "Uid": "#UnitConfig_Slavyane_Farm",
+      "Description": "",
+      "Name": "Изба",
+      "Size": {
+        "Width": 5,
+        "Height": 3
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Barrack",
+      "Uid": "#UnitConfig_Slavyane_Barrack",
+      "Description": "",
+      "Name": "Казарма",
+      "Size": {
+        "Width": 5,
+        "Height": 3
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Stables",
+      "Uid": "#UnitConfig_Slavyane_Stables",
+      "Description": "",
+      "Name": "Конюшня",
+      "Size": {
+        "Width": 5,
+        "Height": 3
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_StoneBarrack",
+      "Uid": "#UnitConfig_Slavyane_StoneBarrack",
+      "Description": "",
+      "Name": "Казарма",
+      "Size": {
+        "Width": 5,
+        "Height": 3
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_StoneBarrack",
+      "Uid": "#UnitConfig_Slavyane_Test_Building",
+      "Description": "",
+      "Name": "тестовое здание для проверки места",
+      "Size": {
+        "Width": 7,
+        "Height": 5
+      }
+    }
+  ]
+}

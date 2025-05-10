@@ -1,0 +1,472 @@
+{
+  "FormatVersion": "v0.60pre",
+  "Force": "#Force_Mage",
+  "Items": [
+    {
+      "Archetype": "#UnitConfig_Slavyane_Heavymen",
+      "Uid": "#UnitConfig_Mage_Minotaur",
+      "Description": "Минотавр бог ближнего боя",
+      "Name": "Минотавр",
+      "MainAnimationsCatalog": "#AnimCatalog_Mage_Minotaur",
+      "PortraitCatalog": "#AnimCatalog_MinotaurPortrait",
+      "DecayCatalog": "#AnimCatalog_Slavyane_CommonDecay",
+      "SoundsCatalog": "#SoundsCatalog_Units_Nature_Bear_3d0ce32a8faa",
+      "Shield": 0,
+      "MaxHealth": 40,
+      "Weight": 20,
+      "PressureResist": 30,
+      "Flags": "FireResistant, MagicResistant",
+      "Specification": "Infantry",
+      "CostResources": {
+        "Gold": 200,
+        "Metal": 200,
+        "Lumber": 200,
+        "People": 1
+      },
+      "AllowedCommands": {
+        "$rem": [
+          "Capture"
+        ]
+      },
+      "Speeds": {
+        "Grass": 7,
+        "Forest": 0,
+        "Water": 0,
+        "Marsh": 7,
+        "Sand": 6,
+        "Mounts": 0,
+        "Road": 10,
+        "Ice": 10
+      },
+      "ProductionTime": 1200,
+      "MainArmament": {
+        "BulletConfig": "#BulletConfig_CommonMele",
+        "ShotParams": {
+          "Damage": 5,
+          "AdditiveBulletSpeed": "0.000"
+        },
+        "Range": 1,
+        "ForestRange": 1,
+        "RangeMin": 0,
+        "Levels": 2,
+        "ReloadTime": 2,
+        "BaseAccuracy": 0,
+        "MaxDistanceDispersion": 0,
+        "DisableDispersion": true,
+        "EmitBulletsCountMin": 1,
+        "EmitBulletsCountMax": 1,
+        "GunCoord": {
+          "Up": {
+            "X": 0,
+            "Y": -25
+          },
+          "RightUp": {
+            "X": 25,
+            "Y": -25
+          },
+          "Right": {
+            "X": 25,
+            "Y": -3
+          },
+          "RightDown": {
+            "X": 25,
+            "Y": 25
+          },
+          "Down": {
+            "X": 0,
+            "Y": 20
+          },
+          "LeftDown": {
+            "X": -25,
+            "Y": 25
+          },
+          "Left": {
+            "X": -25,
+            "Y": -3
+          },
+          "LeftUp": {
+            "X": -25,
+            "Y": -25
+          }
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Barrack",
+      "Uid": "#UnitConfig_Slavyane_Barrack",
+      "ProfessionParams": {
+        "$chg": {
+          "UnitProducer": {
+            "$type": "HordeClassLibrary::UnitProducerProfessionParams",
+            "CanProduceList": {
+              "$add": [
+                "#UnitConfig_Mage_Minotaur"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Mage_Minotaur",
+      "Uid": "#UnitConfig_Mage_Minotaur",
+      "ContentPackRequirements": [
+        "#ContentPack_BlacksmithMod"
+      ],
+      "TechConfig": {
+        "Requirements": {
+          "$add": [
+            "#UnitConfig_Slavyane_Blacksmith"
+          ]
+        }
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Swordmen",
+      "Uid": "#UnitConfig_Mage_Skeleton",
+      "Description": "Сжечь холопа до скелета",
+      "Name": "Скелет",
+      "MainAnimationsCatalog": "#AnimCatalog_Mage_Skeleton",
+      "PortraitCatalog": "#AnimCatalog_SkeletonPortrait",
+      "DecayCatalog": "#AnimCatalog_Slavyane_CommonDecay",
+      "SoundsCatalog": "#SoundsCatalog_Units_Mage_Skeleton",
+      "MaxHealth": 15,
+      "Flags": "Lifeless, FireResistant, MagicResistant",
+      "AllowedCommands": {
+        "MoveToPoint": "#UnitCommandConfig_MoveToPoint",
+        "HoldPosition": "#UnitCommandConfig_HoldPosition",
+        "Attack": "#UnitCommandConfig_Attack",
+        "StepAway": "#UnitCommandConfig_StepAway"
+      },
+      "Speeds": {
+        "Grass": 12,
+        "Forest": 9,
+        "Water": 0,
+        "Marsh": 12,
+        "Sand": 12,
+        "Mounts": 0,
+        "Road": 15,
+        "Ice": 15
+      },
+      "CostResources": {
+        "Gold": 0,
+        "Metal": 0,
+        "Lumber": 20,
+        "People": 1
+      },
+      "SalarySlots": 0
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Labor",
+      "Uid": "#UnitConfig_Slavyane_Labor",
+      "ProfessionParams": {
+        "$add": {
+          "UnitProducer": {
+            "$type": "HordeClassLibrary::UnitProducerProfessionParams",
+            "CanProduceList": [
+              "#UnitConfig_Mage_Skeleton"
+            ],
+            "ProductDirection": "Down",
+            "ProduceCommandConfig": "#UnitCommandConfig_Produce",
+            "IgnoreLifeDistance": false
+          }
+        }
+      },
+      "EveryTickExtraWorkers": {
+        "$add": [
+          {
+            "$type": "HordeClassLibrary::KickAwayFromEntranceEveryTick"
+          }
+        ]
+      }
+    },
+    {
+      "Uid": "#UnitConfig_Mage_MageHouse",
+      "Description": "Здесь можно привлечь отшельника к службе.",
+      "Name": "Приют отшельника",
+      "Hotkey": null,
+      "PreferredProductListPosition": {
+        "X": 0,
+        "Y": 20
+      },
+      "CitadelId": 12,
+      "Size": {
+        "Width": 5,
+        "Height": 3
+      },
+      "MainAnimationsCatalog": "#AnimCatalog_Mage_MageHouse",
+      "InForestAnimationsCatalog": null,
+      "PortraitCatalog": "#AnimCatalog_MageHousePortrait",
+      "DecayCatalog": "#AnimCatalog_Mage_MageHouseRuins",
+      "SoundsCatalog": "#SoundsCatalog_Units_Slavyane_Laboratory_f13ab37ba901",
+      "TintColor": null,
+      "Weight": 250,
+      "PressureResist": 500,
+      "Flags": "Building, Lifeless",
+      "Specification": "Lab",
+      "Shield": 4,
+      "MaxHealth": 60,
+      "MinHealth": 10,
+      "Sight": 8,
+      "ForestVision": 0,
+      "OrderDistance": 8,
+      "ChaseDistance": 0,
+      "RevengeAttackDistance": 8,
+      "Speeds": {
+        "Grass": 10,
+        "Forest": 0,
+        "Water": 0,
+        "Marsh": 10,
+        "Sand": 10,
+        "Mounts": 0,
+        "Road": 10,
+        "Ice": 0
+      },
+      "MoveType": "OnlyPlain",
+      "ReloadTime": 0,
+      "Rating": 0,
+      "MapLayer": "Main",
+      "DefaultDrawLayer": "Units",
+      "GrayFogBehavior": "KeepState",
+      "CostResources": {
+        "Gold": 2000,
+        "Metal": 2000,
+        "Lumber": 1500,
+        "People": 20
+      },
+      "ProductionTime": 3600,
+      "SalarySlots": 0,
+      "ProducedPeople": 0,
+      "AllowedCommands": {
+        "DestroySelf": "#UnitCommandConfig_DestroySelf"
+      },
+      "BuildingConfig": {
+        "EmergePoint": {
+          "X": 2,
+          "Y": 2
+        },
+        "EmergePoint2": {
+          "X": 2,
+          "Y": 3
+        },
+        "LifeDistance": 8,
+        "DestructionDustEffectConfig": "#VisualEffectConfig_BigDust",
+        "DestructionBeamsNumber": 5
+      },
+      "TechConfig": {
+        "Requirements": [
+          "#UnitConfig_Slavyane_Sawmill",
+          "#UnitConfig_Slavyane_Barrack"
+        ]
+      },
+      "ProfessionParams": {
+        "UnitProducer": {
+          "$type": "HordeClassLibrary::UnitProducerProfessionParams",
+          "CanProduceList": [
+            "#UnitConfig_Mage_Mag_2",
+            "#UnitConfig_Mage_Olga",
+            "#UnitConfig_Mage_Villur",
+            "#UnitConfig_Mage_Mag_16",
+            "#UnitConfig_Mage_Mag_15",
+          ],
+          "ProductDirection": "Down",
+          "ProduceCommandConfig": "#UnitCommandConfig_Produce",
+          "IgnoreLifeDistance": false
+        },
+        "Reparable": {
+          "$type": "HordeClassLibrary::ReparableProfessionParams",
+          "AllowRepairSelf": false,
+          "RecoverCost": {
+            "Gold": 0,
+            "Metal": 0,
+            "Lumber": 0,
+            "People": 0
+          },
+          "RecoverTime": 500,
+          "RepairCommandConfig": "#UnitCommandConfig_RepairSelf"
+        }
+      },
+      "MainArmament": null,
+      "ExtraArmament": null,
+      "GetCommandTypeWorker": {
+        "$type": "HordeClassLibrary::BaseBuildingGetCommandType"
+      },
+      "GetOrderWorker": {
+        "$type": "HordeClassLibrary::BaseBuildingGetOrder"
+      },
+      "GetSpeedAtCellWorker": {
+        "$type": "HordeClassLibrary::BaseBuildingGetSpeedAtCell"
+      },
+      "CanBePlacedWorker": {
+        "$type": "HordeClassLibrary::BaseBuildingCanBePlaced"
+      },
+      "CancelWorker": {
+        "$type": "HordeClassLibrary::BaseBuildingCancel"
+      },
+      "AnalyzeSituationWorker": {
+        "$type": "HordeClassLibrary::UnitWorkerAnalyzeSituationStub"
+      },
+      "EveryTickWorker": {
+        "$type": "HordeClassLibrary::BaseBuildingEveryTick"
+      },
+      "EveryTickExtraWorkers": [
+        {
+          "$type": "HordeClassLibrary::KickAwayFromEntranceEveryTick"
+        }
+      ],
+      "StateWorkers": {
+        "Stay": {
+          "$type": "HordeClassLibrary::BaseBuildingDoNothing"
+        },
+        "Death": {
+          "$type": "HordeClassLibrary::BaseBuildingDeath"
+        },
+        "BuildSelf": {
+          "$type": "HordeClassLibrary::BaseBuildingBuildSelf"
+        },
+        "RepairSelf": {
+          "$type": "HordeClassLibrary::BaseBuildingRepairSelf"
+        },
+        "Produce": {
+          "$type": "HordeClassLibrary::BaseBuildingProduce"
+        },
+        "ProduceAt": {
+          "$type": "HordeClassLibrary::BaseBuildingProduceAt"
+        }
+      },
+      "CitadelAnimPhases": {
+        "Building": 8,
+        "Death": 8,
+        "Stand": 10
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Mage_Mag_2",
+      "Uid": "#UnitConfig_Mage_Mag_2",
+      "Name": "Фантом",
+      "MaxHealth": 5,
+      "EveryTickExtraWorkers": {
+        "$add": [
+          {
+            "$type": "HordeClassLibrary::HealAuraEveryTick",
+            "HealPeriod": 128,
+            "HealRange": 4,
+            "HealValue": 300
+          }
+        ]
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Mage_Villur",
+      "Uid": "#UnitConfig_Mage_Villur",
+      "Name": "Виллур",
+      "MaxHealth": 10
+    },
+    {
+      "Archetype": "#UnitConfig_Mage_Mag_16",
+      "Uid": "#UnitConfig_Mage_Mag_16",
+      "Name": "Икон",
+      "MaxHealth": 10
+    },
+    {
+      "Archetype": "#UnitConfig_Mage_Olga",
+      "Uid": "#UnitConfig_Mage_Olga",
+      "Name": "Ольга",
+      "MaxHealth": 10,
+      "EveryTickExtraWorkers": {
+        "$add": [
+          {
+            "$type": "HordeClassLibrary::HealAuraEveryTick",
+            "HealPeriod": 128,
+            "HealRange": 4,
+            "HealValue": 200
+          }
+        ]
+      }
+    },
+    {
+      "Archetype": "#UnitConfig_Slavyane_Raider",
+      "Uid": "#UnitConfig_Mage_Bearmen",
+      "Description": "Всадник на медведе. Может бегать по лесу, сильно косолапит по песку",
+      "Name": "Медвежий всадник",
+      "MainAnimationsCatalog": "#AnimCatalog_Mage_Bearmen",
+      "PortraitCatalog": "#AnimCatalog_BearmenPortrait",
+      "DecayCatalog": "#AnimCatalog_Slavyane_CommonDecay",
+      "SoundsCatalog": "#SoundsCatalog_Units_Nature_Bear_3d0ce32a8faa",
+      "Shield": 2,
+      "MaxHealth": 30,
+      "Weight": 20,
+      "PressureResist": 30,
+      "Flags": "None",
+      "Specification": "Rider",
+      "CostResources": {
+        "Gold": 100,
+        "Metal": 50,
+        "Lumber": 100,
+        "People": 1
+      },
+      "Speeds": {
+        "Grass": 17,
+        "Forest": 8,
+        "Water": 0,
+        "Marsh": 17,
+        "Sand": 10,
+        "Mounts": 0,
+        "Road": 18,
+        "Ice": 15
+      },
+      "ProductionTime": 1200,
+      "MainArmament": {
+        "BulletConfig": "#BulletConfig_CommonMele",
+        "ShotParams": {
+          "Damage": 7,
+          "AdditiveBulletSpeed": "0.000"
+        },
+        "Range": 1,
+        "ForestRange": 1,
+        "RangeMin": 0,
+        "Levels": 2,
+        "ReloadTime": 2,
+        "BaseAccuracy": 0,
+        "MaxDistanceDispersion": 0,
+        "DisableDispersion": true,
+        "EmitBulletsCountMin": 1,
+        "EmitBulletsCountMax": 1,
+        "GunCoord": {
+          "Up": {
+            "X": 0,
+            "Y": -25
+          },
+          "RightUp": {
+            "X": 25,
+            "Y": -25
+          },
+          "Right": {
+            "X": 25,
+            "Y": -3
+          },
+          "RightDown": {
+            "X": 25,
+            "Y": 25
+          },
+          "Down": {
+            "X": 0,
+            "Y": 20
+          },
+          "LeftDown": {
+            "X": -25,
+            "Y": 25
+          },
+          "Left": {
+            "X": -25,
+            "Y": -3
+          },
+          "LeftUp": {
+            "X": -25,
+            "Y": -25
+          }
+        }
+      }
+    }
+  ]
+}
