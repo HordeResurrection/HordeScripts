@@ -1,3 +1,4 @@
+import { IMaraPoint } from "./IMaraPoint";
 import { MaraPoint } from "./MaraPoint";
 
 export class MaraRect {
@@ -23,7 +24,7 @@ export class MaraRect {
         )
     }
 
-    IsPointInside(point: any): boolean {
+    IsPointInside(point: IMaraPoint): boolean {
         return (
             point.X >= this.TopLeft.X && point.Y >= this.TopLeft.Y
             &&

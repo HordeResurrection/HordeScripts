@@ -1,3 +1,4 @@
+import { MaraPriority } from "../MaraPriority";
 
 export class MaraSettlementControllerSettings {
     public UnitSearch: UnitSearchSettings = new UnitSearchSettings();
@@ -6,6 +7,7 @@ export class MaraSettlementControllerSettings {
     public ControllerStates: ControllerStatesSettings = new ControllerStatesSettings();
     public ResourceMining: ResourceMiningSettings = new ResourceMiningSettings();
     public Combat: CombatSettings = new CombatSettings();
+    public Priorities: Priorities = new Priorities();
 }
 
 class UnitSearchSettings {
@@ -14,19 +16,56 @@ class UnitSearchSettings {
 }
 
 class TimeoutsSettings {
-    public RebuildEstimationThreshold: number = 2 * 60 * 50;
-    
     public MaxBuildUpProduction: number = 2 * 60 * 50;
     public MinBuildUpProduction: number = 0.5 * 60 * 50;
 
-    public UnitProductionEstimationThreshold: number = 2 * 60 * 50;
     public Exterminate: number = 5 * 60 * 50;
     public Develop: number = 2 * 60 * 50;
     
     public ExpandBuild: number = 1.5 * 60 * 50;
     public ExpandPrepare: number = 5 * 60 * 50;
+
+    public StrategyActionSuccessMinCooldown = 5 * 50;
+    public StrategyActionSuccessMaxCooldown = 20 * 50;
+
+    public StrategyActionFailReattemptMinCooldown = 20 * 50;
+    public StrategyActionFailReattemptMaxCooldown = 40 * 50;
+    
+    public StrategyActionUnavailReattemptMaxCooldown: number = 3 * 60 * 50;
+    public StrategyActionUnavailReattemptMinCooldown: number = 1 * 60 * 50;
+
+    public DefaultTaskReattemptMaxCooldown: number = 20 * 50;
+
+    public StrategyReInitMin = 30 * 60 * 50;
+    public StrategyReInitMax = 60 * 60 * 50;
+
+    public SettlementEnhanceMinCooldown = 2 * 60 * 50;
+    public SettlementEnhanceMaxCooldown = 9 * 60 * 50;
     
     public UnfinishedConstructionThreshold: number = 2 * 60 * 50;
+
+    public ResourceRequestDuration: number = 2 * 60 * 50;
+}
+
+class Priorities {
+    // Tasks
+    public SettlementDefence: MaraPriority = MaraPriority.Absolute;
+    public ExpandBuild: MaraPriority = MaraPriority.Normal;
+    public SettlementDevelopment: MaraPriority = MaraPriority.Normal;
+    public Attack: MaraPriority = MaraPriority.Normal;
+    public LandmarkCapture: MaraPriority = MaraPriority.Normal;
+    public DefenceBuild: MaraPriority = MaraPriority.Normal;
+    public ProduceAdditionalHarvesters: MaraPriority = MaraPriority.Low;
+    public ExpandUpgrade: MaraPriority = MaraPriority.Low;
+
+    // Production Requests
+    public DefenceUnitsProduction: MaraPriority = MaraPriority.Absolute;
+    public HarvesterProduction: MaraPriority = MaraPriority.Normal;
+    public HousingProduction: MaraPriority = MaraPriority.Normal;
+    public AttackUnitsProduction: MaraPriority = MaraPriority.Normal;
+    public LandmarkCaptureUnitsProduction: MaraPriority = MaraPriority.Low;
+    public PointGuardProduction: MaraPriority = MaraPriority.Low;
+    public ReinforcementUnitsProduction: MaraPriority = MaraPriority.Background;
 }
 
 class SquadsSettings {
@@ -36,22 +75,25 @@ class SquadsSettings {
     public MinCombativityIndex: number = 0.25;
     public MinStrength: number = 100;
     public DefaultMovementPrecision: number = 3;
-    public KiteTimeout: number = 8 * 50; // 8 sec
+    public KiteTimeout: number = 8 * 50;
     public KiteThresholdPositionChangeDistance: number = 5;
+    public GatherUpTimeout = 5 * 50;
 
     public DebugSquads: boolean = false;
 }
 
 class ControllerStatesSettings {
-    public BuildUpProbabilityWhenOffensePossible = 0.70;
-    public BuildUpProbabilityWhenDefensePossible = 0.30;
-    public UnnecessaryExpandProbability = 0.20;
+    public DefendedGatesCount = 5;
+    public DefendedGateMinSize = 3;
+    public DefendedGateMaxDistanceFromSettlement = 15;
     
     public ExterminatingLossRatioThreshold: number = 0.33;
     public MinAttackStrength: number = 100;
 
     public MaxHarvesterProductionBatch: number = 6;
     public MaxSameCfgIdProducerCount: number = 3;
+
+    public DevelopmentToReinforcementRatio: number = 40;
 }
 
 class ResourceMiningSettings {
@@ -68,7 +110,7 @@ class ResourceMiningSettings {
 }
 
 class CombatSettings {
-    public ExpandDefenseStrength: number = 100;
+    public PointDefenseBatchStrength: number = 100;
     public MaxCompositionUnitCount: number = 20;
     public MaxUsedOffensiveCfgIdCount: number = 4;
     public MaxUsedDefensiveCfgIdCount: number = 1;

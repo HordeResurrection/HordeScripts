@@ -103,7 +103,7 @@ export class MaraSquadIdleState extends MaraSquadState {
         }
     }
 
-    private forestCellFilter(cell: any): boolean {
+    private forestCellFilter(cell: MaraPoint): boolean {
         let point = new MaraPoint(cell.X, cell.Y);
         let tileType = MaraMap.GetTileType(point);
 

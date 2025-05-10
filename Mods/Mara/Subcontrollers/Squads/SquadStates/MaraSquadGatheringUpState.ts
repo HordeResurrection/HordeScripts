@@ -4,6 +4,8 @@ import { MaraSquadState } from "./MaraSquadState";
 import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
 
 export abstract class MaraSquadGatheringUpState extends MaraSquadState {
+    private startTick: number | null = null;
+    
     OnEntry(): void {
         if (this.squad.CurrentMovementPoint) {
             let closestToTargetUnit: MaraUnitCacheItem | null = null;
@@ -27,6 +29,10 @@ export abstract class MaraSquadGatheringUpState extends MaraSquadState {
     OnExit(): void {}
     
     Tick(tickNumber: number): void {
+        if (this.startTick == null) {
+            this.startTick = tickNumber;
+        }
+        
         if (this.squad.IsEnemyNearby()) {
             this.squad.SetState(new MaraSquadBattleState(this.squad));
             return;
@@ -43,6 +49,11 @@ export abstract class MaraSquadGatheringUpState extends MaraSquadState {
             this.onGatheredUp();
             return;
         }
+
+        if (tickNumber - this.startTick > this.squad.Controller.SquadsSettings.GatherUpTimeout) {
+            this.onGatheredUp();
+            return;
+        }
     }
 
     protected abstract onGatheredUp(): void;
@@ -50,6 +61,6 @@ export abstract class MaraSquadGatheringUpState extends MaraSquadState {
     private distanceToTargetCell(unit: MaraUnitCacheItem): number {
         let pathLength = MaraUtils.GetUnitPathLength(unit);
 
-        return pathLength ?? MaraUtils.ChebyshevDistance(unit.UnitCell, this.squad.CurrentMovementPoint);
+        return pathLength ?? MaraUtils.ChebyshevDistance(unit.UnitCell, this.squad.CurrentMovementPoint!);
     }
 }

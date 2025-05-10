@@ -1,5 +1,6 @@
+import { IMaraPoint } from "./IMaraPoint";
 
-export class MaraPoint {
+export class MaraPoint implements IMaraPoint {
     public readonly X: number;
     public readonly Y: number;
 

@@ -10,24 +10,24 @@ import { MaraPoint } from "../../../Common/MaraPoint";
 import { MaraMap } from "../../../Common/MapAnalysis/MaraMap";
 import { MaraUnitCacheItem } from "../../../Common/Cache/MaraUnitCacheItem";
 import { MaraUnitConfigCache } from "../../../Common/Cache/MaraUnitConfigCache";
-import { Mara } from "../../../Mara";
+import { IMaraPoint } from "../../../Common/IMaraPoint";
 
 class MaraThreatMap extends MaraCellDataHolder {
     constructor () {
         super();
     }
 
-    Get(cell: any): any {
+    Get(cell: IMaraPoint): any {
         let index = this.makeIndex(cell);
         return (this.data[index] ?? 0);
     }
 
-    Set(cell: any, value: any) {
+    Set(cell: IMaraPoint, value: any) {
         let index = this.makeIndex(cell);
         this.data[index] = value;
     }
 
-    Add(cell: any, value: any): void {
+    Add(cell: IMaraPoint, value: any): void {
         let index = this.makeIndex(cell);
         let threat = (this.data[index] ?? 0) + value;
         this.data[index] = threat;
@@ -39,12 +39,12 @@ class MaraCellHeuristics extends MaraCellDataHolder {
         super();
     }
 
-    Get(cell: any): any {
+    Get(cell: IMaraPoint): any {
         let index = this.makeIndex(cell);
         return this.data[index];
     }
 
-    Set(cell: any, value: any) {
+    Set(cell: IMaraPoint, value: any) {
         let index = this.makeIndex(cell);
         this.data[index] = value;
     }
@@ -55,27 +55,27 @@ class MaraReservedCellData extends MaraCellDataHolder {
         super();
     }
 
-    Get(cell: any): any {
+    Get(cell: IMaraPoint): any {
         let index = this.makeIndex(cell);
         return (this.data[index] ?? false);
     }
 
-    Set(cell: any, value: any) {
+    Set(cell: IMaraPoint, value: any) {
         let index = this.makeIndex(cell);
         this.data[index] = value;
     }
 }
 
 export class MaraSquadBattleState extends MaraSquadState {
-    private enemySquads: Array<MaraSquad>;
-    private enemyUnits: Array<MaraUnitCacheItem>;
-    private threatMap: MaraThreatMap;
-    private cellHeuristics: MaraCellHeuristics;
-    private reservedCells: MaraReservedCellData;
+    private enemySquads: Array<MaraSquad> = [];
+    private enemyUnits: Array<MaraUnitCacheItem> = [];
+    private threatMap: MaraThreatMap = new MaraThreatMap();
+    private cellHeuristics: MaraCellHeuristics = new MaraCellHeuristics();
+    private reservedCells: MaraReservedCellData = new MaraReservedCellData();
 
-    private initialLocation: MaraSquadLocation;
-    private lastNonKitedTick: number;
-    private initialEnemyLocation: MaraPoint;
+    private initialLocation: MaraSquadLocation | null = null;
+    private lastNonKitedTick: number = Infinity;
+    private initialEnemyLocation: MaraPoint | null = null;
     
     OnEntry(): void {
         this.updateThreats();
@@ -118,7 +118,7 @@ export class MaraSquadBattleState extends MaraSquadState {
             }
 
             if (this.isKitingDetected(tickNumber)) {
-                this.squad.SetState(new MaraSquadPullbackState(this.squad, this.initialLocation.Point));
+                this.squad.SetState(new MaraSquadPullbackState(this.squad, this.initialLocation!.Point));
                 return;
             }
 
@@ -145,7 +145,7 @@ export class MaraSquadBattleState extends MaraSquadState {
         let isNoAttackForTooLong = tickNumber - this.lastNonKitedTick >= this.squad.Controller.SquadsSettings.KiteTimeout;
         
         let isEnemyMovedTooFar = 
-            MaraUtils.ChebyshevDistance(this.initialEnemyLocation, currentEnemyLocation) > this.squad.Controller.SquadsSettings.KiteThresholdPositionChangeDistance;
+            MaraUtils.ChebyshevDistance(this.initialEnemyLocation!, currentEnemyLocation) > this.squad.Controller.SquadsSettings.KiteThresholdPositionChangeDistance;
 
         return isNoAttackForTooLong && isEnemyMovedTooFar;
     }
@@ -219,7 +219,7 @@ export class MaraSquadBattleState extends MaraSquadState {
         this.squad.Debug(`distrubuting targets. enemies:`);
         
         for (let enemy of this.enemyUnits) {
-            this.squad.Debug(enemy.Unit.ToString());
+            this.squad.Debug(enemy.Unit.ToString()!);
         }
         
         this.reservedCells = new MaraReservedCellData();
@@ -477,7 +477,7 @@ export class MaraSquadBattleState extends MaraSquadState {
         }
     }
 
-    private calcCellHeuristic(targetCell: any, unit: MaraUnitCacheItem): number {
+    private calcCellHeuristic(targetCell: IMaraPoint, unit: MaraUnitCacheItem): number {
         let occupyingUnit = MaraUtils.GetUnit(targetCell);
         
         if (occupyingUnit && occupyingUnit.UnitId != unit.UnitId) {

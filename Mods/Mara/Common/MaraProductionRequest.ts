@@ -1,112 +1,49 @@
-import { BuildTracker } from "library/mastermind/mastermind-types";
-import { MaraUtils } from "../MaraUtils";
 import { MaraUnitCacheItem } from "./Cache/MaraUnitCacheItem";
-import { MaraPoint } from "./MaraPoint";
+import { MaraPriority } from "./MaraPriority";
+import { MaraProductionRequestItem } from "./MaraProductionRequestItem";
 
 export class MaraProductionRequest {
-    public ConfigId: string;
-    public Point: MaraPoint | null;
-    public Precision: number | null;
+    private static idSequence = 0;
+    
     public IsForce: boolean = false;
-    public ProducedUnit: any = null;
     public Executor: MaraUnitCacheItem | null = null;
+    public Items: Array<MaraProductionRequestItem>;
+    public readonly Id: number;
+    public readonly Priority: MaraPriority;
 
-    public get MasterMindRequest(): any {
-        return this.masterMindRequest;
-    }
+    private isCancelled = false;
 
-    public set MasterMindRequest(value: any) {
-        this.masterMindRequest = value;
-
-        if (value == null) {
-            return;
-        }
-
-        let that = this;
-
-        this.trackerChangedHandler = this.masterMindRequest.TrackerChanged.connect(
-            function (sender, args) {
-                let tracker = MaraUtils.GetPropertyValue(args, "NewTracker");
-                let buildTracker;
-
-                try {
-                    buildTracker = MaraUtils.CastToType(tracker, BuildTracker);
-
-                    if (!buildTracker) {
-                        return;
-                    }
-                }
-                catch (ex) {
-                    return;
-                }
-
-                let unit = MaraUtils.GetPropertyValue(buildTracker, "TrackUnit");
-                that.ProducedUnit = unit;
-            }
-        );
-    }
-
-    private masterMindRequest: any = null;
-    private trackerChangedHandler: any = null;
-
-    constructor(
-        configId: string,
-        point: MaraPoint | null,
-        precision: number | null,
-        isForce?: boolean
-    ) {
-        this.ConfigId = configId;
-        this.Point = point;
-        this.Precision = precision;
-
-        if (isForce != null) {
-            this.IsForce = isForce;
-        }
-        else {
-            this.IsForce = false;
-        }
+    public get IsExecuting(): boolean {
+        return this.Items.find((i) => i.IsExecuting) != undefined;
     }
 
     public get IsCompleted(): boolean {
-        if (this.MasterMindRequest) {
-            return !this.MasterMindRequest.State.IsUnfinished();
-        }
-        else {
-            return false;
-        }
+        return this.Items.every((i) => i.IsCompleted);
     }
 
-    public get IsSuccess(): boolean {
-        if (this.MasterMindRequest) {
-            return this.MasterMindRequest.State.IsSuccessfullyCompleted();
-        }
-        else {
-            return false;
-        }
+    public get IsCancelled(): boolean {
+        return this.isCancelled;
     }
+    
+    constructor(
+        items: Array<MaraProductionRequestItem>,
+        priority: MaraPriority,
+        isForce?: boolean
+    ) {
+        this.Items = items;
+        this.Items.forEach((i) => i.ParentRequest = this);
+        this.Priority = priority;
+        this.IsForce = isForce ?? false;
 
-    public WipeResults(): void {
-        this.ProducedUnit = null;
-        this.masterMindRequest = null;
-        this.Executor = null;
-    }
-
-    public OnProductionFinished(): void {
-        if (this.trackerChangedHandler) {
-            this.trackerChangedHandler.disconnect();
-        }
+        MaraProductionRequest.idSequence ++;
+        this.Id = MaraProductionRequest.idSequence;
     }
 
     public ToString(): string {
-        let location: string;
+        return `(${this.Priority}) ` + this.Items.map((i) => i.ToString()).join("\n");
+    }
 
-        if (this.Point) {
-            location = this.Point.ToString();
-        }
-        else {
-            location = "any location";
-        }
-
-        return `${this.ConfigId} at (${location}):${this.Precision}`;
+    public Cancel(): void {
+        this.isCancelled = true;
     }
 }

@@ -2,19 +2,20 @@ import { MaraSettlementController } from "../../MaraSettlementController";
 import { MaraUtils } from "../../MaraUtils";
 
 class SelectionResult {
-    ConfigData: Map<string, CfgIdSelectionItem>;
+    ConfigData: Map<string, CfgIdSelectionItem> = new Map<string, CfgIdSelectionItem>();
     LowestTechCfgId: string = "";
 }
 
 class CfgIdSelectionItem {
-    CfgId: string;
-    ProductionChain: Array<string>;
+    CfgId: string = "";
+    ProductionChain: Array<string> = [];
 }
 
 export class SettlementGlobalStrategy {
-    OffensiveCfgIds: Array<CfgIdSelectionItem>;
-    DefensiveBuildingsCfgIds: Array<CfgIdSelectionItem>;
-    LowestTechOffensiveCfgId: string;
+    OffensiveCfgIds: Array<CfgIdSelectionItem> = [];
+    DefensiveBuildingsCfgIds: Array<CfgIdSelectionItem> = [];
+    AuxCfgIds: Array<CfgIdSelectionItem> = [];
+    LowestTechOffensiveCfgId: string = "";
     
     private isInited: boolean = false;
 
@@ -56,9 +57,36 @@ export class SettlementGlobalStrategy {
 
         this.DefensiveBuildingsCfgIds = Array.from(defensiveResults.ConfigData.values());
 
+        let availableWalkableCfgs = availableCfgIds.filter(
+            (value) => MaraUtils.IsWalkableConfigId(value)
+        );
+
+        let walkableResults = this.initCfgIdsType(
+            settlementController, 
+            availableWalkableCfgs, 
+            1
+        );
+
+        this.AuxCfgIds = Array.from(walkableResults.ConfigData.values());
+
         settlementController.Debug(`Inited global strategy`);
-        settlementController.Debug(`Offensive CfgIds: ${this.OffensiveCfgIds.map((value) => value.CfgId).join(", ")}`);
-        settlementController.Debug(`Defensive CfgIds: ${this.DefensiveBuildingsCfgIds.map((value) => value.CfgId).join(", ")}`);
+        settlementController.Debug(`Offensive CfgIds: ${this.printSelectionItems(this.OffensiveCfgIds)}`);
+        settlementController.Debug(`Defensive CfgIds: ${this.printSelectionItems(this.DefensiveBuildingsCfgIds)}`);
+        settlementController.Debug(`Auxiliary CfgIds: ${this.printSelectionItems(this.AuxCfgIds)}`);
+    }
+
+    private printSelectionItems(items: Array<CfgIdSelectionItem>): string {
+        let result = "";
+
+        for (let item of items) {
+            result += item.CfgId + ":\n";
+
+            for (let chainItem of item.ProductionChain) {
+                result += `\t${chainItem}\n`;
+            }
+        }
+
+        return result;
     }
 
     private initCfgIdsType(

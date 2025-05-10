@@ -78,4 +78,15 @@ export class MaraResources {
 
         return result;
     }
+
+    public Add(other: MaraResources): void {
+        other.resources.forEach(
+            (v, k) => {
+                let thisValue = this.resources.get(k) ?? 0;
+                let otherValue = other.resources.get(k) ?? 0;
+                
+                this.resources.set(k, thisValue + otherValue);
+            }
+        )
+    }
 }

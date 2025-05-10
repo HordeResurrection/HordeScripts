@@ -16,6 +16,7 @@ export class MaraRegion {
 
     constructor(cells: Array<MaraPoint>) {
         this.cellsIndex = new MaraCellIndex();
+        this.center = new MaraPoint(0, 0);
 
         this.addCells(cells);
     }

@@ -2,12 +2,13 @@ import { MaraUtils } from "Mara/MaraUtils";
 import { MaraSquadState } from "./MaraSquadState";
 import { MaraSquadBattleState } from "./MaraSquadBattleState";
 import { MaraControllableSquad } from "../MaraControllableSquad";
+import { MaraPoint } from "../../../Common/MaraPoint";
 
 export class MaraSquadPullbackState extends MaraSquadState {
-    private timeoutTick: number;
-    private pullbackCell: any;
+    private timeoutTick: number = Infinity;
+    private pullbackCell: MaraPoint;
 
-    constructor(squad: MaraControllableSquad, pullbackCell: any) {
+    constructor(squad: MaraControllableSquad, pullbackCell: MaraPoint) {
         super(squad);
         this.pullbackCell = pullbackCell;
     }

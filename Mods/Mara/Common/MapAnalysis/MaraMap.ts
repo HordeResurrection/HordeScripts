@@ -4,29 +4,37 @@ import { MaraResourceCluster } from "./MaraResourceCluster";
 import { MaraUtils } from "../../MaraUtils";
 import { Mara } from "../../Mara";
 import { MaraCellIndex } from "./MaraCellIndex";
-import { TileType } from "library/game-logic/horde-types";
+import { ResourceTile, ResourceTileType, Settlement, TileType, Unit, UnitBuildingCompleteEventArgs, UnitConfig } from "library/game-logic/horde-types";
 import { MaraUnwalkableRegion } from "./MaraUnwalkableRegion";
 import { MaraRegion } from "./MaraRegion";
 import { MaraRegionIndex } from "./MaraRegionIndex";
 import { MaraMapNode } from "./MaraMapNode";
 import { MaraMapNodeType } from "./MaraMapNodeType";
-import { createHordeColor } from "library/common/primitives";
+import { createHordeColor, HordeColor } from "library/common/primitives";
 import { MaraPath } from "./MaraPath";
-import SortedSet from "./SortedSet.js"
+import SortedSet from "../SortedSet.js"
 import RBush from "../RBush/rbush.js"
 import { MaraRect } from "../MaraRect";
+import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
+import { MaraMapNodeLink } from "./MaraMapNodeLink";
+import { MaraUnitCacheItem } from "../Cache/MaraUnitCacheItem";
+import { IMaraPoint } from "../IMaraPoint";
+import { MasterMind } from "library/mastermind/mastermind-types";
+
+type UnitsListChangedEventArgs = HordeClassLibrary.World.Settlements.Modules.SettlementUnits.UnitsListChangedEventArgs;
+type ChangesObtainer = HordeClassLibrary.World.ScenaComponents.TickChanges.TickChangesObtainer<HordeClassLibrary.World.ScenaComponents.Intrinsics.ResourcesMapModification>;
 
 class TileTypeCache extends MaraCellDataHolder {
     constructor () {
         super();
     }
 
-    Get(cell: any): any {
+    Get(cell: IMaraPoint): TileType | null {
         let index = this.makeIndex(cell);
         return this.data[index];
     }
 
-    Set(cell: any, value: any) {
+    Set(cell: IMaraPoint, value: TileType | null) {
         let index = this.makeIndex(cell);
         this.data[index] = value;
     }
@@ -37,12 +45,12 @@ class ClusterData extends MaraCellDataHolder {
         super();
     }
 
-    Get(cell: any): any {
+    Get(cell: IMaraPoint): any {
         let index = this.makeIndex(cell);
         return this.data[index];
     }
 
-    Set(cell: any, value: any) {
+    Set(cell: IMaraPoint, value: any) {
         let index = this.makeIndex(cell);
         this.data[index] = value;
     }
@@ -75,6 +83,13 @@ export class MaraMap {
     public static readonly RESOURCE_CLUSTER_SIZE = 8;
     public static readonly RESOURCE_CLUSTER_MAX_MINERAL_CELLS = 9;
     private static readonly MAX_PATH_COUNT = 10;
+
+    private static readonly WALKABLE_TO_WALKABLE_COST = 1;
+    private static readonly WALKABLE_TO_UNWALKABLE_COST = 2;
+    private static readonly UNWALKABLE_TO_WALKABLE_COST = 1;
+    private static readonly UNWALKABLE_TO_UNWALKABLE_COST = 20;
+
+    private static readonly REACHABLE_CELL_SEARCH_RADIUS = 5;
     
     private static tileTypeCache: TileTypeCache = new TileTypeCache();
     
@@ -83,16 +98,19 @@ export class MaraMap {
     private static nodeIndex: MaraRegionIndex;
 
     private static DEBUG_RESOURCES = false;
-    private static resourceMapMonitor: any;
-    private static resourceData: Array<Array<any>> = [];
+    private static resourceMapMonitor: ChangesObtainer;
+    private static resourceData: Array<Array<ResourceTile>> = [];
     private static clusterData: ClusterData = new ClusterData();
     private static clusterSpatialIndex: RBush;
 
     private static unitBuildHandlers: Map<number, any>;
+
+    private static cellsCache: Map<string, MaraPoint>;
     
     public static Init(): void {
         MaraMap.resourceMapMonitor = MaraUtils.GetScena().ResourcesMap.CreateChangesObtainer("resource monitor");
         MaraMap.unitBuildHandlers = new Map<number, any>();
+        MaraMap.cellsCache = new Map<string, MaraPoint>();
         
         Mara.Debug(`Analyzing terrain...`);
         MaraMap.buildMap();
@@ -128,7 +146,7 @@ export class MaraMap {
         });
     }
 
-    static GetCellMineralType(x: number, y: number): any {
+    static GetCellMineralType(x: number, y: number): ResourceTileType {
         let res = MaraMap.resourceData[x][y];
         return res.ResourceType;
     }
@@ -147,7 +165,38 @@ export class MaraMap {
         MaraMap.clusterData.Set(cell, cluster);
     }
 
-    static GetPaths(from: MaraPoint, to: MaraPoint): Array<MaraPath> {
+    static GetShortestPath(from: MaraPoint, to: MaraPoint, unwalkableNodeTypesToInclude: Array<TileType> = []): MaraPath | null {
+        let fromNode = MaraMap.mapNodes.find((n) => n.Region.HasCell(from));
+
+        if (!fromNode) {
+            return null;
+        }
+
+        let toNode = MaraMap.mapNodes.find((n) => n.Region.HasCell(to));
+
+        if (!toNode) {
+            return null;
+        }
+
+        MaraMap.initPathfinding(unwalkableNodeTypesToInclude);
+
+        //let path = MaraMap.dijkstraPath(fromNode, toNode, MaraMap.mapNodes);
+        let path = MaraMap.aStarPath(
+            fromNode, 
+            toNode, 
+            MaraMap.aStarHeuristic,
+            MaraMap.mapNodes
+        );
+
+        if (path.length == 0) {
+            return null;
+        }
+        else {
+            return new MaraPath(path);
+        }
+    }
+
+    static GetPaths(from: MaraPoint, to: MaraPoint, unwalkableNodeTypesToInclude: Array<TileType> = []): Array<MaraPath> {
         let fromNode = MaraMap.mapNodes.find((n) => n.Region.HasCell(from));
 
         if (!fromNode) {
@@ -159,17 +208,15 @@ export class MaraMap {
         if (!toNode) {
             return [];
         }
+
+        MaraMap.initPathfinding(unwalkableNodeTypesToInclude);
         
         let paths: Array<MaraPath> = [];
-        
-        MaraMap.mapNodes.forEach((n) => {
-            n.Weigth = n.Type != MaraMapNodeType.Unwalkable ? 1 : Infinity;
-        });
-
         const WEIGTH_INCREMENT = 100;
 
         while (paths.length < MaraMap.MAX_PATH_COUNT) {
-            let path = MaraMap.dijkstraPath(fromNode, toNode, MaraMap.mapNodes);
+            //let path = MaraMap.dijkstraPath(fromNode, toNode, MaraMap.mapNodes);
+            let path = MaraMap.aStarPath(fromNode, toNode, MaraMap.aStarHeuristic, MaraMap.mapNodes);
             
             if (path.length == 0) { // not found
                 return [];
@@ -180,23 +227,14 @@ export class MaraMap {
             }
             else {
                 path.forEach((v) => v.Weigth += WEIGTH_INCREMENT);
-                
-                let cleanPath = path.filter((n) => n != fromNode && n != toNode);
-                let gateCenters = cleanPath.map((v) => v.Region.Center);
-                
-                let resultNodes: Array<MaraPoint> = [];
-                resultNodes.push(from);
-                resultNodes.push(...gateCenters);
-                resultNodes.push(to);
-
-                paths.push(new MaraPath(resultNodes));
+                paths.push(new MaraPath(path));
             }
         }
 
         return paths;
     }
 
-    static GetTileType(cell: MaraPoint): any {
+    static GetTileType(cell: MaraPoint): TileType | null {
         let tileType = MaraMap.tileTypeCache.Get(cell);
 
         if (!tileType) {
@@ -223,11 +261,11 @@ export class MaraMap {
         }
 
         for (let node of overlappedNodes) {
-            for (let neighbour of node.Neighbours) {
-                neighbour.Neighbours = neighbour.Neighbours.filter((n) => n != node);
+            for (let link of node.Links) {
+                link.Node.Links = link.Node.Links.filter((n) => n.Node != node);
             }
 
-            node.Neighbours = [];
+            node.Links = [];
         }
 
         overlappedNodes = overlappedNodes.filter((n) => n.Region.Cells.length > 0);
@@ -260,6 +298,278 @@ export class MaraMap {
         }) as Array<MaraResourceClusterBushItem>;
 
         return cacheItems.map((i) => i.ResourceCluster);
+    }
+
+    static GetMapNode(cell: MaraPoint): MaraMapNode | undefined {
+        return MaraMap.mapNodes.find((n) => n.Region.HasCell(cell));
+    }
+
+    static GetAllNodes(nodeType: MaraMapNodeType): Array<MaraMapNode> {
+        return this.mapNodes.filter((n) => n.Type == nodeType);
+    }
+
+    static ConnectMapNodesByBridge(nodesPath: Array<MaraMapNode>, bridgeConfigId: string, masterMind: MasterMind): Array<MaraRect> {
+        return []; //TODO: temporarily disable bridge building, remove this
+        
+        if (nodesPath.length < 3) {
+            return [];
+        }
+        
+        let sourceNode = nodesPath[0];
+        let firstUnwalkableNode = nodesPath[1];
+        let sourceCells = MaraMap.getNeighbourCells(firstUnwalkableNode, sourceNode);
+
+        let destNode = nodesPath[nodesPath.length - 1];
+        let lastUnwalkableNode = nodesPath[nodesPath.length - 2];
+        let destCells = MaraMap.getNeighbourCells(lastUnwalkableNode, destNode);
+
+        const RETRY_COUNT = 3;
+
+        for (let i = 0; i < RETRY_COUNT; i ++) {
+            let sourceCell = MaraUtils.RandomSelect(masterMind, sourceCells)!;
+
+            let destCellsData = destCells.map(
+                (v) => {
+                    return {
+                        Distance: MaraUtils.EuclidDistance(sourceCell, v),
+                        Cell: v
+                    }
+                }
+            );
+
+            let destCell = MaraUtils.FindExtremum(destCellsData, (candidate, extremum) => extremum.Distance - candidate.Distance)!.Cell;
+
+            let bridgeSections = MaraMap.markupBridge(sourceCell, destCell, bridgeConfigId);
+
+            if (MaraMap.validateBridge(bridgeSections, sourceNode, destNode)) {
+                return bridgeSections;
+            }
+        }
+        
+        return [];
+    }
+
+    static UpdatePathForUnit(unit: MaraUnitCacheItem, path: Array<MaraPoint>): Array<MaraPoint> {
+        let updatedPath = new Array<MaraPoint>();
+
+        let unitMovementType = MaraUtils.GetConfigIdMoveType(unit.UnitCfgId);
+
+        for (let cell of path) {
+            let cellKey = unitMovementType + cell.ToString();
+            
+            let reachableCell = MaraMap.cellsCache.get(cellKey);
+            
+            if (!reachableCell) {
+                let closestCell = MaraUtils.FindClosestCell(
+                    cell, 
+                    MaraMap.REACHABLE_CELL_SEARCH_RADIUS,
+                    (cell) => MaraUtils.IsCellReachable(cell, unit)
+                );
+
+                if (closestCell) {
+                    MaraMap.cellsCache.set(cellKey, closestCell);
+                    reachableCell = closestCell;
+                }
+                else {
+                    reachableCell = cell;
+                }
+            }
+
+            updatedPath.push(reachableCell);
+        }
+        
+        return updatedPath;
+    }
+
+    private static initPathfinding(unwalkableNodeTypesToInclude: Array<TileType>): void {
+        const UNWALKABLE_NODE_INITIAL_WEIGTH = 500;
+        
+        MaraMap.mapNodes.forEach((n) => {
+            if (n.Type != MaraMapNodeType.Unwalkable) {
+                n.Weigth = 1;
+            }
+            else if (
+                unwalkableNodeTypesToInclude.findIndex((v) => v == n.TileType) > -1
+            ) {
+                n.Weigth = UNWALKABLE_NODE_INITIAL_WEIGTH;
+            }
+            else {
+                n.Weigth = Infinity;
+            }
+        });
+    }
+
+    private static validateBridge(bridgeSections: Array<MaraRect>, sourceNode: MaraMapNode, destNode: MaraMapNode): boolean {
+        if (bridgeSections.length == 0) {
+            return false;
+        }
+
+        return (
+            MaraMap.isBridgeSectionNeighboursNode(bridgeSections[0], sourceNode) &&
+            MaraMap.isBridgeSectionNeighboursNode(bridgeSections[bridgeSections.length - 1], destNode)
+        )
+    }
+
+    private static isBridgeSectionNeighboursNode(section: MaraRect, node: MaraMapNode): boolean {
+        for (let x = section.TopLeft.X - 1; x <= section.BottomRight.X + 1; x ++) {
+            for (let y = section.TopLeft.Y - 1; y <= section.BottomRight.Y + 1; y ++) {
+                let cell = new MaraPoint(x, y);
+                
+                if (node.Region.HasCell(cell)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static getNeighbourCells(node1: MaraMapNode, node2: MaraMapNode): Array<MaraPoint> {
+        let result: Array<MaraPoint> = [];
+
+        MaraMap.processAllNeighbours(
+            node1,
+            MaraMap.nodeIndex,
+            true,
+            (neighbourCell, neighbourNode) => {
+                if (
+                    node2.Region.HasCell(neighbourCell) &&
+                    !result.find((v) => v == neighbourCell)
+                ) {
+                    result.push(neighbourCell);
+                }
+            }
+        );
+
+        return result
+    }
+
+    private static markupBridge(from: MaraPoint, to: MaraPoint, bridgeConfigId: string): Array<MaraRect> {
+        let coveredCells = new MaraCellIndex();
+        let cellsToCover = MaraUtils.MakeLine(from, to);
+        let bridgeConfig = MaraUtils.GetUnitConfig(bridgeConfigId);
+    
+        if (!cellsToCover[0].EqualsTo(from)) {
+            cellsToCover.reverse();
+        }
+    
+        let bridgeWidth = MaraUtils.GetConfigIdWidth(bridgeConfigId);
+        let bridgeHeigth = MaraUtils.GetConfigIdHeight(bridgeConfigId);
+        let offset = new MaraPoint(0, 0);
+        let result = new Array<MaraRect>();
+    
+        for (let i = 0; i < cellsToCover.length; i ++) {
+            let currentCell = cellsToCover[i];
+            
+            if (coveredCells.Get(currentCell)) {
+                continue;
+            }
+    
+            let bridgeSectionPosition = currentCell.Shift(offset);
+    
+            if (
+                !MaraMap.isBridgeCanBePlaced(
+                    bridgeConfig, 
+                    bridgeWidth, 
+                    bridgeHeigth,
+                    bridgeSectionPosition, 
+                    coveredCells
+                )
+            ) {
+                let newOffset = MaraMap.recalcBridgeSectionOffset(
+                    bridgeConfig, 
+                    bridgeWidth, 
+                    bridgeHeigth, 
+                    currentCell, 
+                    coveredCells
+                );
+    
+                if (newOffset) {
+                    offset = newOffset;
+                    bridgeSectionPosition = currentCell.Shift(offset);
+                }
+                else {
+                    if (result.length == 0) {
+                        continue;
+                    }
+                    else {
+                        return result;
+                    }
+                }
+            }
+    
+            let bridgeBottomRight = new MaraPoint(
+                bridgeSectionPosition.X + bridgeWidth - 1,
+                bridgeSectionPosition.Y + bridgeHeigth - 1
+            );
+    
+            let newSection = new MaraRect(
+                bridgeSectionPosition,
+                bridgeBottomRight
+            );
+    
+            result.push(newSection);
+    
+            for (let x = bridgeSectionPosition.X; x <= bridgeBottomRight.X; x ++) {
+                for (let y = bridgeSectionPosition.Y; y <= bridgeBottomRight.Y; y ++) {
+                    coveredCells.Set(new MaraPoint(x, y), true);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    private static isBridgeCanBePlaced(
+        bridgeConfig: UnitConfig, 
+        bridgeWidth: number, 
+        bridgeHeigth: number, 
+        position: MaraPoint, 
+        coveredCells: MaraCellIndex
+    ): boolean {
+        if (!unitCanBePlacedByRealMap(bridgeConfig, position.X, position.Y)) {
+            return false;
+        }
+        
+        let bridgeBottomRight = new MaraPoint(
+            position.X + bridgeWidth - 1,
+            position.Y + bridgeHeigth - 1
+        );
+    
+        let sectionRect = new MaraRect(
+            position,
+            bridgeBottomRight
+        );
+    
+        for (let x = sectionRect.TopLeft.X; x <= sectionRect.BottomRight.X; x ++) {
+            for (let y = sectionRect.TopLeft.Y; y <= sectionRect.BottomRight.Y; y ++) {
+                if (coveredCells.Get(new MaraPoint(x, y))) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    private static recalcBridgeSectionOffset(
+        bridgeConfig: UnitConfig, 
+        bridgeWidth: number, 
+        bridgeHeigth: number, 
+        position: MaraPoint, 
+        coveredCells: MaraCellIndex
+    ): MaraPoint | null {
+        for (let row = Math.max(position.Y - bridgeHeigth + 1, 0); row <= position.Y; row ++) {
+            for (let col = Math.max(position.X - bridgeWidth + 1, 0); col <= position.X; col ++) {
+                let newPosition = new MaraPoint(col, row);
+                
+                if (MaraMap.isBridgeCanBePlaced(bridgeConfig, bridgeWidth, bridgeHeigth, newPosition, coveredCells)) {
+                    return new MaraPoint(col - position.X, row - position.Y);
+                }
+            }
+        }
+    
+        return null;
     }
 
     private static buildMap(): void {
@@ -518,7 +828,7 @@ export class MaraMap {
                     else {
                         let pairCell = cellPairs[closestBackCellIndex][1];
                         
-                        if (closestDistance < MaraUtils.EuclidDistance(pairCell, closestCell)) {
+                        if (closestDistance < MaraUtils.EuclidDistance(pairCell, closestCell!)) {
                             cellPairs[closestBackCellIndex][1] = sourceCell;
                         }
                     }
@@ -648,27 +958,42 @@ export class MaraMap {
 
     private static linkMap(mapNodes: Array<MaraMapNode>, nodeIndex: MaraRegionIndex, diagonalLinking: boolean): void {
         for (let node of mapNodes) {
-            for (let cell of node.Region.Cells) {
-                
-                let shiftVectors = [
-                    new MaraPoint(0, 1)
-                ];
-
-                if (diagonalLinking) {
-                    shiftVectors.push(new MaraPoint(1, 1))
+            MaraMap.processAllNeighbours(
+                node, 
+                nodeIndex,
+                diagonalLinking,
+                (neighbourCell, neighbourNode) => {
+                    MaraMap.linkNodes(node, neighbourNode);
                 }
+            )
+        }
+    }
 
-                for (let i = 0; i < 4; i ++) {
-                    for (let i = 0; i < shiftVectors.length; i ++) {
-                        shiftVectors[i] = shiftVectors[i].Rotate90DegreesCcw();
+    private static processAllNeighbours(
+        mapNode: MaraMapNode, 
+        nodeIndex: MaraRegionIndex, 
+        includeDiagonals: boolean,
+        neighbourProcessor: (neighbourCell: MaraPoint, neighbourNode: MaraMapNode) => void
+    ): void {
+        for (let cell of mapNode.Region.Cells) {
+            let shiftVectors = [
+                new MaraPoint(0, 1)
+            ];
 
-                        let vector = shiftVectors[i];
-                        let neighbourCell = cell.Shift(vector);
-                        let neighbourNode = nodeIndex.Get(neighbourCell);
+            if (includeDiagonals) {
+                shiftVectors.push(new MaraPoint(1, 1))
+            }
 
-                        if (neighbourNode && neighbourNode != node) {
-                            MaraMap.linkNodes(node, neighbourNode);
-                        }
+            for (let i = 0; i < 4; i ++) {
+                for (let i = 0; i < shiftVectors.length; i ++) {
+                    shiftVectors[i] = shiftVectors[i].Rotate90DegreesCcw();
+
+                    let vector = shiftVectors[i];
+                    let neighbourCell = cell.Shift(vector);
+                    let neighbourNode = nodeIndex.Get(neighbourCell);
+
+                    if (neighbourNode && neighbourNode != mapNode) {
+                        neighbourProcessor(neighbourCell, neighbourNode);
                     }
                 }
             }
@@ -686,17 +1011,17 @@ export class MaraMap {
                 let node = MaraMap.mapNodes[i];
 
                 if (
-                    node.Neighbours.length == 1 &&
+                    node.Links.length == 1 &&
                     (
                         node.Type == MaraMapNodeType.Gate ||
                         node.Type == MaraMapNodeType.Walkable && node.Region.Cells.length < MaraMap.REGION_SIZE / 4
                     )
                 ) {
-                    let neighbour = node.Neighbours[0];
+                    let link = node.Links[0];
 
-                    if (neighbour.Type == MaraMapNodeType.Walkable) {
-                        neighbour.Region.AddCells(node.Region.Cells);
-                        neighbour.Neighbours = neighbour.Neighbours.filter((v) => v != node);
+                    if (link.Node.Type == MaraMapNodeType.Walkable) {
+                        link.Node.Region.AddCells(node.Region.Cells);
+                        link.Node.Links = link.Node.Links.filter((v) => v.Node != node);
                         
                         atLeastOneNodeChanged = true;
                     }
@@ -715,12 +1040,33 @@ export class MaraMap {
     }
 
     private static linkNodes(node: MaraMapNode, neighbourNode: MaraMapNode): void {
-        if (!node.Neighbours.find((v) => v == neighbourNode)) {
-            node.Neighbours.push(neighbourNode);
+        if (!node.Links.find((v) => v.Node == neighbourNode)) {
+            let link = new MaraMapNodeLink(neighbourNode, MaraMap.getTransitionCost(node, neighbourNode));
+            node.Links.push(link);
         }
     
-        if (!neighbourNode.Neighbours.find((v) => v == node)) {
-            neighbourNode.Neighbours.push(node);
+        if (!neighbourNode.Links.find((v) => v.Node == node)) {
+            let link = new MaraMapNodeLink(neighbourNode, MaraMap.getTransitionCost(neighbourNode, node));
+            neighbourNode.Links.push(link);
+        }
+    }
+
+    private static getTransitionCost(from: MaraMapNode, to: MaraMapNode): number {
+        if (from.IsWalkable()) {
+            if (to.IsWalkable()) {
+                return MaraMap.WALKABLE_TO_WALKABLE_COST;
+            }
+            else {
+                return MaraMap.WALKABLE_TO_UNWALKABLE_COST;
+            }
+        }
+        else {
+            if (to.IsWalkable()) {
+                return MaraMap.UNWALKABLE_TO_WALKABLE_COST;
+            }
+            else {
+                return MaraMap.UNWALKABLE_TO_UNWALKABLE_COST;
+            }
         }
     }
 
@@ -773,19 +1119,19 @@ export class MaraMap {
         let processedPairs: [MaraRegion, MaraRegion][] = [];
         
         for (let node of MaraMap.mapNodes) {
-            for (let neighbour of node.Neighbours) {
+            for (let link of node.Links) {
                 if (
                     !processedPairs.find(
-                        (r) => (r[0] == neighbour.Region || r[1] == neighbour.Region) &&
+                        (r) => (r[0] == link.Node.Region || r[1] == link.Node.Region) &&
                         (r[0] == node.Region || r[1] == node.Region)
                     )
                 ) {
-                    processedPairs.push([node.Region, neighbour.Region]);
-                    MaraUtils.DrawLineOnScena(node.Region.Center, neighbour.Region.Center);
+                    processedPairs.push([node.Region, link.Node.Region]);
+                    MaraUtils.DrawLineOnScena(node.Region.Center, link.Node.Region.Center);
                 }
             }
 
-            let color: any;
+            let color: HordeColor;
 
             switch (node.Type) {
                 case MaraMapNodeType.Gate:
@@ -833,10 +1179,27 @@ export class MaraMap {
         });
     }
 
-    private static dijkstraPath(from: MaraMapNode, to: MaraMapNode, nodes: Array<MaraMapNode>): Array<MaraMapNode> {
+    private static aStarHeuristic(
+        curNode: MaraMapNode, 
+        toNode: MaraMapNode
+    ): number {
+        let distance = MaraUtils.ChebyshevDistance(toNode.Region.Center, curNode.Region.Center);
+
+        return distance / MaraMap.REGION_SIZE;
+    }
+
+    private static aStarPath(
+        from: MaraMapNode, 
+        to: MaraMapNode, 
+        heuristic: (
+            curNode: MaraMapNode, 
+            toNode: MaraMapNode
+        ) => number,
+        nodes: Array<MaraMapNode>,
+    ): Array<MaraMapNode> {
         let options: any = {};
-        options.comparator = (a, b) => {
-            let distance = a.ShortestDistance - b.ShortestDistance;
+        options.comparator = (a: MaraMapNode, b: MaraMapNode) => {
+            let distance = a.AStarHeuristic - b.AStarHeuristic;
 
             if (isNaN(distance) || distance == 0) {
                 return a.Id - b.Id;
@@ -848,32 +1211,45 @@ export class MaraMap {
 
         let unprocessedNodes = new SortedSet(options);
         from.ShortestDistance = 0;
+        from.AStarHeuristic = heuristic(from, to);
         
-        nodes.forEach((n) => {
+        for (let n of nodes) {
             if (n != from) {
                 n.ShortestDistance = Infinity;
+                n.AStarHeuristic = Infinity;
             }
+
             unprocessedNodes.insert(n);
-        });
+        }
         
-        let processedNodes = {};
+        let processedNodes: {
+            [key: number]: MaraMapNode
+        } = {};
         
         while (unprocessedNodes.length > 0) {
             let closestNode: MaraMapNode = unprocessedNodes.beginIterator().value();
+
+            if (closestNode == to) {
+                break;
+            }
             
-            for (let node of closestNode.Neighbours) {
-                let n = processedNodes[node.Id];
+            for (let link of closestNode.Links) {
+                let n = processedNodes[link.Node.Id];
                 
                 if (n != null) {
                     continue;
                 }
     
-                let newDistance = closestNode.ShortestDistance + node.Weigth;
+                let newDistance = MaraMap.calcDistance(closestNode, link);
     
-                if (newDistance < node.ShortestDistance) {
-                    unprocessedNodes.remove(node);
-                    node.ShortestDistance = newDistance;
-                    unprocessedNodes.insert(node);
+                if (newDistance < link.Node.ShortestDistance) {
+                    unprocessedNodes.remove(link.Node);
+                    
+                    link.Node.PrevNode = closestNode;
+                    link.Node.ShortestDistance = newDistance;
+                    link.Node.AStarHeuristic = newDistance + heuristic(link.Node, to);
+                    
+                    unprocessedNodes.insert(link.Node);
                 }
             }
             
@@ -891,7 +1267,7 @@ export class MaraMap {
         let currentNode = to;
     
         while (currentNode != from) {
-            let nextNode = currentNode.Neighbours.find((n) => currentNode.ShortestDistance == (currentNode.Weigth + n.ShortestDistance))!;
+            let nextNode = currentNode.PrevNode!;
             result.push(nextNode);
             currentNode = nextNode;
         }
@@ -899,12 +1275,18 @@ export class MaraMap {
         return result.reverse();
     }
 
+    private static calcDistance(source: MaraMapNode, link: MaraMapNodeLink): number {
+        return source.ShortestDistance + 
+            link.Node.Weigth + 
+            link.Weigth * MaraUtils.ChebyshevDistance(source.Region.Center, link.Node.Region.Center);
+    }
+
     private static initCellResources(): void {
         let scenaWidth = MaraUtils.GetScenaWidth();
         let scenaHeigth = MaraUtils.GetScenaHeigth();
         
         for (let x = 0; x < scenaWidth; x++) {
-            let columnData: Array<any> = [];
+            let columnData: Array<ResourceTile> = [];
             MaraMap.resourceData.push(columnData);
             
             for (let y = 0; y < scenaHeigth; y++) {
@@ -936,21 +1318,21 @@ export class MaraMap {
         MaraMap.clusterSpatialIndex.load(clusterSpatialData);
     }
 
-    private static watchSettlement(settlement: any): void {
+    private static watchSettlement(settlement: Settlement): void {
         settlement.Units.UnitsListChanged.connect(
-            (sender, UnitsListChangedEventArgs) => {
+            (sender: any, UnitsListChangedEventArgs: UnitsListChangedEventArgs) => {
                 MaraMap.unitListChangedProcessor(sender, UnitsListChangedEventArgs);
             }
         );
     }
 
-    private static unitListChangedProcessor(sender, UnitsListChangedEventArgs): void {
+    private static unitListChangedProcessor(sender: any, UnitsListChangedEventArgs: UnitsListChangedEventArgs): void {
         let unit = UnitsListChangedEventArgs.Unit;
 
-        if (MaraUtils.IsWalkableConfig(unit.Cfg)) {
+        if (MaraUtils.IsWalkableConfigId(unit.Cfg.Uid)) {
             if (UnitsListChangedEventArgs.IsAdded) {
                 let handler = unit.EventsMind.BuildingComplete.connect(
-                    (sender, args) => {
+                    (sender: any, args: UnitBuildingCompleteEventArgs) => {
                         MaraMap.walkableBuildingBuiltProcessor(sender, args);
                     }
                 );
@@ -986,14 +1368,14 @@ export class MaraMap {
         }
     }
 
-    private static walkableBuildingBuiltProcessor(sender, args): void {
+    private static walkableBuildingBuiltProcessor(sender: any, args: UnitBuildingCompleteEventArgs): void {
         let builtUnit = args.TriggeredUnit;
         let unitCells = this.getUnitCells(builtUnit);
 
         MaraMap.AddNode(unitCells, MaraMapNodeType.Gate);
     }
 
-    private static getUnitCells(unit: any): Array<MaraPoint> {
+    private static getUnitCells(unit: Unit): Array<MaraPoint> {
         let unitCells: Array<MaraPoint> = [];
 
         let maxX = unit.Cell.X + MaraUtils.GetConfigIdWidth(unit.Cfg.Uid);
