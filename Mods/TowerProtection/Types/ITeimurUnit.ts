@@ -1,6 +1,6 @@
 import { generateCellInSpiral } from "library/common/position-tools";
 import { createPoint } from "library/common/primitives";
-import { TileType, UnitCommand } from "library/game-logic/horde-types";
+import { UnitCommand } from "library/game-logic/horde-types";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
@@ -40,7 +40,7 @@ export class ITeimurUnit extends IUnit {
             let unitsIter = iterateOverUnitsInBox(createPoint(this.unit.Cell.X, this.unit.Cell.Y), 2);
             for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
                 var _unit = u.value;
-                if (_unit.Owner.Uid == GlobalVars.teams[this.teamNum].teimurSettlementIdx) {
+                if (Number.parseInt(_unit.Owner.Uid) == GlobalVars.teams[this.teamNum].teimurSettlementIdx) {
                     continue;
                 }
 
@@ -109,9 +109,9 @@ export class ITeimurUnit extends IUnit {
         // убираем требования
         GlobalVars.configs[this.CfgUid].TechConfig.Requirements.Clear();
         // убираем производство людей
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "ProducedPeople", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "ProducedPeople", 0);
         // убираем налоги
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "SalarySlots", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "SalarySlots", 0);
         // уменьшаем скорость в 2 раза
         // var tylesType = [
         //     TileType.Grass,
@@ -151,15 +151,15 @@ export class ITeimurUnit extends IUnit {
 
         if (spawnCount <= this.MaxSpawnCount) {
             // задаем количество здоровья
-            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(this.MaxHealthBase));
+            ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(this.MaxHealthBase));
             // задаем урон
-            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", Math.floor(this.DamageBase));
+            ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", Math.floor(this.DamageBase));
         } else {
             var coeff = spawnCount / this.MaxSpawnCount;
             // задаем количество здоровья
-            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(this.MaxHealthBase * coeff));
+            ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(this.MaxHealthBase * coeff));
             // задаем урон
-            GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", Math.floor(this.DamageBase * coeff));
+            ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", Math.floor(this.DamageBase * coeff));
         }
 
         return Math.min(spawnCount, this.MaxSpawnCount);

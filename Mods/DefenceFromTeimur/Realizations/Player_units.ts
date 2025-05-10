@@ -7,8 +7,8 @@ import { UnitCommand, UnitFlags, UnitHurtType, UnitSpecification } from "library
 import { TeimurLegendaryUnitsClass, Teimur_Legendary_GREED_HORSE } from "./Teimur_units";
 import { log } from "library/common/logging";
 import { WaveUnit } from "../Types/IAttackPlan";
-import { IncomePlanClass, IncomePlansClass } from "./IncomePlans";
 import { eNext, enumerate } from "library/dotnet/dotnet-utils";
+import { ITeimurUnit } from "../Types/ITeimurUnit";
 
 export class Player_GOALCASTLE extends IUnit {
     static CfgUid      : string = "#DefenceTeimur_GoalCastle";
@@ -22,7 +22,7 @@ export class Player_GOALCASTLE extends IUnit {
         IUnit.InitConfig.call(this);
 
         // ХП
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 2000);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 2000);
         // убираем починку
         GlobalVars.configs[this.CfgUid].ProfessionParams.Remove(UnitProfession.Reparable);
         // запрещаем самоуничтожение
@@ -46,11 +46,11 @@ export class Player_CASTLE_CHOISE_DIFFICULT extends IUnit {
         IUnit.InitConfig.call(this);
 
         // описание
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Выберите сложность");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Выберите сложность");
         // ХП
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 2000);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 2000);
         // Броня
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 1000);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 1000);
         // убираем починку
         GlobalVars.configs[this.CfgUid].ProfessionParams.Remove(UnitProfession.Reparable);
         // запрещаем самоуничтожение
@@ -68,22 +68,22 @@ export class Player_CASTLE_CHOISE_DIFFICULT extends IUnit {
                 GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(choise_BaseCfgUid, unitChoise_CfgUid);
 
                 // назначаем имя
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Name", "Выбрать сложность " + difficultIdx);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Name", "Выбрать сложность " + difficultIdx);
                 // Броня
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Shield", difficultIdx);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Shield", difficultIdx);
                 // описание
                 if (difficultIdx < GlobalVars.difficult) {
-                    GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Эта сложность меньше рекомендуемой");
+                    ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Эта сложность меньше рекомендуемой");
                 } else if (difficultIdx == GlobalVars.difficult) {
-                    GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Рекомендуемая сложность");
+                    ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Рекомендуемая сложность");
                 } else {
-                    GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Эта сложность больше рекомендуемой");
+                    ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Эта сложность больше рекомендуемой");
                 }
                 // убираем цену
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Gold",   0);
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Metal",  0);
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Lumber", 0);
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "People", 0);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Gold",   0);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Metal",  0);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Lumber", 0);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "People", 0);
                 // убираем требования
                 GlobalVars.configs[unitChoise_CfgUid].TechConfig.Requirements.Clear();
 
@@ -105,11 +105,11 @@ export class Player_CASTLE_CHOISE_ATTACKPLAN extends IUnit {
         IUnit.InitConfig.call(this);
 
         // описание
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Выберите волну");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Выберите волну");
         // ХП
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 2000);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 2000);
         // Броня
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 1000);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 1000);
         // убираем починку
         GlobalVars.configs[this.CfgUid].ProfessionParams.Remove(UnitProfession.Reparable);
         // запрещаем самоуничтожение
@@ -127,16 +127,16 @@ export class Player_CASTLE_CHOISE_ATTACKPLAN extends IUnit {
                 GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(choise_BaseCfgUid, unitChoise_CfgUid);
 
                 // назначаем имя
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Name", "Выбрать волну " + planIdx);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Name", "Выбрать волну " + planIdx);
                 // Броня
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Shield", planIdx);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Shield", planIdx);
                 // описание
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", AttackPlansClass[planIdx].Description + "\nИнком:" + AttackPlansClass[planIdx].IncomePlanClass.Description);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", AttackPlansClass[planIdx].Description + "\nИнком:" + AttackPlansClass[planIdx].IncomePlanClass.Description);
                 // убираем цену
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Gold",   0);
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Metal",  0);
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Lumber", 0);
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "People", 0);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Gold",   0);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Metal",  0);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Lumber", 0);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "People", 0);
                 // убираем требования
                 GlobalVars.configs[unitChoise_CfgUid].TechConfig.Requirements.Clear();
 
@@ -159,18 +159,18 @@ export class Player_Teimur_Dovehouse extends IUnit {
     public static InitConfig() {
         IUnit.InitConfig.call(this);
 
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Голубятня Теймура");
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "В этой голубятне находятся голуби с родины Теймуров. Пошлите весточку Теймурам, чтобы они отправили в бой одного из своих бойцов.");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Голубятня Теймура");
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", "В этой голубятне находятся голуби с родины Теймуров. Пошлите весточку Теймурам, чтобы они отправили в бой одного из своих бойцов.");
         // стоимость
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Gold",   500);
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Metal",  500);
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Lumber", 300);
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "People", 7);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Gold",   500);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Metal",  500);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "Lumber", 300);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].CostResources, "People", 7);
         // убираем требования
         GlobalVars.configs[this.CfgUid].TechConfig.Requirements.Clear();
         // убираем точку выхода
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].BuildingConfig, "EmergePoint", null);
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].BuildingConfig, "EmergePoint2", null);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].BuildingConfig, "EmergePoint", null);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].BuildingConfig, "EmergePoint2", null);
 
         // добавляем постройку легендарных юнитов
         this.WaveUnits = new Array<WaveUnit>();
@@ -189,18 +189,18 @@ export class Player_Teimur_Dovehouse extends IUnit {
                 GlobalVars.configs[unitCfgUid] = CreateUnitConfig(TeimurLegendaryUnitsClass[unitNum].CfgUid, unitCfgUid);
 
                 // стоимость легендарного юнита в здании для отправки врагам
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid].CostResources, "Gold",   500);
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid].CostResources, "Metal",  500);
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid].CostResources, "Lumber", 300);
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid].CostResources, "People", 7);
+                ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid].CostResources, "Gold",   500);
+                ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid].CostResources, "Metal",  500);
+                ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid].CostResources, "Lumber", 300);
+                ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid].CostResources, "People", 7);
                 // убираем требования
                 GlobalVars.configs[unitCfgUid].TechConfig.Requirements.Clear();
                 // время постройки 10 секунд
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid], "ProductionTime", 250);
+                ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid], "ProductionTime", 250);
                 // устанавливаем ид waveUnit
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid], "Shield", unitNum);
+                ScriptUtils.SetValue(GlobalVars.configs[unitCfgUid], "Shield", unitNum);
                 // добавляем waveUnit
-                this.WaveUnits.push(new WaveUnit(TeimurLegendaryUnitsClass[unitNum], 1));
+                this.WaveUnits.push(new WaveUnit(TeimurLegendaryUnitsClass[unitNum] as typeof ITeimurUnit, 1));
                 
                 produceList.Add(GlobalVars.configs[unitCfgUid]);
             }
@@ -268,7 +268,7 @@ class Player_worker extends IUnit {
                 return;
             }
 
-            var cfg : any = GlobalVars.HordeContentApi.GetUnitConfig(cfgUid);
+            var cfg : any = HordeContentApi.GetUnitConfig(cfgUid);
             // удаляем требования
             cfg.TechConfig.Requirements.Clear();
             // переходим к следующему ид
@@ -303,7 +303,7 @@ class Player_worker extends IUnit {
                 return;
             }
 
-            var cfg : any = GlobalVars.HordeContentApi.GetUnitConfig(cfgUid);
+            var cfg : any = HordeContentApi.GetUnitConfig(cfgUid);
             if (produceList.Contains(cfg)) {
                 produceList.Remove(cfg);
             }

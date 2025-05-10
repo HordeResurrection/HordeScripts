@@ -7,11 +7,9 @@ import { unitCanBePlacedByRealMap } from "../Utils";
 import { Cell } from "./Geometry";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
 import { createPoint } from "library/common/primitives";
-import { log } from "library/common/logging";
-import { printObjectItems } from "library/common/introspection";
 import { UnitProfession } from "library/game-logic/unit-professions";
 
-const UnitQueryFlag = HCL.HordeClassLibrary.UnitComponents.Enumerations.UnitQueryFlag;
+const UnitQueryFlag = HordeClassLibrary.UnitComponents.Enumerations.UnitQueryFlag;
 
 export class ITeimurUnit extends IUnit {
     static canAttackBuilding : boolean = true;
@@ -40,7 +38,7 @@ export class ITeimurUnit extends IUnit {
             let unitsIter = iterateOverUnitsInBox(createPoint(this.unit.Cell.X, this.unit.Cell.Y), 2);
             for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
                 var _unit = u.value;
-                if (_unit.Owner.Uid == GlobalVars.teams[this.teamNum].teimurSettlementId) {
+                if (Number.parseInt(_unit.Owner.Uid) == GlobalVars.teams[this.teamNum].teimurSettlementId) {
                     continue;
                 }
 
@@ -109,9 +107,9 @@ export class ITeimurUnit extends IUnit {
         // убираем требования
         GlobalVars.configs[this.CfgUid].TechConfig.Requirements.Clear();
         // убираем производство людей
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "ProducedPeople", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "ProducedPeople", 0);
         // убираем налоги
-        GlobalVars.ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "SalarySlots", 0);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "SalarySlots", 0);
 
         // проверяем, может ли юнит атаковать здания
         if (GlobalVars.configs[this.CfgUid].MainArmament && GlobalVars.configs[this.CfgUid].MainArmament.BulletConfig.DisallowedTargets.HasFlag(UnitQueryFlag.Buildings)) {

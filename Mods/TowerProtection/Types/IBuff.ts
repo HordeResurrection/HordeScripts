@@ -1,4 +1,3 @@
-import { printObjectItems } from "library/common/introspection";
 import { GlobalVars } from "../GlobalData";
 import { CreateUnitConfig } from "../Utils";
 import { UnitFlags } from "library/game-logic/horde-types";

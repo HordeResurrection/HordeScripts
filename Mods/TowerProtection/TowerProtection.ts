@@ -13,9 +13,8 @@ import { ITeimurUnit } from "./Types/ITeimurUnit";
 import { IUnit } from "./Types/IUnit";
 import { Team } from "./Types/Team";
 import { spawnUnit } from "./Utils";
-import { Buff_AddShield, Buff_Improvements, Buff_PeriodAttack_Arrow, Buff_PeriodAttack_Arrow_2, Buff_PeriodAttack_Catapult, Buff_PeriodAttack_Ikon, Buff_PeriodHealing, Buff_PeriodIncomeGold, BuffsClass } from "./Realizations/Buffs";
+import { Buff_Improvements, Buff_PeriodHealing, Buff_PeriodIncomeGold, BuffsClass } from "./Realizations/Buffs";
 import { IBuff } from "./Types/IBuff";
-import { printObjectItems } from "library/common/introspection";
 import { spawnString } from "library/game-logic/decoration-spawn";
 
 
@@ -90,16 +89,11 @@ export class TowerProtection extends HordePluginBase {
         GlobalVars.buffs           = new Array<IBuff>();
 
         GlobalVars.gameStateChangedTickNum = 0;
-        GlobalVars.ScriptUtils     = ScriptUtils;
-        GlobalVars.ActiveScena     = ActiveScena;
-        GlobalVars.HordeContentApi = HordeContentApi;
-        GlobalVars.HordeEngine     = HordeEngine;
         GlobalVars.Players         = Players;
-        GlobalVars.scenaWidth      = GlobalVars.ActiveScena.GetRealScena().Size.Width;
-        GlobalVars.scenaHeight     = GlobalVars.ActiveScena.GetRealScena().Size.Height;
-        GlobalVars.unitsMap        = GlobalVars.ActiveScena.GetRealScena().UnitsMap;
+        GlobalVars.scenaWidth      = ActiveScena.GetRealScena().Size.Width;
+        GlobalVars.scenaHeight     = ActiveScena.GetRealScena().Size.Height;
+        GlobalVars.unitsMap        = ActiveScena.GetRealScena().UnitsMap;
         GlobalVars.configs         = new Array<any>();
-        GlobalVars.HCL             = HCL;
 
         // профилировка
         this.timers = new Array<number>(20);
@@ -111,7 +105,7 @@ export class TowerProtection extends HordePluginBase {
         GlobalVars.SetGameState(GameState.Init);
 
         // проверяем, что за карта
-        var scenaName = GlobalVars.ActiveScena.GetRealScena().ScenaName;
+        var scenaName = ActiveScena.GetRealScena().ScenaName;
         if (scenaName == "Башенная защита - стандарт") {
             GlobalVars.teams = new Array<Team>(6);
             for (var i = 0; i < 2; i++) {
@@ -129,6 +123,7 @@ export class TowerProtection extends HordePluginBase {
                         new Rectangle(shiftX + 8, shiftY + 8, 32, 32),
                         teamNum
                     );
+                    GlobalVars.teams[teamNum].inGame = false;
                 }
             }
         } else {
@@ -137,7 +132,7 @@ export class TowerProtection extends HordePluginBase {
     }
 
     private Init(gameTickNum: number) {
-        GlobalVars.rnd = GlobalVars.ActiveScena.GetRealScena().Context.Randomizer;
+        GlobalVars.rnd = ActiveScena.GetRealScena().Context.Randomizer;
         
         //////////////////////////////////////////
         // инициализируем игроков в командах
@@ -149,8 +144,8 @@ export class TowerProtection extends HordePluginBase {
             GlobalVars.teams[teamNum].incomeLumber = 0;
             GlobalVars.teams[teamNum].incomePeople = 0;
             GlobalVars.teams[teamNum].nickname     = "";
-            GlobalVars.teams[teamNum].settlement       = GlobalVars.ActiveScena.GetRealScena().Settlements.GetByUid('' + GlobalVars.teams[teamNum].settlementIdx);
-            GlobalVars.teams[teamNum].teimurSettlement = GlobalVars.ActiveScena.GetRealScena().Settlements.GetByUid('' + GlobalVars.teams[teamNum].teimurSettlementIdx);
+            GlobalVars.teams[teamNum].settlement       = ActiveScena.GetRealScena().Settlements.GetByUid('' + GlobalVars.teams[teamNum].settlementIdx);
+            GlobalVars.teams[teamNum].teimurSettlement = ActiveScena.GetRealScena().Settlements.GetByUid('' + GlobalVars.teams[teamNum].teimurSettlementIdx);
             GlobalVars.teams[teamNum].color            = GlobalVars.teams[teamNum].settlement.SettlementColor;
         }
 
@@ -191,7 +186,7 @@ export class TowerProtection extends HordePluginBase {
             }
 
             // убираем налоги
-            var censusModel = GlobalVars.ScriptUtils.GetValue(settlement.Census, "Model");
+            var censusModel = ScriptUtils.GetValue(settlement.Census, "Model");
             // Установить период сбора налогов и выплаты жалования (чтобы отключить сбор, необходимо установить 0)
             censusModel.TaxAndSalaryUpdatePeriod = 0;
 
@@ -225,7 +220,7 @@ export class TowerProtection extends HordePluginBase {
             } else {
                 GlobalVars.teams[teamNum].tower = new IUnit(spawnUnit(
                     GlobalVars.teams[teamNum].settlement,
-                    GlobalVars.HordeContentApi.GetUnitConfig(Player_TOWER_CHOISE_DIFFICULT.BaseCfgUid),
+                    HordeContentApi.GetUnitConfig(Player_TOWER_CHOISE_DIFFICULT.BaseCfgUid),
                     UnitDirection.Down,
                     createPoint(GlobalVars.teams[teamNum].towerCell.X, GlobalVars.teams[teamNum].towerCell.Y)
                 ), teamNum);
@@ -257,24 +252,32 @@ export class TowerProtection extends HordePluginBase {
 
         // инициализируем строковые декорации игроков
 
-        this.teamsStringDecorationObj = new Array<number>(GlobalVars.teams.length);
-        for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-            if (!GlobalVars.teams[teamNum].inGame) {
-                continue;
+        if (!this.teamsStringDecorationObj) {
+            this.teamsStringDecorationObj = new Array<number>(GlobalVars.teams.length);
+            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+                if (!GlobalVars.teams[teamNum].inGame) {
+                    continue;
+                }
+
+                var strDecObj = spawnString(
+                    ActiveScena,
+                    GlobalVars.teams[teamNum].nickname + ":\n",
+                    createPoint(32*(GlobalVars.teams[teamNum].towerCell.X - 20), 32*(GlobalVars.teams[teamNum].towerCell.Y - 20)),
+                    100000000);
+                strDecObj.Height = 20;
+                //strDecObj.Color = GlobalVars.teams[teamNum].color;
+                strDecObj.Color     = createHordeColor(
+                    255,
+                    Math.min(255, GlobalVars.teams[teamNum].color.R + 128),
+                    Math.min(255, GlobalVars.teams[teamNum].color.G + 128),
+                    Math.min(255, GlobalVars.teams[teamNum].color.B + 128)
+                );
+                strDecObj.DrawLayer = DrawLayer.Birds;
+                //strDecObj.Font = FontUtils.DefaultFont;        // Шрифт Северного Ветра (нельзя изменить высоту букв)
+                strDecObj.Font = FontUtils.DefaultVectorFont;  // Шрифт, что используется в чате
+
+                this.teamsStringDecorationObj[teamNum] = strDecObj;
             }
-
-            var strDecObj = spawnString(
-                GlobalVars.ActiveScena,
-                GlobalVars.teams[teamNum].nickname + ":\n",
-                createPoint(32*(GlobalVars.teams[teamNum].towerCell.X - 20), 32*(GlobalVars.teams[teamNum].towerCell.Y - 20)),
-                100000000);
-            strDecObj.Height = 18;
-            //strDecObj.Color = GlobalVars.teams[teamNum].color;
-            strDecObj.DrawLayer = DrawLayer.Birds;
-            strDecObj.Font = FontUtils.DefaultFont;        // Шрифт Северного Ветра (нельзя изменить высоту букв)
-            //strDecObj.Font = FontUtils.DefaultVectorFont;  // Шрифт, что используется в чате
-
-            this.teamsStringDecorationObj[teamNum] = strDecObj;
         }
 
         GlobalVars.SetGameState(GameState.ChoiseDifficult);
@@ -323,7 +326,7 @@ export class TowerProtection extends HordePluginBase {
     }
 
     private ChoiseWave(gameTickNum: number) {
-        var FPS = GlobalVars.HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
+        var FPS = HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
 
         //////////////////////////////////////////
         // выбор волны
@@ -413,6 +416,7 @@ export class TowerProtection extends HordePluginBase {
             replaceParams.PreserveOrders      = false; // Нужно ли передать приказы?
             replaceParams.Silent              = true;  // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
             GlobalVars.teams[teamNum].tower   = new PlayerTowersClass[teamNum](GlobalVars.teams[teamNum].tower.unit.Owner.Units.ReplaceUnit(replaceParams), teamNum);
+            this.log.info("спавним для teamNum ", teamNum, " towerclassname = ", PlayerTowersClass[teamNum].name);
 
             GlobalVars.units.push(GlobalVars.teams[teamNum].tower);
             GlobalVars.buffs.push(new Buff_Improvements(teamNum));
@@ -427,7 +431,7 @@ export class TowerProtection extends HordePluginBase {
 
         // подписываемся на событие о замене юнита (поддержка LevelSystem)
 
-        let scenaSettlements = GlobalVars.ActiveScena.GetRealScena().Settlements;
+        let scenaSettlements = ActiveScena.GetRealScena().Settlements;
         for (var settlementNum = 0; settlementNum < scenaSettlements.Count; settlementNum++) {
             var settlementUnits = scenaSettlements.Item.get(settlementNum + '').Units;
 
@@ -463,7 +467,7 @@ export class TowerProtection extends HordePluginBase {
         // смещаем номер такта, чтобы время считалось относительно начала игры
         gameTickNum -= GlobalVars.gameStateChangedTickNum;
 
-        var FPS = GlobalVars.HordeEngine.HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
+        var FPS = HordeResurrection.Engine.Logic.Battle.BattleController.GameTimer.CurrentFpsLimit;
 
         // присуждаем поражение если башня уничтожена
 
@@ -710,7 +714,7 @@ export class TowerProtection extends HordePluginBase {
                 if (!GlobalVars.teams[teamNum].inGame) {
                     continue;
                 }
-                GlobalVars.ScriptUtils.SetValue(GlobalVars.teams[teamNum].settlement.Existence, "Status", GlobalVars.HCL.HordeClassLibrary.World.Settlements.Existence.ExistenceStatus.CombatNow);
+                ScriptUtils.SetValue(GlobalVars.teams[teamNum].settlement.Existence, "Status", HordeClassLibrary.World.Settlements.Existence.ExistenceStatus.CombatNow);
             }
         }
     }

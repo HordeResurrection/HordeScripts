@@ -193,7 +193,9 @@ declare abstract class HostFunctions {
  */
 declare abstract class ScriptReflection {
     static SetValue(memberOwner: object, memberName: string, value: any): void;
+    static SetValueAs(targetType: object, memberOwner: object, memberName: string, value: any): void;
     static GetValue(memberOwner: object, memberName: string): any;
+    static GetValueAs(targetType: object, memberOwner: object, memberName: string): any;
     static Invoke(memberOwner: object, methodName: string, ...parameters: any[]): any;
     static InvokeStatic(type: object, methodName: string, ...parameters: any[]): any;
     static CreateInstance(type: object, ...parameters: any[]): any;

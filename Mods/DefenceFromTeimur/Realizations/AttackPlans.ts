@@ -1,12 +1,11 @@
 import { GlobalVars } from "../GlobalData";
 import { TeimurLegendaryUnitsClass, Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER, Teimur_Legendary_HORSE, Teimur_Legendary_DARK_DRAIDER, Teimur_Legendary_FIRE_MAGE, Teimur_Legendary_GREED_HORSE, Teimur_Scorpion } from "./Teimur_units";
 import { IAttackPlan, WaveUnit, Wave } from "../Types/IAttackPlan";
-import { IUnit, RandomUnit } from "../Types/IUnit";
+import { RandomUnit } from "../Types/IUnit";
 import { IIncomePlan } from "../Types/IIncomePlan";
-import { IncomePlan_0, IncomePlan_1 } from "./IncomePlans";
+import { IncomePlan_1 } from "./IncomePlans";
 import { ITeimurUnit } from "../Types/ITeimurUnit";
 import { log } from "library/common/logging";
-import { TileType } from "library/game-logic/horde-types";
 
 export class AttackPlan_1 extends IAttackPlan {
     static Description: string = "Кармические волны";
@@ -409,7 +408,7 @@ export class AttackPlan_4 extends IAttackPlan {
             var res = new Array<WaveUnit>();
             var count = Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1);
             for (var i = 0; i < count; i++) {
-                res.push(new WaveUnit(RandomUnit(TeimurLegendaryUnitsClass), 1));
+                res.push(new WaveUnit(RandomUnit(TeimurLegendaryUnitsClass) as typeof ITeimurUnit, 1));
             }
             return res;
         };
@@ -437,7 +436,7 @@ export class AttackPlan_4 extends IAttackPlan {
             ]),
             new Wave("БОСС ВОЛНА 5", 10 * 60 * 50, [
                 new WaveUnit(Teimur_Raider, 5 * GlobalVars.difficult),
-                new WaveUnit(RandomUnit(TeimurLegendaryUnitsClass), 1)
+                new WaveUnit(RandomUnit(TeimurLegendaryUnitsClass) as typeof ITeimurUnit, 1)
             ]),
             new Wave("ВОЛНА 6", 13.5 * 60 * 50, [
                 new WaveUnit(RandomUnit([Teimur_Swordmen, Teimur_Heavymen, Teimur_Archer, Teimur_Archer_2]), 20 * GlobalVars.difficult)
@@ -489,7 +488,7 @@ export class AttackPlan_4 extends IAttackPlan {
                 new WaveUnit(Teimur_Mag_2, 3 * GlobalVars.difficult),
                 new WaveUnit(Teimur_Villur, 1 * GlobalVars.difficult),
                 new WaveUnit(Teimur_Olga, 1 * GlobalVars.difficult),
-                new WaveUnit(RandomUnit(TeimurLegendaryUnitsClass), 1),
+                new WaveUnit(RandomUnit(TeimurLegendaryUnitsClass) as typeof ITeimurUnit, 1),
                 ... RandomLegendaryUnits()
             ]),
             new Wave("ВОЛНА 13", 32 * 60 * 50, [
@@ -620,7 +619,7 @@ export class AttackPlan_5 extends IAttackPlan {
         for (var gameTick = gameStartTick; gameTick < timeEnd; gameTick += 150 * 50) {
             var spawnCount = Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1);
             for (var i = 0; i < spawnCount; i++) {
-                this.waves.push(new Wave("", gameTick, [ new WaveUnit(RandomUnit(TeimurLegendaryUnitsClass), 1) ]));
+                this.waves.push(new Wave("", gameTick, [ new WaveUnit(RandomUnit(TeimurLegendaryUnitsClass) as typeof ITeimurUnit, 1) ]));
             }
         }
 

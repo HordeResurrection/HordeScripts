@@ -1,5 +1,4 @@
 import { activePlugins } from "active-plugins";
-import { printObjectItems } from "library/common/introspection";
 import { log } from "library/common/logging";
 import { broadcastMessage } from "library/common/messages";
 import { createHordeColor } from "library/common/primitives";
@@ -7,9 +6,8 @@ import { eNext, enumerate } from "library/dotnet/dotnet-utils";
 import { BattleController, TileType, UnitFlags, UnitSpecification } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import HordePluginBase from "plugins/base-plugin";
-import { PrintSelectedSquadOrdersPlugin } from "plugins/print-selected-squad-orders";
 
-const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
+const ReplaceUnitParameters = HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 
 const UnitUpdatePeriod : number = 32;
 
@@ -174,13 +172,13 @@ class UnitExperienceSystem {
 class ExperienceSystemGlobalData {
     static MaxExp:                              number         = 32;
 
-    static Levels_ExpCoeff:                     Array<number>  = [1, 0.5, 0.25, 0.125];
+    static Levels_ExpCoeff:                     Array<number>  = [1.0, 1.0, 0.75, 0.5];
     static Levels_NamePrefix:                   Array<string>  = ["{храбрый}", "{ратник}", "{дружинник}", "{витязь}"];
     static Levels_AdditionalDamageCoeff:        Array<number>  = [1.0, 1.2, 1.3, 1.4];
     static Levels_AdditionalAccuracy:           Array<number>  = [2, 4, 6, 7];
     static Levels_MoveSpeedCoeff:               Array<number>  = [1, 1.1, 1.2, 1.2];
     static Levels_WeaponReloadingSpeedCoeff:    Array<number>  = [1.0/1.14, 1.0/1.33, 1.0/1.6, 1.0/2.0];
-    static Levels_HpCoeff:                      Array<number>  = [1.25, 1.5, 3.0, 5.0];
+    static Levels_HpCoeff:                      Array<number>  = [1.25, 1.57, 3.735, 12.15];
     static Levels_AdditionalShield:             Array<number>  = [0, 0, 0, 0];
     static Levels_AdditionalSight:              Array<number>  = [0, 1, 1, 2];
     static Levels_AdditionalWeight:             Array<number>  = [1, 2, 3, 4];
@@ -258,7 +256,8 @@ class ExperienceSystemGlobalData {
                     var damage = Math.max(mainArmament.ShotParams.Damage, 1);
                     res        = Math.sqrt(hp/damage)*(1 + 0.5*shield/damage)*5.67375886524;
                 } else {
-                    res        = Math.log10(hp)*(1+0.5*shield)*5.67375886524;
+                    //res        = Math.log10(hp)*(1+0.5*shield)*5.67375886524;
+                    res        = 4;
                 }
             } else {
                 var speed = unitConfig.Speeds.Item(TileType.Grass);
@@ -319,7 +318,7 @@ class ExperienceSystemGlobalData {
                 }
                 ScriptUtils.SetValue(nextCfg.MainArmament, "ReloadTime", Math.max(1, Math.round(currCfg.MainArmament.ReloadTime * ExperienceSystemGlobalData.Levels_WeaponReloadingSpeedCoeff[nextLevel])));
                 ScriptUtils.SetValue(nextCfg, "ReloadTime", Math.max(1, Math.round(currCfg.ReloadTime * ExperienceSystemGlobalData.Levels_WeaponReloadingSpeedCoeff[nextLevel])));
-                ScriptUtils.SetValue(nextCfg, "MaxHealth", Math.round(currCfg.MaxHealth * ExperienceSystemGlobalData.Levels_HpCoeff[nextLevel]));
+                ScriptUtils.SetValue(nextCfg, "MaxHealth", Math.round(currCfg.MaxHealth * Math.pow(ExperienceSystemGlobalData.Levels_HpCoeff[nextLevel], 2.0 * currCfg.MainArmament.ShotParams.Damage / currCfg.MaxHealth)));
                 ScriptUtils.SetValue(nextCfg, "Shield", currCfg.Shield + ExperienceSystemGlobalData.Levels_AdditionalShield[nextLevel]);
                 ScriptUtils.SetValue(nextCfg, "Sight", currCfg.Sight + ExperienceSystemGlobalData.Levels_AdditionalSight[nextLevel]);
                 ScriptUtils.SetValue(nextCfg, "Weight", currCfg.Weight + ExperienceSystemGlobalData.Levels_AdditionalWeight[nextLevel]);
@@ -358,7 +357,8 @@ class ExperienceSystemGlobalData {
                 ScriptUtils.SetValue(nextCfg, "ReloadTime",
                     Math.max(1, Math.round(currCfg.ReloadTime / ExperienceSystemGlobalData.Levels_WeaponReloadingSpeedCoeff[unitExperienceSystem.level] * ExperienceSystemGlobalData.Levels_WeaponReloadingSpeedCoeff[nextLevel])));
                 ScriptUtils.SetValue(nextCfg, "MaxHealth",
-                    Math.round(currCfg.MaxHealth / ExperienceSystemGlobalData.Levels_HpCoeff[unitExperienceSystem.level] * ExperienceSystemGlobalData.Levels_HpCoeff[nextLevel]));
+                    Math.round(currCfg.MaxHealth / Math.pow(ExperienceSystemGlobalData.Levels_HpCoeff[unitExperienceSystem.level], 2.0 * currCfg.MainArmament.ShotParams.Damage / currCfg.MaxHealth)
+                               * Math.pow(ExperienceSystemGlobalData.Levels_HpCoeff[nextLevel], 2.0 * currCfg.MainArmament.ShotParams.Damage / currCfg.MaxHealth)));
                 ScriptUtils.SetValue(nextCfg, "Shield",
                     currCfg.Shield - ExperienceSystemGlobalData.Levels_AdditionalShield[unitExperienceSystem.level] + ExperienceSystemGlobalData.Levels_AdditionalShield[nextLevel]);
                 ScriptUtils.SetValue(nextCfg, "Sight",
@@ -406,9 +406,6 @@ class ExperienceSystemPlugin extends HordePluginBase {
                 LEVEL_SYSTEM_GLOBAL_DATA  = this.globalStorage.levelSystemGlobalData as ExperienceSystemGlobalData;
     
                 let scenaSettlements = ActiveScena.GetRealScena().Settlements;
-                for (let settlementId of scenaSettlements) {
-                    this.log.info(settlementId);
-                }
 
                 levelSystemGlobalData.settlementsWarTable = new Array<Array<boolean>>(scenaSettlements.Count);
                 for (var settlementNum = 0; settlementNum < scenaSettlements.Count; settlementNum++) {

@@ -409,7 +409,7 @@ export class AttackPlan_4 extends IAttackPlan {
             var res = new Array<WaveUnit>();
             var count = Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1);
             for (var i = 0; i < count; i++) {
-                res.push(new WaveUnit(RandomElement(TeimurLegendaryUnitsClass), 1));
+                res.push(new WaveUnit(RandomElement(TeimurLegendaryUnitsClass) as typeof ITeimurUnit, 1));
             }
             return res;
         };
@@ -437,7 +437,7 @@ export class AttackPlan_4 extends IAttackPlan {
             ]),
             new Wave("БОСС ВОЛНА 5", 10 * 60 * 50, [
                 new WaveUnit(Teimur_Raider, 5 * GlobalVars.difficult),
-                new WaveUnit(RandomElement(TeimurLegendaryUnitsClass), 1)
+                new WaveUnit(RandomElement(TeimurLegendaryUnitsClass) as typeof ITeimurUnit, 1)
             ]),
             new Wave("ВОЛНА 6", 13.5 * 60 * 50, [
                 new WaveUnit(RandomElement([Teimur_Swordmen, Teimur_Heavymen, Teimur_Archer, Teimur_Archer_2]), 20 * GlobalVars.difficult)
@@ -489,7 +489,7 @@ export class AttackPlan_4 extends IAttackPlan {
                 new WaveUnit(Teimur_Mag_2, 3 * GlobalVars.difficult),
                 new WaveUnit(Teimur_Villur, 1 * GlobalVars.difficult),
                 new WaveUnit(Teimur_Olga, 1 * GlobalVars.difficult),
-                new WaveUnit(RandomElement(TeimurLegendaryUnitsClass), 1),
+                new WaveUnit(RandomElement(TeimurLegendaryUnitsClass) as typeof ITeimurUnit, 1),
                 ... RandomLegendaryUnits()
             ]),
             new Wave("ВОЛНА 13", 32 * 60 * 50, [
@@ -620,7 +620,7 @@ export class AttackPlan_5 extends IAttackPlan {
         for (var gameTick = gameStartTick; gameTick < timeEnd; gameTick += 150 * 50) {
             var spawnCount = Math.max(Math.floor((GlobalVars.difficult + 1) / 2), 1);
             for (var i = 0; i < spawnCount; i++) {
-                this.waves.push(new Wave("", gameTick, [ new WaveUnit(RandomElement(TeimurLegendaryUnitsClass), 1) ]));
+                this.waves.push(new Wave("", gameTick, [ new WaveUnit(RandomElement(TeimurLegendaryUnitsClass) as typeof ITeimurUnit, 1) ]));
             }
         }
 

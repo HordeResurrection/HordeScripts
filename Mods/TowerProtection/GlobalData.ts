@@ -7,10 +7,10 @@ export enum GameState { PreInit, Init, ChoiseDifficult, ChoiseWave, Run, End };
 
 export const CFGPrefix : string = "TowerProtection";
 
-export const DeleteUnitParameters  = HCL.HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
-export const ReplaceUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
-export const PeopleIncomeLevelT    = HCL.HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
-export const UnitQueryFlag         = HCL.HordeClassLibrary.UnitComponents.Enumerations.UnitQueryFlag;
+export const DeleteUnitParameters  = HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
+export const ReplaceUnitParameters = HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
+export const PeopleIncomeLevelT    = HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
+export const UnitQueryFlag         = HordeClassLibrary.UnitComponents.Enumerations.UnitQueryFlag;
 
 export class GlobalVars {
     /** текущее игровое состояние */
@@ -34,21 +34,12 @@ export class GlobalVars {
     public static buffs: Array<IBuff>;
     /** рандомайзер */
     public static rnd: any;
-    /** ScriptUtils */
-    public static ScriptUtils: any;
-    /** ActiveScena */
-    public static ActiveScena: any;
-    /** HordeContentApi */
-    public static HordeContentApi: any;
-    /** HordeEngine */
-    public static HordeEngine: any;
     /** Players */
     public static Players: any;
     public static scenaWidth : number;
     public static scenaHeight : number;
     /** юниты на карте */
     public static unitsMap : any;
-    public static HCL : any;
     public static plugin : any;
 
     public static GetGameState() : GameState {

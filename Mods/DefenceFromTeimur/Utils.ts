@@ -1,8 +1,5 @@
 import { log } from "library/common/logging";
-import { generateCellInSpiral } from "library/common/position-tools";
 import { createPoint } from "library/common/primitives";
-import { PointCommandArgs } from "library/game-logic/horde-types";
-import { Cell } from "./Types/Geometry";
 
 export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
     if (HordeContentApi.HasUnitConfig(newConfigUid)) {
@@ -40,7 +37,7 @@ export function L1Distance(x1: number, y1: number, x2: number, y2: number) {
     return Math.abs(x1 - x2) + Math.abs(y1 - y2);
 }
 
-const SpawnUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
+const SpawnUnitParameters = HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
 export function spawnUnits(settlement, uCfg, uCount, direction, generator) {
     let spawnParams = new SpawnUnitParameters();
     spawnParams.ProductUnitConfig = uCfg;

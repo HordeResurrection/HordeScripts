@@ -256,16 +256,12 @@ declare namespace HordeResurrection.Engine.Logic.Battle.Camera {
 			delta: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): void;
 
-		SetCenterPosition(
-			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
-		): void;
-
-		SetCenterPosition(
+		SetCenterToCell(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		): void;
 
-		SetPositionInCells(
-			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
+		SetCenterToPosition(
+			pos: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		): void;
 
 		UpdateVariables(
@@ -678,6 +674,11 @@ declare namespace HordeResurrection.Engine.Logic.Battle.Cheats.Implementations {
 	{
 		// Constructors:
 		constructor();
+
+		// Methods:
+		static GetDamageFor(
+			u: HordeClassLibrary.World.Objects.Units.Unit | null
+		): number;
 	}
 }
 //#endregion
@@ -1713,14 +1714,14 @@ declare namespace HordeResurrection.Engine.Logic.Battle.ReplaySystem {
 	class RecordInfo extends System.Object {
 
 		// Properties:
-		readonly PlayersList: System.Collections.Generic.IReadOnlyList<HordeResurrection.Engine.Logic.Main.Players.PlayerReplayModel>;
-		readonly RecorderSlot: number;
-		readonly RandomSeed: number;
+		readonly GameVersion: string;
 		readonly Scena: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaStamp;
 		readonly BattleSettings: HordeClassLibrary.World.Context.BattleSettings;
-		readonly ContentPackStamps: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStampsCollection;
-		readonly GameVersion: string;
+		readonly RandomSeed: number;
 		readonly InputExecutionPeriod: number;
+		readonly RecorderSlot: number;
+		readonly PlayersList: System.Collections.Generic.IReadOnlyList<HordeResurrection.Engine.Logic.Main.Players.PlayerReplayModel>;
+		readonly ContentPackStamps: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStampsCollection;
 
 		// Methods:
 		static MakeRecordInfo(

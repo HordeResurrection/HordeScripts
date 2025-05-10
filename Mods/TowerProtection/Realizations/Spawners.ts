@@ -31,8 +31,8 @@ export class RectangleRingSpawner extends ISpawner {
 
         // создаем множество ячеек
         // пробегаем по квадрату и выбираем нужные ячейки
-        let scenaWidth  = GlobalVars.ActiveScena.GetRealScena().Size.Width;
-        let scenaHeight = GlobalVars.ActiveScena.GetRealScena().Size.Height;
+        let scenaWidth  = ActiveScena.GetRealScena().Size.Width;
+        let scenaHeight = ActiveScena.GetRealScena().Size.Height;
         var xS          = Math.max(0, outRect.X);
         var yS          = Math.max(0, outRect.Y);
         var xE          = Math.min(outRect.X + outRect.W, scenaWidth);
@@ -52,7 +52,7 @@ export class RectangleRingSpawner extends ISpawner {
     }
 
     public Generator() : any {
-        let rnd = GlobalVars.ActiveScena.GetRealScena().Context.Randomizer;
+        let rnd = ActiveScena.GetRealScena().Context.Randomizer;
         var set = new Array<number>(this.cells.length);
         for (var i = 0; i < this.cells.length; i++) {
             set[i] = i;
@@ -96,8 +96,8 @@ export class RingSpawner extends ISpawner {
 
         // создаем множество ячеек
         // пробегаем по квадрату и выбираем нужные ячейки
-        let scenaWidth  = GlobalVars.ActiveScena.GetRealScena().Size.Width;
-        let scenaHeight = GlobalVars.ActiveScena.GetRealScena().Size.Height;
+        let scenaWidth  = ActiveScena.GetRealScena().Size.Width;
+        let scenaHeight = ActiveScena.GetRealScena().Size.Height;
         var xs = Math.max(center.X - rMax, 0);
         var xe = Math.min(center.X + rMax, scenaWidth - 1);
         var ys = Math.max(center.Y - rMax, 0);
@@ -123,7 +123,7 @@ export class RingSpawner extends ISpawner {
     }
 
     public Generator() : any {
-        let rnd = GlobalVars.ActiveScena.GetRealScena().Context.Randomizer;
+        let rnd = ActiveScena.GetRealScena().Context.Randomizer;
         var set = new Array<number>(this.cells.length);
         for (var i = 0; i < this.cells.length; i++) {
             set[i] = i;

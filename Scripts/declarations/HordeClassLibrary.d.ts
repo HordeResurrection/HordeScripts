@@ -6157,6 +6157,10 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 			target: HordeClassLibrary.World.Objects.Units.Unit | null
 		): boolean;
 
+		CanAutoCaptureNow(
+			target: HordeClassLibrary.World.Objects.Units.Unit | null
+		): boolean;
+
 		GetCapturer(): HordeClassLibrary.World.Objects.Units.Unit;
 
 		IsCaptureInProgress(): boolean;
@@ -15933,11 +15937,11 @@ declare namespace HordeClassLibrary.World.Settlements.FogOfWar {
 
 		EmitFor(
 			settlement: HordeClassLibrary.World.Settlements.Settlement | null
-		): void;
+		): boolean;
 
 		CancelFor(
 			settlement: HordeClassLibrary.World.Settlements.Settlement | null
-		): void;
+		): boolean;
 	}
 }
 //#endregion
@@ -17596,6 +17600,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 		// Properties:
 		readonly FogOfWar: HordeClassLibrary.World.Settlements.Modules.Vision.FogOfWarVision;
 		readonly ForestVision: HordeClassLibrary.World.Settlements.Modules.Vision.ForestVision;
+		readonly VisionModules: System.Collections.Immutable.ImmutableArray<HordeClassLibrary.World.Settlements.Modules.Vision.ASettlementVisionModule>;
 
 		// Methods:
 		UpdateOnGameTick(): void;
@@ -17673,6 +17678,18 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Vision {
 		extends HordeClassLibrary.World.Settlements.Modules.ASettlementModule
 	{
 		// Methods:
+		UpdateOnGameTick(): void;
+
+		ExploreByUnitsOf(
+			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
+			raiseGeneralEvent?: boolean /* = false */
+		): boolean;
+
+		HideByUnitsOf(
+			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
+			raiseGeneralEvent?: boolean /* = false */
+		): boolean;
+
 		IsCellVisible(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): boolean;
@@ -17711,25 +17728,15 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Vision {
 			raiseEvent?: boolean /* = true */
 		): void;
 
-		UpdateOnGameTick(): void;
-
-		ExploreUnitsOf(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
-		): void;
-
-		HideUnitsOf(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
-		): void;
-
 		Explore(
 			rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
 			raiseEvent?: boolean /* = true */
-		): void;
+		): boolean;
 
 		Hide(
 			rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
 			raiseEvent?: boolean /* = true */
-		): void;
+		): boolean;
 
 		AddEasing(
 			rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
@@ -17801,9 +17808,6 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Vision {
 			owner: HordeClassLibrary.World.Settlements.Settlement | null,
 			vision: HordeClassLibrary.World.Settlements.Modules.SettlementVision | null
 		);
-
-		// Methods:
-		UpdateOnGameTick(): void;
 	}
 }
 //#endregion

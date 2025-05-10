@@ -1,8 +1,5 @@
-import { log } from "library/common/logging";
-import { generateCellInSpiral } from "library/common/position-tools";
 import { createPoint } from "library/common/primitives";
-import { PointCommandArgs } from "library/game-logic/horde-types";
-import { Cell } from "./Types/Geometry";
+import { ScriptUnitWorkerState, UnitConfig } from "library/game-logic/horde-types";
 import { getUnitProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 
 export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
@@ -39,7 +36,7 @@ export function L1Distance(x1: number, y1: number, x2: number, y2: number) {
     return Math.abs(x1 - x2) + Math.abs(y1 - y2);
 }
 
-const SpawnUnitParameters = HCL.HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
+const SpawnUnitParameters = HordeClassLibrary.World.Objects.Units.SpawnUnitParameters;
 export function spawnUnits(settlement, uCfg, uCount, direction, generator) {
     let spawnParams = new SpawnUnitParameters();
     spawnParams.ProductUnitConfig = uCfg;
@@ -99,7 +96,7 @@ export function* generateRandomCellInRect(rectX, rectY, rectW, rectH) {
 export function CfgAddUnitProducer(Cfg: any) {
     // даем профессию найм войнов при отсутствии
     if (!getUnitProfessionParams(Cfg, UnitProfession.UnitProducer)) {
-        var donorCfg = HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Barrack"));
+        var donorCfg = HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Barrack")) as UnitConfig;
         var prof_unitProducer = getUnitProfessionParams(donorCfg, UnitProfession.UnitProducer);
         Cfg.ProfessionParams.Item.set(UnitProfession.UnitProducer, prof_unitProducer);
         
@@ -111,4 +108,25 @@ export function CfgAddUnitProducer(Cfg: any) {
         // }
         HordeContentApi.RemoveConfig(donorCfg);
     }
+}
+
+export function setUnitStateWorker(plugin, unitCfg, unitState, workerFunc) {
+    //const workerName = `${plugin.name}_${unitState}Worker`
+    const workerName = `${unitCfg.Uid}_worker`
+
+    // Обертка для метода из плагина, чтобы работал "this"
+    const workerWrapper = (u) => workerFunc.call(plugin, u);
+
+    // Прокидываем доступ к функции-обработчику в .Net через глобальную переменную
+    UnitWorkersRegistry.Register(workerName, workerWrapper);
+
+    // Объект-обработчик
+    const workerObject = new ScriptUnitWorkerState();
+    
+    // Установка функции-обработчика
+    ScriptUtils.SetValue(workerObject, "FuncName", workerName);
+
+    // Установка обработчика в конфиг
+    const stateWorkers = ScriptUtils.GetValue(unitCfg, "StateWorkers");
+    stateWorkers.Item.set(unitState, workerObject);
 }

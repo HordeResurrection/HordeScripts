@@ -1,11 +1,8 @@
-import { createGameMessageWithSound } from "library/common/messages";
-import { createHordeColor } from "library/common/primitives";
 import { UnitDirection } from "library/game-logic/horde-types";
 import { GlobalVars } from "../GlobalData";
 import { spawnUnits } from "../Utils";
 import { Cell } from "./Geometry";
 import { WaveUnit, Wave } from "./IAttackPlan";
-import { ILegendaryUnit } from "./ILegendaryUnit";
 
 export abstract class ISpawner {
     name: string;
