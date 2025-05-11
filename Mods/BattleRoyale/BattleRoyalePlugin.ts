@@ -382,7 +382,7 @@ export class BattleRoyalePlugin extends HordePluginBase {
                 var settlementNum = Number.parseInt(player.GetRealSettlement().Uid);
                 if (this._playerUidToSettlement.has(settlementNum)) {
                     var playerSettlementNum = this._playerUidToSettlement.get(settlementNum) as number;
-                    BattleController.Camera.SetCenterPosition(this._playerTaverns[playerSettlementNum].hordeUnit.Cell);
+                    BattleController.Camera.SetCenterToCell(this._playerTaverns[playerSettlementNum].hordeUnit.Cell);
                 }
             }
         }
@@ -485,7 +485,7 @@ export class BattleRoyalePlugin extends HordePluginBase {
                 var settlementNum = Number.parseInt(player.GetRealSettlement().Uid);
                 if (this._playerUidToSettlement.has(settlementNum)) {
                     var playerSettlementNum = this._playerUidToSettlement.get(settlementNum) as number;
-                    BattleController.Camera.SetCenterPosition(this._playerSettlements[playerSettlementNum].heroUnit.hordeUnit.Cell);
+                    BattleController.Camera.SetCenterToCell(this._playerSettlements[playerSettlementNum].heroUnit.hordeUnit.Cell);
                 }
             }
         }
