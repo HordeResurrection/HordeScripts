@@ -470,19 +470,11 @@ export class StrategySubcontroller extends MaraTaskableSubcontroller {
 
     CaptureLandmark(point: MaraPoint): SubcontrollerRequestResult {
         let result = new SubcontrollerRequestResult();
-        
-        let enemies = this.GetEnemiesAroundPoint(point, this.settlementController.Settings.UnitSearch.ExpandEnemySearchRadius);
 
-        if (enemies.length == 0) {
-            result.IsSuccess = true;
-            result.Task = null;
-        }
-        else {
-            result.IsSuccess = false;
-            result.Task = new LandmarkCaptureTask(point, this.settlementController, this);
-            
-            this.AddTask(result.Task);
-        }
+        result.IsSuccess = false;
+        result.Task = new LandmarkCaptureTask(point, this.settlementController, this);
+        
+        this.AddTask(result.Task);
 
         return result;
     }

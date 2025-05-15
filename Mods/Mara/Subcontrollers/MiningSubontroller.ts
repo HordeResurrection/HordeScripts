@@ -727,8 +727,6 @@ export class MiningSubcontroller extends MaraTaskableSubcontroller {
 
                 let clusterSelection = this.settlementController.StrategyController.SelectOptimalResourceCluster(closestCandidates);
 
-                return clusterSelection.OptimalReachable; //TODO: temporarily disable unreachable expands, remove this
-
                 if (clusterSelection.Optimal) {
                     if (clusterSelection.IsOptimalClusterReachable) {
                         return clusterSelection.Optimal;

@@ -1,3 +1,4 @@
+import { MaraMap } from "../../../Common/MapAnalysis/MaraMap";
 import { MaraResourceCluster } from "../../../Common/MapAnalysis/MaraResourceCluster";
 import { MaraResourceType } from "../../../Common/MapAnalysis/MaraResourceType";
 import { MaraPoint } from "../../../Common/MaraPoint";
@@ -30,6 +31,14 @@ export class ExpandBuildState extends ProductionTaskState {
             return false;
         }
         else {
+            let settlementLocation = this.settlementController.GetSettlementLocation()!;
+            let path = MaraMap.GetShortestPath(settlementLocation.Center, center);
+
+            if (!path && !settlementLocation.Center.EqualsTo(center)) {
+                this.task.Debug(`Unable to build expand, location is not reachable`);
+                return false;
+            }
+            
             this.expandCenter = center;
             this.targetExpand!.BuildCenter = center;
 

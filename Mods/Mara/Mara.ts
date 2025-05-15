@@ -109,9 +109,9 @@ export class Mara {
             Mara.CanRun = true;
             Mara.controllers = [];
 
-            MaraMap.Init();
             MaraUnitCache.Init();
             MaraUnitConfigCache.Init();
+            MaraMap.Init();
 
             let tickOffset = 0;
             let processedSettlements: Array<Settlement> = [];

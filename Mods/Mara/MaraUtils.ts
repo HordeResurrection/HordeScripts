@@ -103,8 +103,8 @@ export class MaraUtils {
         return DotnetHolder.ResourceMap.Item.get(x, y);
     }
 
-    static GetAllSettlements(): Array<any> {
-        let result: Array<any> = [];
+    static GetAllSettlements(): Array<Settlement> {
+        let result: Array<Settlement> = [];
 
         ForEach(
             DotnetHolder.RealScena.Settlements,
