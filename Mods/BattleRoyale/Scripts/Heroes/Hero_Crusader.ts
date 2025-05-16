@@ -15,7 +15,7 @@ export class Hero_Crusader extends IHero {
         ScriptUtils.SetValue(this.Cfg.MainArmament.ShotParams, "Damage", 5);
         ScriptUtils.SetValue(this.Cfg, "Sight", 5);
 
-        IHero._InitHordeConfig.call(this);
+        super._InitHordeConfig();
         //ScriptUtils.SetValue(config, "Flags", mergeFlags(UnitFlags, config.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
     }
 }

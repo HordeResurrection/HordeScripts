@@ -1,8 +1,8 @@
 import { LogLevel } from "library/common/logging";
-import { generateCellInSpiral, generateRandomCellInRect } from "library/common/position-tools";
+import { generateCellInRect, generateCellInSpiral, generateRandomCellInRect } from "library/common/position-tools";
 import { isReplayMode } from "library/game-logic/game-tools";
 import { BattleController, Settlement, UnitDirection, UnitHurtType } from "library/game-logic/horde-types";
-import { spawnUnits } from "library/game-logic/unit-spawn";
+import { spawnUnit, spawnUnits } from "library/game-logic/unit-spawn";
 import HordePluginBase from "plugins/base-plugin";
 import { Factory_Slavyane } from "./Units/Factory_Slavyane";
 import { GameField } from "./Core/GameField";
@@ -21,6 +21,10 @@ import { Tavern } from "./Units/Tavern";
 import { ISpell } from "./Heroes/Spells/ISpell";
 import { Spell_Teleportation } from "./Heroes/Spells/Spell_Teleportation";
 import { Spell_Fireball } from "./Heroes/Spells/Spell_Fireball";
+import { Spell_Arrows_Volley } from "./Heroes/Spells/Spell_Arrows_Volley";
+import { Spell_golden_barracks_summon } from "./Heroes/Spells/Spell_golden_barracks_summon";
+import { Spell_healing_aura } from "./Heroes/Spells/Spell_healing_aura";
+import { Spell_teleportation_mark } from "./Heroes/Spells/Spell_teleportation_mark";
 
 const PeopleIncomeLevel = HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 type PeopleIncomeLevel = HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
@@ -34,8 +38,12 @@ enum GameState {
 }
 
 var spellsTypes : Array<typeof ISpell> = [
-    Spell_Teleportation,
-    Spell_Fireball
+    Spell_Arrows_Volley,
+    Spell_Fireball,
+    Spell_golden_barracks_summon,
+    Spell_healing_aura,
+    Spell_teleportation_mark,
+    Spell_Teleportation
 ];
 
 export class BattleRoyalePlugin extends HordePluginBase {
@@ -147,20 +155,23 @@ export class BattleRoyalePlugin extends HordePluginBase {
 
         // спавн способностей
         if (this._nextSpawnSpell < gameTickNum && this._gameField.CurrentCircle()) {
-            this._nextSpawnSpell = gameTickNum + 60 * 50;
+            this._nextSpawnSpell = gameTickNum + 50 * 50;
 
             var rnd          = ActiveScena.GetRealScena().Context.Randomizer;
             var spellTypeNum = rnd.RandomNumber(0, spellsTypes.length - 1);
-            var circle              = this._gameField.CurrentCircle() as GeometryCircle;
-            var circleCenter        = circle.center.Scale(1/32);
-            var circleRadius        = circle.radius / 32;
+            var gameFieldRectangle  = this._gameField.GetCurrentRectangle();
             var generator           = generateRandomCellInRect(
-                Math.round(circleCenter.X - circleRadius),
-                Math.round(circleCenter.Y - circleRadius),
-                Math.round(circleCenter.X + circleRadius),
-                Math.round(circleCenter.Y + circleRadius));
+                gameFieldRectangle.LD.X,
+                gameFieldRectangle.LD.Y,
+                gameFieldRectangle.RU.X,
+                gameFieldRectangle.RU.Y);
             var spellCell    = generator.next().value;
-            this._spells.push(new spellsTypes[spellTypeNum](new Cell(spellCell.X, spellCell.Y)));
+            this._spells.push(
+                new spellsTypes[spellTypeNum](
+                    new Cell(spellCell.X, spellCell.Y),
+                    this._buildingsTemplate,
+                    this._neutralSettlement,
+                    this._enemySettlement));
         }
 
         // спавн строений
@@ -177,14 +188,12 @@ export class BattleRoyalePlugin extends HordePluginBase {
                 rarityNum--;
                 rarityStart*=2;
             }
-            var circle              = this._gameField.CurrentCircle() as GeometryCircle;
-            var circleCenter        = circle.center.Scale(1/32);
-            var circleRadius        = circle.radius / 32;
+            var gameFieldRectangle  = this._gameField.GetCurrentRectangle();
             var generator           = generateRandomCellInRect(
-                Math.round(circleCenter.X - circleRadius),
-                Math.round(circleCenter.Y - circleRadius),
-                Math.round(circleCenter.X + circleRadius),
-                Math.round(circleCenter.Y + circleRadius));
+                gameFieldRectangle.LD.X,
+                gameFieldRectangle.LD.Y,
+                gameFieldRectangle.RU.X,
+                gameFieldRectangle.RU.Y);
             var units               = spawnUnits(
                 this._enemySettlement.hordeSettlement,
                 this._buildingsTemplate[buildingTemplateNum].buildings[rarityNum].hordeConfig,
@@ -303,6 +312,11 @@ export class BattleRoyalePlugin extends HordePluginBase {
 
                     if (!playerSettlement) return;
 
+                    // проверяем, что поселение не проиграло
+                    if (playerSettlement.isDefeat) {
+                        return;
+                    }
+
                     var rarityNum = 0;
                     for (;rarityNum < that._buildingsTemplate[building.templateNum].buildings.length; rarityNum++) {
                         if (that._buildingsTemplate[building.templateNum].buildings[rarityNum].hordeConfig.Uid ==
@@ -411,19 +425,23 @@ export class BattleRoyalePlugin extends HordePluginBase {
         var that = this;
         var rnd         = ActiveScena.GetRealScena().Context.Randomizer;
         var generator   = this._gameField.GeneratorRandomCell();
-        var gameFieldArea = this._gameField.Area();
+        var gameFieldArea = this._gameField.StartArea();
 
         // создаем выбранных героев в случайном месте карты и создаем поселения игроков
 
+        var heroesPosition = this._gameField.GetEquidistantPositions(this._playerHordeSettlements.length);
+
         for (var playerNum = 0; playerNum < this._playerHordeSettlements.length; playerNum++) {
             var selectedHero = this._playerTaverns[playerNum].selectedHero as typeof IHero;
-
+            var heroCellNum  = rnd.RandomNumber(0, heroesPosition.length - 1);
+            var generatorHeroCell = generateCellInSpiral(heroesPosition[heroCellNum].X, heroesPosition[heroCellNum].Y);
             var hero = new selectedHero(spawnUnits(
                 this._playerHordeSettlements[playerNum],
                 selectedHero.GetHordeConfig(),
                 1,
                 UnitDirection.RightDown,
-                generator)[0]);
+                generatorHeroCell)[0]);
+            heroesPosition.splice(heroCellNum, 1);
 
             this._playerSettlements.push(new PlayerSettlement(this._playerHordeSettlements[playerNum], hero));
 
@@ -475,7 +493,12 @@ export class BattleRoyalePlugin extends HordePluginBase {
         for (var i = 0; i < spawnSpellsCount; i++) {
             var spellTypeNum = rnd.RandomNumber(0, spellsTypes.length - 1);
             var spellCell    = generator.next().value;
-            this._spells.push(new spellsTypes[spellTypeNum](new Cell(spellCell.X, spellCell.Y)));
+            this._spells.push(
+                new spellsTypes[spellTypeNum](
+                    new Cell(spellCell.X, spellCell.Y),
+                    this._buildingsTemplate,
+                    this._neutralSettlement,
+                    this._enemySettlement));
         }
 
         // перемещаем экран на героев игроков

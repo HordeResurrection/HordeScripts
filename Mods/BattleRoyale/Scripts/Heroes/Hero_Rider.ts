@@ -19,7 +19,7 @@ export class Hero_Rider extends IHero {
         ScriptUtils.SetValue(this.Cfg, "PressureResist", 30);
         this.Cfg.Speeds.Item.set(TileType.Forest, 2);
 
-        IHero._InitHordeConfig.call(this);
+        super._InitHordeConfig();
         //ScriptUtils.SetValue(config, "Flags", mergeFlags(UnitFlags, config.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
     }
 }

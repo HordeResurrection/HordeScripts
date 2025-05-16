@@ -20,6 +20,6 @@ export class Hero_FireArcher extends IHero {
         ScriptUtils.SetValue(this.Cfg, "Weight", 9);
         ScriptUtils.SetValue(this.Cfg, "PressureResist", 20);
         
-        IHero._InitHordeConfig.call(this);
+        super._InitHordeConfig();
     }
 }

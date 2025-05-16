@@ -39,7 +39,7 @@ export class Tavern extends IUnit {
     }
 
     public static GetHordeConfig(): UnitConfig {
-        IUnit.GetHordeConfig.call(this);
+        super.GetHordeConfig();
 
         if (!this._OnProducedCallbackInit) {
             this._OnProducedCallbackInit = true;
@@ -74,7 +74,7 @@ export class Tavern extends IUnit {
     }
 
     public static _InitHordeConfig(): void {
-        IUnit._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         // добавляем героев
         var producerParams = this.Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer) as UnitProducerProfessionParams;

@@ -41,7 +41,7 @@ export class IHero extends IUnit {
     }
 
     public static GetHordeConfig () : UnitConfig {
-        IUnit.GetHordeConfig.call(this);
+        super.GetHordeConfig();
 
         // добавляем кастомный обработчик команд
         if (!this._GetOrderWorkerSet) {
@@ -66,7 +66,7 @@ export class IHero extends IUnit {
     }
 
     protected static _InitHordeConfig() {
-        IUnit._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         // формируем описание характеристик
 
@@ -90,9 +90,9 @@ export class IHero extends IUnit {
 
         // создаем кастомную команду
 
-        if (!this.Cfg.AllowedCommands.ContainsKey(UnitCommand.Capture)) {
-            this.Cfg.AllowedCommands.Add(UnitCommand.Capture, ISpell.GetHordeConfig());
-        }
+        // if (!this.Cfg.AllowedCommands.ContainsKey(UnitCommand.Capture)) {
+        //     this.Cfg.AllowedCommands.Add(UnitCommand.Capture, ISpell.GetHordeConfig());
+        // }
     }
     
     private static _GetOrderWorker(unit: Unit, commandArgs: ACommandArgs): boolean {
@@ -123,8 +123,14 @@ export class IHero extends IUnit {
         this._formation.OnEveryTick(gameTickNum);
         this._UpdateFrame();
 
-        if (!IUnit.prototype.OnEveryTick.call(this, gameTickNum)) {
+        if (!super.OnEveryTick(gameTickNum)) {
             return false;
+        }
+
+        // если способность закончила действие
+        if (this._spell?.IsEnd()) {
+            this.hordeUnit.CommandsMind.RemoveAddedCommand(this._spell.GetUnitCommand());
+            this._spell = null;
         }
 
         this._formation.SetCenter(Cell.ConvertHordePoint(this.hordeUnit.Cell));
@@ -143,23 +149,21 @@ export class IHero extends IUnit {
             }
         }
         // кастомная команда
-        else if (commandArgs.CommandType == UnitCommand.Capture) {
-            var targetCell = Cell.ConvertHordePoint(commandArgs.TargetCell);
-            if (this._spell) {
-                this._spell.Activate(targetCell);
-                this._spell = null;
-            } else {
-                this.hordeUnit.Owner.Messages.AddMessage(createGameMessageWithNoSound("У вас нету способности!"));
-            }
+        else if (this._spell && commandArgs.CommandType == this._spell.GetUnitCommand()) {
+            this._spell.Activate(commandArgs);
             return false;
         }
 
         return true;
     }
 
-    public PickUpSpell(spell: ISpell) {
+    public PickUpSpell(spell: ISpell) : boolean {
         if (!this._spell) {
             this._spell = spell;
+            this.hordeUnit.CommandsMind.AddCommand(this._spell.GetUnitCommand(), spell.GetCommandConfig());
+            return true;
+        } else {
+            return false;
         }
     }
 

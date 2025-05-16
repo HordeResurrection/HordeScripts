@@ -1,52 +1,147 @@
-import { createPoint } from "library/common/primitives";
-import { BattleController, GeometryCanvas, GeometryVisualEffect, Stride_Color, Stride_Vector2, UnitCommandConfig } from "library/game-logic/horde-types";
+import { createPoint, HordeColor, Point2D } from "library/common/primitives";
+import { ACommandArgs, BattleController, BulletConfig, DrawLayer, GeometryCanvas, GeometryVisualEffect, Stride_Color, Stride_Vector2, StringVisualEffect, UnitCommand, UnitCommandConfig } from "library/game-logic/horde-types";
 import { Cell } from "../../Core/Cell";
 import { IHero } from "../IHero";
-import { spawnGeometry } from "library/game-logic/decoration-spawn";
+import { spawnGeometry, spawnString } from "library/game-logic/decoration-spawn";
 import { createGameMessageWithNoSound } from "library/common/messages";
+import { BuildingTemplate } from "../../Units/IFactory";
+import { GameSettlement } from "../../Core/GameSettlement";
 
 export enum SpellState {
     DROPPED = 0,
     PICKUP, 
     ACTIVATED,
+    RELOAD,
     END
 }
 
 export class ISpell {
-    protected static CfgPrefix : string = "#BattleRoyale_";
-    protected static CfgUid    : string = "Hero_CustomCommand";
+    protected static _CfgPrefix             : string = "#BattleRoyale_";
+    protected static _CfgUid                : string = "Hero_CustomCommand";
+    protected static _UnitCommand           : UnitCommand = UnitCommand.HoldPosition;
+    protected static _UnitCommandBaseCfg    : string = "#UnitCommandConfig_HoldPosition";
+    protected static _AnimationsCatalogRef  : string = "#AnimCatalog_Command_View";
+    protected static _EffectStrideColor     : Stride_Color = new Stride_Color(255, 255, 255, 255);
+    protected static _EffectHordeColor      : HordeColor = new HordeColor(255, 255, 255, 255);
+    protected static _Name                  : string = "Способность";
+    protected static _Description           : string = "";
 
-    protected _name            : string = "Способность";
-    protected _description     : string = "";
+    private  _commandConfig         : UnitCommandConfig;
+    private  _state                 : SpellState;
+    private  _reloadTick            : number;
+    private static _ProcessingTick : number = 0;
+    private static _ProcessingTickModule : number = 25;
+    private        _processingTick : number;
+    private _textEffect             : StringVisualEffect | null;
+    private _visualEffect           : GeometryVisualEffect | null;
 
-    private static ProcessingTick : number = 0;
-    private static ProcessingTickModule : number = 25;
-    private   _processingTick : number;
+    protected _hero                 : IHero | null;
+    protected _cell                 : Cell;
+    protected _activateArgs         : ACommandArgs;
+    protected _activatedGameTick    : number;
+    protected _reloadPeriod         : number;
+    protected _charges              : number;
+    protected _buildingsTemplate    : Array<BuildingTemplate>;
+    protected _neutralSettlement    : GameSettlement;
+    protected _enemySettlement      : GameSettlement;
 
-    private _visualEffect : GeometryVisualEffect | null;
-
-    protected _state      : SpellState;
-    protected _targetCell : Cell;
-    protected _hero       : IHero | null;
-    protected _cell       : Cell;
-    protected _activatedGameTick : number;
-
-    constructor(cell: Cell) {
+    constructor(cell: Cell,
+        buildingsTemplate: Array<BuildingTemplate>,
+        neutralSettlement: GameSettlement,
+        enemySettlement      : GameSettlement) {
         this._state             = SpellState.DROPPED;
         this._hero              = null;
         this._cell              = cell;
+        this._textEffect        = null;
         this._visualEffect      = null;
+        this._buildingsTemplate = buildingsTemplate;
+        this._neutralSettlement = neutralSettlement;
+        this._enemySettlement   = enemySettlement;
 
-        this._processingTick    = ISpell.ProcessingTick++ % ISpell.ProcessingTickModule;
+        this._processingTick    = ISpell._ProcessingTick++ % ISpell._ProcessingTickModule;
+        this._commandConfig     = this._MakeCommandConfig();
+        this._charges           = 1;
+        this._reloadPeriod      = 50;
     }
 
-    public static GetHordeConfig () : UnitCommandConfig {
-        var customCommandCfgUid = this.CfgPrefix + this.CfgUid;
+    public GetUnitCommand() : UnitCommand {
+        return this.constructor['_UnitCommand'];
+    }
+
+    public GetCommandConfig() : UnitCommandConfig {
+        return this._commandConfig;
+    }
+
+    public IsEnd() : boolean {
+        return this._state == SpellState.END;
+    }
+
+    public Activate(activateArgs: ACommandArgs) : boolean {
+        if (this._state == SpellState.PICKUP) {
+            this._state             = SpellState.ACTIVATED;
+            this._activatedGameTick = BattleController.GameTimer.GameFramesCounter;
+            this._activateArgs      = activateArgs;
+
+            this._textEffect             = spawnString(ActiveScena, this.constructor['_Name'],
+                Cell.ConvertHordePoint(this._hero?.hordeUnit.Cell as Point2D)
+                .Scale(32).Add(new Cell(-2.5*this.constructor['_Name'].length, 0)).Round().ToHordePoint(), 150);
+            this._textEffect.Height    = 18;
+            this._textEffect.Color     = this.constructor['_EffectHordeColor'];
+            this._textEffect.DrawLayer = DrawLayer.Birds;
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public OnEveryTick(gameTickNum: number): boolean {
+        if (gameTickNum % ISpell._ProcessingTickModule != this._processingTick) {
+            return false;
+        }
+
+        switch (this._state) {
+            case SpellState.DROPPED:
+                if (!this._OnEveryTickDropped(gameTickNum)) {
+                    this._state = SpellState.PICKUP;
+                }
+                break;
+            case SpellState.PICKUP:
+                if (!this._OnEveryTickPickup(gameTickNum)) {
+                    this._state = SpellState.ACTIVATED;
+                }
+                break;
+            case SpellState.ACTIVATED:
+                if (!this._OnEveryTickActivated(gameTickNum)) {
+                    this._charges--;
+                    if (this._charges == 0) {
+                        this._state = SpellState.END;
+                    } else {
+                        this._reloadTick = gameTickNum + this._reloadPeriod;
+                        this._state = SpellState.RELOAD;
+                    }
+                }
+                break;
+            case SpellState.RELOAD:
+                if (!this._OnEveryTickReload(gameTickNum)) {
+                    this._state = SpellState.PICKUP;
+                }
+                break;
+            case SpellState.END:
+                break;
+        }
+
+        return true;
+    }
+
+    protected _MakeCommandConfig() : UnitCommandConfig {
+        var customCommandCfgUid = this.constructor['_CfgPrefix'] + this.constructor['_CfgUid'];
         var customCommand : UnitCommandConfig;
         if (HordeContentApi.HasUnitCommand(customCommandCfgUid)) {
             customCommand = HordeContentApi.GetUnitCommand(customCommandCfgUid);
         } else {
-            customCommand = HordeContentApi.CloneConfig(HordeContentApi.GetUnitCommand("#UnitCommandConfig_Capture"), customCommandCfgUid) as UnitCommandConfig;
+            customCommand = HordeContentApi.CloneConfig(
+                HordeContentApi.GetUnitCommand(this.constructor['_UnitCommandBaseCfg']), customCommandCfgUid) as UnitCommandConfig;
             // Настройка
             ScriptUtils.SetValue(customCommand, "Name", "Активный навык");
             ScriptUtils.SetValue(customCommand, "Tip", "Применить полученный активный навык");  // Это будет отображаться при наведении курсора
@@ -56,73 +151,84 @@ export class ISpell {
             ScriptUtils.SetValue(customCommand, "PreferredPosition", createPoint(1, 1));
             ScriptUtils.SetValue(customCommand, "AutomaticMode", null);
             // Установка анимации выполняетс чуть другим способом:
-            ScriptUtils.GetValue(customCommand, "AnimationsCatalogRef").SetConfig(HordeContentApi.GetAnimationCatalog("#AnimCatalog_Command_View"));
+            ScriptUtils.GetValue(customCommand, "AnimationsCatalogRef")
+                .SetConfig(HordeContentApi.GetAnimationCatalog(this.constructor['_AnimationsCatalogRef']));
         }
 
         return customCommand;
     }
 
-    public IsEnd() : boolean {
-        return this._state == SpellState.END;
-    }
+    protected _OnEveryTickDropped(gameTickNum: number) {
+        // создаем визуальный эффект
 
-    public Activate(targetCell: Cell) {
-        this._state             = SpellState.ACTIVATED;
-        this._activatedGameTick = BattleController.GameTimer.GameFramesCounter;
-        this._targetCell        = targetCell;
-    }
-
-    public OnEveryTick(gameTickNum: number): boolean {
-        if (gameTickNum % ISpell.ProcessingTickModule != this._processingTick) {
-            return false;
+        if (!this._visualEffect) {
+            this._MakeVisualEffect();
         }
 
-        if (this._state == SpellState.DROPPED) {
-            // создаем визуальный эффект
+        // ищем обладателя способности
 
-            if (!this._visualEffect) {
-                // Объект для низкоуровневого формирования геометрии
-                let geometryCanvas = new GeometryCanvas();
-                
-                const width  = 32;
-                const height = 32;
-        
-                var points = host.newArr(Stride_Vector2, 5)  as Stride_Vector2[];;
-                points[0] = new Stride_Vector2(Math.round(-0.6*width),  Math.round(-0.6*height));
-                points[1] = new Stride_Vector2(Math.round( 0.6*width),  Math.round(-0.6*height));
-                points[2] = new Stride_Vector2(Math.round( 0.6*width),  Math.round( 0.6*height));
-                points[3] = new Stride_Vector2(Math.round(-0.6*width),  Math.round( 0.6*height));
-                points[4] = new Stride_Vector2(Math.round(-0.6*width),  Math.round(-0.6*height));
-        
-                geometryCanvas.DrawPolyLine(points,
-                    new Stride_Color(255, 255, 255, 255),
-                    3.0, false);
-        
-                let ticksToLive = GeometryVisualEffect.InfiniteTTL;
-                this._visualEffect = spawnGeometry(ActiveScena, geometryCanvas.GetBuffers(), this._cell.Scale(32).Add(new Cell(16, 16)).ToHordePoint(), ticksToLive);
-            }
-
-            // ищем обладателя способности
-
-            var upperHordeUnit = ActiveScena.UnitsMap.GetUpperUnit(this._cell.ToHordePoint());
-            if (upperHordeUnit) {
-                var hero = IHero.OpUnitIdToHeroObject.get(upperHordeUnit.Id);
-                if (hero) {
-                    this._hero = hero;
-                    this._hero.PickUpSpell(this);
-
+        var upperHordeUnit = ActiveScena.UnitsMap.GetUpperUnit(this._cell.ToHordePoint());
+        if (upperHordeUnit) {
+            var hero = IHero.OpUnitIdToHeroObject.get(upperHordeUnit.Id);
+            if (hero) {
+                this._hero = hero;
+                if (this._hero.PickUpSpell(this)) {
                     // оповещение о способности
-                    this._hero.hordeUnit.Owner.Messages.AddMessage(createGameMessageWithNoSound("Вам доступна способность: " + this._name + "\n" + this._description));
+                    this._hero.hordeUnit.Owner.Messages.AddMessage(
+                        createGameMessageWithNoSound(
+                            "Вам доступна способность: " + this.constructor['_Name'] + "\n" + this.constructor['_Description']));
 
                     // удалить визуальный эффект
-                    this._visualEffect?.Free();
-                    this._visualEffect = null;
+                    this._FreeVisualEffect();
 
-                    this._state = SpellState.PICKUP;
+                    return false;
                 }
             }
         }
 
         return true;
+    }
+
+    protected _OnEveryTickPickup(gameTickNum: number) {
+        return true;
+    }
+
+    protected _OnEveryTickActivated(gameTickNum: number) {
+        return true;
+    }
+
+    protected _OnEveryTickReload(gameTickNum: number) {
+        return gameTickNum < this._reloadTick;
+    }
+
+    private _MakeVisualEffect() {
+        let geometryCanvas = new GeometryCanvas();
+        const width  = 32;
+        const height = 32;
+        var points = host.newArr(Stride_Vector2, 5)  as Stride_Vector2[];;
+        points[0] = new Stride_Vector2(Math.round(-0.6*width),  Math.round(-0.6*height));
+        points[1] = new Stride_Vector2(Math.round( 0.6*width),  Math.round(-0.6*height));
+        points[2] = new Stride_Vector2(Math.round( 0.6*width),  Math.round( 0.6*height));
+        points[3] = new Stride_Vector2(Math.round(-0.6*width),  Math.round( 0.6*height));
+        points[4] = new Stride_Vector2(Math.round(-0.6*width),  Math.round(-0.6*height));
+
+        geometryCanvas.DrawPolyLine(points, this.constructor['_EffectStrideColor'], 2.0, false);
+
+        let ticksToLive = GeometryVisualEffect.InfiniteTTL;
+        this._visualEffect = spawnGeometry(ActiveScena, geometryCanvas.GetBuffers(), this._cell.Scale(32).Add(new Cell(16, 16)).ToHordePoint(), ticksToLive);
+
+        this._textEffect           = spawnString(ActiveScena, this.constructor['_Name'],
+            this._cell.Scale(32).Add(new Cell(-2.5*this.constructor['_Name'].length, -20)).Round().ToHordePoint(), ticksToLive);
+        this._textEffect.Height    = 18;
+        this._textEffect.Color     = this.constructor['_EffectHordeColor'];
+        this._textEffect.DrawLayer = DrawLayer.Birds;
+    }
+
+    private _FreeVisualEffect() {
+        this._visualEffect?.Free();
+        this._visualEffect = null;
+        
+        this._textEffect?.Free();
+        this._textEffect = null;
     }
 }

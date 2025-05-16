@@ -52,7 +52,7 @@ export class Hero_Totemist extends IHero {
         produceList.Add(formationTotemFireConfig);
         produceList.Add(formationTotemFireBallConfig);
 
-        IHero._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n" +
             "Сражается с помощью тотемов защиты (" + totemDefenceConfig.MaxHealth + " здоровья " + totemDefenceConfig.MainArmament.ShotParams.Damage + " урона, требуют "
@@ -63,7 +63,7 @@ export class Hero_Totemist extends IHero {
     }
 
     public AddUnitToFormation(unit: IUnit): void {
-        IHero.prototype.AddUnitToFormation.call(this, unit);
+        super.AddUnitToFormation(unit);
 
         if (unit.hordeConfig.Uid == FormationTotem_fire.GetHordeConfig().Uid) {
             this._formation_totems.push(new FormationTotem_fire(unit.hordeUnit));
@@ -80,7 +80,7 @@ export class Hero_Totemist extends IHero {
     public OnEveryTick(gameTickNum: number): boolean {
         this._formation_totems.forEach((totem) => totem.OnEveryTick(gameTickNum));
 
-        if (!IHero.prototype.OnEveryTick.call(this, gameTickNum)) {
+        if (!super.OnEveryTick(gameTickNum)) {
             return false;
         }
 
@@ -200,7 +200,7 @@ class Totem_defence extends IUnit {
     }
 
     protected static _InitHordeConfig() {
-        IUnit._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Тотем защиты");
         ScriptUtils.SetValue(this.Cfg, "Description", "Стреляет ядрами во врагов");
@@ -236,7 +236,7 @@ class IFormationTotem extends IUnit {
     }
 
     protected static _InitHordeConfig() {
-        IUnit._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         ScriptUtils.SetValue(this.Cfg, "MaxHealth", 40);
         ScriptUtils.SetValue(this.Cfg, "MinHealth", 5);
@@ -249,7 +249,7 @@ class IFormationTotem extends IUnit {
     }
 
     public OnEveryTick(gameTickNum: number): boolean {
-        if (!IUnit.prototype.OnEveryTick.call(this, gameTickNum)) {
+        if (!super.OnEveryTick(gameTickNum)) {
             return false;
         }
 
@@ -296,7 +296,7 @@ class FormationTotem_fire extends IFormationTotem {
     }
 
     protected static _InitHordeConfig() {
-        IFormationTotem._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Тотем формации - огненный лучник");
         ScriptUtils.SetValue(this.Cfg, "Description", "Добавляет дождь из огненных стрел внутри формации.\nФормация это полигон соединяющий 3 и более тотемов формации.");
@@ -320,7 +320,7 @@ class FormationTotem_ballista extends IFormationTotem {
     }
 
     protected static _InitHordeConfig() {
-        IFormationTotem._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Тотем формации - баллиста");
         ScriptUtils.SetValue(this.Cfg, "Description", "Добавляет дождь из стрел баллисты внутри формации.\nФормация это полигон соединяющий 3 и более тотемов формации.");
@@ -344,7 +344,7 @@ class FormationTotem_fireball extends IFormationTotem {
     }
 
     protected static _InitHordeConfig() {
-        IFormationTotem._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Тотем формации - огненный шар");
         ScriptUtils.SetValue(this.Cfg, "Description", "Добавляет дождь из огненных шаров внутри формации.\nФормация это полигон соединяющий 3 и более тотемов формации.");

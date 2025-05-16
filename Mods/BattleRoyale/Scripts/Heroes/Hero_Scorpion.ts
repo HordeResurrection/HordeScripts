@@ -30,9 +30,9 @@ export class Hero_Scorpion extends IHero {
         this.Cfg.Speeds.Item.set(TileType.Forest, 4);
         this.Cfg.Speeds.Item.set(TileType.Grass, 13);
         ScriptUtils.SetValue(this.Cfg, "Weight", 9);
-        ScriptUtils.SetValue(this.Cfg, "PressureResist", 18);
+        ScriptUtils.SetValue(this.Cfg, "PressureResist", 20);
         
-        IHero._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         var scorpionConfig = Scorpion.GetHordeConfig();
         ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n" +
@@ -47,7 +47,7 @@ export class Hero_Scorpion extends IHero {
     }
 
     public AddUnitToFormation(unit: IUnit): void {
-        IHero.prototype.AddUnitToFormation.call(this, unit);
+        super.AddUnitToFormation(unit);
 
         if (unit.hordeConfig.Uid == Scorpion.GetHordeConfig().Uid) {
             this._scorpions.push(unit);
@@ -59,7 +59,7 @@ export class Hero_Scorpion extends IHero {
     }
 
     public OnEveryTick(gameTickNum: number): boolean {
-        if (!IHero.prototype.OnEveryTick.call(this, gameTickNum)) {
+        if (!super.OnEveryTick(gameTickNum)) {
             return false;
         }
 
@@ -104,10 +104,10 @@ class Scorpion extends IUnit {
     }
 
     protected static _InitHordeConfig() {
-        IUnit._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Скорпион");
-        ScriptUtils.SetValue(this.Cfg, "MaxHealth", 7);
+        ScriptUtils.SetValue(this.Cfg, "MaxHealth", 9);
         ScriptUtils.SetValue(this.Cfg, "Shield", 0);
         ScriptUtils.SetValue(this.Cfg.MainArmament.ShotParams, "Damage", 3);
         ScriptUtils.SetValue(this.Cfg, "Flags", mergeFlags(UnitFlags, this.Cfg.Flags, UnitFlags.NotChoosable));

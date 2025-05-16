@@ -39,7 +39,7 @@ export class Hero_Hunter extends IHero {
         ScriptUtils.SetValue(this.Cfg, "Weight", 9);
         ScriptUtils.SetValue(this.Cfg, "PressureResist", 20);
 
-        IHero._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         //ScriptUtils.SetValue(config, "Flags", mergeFlags(UnitFlags, config.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
         
@@ -51,7 +51,7 @@ export class Hero_Hunter extends IHero {
     }
 
     public OnEveryTick(gameTickNum: number): boolean {
-        if (!IHero.prototype.OnEveryTick.call(this, gameTickNum)) {
+        if (!super.OnEveryTick(gameTickNum)) {
             return false;
         }
 
@@ -83,7 +83,7 @@ class Bear extends IUnit {
     }
 
     protected static _InitHordeConfig() {
-        IUnit._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Подручный медведь");
         ScriptUtils.SetValue(this.Cfg, "Flags", mergeFlags(UnitFlags, this.Cfg.Flags, UnitFlags.NotChoosable));
