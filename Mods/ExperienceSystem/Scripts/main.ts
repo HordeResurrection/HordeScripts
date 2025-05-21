@@ -1,9 +1,9 @@
 import { activePlugins } from "active-plugins";
 import { log } from "library/common/logging";
 import { broadcastMessage } from "library/common/messages";
-import { createHordeColor } from "library/common/primitives";
+import { createHordeColor, HordeColor } from "library/common/primitives";
 import { eNext, enumerate } from "library/dotnet/dotnet-utils";
-import { BattleController, TileType, UnitFlags, UnitSpecification } from "library/game-logic/horde-types";
+import { BattleController, TileType, Unit, UnitConfig, UnitFlags, UnitSpecification } from "library/game-logic/horde-types";
 import { UnitProfession } from "library/game-logic/unit-professions";
 import HordePluginBase from "plugins/base-plugin";
 
@@ -25,7 +25,7 @@ export function onInitialization() {
 }
 
 class UnitExperienceSystem {
-    unit:                       any;
+    unit:                       Unit;
     tickMask:                   number;
     unitDTO:                    any;
     Cfg_MaxHealth:              number;
@@ -40,7 +40,7 @@ class UnitExperienceSystem {
 
     configExpCoeff:             number;
 
-    constructor (unit: any, baseUnit?: any) {
+    constructor (unit: Unit, baseUnit?: Unit) {
         this.unit                       = unit;
         this.unitDTO                    = ScriptUtils.GetValue(this.unit, "Model");
         this.tickMask                   = unit.PseudoTickCounter % UnitUpdatePeriod;
@@ -152,7 +152,7 @@ class UnitExperienceSystem {
         }
     }
 
-    public OnCauseDamage(victimUnit: any, damage: number) {
+    public OnCauseDamage(victimUnit: Unit, damage: number) {
         var trueDamage = damage - victimUnit.Cfg.Shield;
         if (trueDamage > 0 && this.level < ExperienceSystemGlobalData.Levels_ExpCoeff.length - 1) {
             this.experience += trueDamage
@@ -183,7 +183,7 @@ class ExperienceSystemGlobalData {
     static Levels_AdditionalSight:              Array<number>  = [0, 1, 1, 2];
     static Levels_AdditionalWeight:             Array<number>  = [1, 2, 3, 4];
     static Levels_AdditionalPressureResist:     Array<number>  = [1, 2, 3, 4];
-    static Levels_TintColor:                    Array<any>     = [createHordeColor(255, 150, 255, 150), createHordeColor(255, 180, 180, 255), createHordeColor(255, 255, 150, 255), createHordeColor(150, 255, 170, 0)];
+    static Levels_TintColor:                    Array<HordeColor> = [createHordeColor(255, 150, 255, 150), createHordeColor(255, 180, 180, 255), createHordeColor(255, 255, 150, 255), createHordeColor(150, 255, 170, 0)];
     static Levels_Alerts:                       Array<boolean> = [false, false, false, true];
 
     static PassiveExpIncome_Period:             number = 512;
@@ -200,12 +200,12 @@ class ExperienceSystemGlobalData {
         this._isCombadConfigsCash = new Map<string, boolean>();
         this._getConfigExpCoeff   = new Map<string, number>();
         this._getConfigExpPerHP   = new Map<string, number>();
-        this._getNextLevelCfgCash = new Map<string, any>();
+        this._getNextLevelCfgCash = new Map<string, UnitConfig>();
     }
 
     private _isCombadConfigsCash: Map<string, boolean>;
     /// для конфига вернет флаг, что для конфига нужна система опыта
-    public IsCombatConfig(unitConfig: any): boolean {
+    public IsCombatConfig(unitConfig: UnitConfig): boolean {
         var isCombat              : boolean               = false;
         if (this._isCombadConfigsCash.has(unitConfig.Uid)) {
             isCombat = this._isCombadConfigsCash.get(unitConfig.Uid) as boolean;
@@ -222,7 +222,7 @@ class ExperienceSystemGlobalData {
 
     private _getConfigExpCoeff: Map<string, number>;
     /// для конфига вернет коэффициент прокачки
-    public GetConfigExpCoeff(unitConfig: any): number {
+    public GetConfigExpCoeff(unitConfig: UnitConfig): number {
         var res: number = 0;
         if (this._getConfigExpCoeff.has(unitConfig.Uid)) {
             res = this._getConfigExpCoeff.get(unitConfig.Uid) as number;
@@ -241,7 +241,7 @@ class ExperienceSystemGlobalData {
 
     private _getConfigExpPerHP: Map<string, number>;
     /// для конфига вернет опыт за единицу хп
-    public GetConfigExpPerHP(unitConfig: any): number {
+    public GetConfigExpPerHP(unitConfig: UnitConfig): number {
         var res: number = 0;
         if (this._getConfigExpPerHP.has(unitConfig.Uid)) {
             res = this._getConfigExpPerHP.get(unitConfig.Uid) as number;
@@ -260,7 +260,7 @@ class ExperienceSystemGlobalData {
                     res        = 4;
                 }
             } else {
-                var speed = unitConfig.Speeds.Item(TileType.Grass);
+                var speed = unitConfig.Speeds.Item.get(TileType.Grass) as number;
                 if (mainArmament) {
                     var damage = Math.max(mainArmament.ShotParams.Damage, 1);
                     res        = Math.sqrt(hp/damage)*(1 + 0.5*shield/damage)*Math.sqrt(speed * 0.1)*5.67375886524;
@@ -279,8 +279,8 @@ class ExperienceSystemGlobalData {
         return res;
     }
 
-    private _getNextLevelCfgCash: Map<string, any>;
-    public GetNextLevelCfg(unitExperienceSystem: UnitExperienceSystem) {
+    private _getNextLevelCfgCash: Map<string, UnitConfig>;
+    public GetNextLevelCfg(unitExperienceSystem: UnitExperienceSystem) : UnitConfig {
         var currCfg    = unitExperienceSystem.unit.Cfg;
         var currCfgUid = currCfg.Uid;
         var nextCfg    = this._getNextLevelCfgCash.get(currCfgUid);
@@ -294,7 +294,7 @@ class ExperienceSystemGlobalData {
             if (HordeContentApi.HasUnitConfig(nextConfigUid)) {
                 nextCfg = HordeContentApi.GetUnitConfig(nextConfigUid);
             } else {
-                nextCfg = HordeContentApi.CloneConfig(currCfg, nextConfigUid);
+                nextCfg = HordeContentApi.CloneConfig(currCfg, nextConfigUid) as UnitConfig;
             }
 
             // настраиваем конфиг
@@ -314,7 +314,9 @@ class ExperienceSystemGlobalData {
                     TileType.Ice
                 ];
                 for (var tileNum = 0; tileNum < tylesType.length; tileNum++) {
-                    nextCfg.Speeds.Item.set(tylesType[tileNum], Math.round(currCfg.Speeds.Item.get(tylesType[tileNum]) * ExperienceSystemGlobalData.Levels_MoveSpeedCoeff[nextLevel]));
+                    nextCfg.Speeds.Item.set(tylesType[tileNum],
+                        Math.round((currCfg.Speeds.Item.get(tylesType[tileNum]) as number)
+                            * ExperienceSystemGlobalData.Levels_MoveSpeedCoeff[nextLevel]));
                 }
                 ScriptUtils.SetValue(nextCfg.MainArmament, "ReloadTime", Math.max(1, Math.round(currCfg.MainArmament.ReloadTime * ExperienceSystemGlobalData.Levels_WeaponReloadingSpeedCoeff[nextLevel])));
                 ScriptUtils.SetValue(nextCfg, "ReloadTime", Math.max(1, Math.round(currCfg.ReloadTime * ExperienceSystemGlobalData.Levels_WeaponReloadingSpeedCoeff[nextLevel])));
@@ -325,11 +327,13 @@ class ExperienceSystemGlobalData {
                 ScriptUtils.SetValue(nextCfg, "PressureResist", currCfg.PressureResist + ExperienceSystemGlobalData.Levels_AdditionalPressureResist[nextLevel]);
                 ScriptUtils.SetValue(nextCfg, "TintColor", ExperienceSystemGlobalData.Levels_TintColor[nextLevel]);
                 // иконка в лесу
-                var inForestAnimRef        = ScriptUtils.GetValue(currCfg, "InForestAnimationsCatalogRef");
-                var inForestAnimNextCfgUid = inForestAnimRef.Uid + "_" + (nextLevel + 1);
-                log.info("inForestAnimNextCfgUid = ", inForestAnimNextCfgUid);
-                if (HordeContentApi.HasAnimation(inForestAnimNextCfgUid)) {
-                    ScriptUtils.GetValue(nextCfg, "InForestAnimationsCatalogRef").SetConfig(HordeContentApi.GetAnimationCatalog(inForestAnimNextCfgUid));
+                if (currCfg.InForestAnimationsCatalog) {
+                    var inForestAnimRef        = ScriptUtils.GetValue(currCfg, "InForestAnimationsCatalogRef");
+                    var inForestAnimNextCfgUid = inForestAnimRef.Uid + "_" + (nextLevel + 1);
+                    log.info("inForestAnimNextCfgUid = ", inForestAnimNextCfgUid);
+                    if (HordeContentApi.HasAnimation(inForestAnimNextCfgUid)) {
+                        ScriptUtils.GetValue(nextCfg, "InForestAnimationsCatalogRef").SetConfig(HordeContentApi.GetAnimationCatalog(inForestAnimNextCfgUid));
+                    }
                 }
             } else {
                 ScriptUtils.SetValue(nextCfg, "Name",
@@ -350,7 +354,9 @@ class ExperienceSystemGlobalData {
                 ];
                 const invMoveSpeedCoeff = 1.0 / ExperienceSystemGlobalData.Levels_MoveSpeedCoeff[unitExperienceSystem.level];
                 for (var tileNum = 0; tileNum < tylesType.length; tileNum++) {
-                    nextCfg.Speeds.Item.set(tylesType[tileNum], Math.round(currCfg.Speeds.Item.get(tylesType[tileNum]) * invMoveSpeedCoeff * ExperienceSystemGlobalData.Levels_MoveSpeedCoeff[nextLevel]));
+                    nextCfg.Speeds.Item.set(tylesType[tileNum],
+                        Math.round((currCfg.Speeds.Item.get(tylesType[tileNum]) as number)
+                            * invMoveSpeedCoeff * ExperienceSystemGlobalData.Levels_MoveSpeedCoeff[nextLevel]));
                 }
                 ScriptUtils.SetValue(nextCfg.MainArmament, "ReloadTime",
                     Math.max(1, Math.round(currCfg.MainArmament.ReloadTime / ExperienceSystemGlobalData.Levels_WeaponReloadingSpeedCoeff[unitExperienceSystem.level] * ExperienceSystemGlobalData.Levels_WeaponReloadingSpeedCoeff[nextLevel])));
