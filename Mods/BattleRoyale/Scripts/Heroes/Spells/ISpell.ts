@@ -114,7 +114,7 @@ export class ISpell {
             case SpellState.ACTIVATED:
                 if (!this._OnEveryTickActivated(gameTickNum)) {
                     this._charges--;
-                    if (this._charges == 0) {
+                    if (this._charges == 0 || this._hero?.IsDead) {
                         this._state = SpellState.END;
                     } else {
                         this._reloadTick = gameTickNum + this._reloadPeriod;
