@@ -28,12 +28,12 @@ export class Example_GameWorks extends HordeExampleBase {
             this.log.info('В данный момент идет одиночное сражение');
         }
 
-        // Реплей? (недоступно при инициализации сцены, т.е. в onFirstRun)
+        // Сейчас воспроизводится реплей?
         if (isReplayMode()) {
             this.log.info('В данный момент идет воспроизведение реплея (проверка 1)');
         }
 
-        // Инфо по реплею (недоступно при инициализации сцены, т.е. в onFirstRun)
+        // Инфо по реплею
         const ReplayWorkMode = HordeResurrection.Engine.Logic.Battle.ReplaySystem.ReplayWorkMode;
         let replayWorkMode = BattleController.ReplayModuleWorkMode;
         if (replayWorkMode == ReplayWorkMode.Play) {
@@ -41,7 +41,13 @@ export class Example_GameWorks extends HordeExampleBase {
         } else if (replayWorkMode == ReplayWorkMode.Record) {
             this.log.info('В данный момент запущена запись реплея');
         } else {
-            this.log.info('В данный момент невозможно определить статус реплея:', '"' + replayWorkMode + '"', '(Недоступно в момент инициализации сражения)');
+            this.log.info('В данный момент невозможно определить статус реплея:', '"' + replayWorkMode + '"');
+        }
+        
+        // Отключение ввода ботов в режиме реплея (может быть использовано для отладки бота и MasterMind)
+        if (BattleController.IsReplayMode) {
+            this.log.info("Отключение ввода бота в реплее.");
+            BattleController.InputModule.AllowBotInput = false;
         }
     }
 }

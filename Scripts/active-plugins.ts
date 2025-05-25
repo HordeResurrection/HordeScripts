@@ -12,9 +12,6 @@ function getDefaultPlugins() {
 
         // // Debug plugins:
         // new PrintSelectedSquadOrdersPlugin(),
-        
-        // // Special plugins:
-        // new InputOptionsPlugin(),
     ];
 }
 
@@ -78,5 +75,4 @@ import { AttentionOnSurfacePlugin } from "plugins/attention-on-surface";
 
 // Импорты для отключенных плагинов
 import { PrintSelectedSquadOrdersPlugin } from "plugins/print-selected-squad-orders";
-import { InputOptionsPlugin } from "plugins/input-options";
 
