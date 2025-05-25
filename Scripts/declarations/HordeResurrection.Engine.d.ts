@@ -2182,11 +2182,21 @@ declare namespace HordeResurrection.Engine.Logic.Main {
 			player: HordeResurrection.Engine.Logic.Main.Players.Player | null
 		): HordeResurrection.Engine.Logic.Main.Players.Player;
 
+		static RemovePlayer(
+			player: HordeResurrection.Engine.Logic.Main.Players.Player | null
+		): void;
+
 		static RemoveByGuid(
 			playerGuid: string
 		): void;
 
 		static RemoveAllNetPlayers(): void;
+
+		static DoNetPlayersAudit(): void;
+
+		static DoNetPlayerAudit(
+			player: HordeResurrection.Engine.Logic.Main.Players.Player | null
+		): void;
 
 		static CheckPlayerSlots(): void;
 

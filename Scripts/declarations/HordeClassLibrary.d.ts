@@ -12348,6 +12348,8 @@ declare namespace HordeClassLibrary.World.Context.Parameters {
 		static readonly /* const */ AirAccelerationDefault: number; // = 0,1875
 		static readonly /* const */ WindSpeedUpdatePeriodDefault: number; // = 24
 		static readonly /* const */ WindDeltaUpdatePeriodDefault: number; // = 256
+		static readonly /* const */ FireFadingPeriodOnRepairingDefault: number; // = 100
+		static readonly /* const */ RepairHelperExtinguishingFactorDefault: number; // = 10
 		static readonly /* const */ PopulationTerritoryAroundActiveBuildingDefault: number; // = 6
 		static readonly /* const */ LumberIncomeValueDefault: number; // = 10
 
@@ -12358,6 +12360,8 @@ declare namespace HordeClassLibrary.World.Context.Parameters {
 		WindDeltaMax: HordeResurrection.Basic.Primitives.PreciseFraction;
 		WindSpeedUpdatePeriod: number;
 		WindDeltaUpdatePeriod: number;
+		FireFadingPeriodOnRepairing: number;
+		RepairHelperExtinguishingFactor: number;
 		PopulationTerritoryAroundActiveBuilding: number;
 		LumberIncomeValue: number;
 	}
@@ -13974,6 +13978,8 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 
 		CanBeRepairedNow(): boolean;
 
+		RepairCompleted(): boolean;
+
 		CanRepairLite(
 			repairTarget: HordeClassLibrary.World.Objects.Units.Unit | null
 		): boolean;
@@ -15549,6 +15555,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents {
 		readonly UnitsMap: HordeClassLibrary.World.ScenaComponents.Intrinsics.UnitsMap;
 		readonly Wind: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaWind;
 		readonly Messages: HordeClassLibrary.World.Simple.GameMessagesCollection;
+		readonly Watcher: HordeClassLibrary.World.ScenaComponents.Watcher.ScenaWatcher;
 		readonly Rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D;
 		readonly RectPixels: HordeResurrection.Basic.Primitives.Geometry.Rect2D;
 		readonly IsInitialized: boolean;
@@ -15897,6 +15904,8 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Watcher {
 		constructor();
 
 		// Methods:
+		UpdateOnGameTick(): void;
+
 		CheckRegistration(
 			scena: HordeClassLibrary.World.ScenaComponents.Scena | null,
 			u: HordeClassLibrary.World.Objects.Units.Unit | null
