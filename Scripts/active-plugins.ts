@@ -1,7 +1,6 @@
 import { log } from "library/common/logging";
 import HordePluginBase from "plugins/base-plugin";
 import ScenaScriptBase from "plugins/base-scena-script";
-import { AttentionOnSurfacePlugin } from "plugins/attention-on-surface";
 
 
 /**
@@ -11,7 +10,11 @@ function getDefaultPlugins() {
     return [
         new AttentionOnSurfacePlugin(),
 
+        // // Debug plugins:
         // new PrintSelectedSquadOrdersPlugin(),
+        
+        // // Special plugins:
+        // new InputOptionsPlugin(),
     ];
 }
 
@@ -70,5 +73,10 @@ export class HordePluginsCollection {
  */
 export const activePlugins: HordePluginsCollection = new HordePluginsCollection();
 
+// Импорты плагинов
+import { AttentionOnSurfacePlugin } from "plugins/attention-on-surface";
+
 // Импорты для отключенных плагинов
 import { PrintSelectedSquadOrdersPlugin } from "plugins/print-selected-squad-orders";
+import { InputOptionsPlugin } from "plugins/input-options";
+
