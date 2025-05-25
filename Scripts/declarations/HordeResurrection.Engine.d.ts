@@ -1252,6 +1252,12 @@ declare namespace HordeResurrection.Engine.Logic.Battle.InputSystem.InputItemBui
 
 		constructor(
 			p: HordeResurrection.Engine.Logic.Main.Players.Player | null,
+			selectMode: HordeResurrection.Engine.Logic.Battle.InputSystem.Enums.VirtualSelectUnitsMode,
+			unitIds: HordeClassLibrary.World.Objects.Units.UnitIdLabel[] | null
+		);
+
+		constructor(
+			p: HordeResurrection.Engine.Logic.Main.Players.Player | null,
 			dragStartFragment: HordeResurrection.Engine.Logic.Battle.InputSystem.InputFragments.InputFragmentBattleUiMouseDragStart | null
 		);
 
@@ -1285,6 +1291,7 @@ declare namespace HordeResurrection.Engine.Logic.Battle.InputSystem.InputItemBui
 		readonly UnitIds: HordeClassLibrary.World.Objects.Units.UnitIdLabel[];
 		readonly PatternSettlement: HordeClassLibrary.World.Settlements.Settlement;
 		readonly PatternConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
+		SelectUiSquadWithSound: boolean;
 	}
 }
 //#endregion
@@ -1698,41 +1705,13 @@ declare namespace HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems {
 declare namespace HordeResurrection.Engine.Logic.Battle.InputSystem {
 	class InputModule extends System.Object {
 
-		// Constructors:
-		constructor(
-			networkSynchronizationPeriod: number
-		);
-
 		// Properties:
 		readonly InputExecutionPeriod: number;
 		AllowLocalInput: boolean;
 		AllowBotInput: boolean;
 
 		// Methods:
-		RotateInputListsOnNextTick(
-			currentGameFrameNumber: number
-		): void;
-
-		ExecuteAllInputs(
-			currentGameFrameNumber: number,
-			gameHash: number
-		): void;
-
-		AddReplayVirtualInput(
-			replayVii: HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.AVirtualInputItem | null,
-			gameFrameNumber: number
-		): void;
-
-		AddLocalVirtualInput(
-			localVii: HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.AVirtualInputItem | null,
-			gameFrameNumber: number
-		): void;
-
-		AddRemoteVirtualInput(
-			initiator: HordeResurrection.Engine.Logic.Main.Players.Player | null,
-			rawVii: number[] | null,
-			remoteGameFrameNumber: number
-		): void;
+		ToggleReplayLocalInput(): void;
 	}
 }
 //#endregion
@@ -1806,12 +1785,21 @@ declare namespace HordeResurrection.Engine.Logic.Battle.ReplaySystem {
 declare namespace HordeResurrection.Engine.Logic.Battle.ReplaySystem {
 	class ReplayBuffer extends System.Object {
 
+		// Fields:
+		static readonly /* const */ RecordsPropName: string; // = "Records"
+
 		// Properties:
 		readonly Info: HordeResurrection.Engine.Logic.Battle.ReplaySystem.RecordInfo;
-		readonly Records: System.Collections.ObjectModel.ReadOnlyDictionary<number, System.Collections.Generic.List<HordeResurrection.Engine.Logic.Battle.ReplaySystem.RecordItemBase>>;
 		readonly ReplayFilePath: string;
+		readonly RecordsCount: number;
+		readonly LatestFrame: number;
 
 		// Methods:
+		TryGetRecords(
+			gameFrameNumber: number,
+			/*out*/ records: System.Collections.Generic.List<HordeResurrection.Engine.Logic.Battle.ReplaySystem.RecordItemBase> | null
+		): boolean;
+
 		static LoadFromJson(
 			replayFilePath: string | null
 		): HordeResurrection.Engine.Logic.Battle.ReplaySystem.ReplayBuffer;
@@ -2626,6 +2614,8 @@ declare namespace HordeResurrection.Engine.Logic.Main.Players {
 		): boolean;
 
 		ReplanTerritoryPlanner(): void;
+
+		RepeatSquadSelecting(): void;
 
 		Update(
 			totalTime: string,
