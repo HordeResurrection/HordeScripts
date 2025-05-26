@@ -4,6 +4,13 @@ import { UnitAnimState, UnitLifeState } from "library/game-logic/horde-types";
 import HordeExampleBase from "./base-example";
 import { BooleanT, StringT } from "library/dotnet/dotnet-types";
 
+
+const BattleController = HordeResurrection.Engine.Logic.Battle.BattleController;
+type BattleController = HordeResurrection.Engine.Logic.Battle.BattleController;
+const MainController = HordeResurrection.Engine.Logic.Main.MainController;
+type MainController = HordeResurrection.Engine.Logic.Main.MainController;
+
+
 /**
  * Пример работы с данными игры
  */
@@ -17,7 +24,6 @@ export class Example_GameWorks extends HordeExampleBase {
         this.logMessageOnRun();
 
         // Инфо по тактам
-        const BattleController = HordeResurrection.Engine.Logic.Battle.BattleController;
         this.log.info('Текущий такт:', BattleController.GameTimer.GameFramesCounter);
         this.log.info('Текущий FPS:', BattleController.GameTimer.CurrentFpsLimit);
 
@@ -44,10 +50,10 @@ export class Example_GameWorks extends HordeExampleBase {
             this.log.info('В данный момент невозможно определить статус реплея:', '"' + replayWorkMode + '"');
         }
         
-        // Отключение ввода ботов в режиме реплея (может быть использовано для отладки бота и MasterMind)
-        if (BattleController.IsReplayMode) {
-            this.log.info("Отключение ввода бота в реплее.");
-            BattleController.InputModule.AllowBotInput = false;
+        // Проверка на отладочный режим ботов в реплее
+        if (MainController.HordeSettings.ReplaySettings.BotReproducingMode) {
+            this.log.info("Ввод ботов будет проигнорирован при воспроизведении реплея.");
+            this.log.info("Это отладочный режим реплея, в котором боты должны самостоятельно повторить весь свой ввод.");
         }
     }
 }

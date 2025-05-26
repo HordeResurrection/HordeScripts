@@ -517,7 +517,6 @@ declare namespace HordeResurrection.Intellect {
 		readonly Requests: HordeResurrection.Intellect.Collections.RequestsCollection;
 		readonly Actions: HordeResurrection.Intellect.Collections.ActionsCollection;
 		IsWorkMode: boolean;
-		readonly LastUpdatedGameTick: number;
 		readonly Departments: HordeResurrection.Intellect.Collections.DepartmentsCollection;
 		readonly ArmyDepartment: HordeResurrection.Intellect.Departments.ArmyDepartment;
 		readonly ProductionDepartment: HordeResurrection.Intellect.Departments.ProductionDepartment;
@@ -540,10 +539,6 @@ declare namespace HordeResurrection.Intellect {
 		): void;
 
 		Deinitialize(): void;
-
-		Update(
-			gameTick: number
-		): void;
 
 		UpdateOnGameTick(
 			gameTick: number

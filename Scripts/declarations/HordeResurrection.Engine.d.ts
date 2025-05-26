@@ -1708,7 +1708,8 @@ declare namespace HordeResurrection.Engine.Logic.Battle.InputSystem {
 		// Properties:
 		readonly InputExecutionPeriod: number;
 		AllowLocalInput: boolean;
-		AllowBotInput: boolean;
+		AllowReplayBotInput: boolean;
+		BotReproducingMode: boolean;
 
 		// Methods:
 		ToggleReplayLocalInput(): void;
@@ -2174,10 +2175,6 @@ declare namespace HordeResurrection.Engine.Logic.Main {
 			gameTick: number
 		): void;
 
-		static UpdateMasterMinds(
-			gameTick: number
-		): void;
-
 		static ResetAll(
 			setState: HordeResurrection.Engine.Logic.Main.Players.PlayerState
 		): void;
@@ -2211,7 +2208,8 @@ declare namespace HordeResurrection.Engine.Logic.Main {
 		): HordeResurrection.Engine.Logic.Main.Players.Player;
 
 		static AddReplayPlayer(
-			player: HordeResurrection.Engine.Logic.Main.Players.Player | null
+			player: HordeResurrection.Engine.Logic.Main.Players.Player | null,
+			botReproducingMode: boolean
 		): HordeResurrection.Engine.Logic.Main.Players.Player;
 
 		static RemovePlayer(
@@ -2712,7 +2710,8 @@ declare namespace HordeResurrection.Engine.Logic.Main.Players {
 		ToReplayModel(): HordeResurrection.Engine.Logic.Main.Players.PlayerReplayModel;
 
 		static FromReplayModel(
-			playerReplayModel: HordeResurrection.Engine.Logic.Main.Players.PlayerReplayModel | null
+			playerReplayModel: HordeResurrection.Engine.Logic.Main.Players.PlayerReplayModel | null,
+			botReproducingMode: boolean
 		): HordeResurrection.Engine.Logic.Main.Players.Player;
 
 		GetRealPlayer(): HordeResurrection.Engine.Logic.Main.Players.Player;
@@ -3065,6 +3064,7 @@ declare namespace HordeResurrection.Engine.Settings {
 		readonly CheckScenaIntegrity: boolean;
 		readonly CheckReplayNations: boolean;
 		readonly AllowInputDuringReplayPlaying: boolean;
+		readonly BotReproducingMode: boolean;
 	}
 }
 //#endregion
