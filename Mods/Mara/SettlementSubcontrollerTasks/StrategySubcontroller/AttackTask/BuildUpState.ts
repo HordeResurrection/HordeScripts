@@ -9,6 +9,7 @@ import { ExterminatingState } from "./ExterminatingState";
 
 export class BuildUpState extends ProductionTaskState {
     private enemy: Settlement;
+    private needBuildBridge: boolean = false;
     
     constructor(
         enemy: Settlement,
@@ -77,6 +78,7 @@ export class BuildUpState extends ProductionTaskState {
                         
                         if (bridgeRequest) {
                             result.push(bridgeRequest);
+                            this.needBuildBridge = true;
                         }
                     }
                 }
@@ -87,10 +89,16 @@ export class BuildUpState extends ProductionTaskState {
     }
 
     protected getProductionTimeout(): number | null {
-        return MaraUtils.Random(
+        let timeout = MaraUtils.Random(
             this.settlementController.MasterMind,
             this.settlementController.Settings.Timeouts.MaxBuildUpProduction,
             this.settlementController.Settings.Timeouts.MinBuildUpProduction
         );
+
+        if (this.needBuildBridge) {
+            timeout *= 2;
+        }
+
+        return timeout;
     }
 }

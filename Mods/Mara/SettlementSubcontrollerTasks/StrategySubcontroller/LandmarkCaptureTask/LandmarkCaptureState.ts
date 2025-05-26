@@ -18,7 +18,7 @@ export class LandmarkCaptureState extends SubcontrollerTaskState {
     
     OnEntry(): void {
         if (!this.selectAndAttackEnemy()) {
-            this.settlementController.Info(`Landmark is captured`);
+            this.task.Debug(`Landmark is captured`);
             this.task.Complete(true);
             return;
         }
@@ -49,7 +49,7 @@ export class LandmarkCaptureState extends SubcontrollerTaskState {
         if (combativityIndex >= this.settlementController.Settings.ControllerStates.ExterminatingLossRatioThreshold) {
             if (!this.currentTarget || !this.currentTarget.UnitIsAlive) {
                 if ( !this.selectTarget() ) {
-                    this.settlementController.Info(`Landmark is captured`);
+                    this.task.Debug(`Landmark is captured`);
                     this.task.Complete(true);
                     return;
                 }

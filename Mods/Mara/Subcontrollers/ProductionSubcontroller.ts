@@ -1,7 +1,7 @@
 
-import { MaraSettlementController } from "Mara/MaraSettlementController";
+import { MaraSettlementController } from "../MaraSettlementController";
 import { MaraProductionRequestItem } from "../Common/MaraProductionRequestItem";
-import { MaraUtils } from "Mara/MaraUtils";
+import { MaraUtils } from "../MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { MaraUnitCacheItem } from "../Common/Cache/MaraUnitCacheItem";

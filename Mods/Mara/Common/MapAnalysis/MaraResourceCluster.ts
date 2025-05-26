@@ -12,6 +12,7 @@ export class MaraResourceCluster {
     public GoldCells: Array<MaraPoint> = [];
 
     private woodAmount: number = 0;
+    private center: MaraPoint;
 
     constructor(x: number, y: number) {
         this.Index = new MaraPoint(x, y);
@@ -95,6 +96,11 @@ export class MaraResourceCluster {
         }
 
         this.UpdateWoodAmount();
+
+        let geometricalCenter = new MaraPoint(this.Coordinates.X + MaraMap.RESOURCE_CLUSTER_SIZE / 2, this.Coordinates.Y + MaraMap.RESOURCE_CLUSTER_SIZE / 2);
+        let realCenter = MaraUtils.FindClosestCell(geometricalCenter, MaraMap.RESOURCE_CLUSTER_SIZE / 2,(c) => MaraMap.IsWalkableCell(c))!;
+
+        this.center = realCenter;
     }
 
     public get WoodAmount(): number {
@@ -122,7 +128,7 @@ export class MaraResourceCluster {
     }
 
     public get Center(): MaraPoint {
-        return new MaraPoint(this.Coordinates.X + MaraMap.RESOURCE_CLUSTER_SIZE / 2, this.Coordinates.Y + MaraMap.RESOURCE_CLUSTER_SIZE / 2);
+        return this.center;
     }
 
     public ToString(): string {

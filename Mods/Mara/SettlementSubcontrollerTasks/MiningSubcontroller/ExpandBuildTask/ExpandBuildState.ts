@@ -1,3 +1,4 @@
+import { MaraMap } from "../../../Common/MapAnalysis/MaraMap";
 import { MaraResourceCluster } from "../../../Common/MapAnalysis/MaraResourceCluster";
 import { MaraResourceType } from "../../../Common/MapAnalysis/MaraResourceType";
 import { MaraPoint } from "../../../Common/MaraPoint";
@@ -12,8 +13,7 @@ import { SettlementSubcontrollerTask } from "../../SettlementSubcontrollerTask";
 export class ExpandBuildState extends ProductionTaskState {
     protected requestMiningOnInsufficientResources = false;
     
-    // @ts-ignore
-    private expandCenter: MaraPoint;
+    private expandCenter: MaraPoint | null;
     private harvestersToOrder: UnitComposition = new Map<string, number>();
     private minedMinerals: Set<MaraResourceType> = new Set<MaraResourceType>();
     private targetExpand: TargetExpandData;
@@ -21,6 +21,7 @@ export class ExpandBuildState extends ProductionTaskState {
     constructor(task: SettlementSubcontrollerTask, settlementController: MaraSettlementController, targetExpand: TargetExpandData) {
         super(task, settlementController);
         this.targetExpand = targetExpand;
+        this.expandCenter = null;
     }
 
     protected onEntry(): boolean {
@@ -30,31 +31,39 @@ export class ExpandBuildState extends ProductionTaskState {
             return false;
         }
         else {
-            this.expandCenter = center;
-            this.targetExpand!.BuildCenter = center;
+            let settlementLocation = this.settlementController.GetSettlementLocation()!;
+            let path = MaraMap.GetShortestPath(settlementLocation.Center, center);
 
+            if (!path && !settlementLocation.Center.EqualsTo(center)) {
+                this.task.Debug(`Unable to build expand, location is not reachable`);
+                return false;
+            }
+            
+            this.expandCenter = center;
             return true;
         }
     }
 
     protected onExit(): void {
-        let expandUnits = MaraUtils.GetSettlementUnitsAroundPoint(
-            this.expandCenter,
-            Math.max(this.settlementController.Settings.ResourceMining.WoodcuttingRadius, this.settlementController.Settings.ResourceMining.MiningRadius),
-            [this.settlementController.Settlement],
-            (unit) => 
-                MaraUtils.IsMetalStockConfigId(unit.UnitCfgId) ||
-                MaraUtils.IsMineConfigId(unit.UnitCfgId) ||
-                MaraUtils.IsSawmillConfigId(unit.UnitCfgId)
-        );
-        
-        if (expandUnits.length > 0 && this.isRemoteExpand(this.expandCenter)) {
-            if ( 
-                !this.settlementController.Expands.find( 
-                    (value) => {return value.EqualsTo(this.expandCenter)} 
-                ) 
-            ) {
-                this.settlementController.Expands.push(this.expandCenter);
+        if (this.expandCenter) {
+            let expandUnits = MaraUtils.GetSettlementUnitsAroundPoint(
+                this.expandCenter,
+                Math.max(this.settlementController.Settings.ResourceMining.WoodcuttingRadius, this.settlementController.Settings.ResourceMining.MiningRadius),
+                [this.settlementController.Settlement],
+                (unit) => 
+                    MaraUtils.IsMetalStockConfigId(unit.UnitCfgId) ||
+                    MaraUtils.IsMineConfigId(unit.UnitCfgId) ||
+                    MaraUtils.IsSawmillConfigId(unit.UnitCfgId)
+            );
+            
+            if (expandUnits.length > 0 && this.isRemoteExpand(this.expandCenter)) {
+                if ( 
+                    !this.settlementController.Expands.find( 
+                        (value) => {return value.EqualsTo(this.expandCenter!)} 
+                    ) 
+                ) {
+                    this.settlementController.Expands.push(this.expandCenter);
+                }
             }
         }
     }
@@ -123,7 +132,7 @@ export class ExpandBuildState extends ProductionTaskState {
             }
         }
 
-        this.settlementController.Debug(`Expand center calculated: ${expandCenter.ToString()}`);
+        this.task.Debug(`Expand center calculated: ${expandCenter.ToString()}`);
         return expandCenter;
     }
 
@@ -144,11 +153,9 @@ export class ExpandBuildState extends ProductionTaskState {
         }
     }
 
-
-
     private orderMineProduction(cluster: MaraResourceCluster, resourceType: MaraResourceType): Array<MaraProductionRequest> {
         if (this.minedMinerals.has(resourceType)) {
-            this.settlementController.Debug(`Resource type '${resourceType}' mining is already ordered`);
+            this.task.Debug(`Resource type '${resourceType}' mining is already ordered`);
             return [];
         }
         
@@ -156,7 +163,7 @@ export class ExpandBuildState extends ProductionTaskState {
         let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(mineConfigs);
 
         if (cfgId == null) {
-            this.settlementController.Debug(`Unable to order mine production: no mine config available`);
+            this.task.Debug(`Unable to order mine production: no mine config available`);
             return [];
         }
         
@@ -167,7 +174,7 @@ export class ExpandBuildState extends ProductionTaskState {
         );
 
         if (!minePosition) {
-            this.settlementController.Debug(`Unable to order mine production: no suitable place for mine found`);
+            this.task.Debug(`Unable to order mine production: no suitable place for mine found`);
             return [];
         }
 
@@ -193,7 +200,7 @@ export class ExpandBuildState extends ProductionTaskState {
         cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(harvesterConfigs);
 
         if (cfgId == null) {
-            this.settlementController.Debug(`Unable to order mine production: no harvester config available`);
+            this.task.Debug(`Unable to order mine production: no harvester config available`);
             return [];
         }
 
@@ -216,7 +223,7 @@ export class ExpandBuildState extends ProductionTaskState {
         }
         
         let metalStocks = MaraUtils.GetSettlementUnitsAroundPoint(
-            this.expandCenter, 
+            this.expandCenter!, 
             this.settlementController.Settings.ResourceMining.MiningRadius,
             [this.settlementController.Settlement],
             (unit) => {return MaraUtils.IsMetalStockConfigId(unit.UnitCfgId) && unit.UnitIsAlive}
@@ -227,7 +234,7 @@ export class ExpandBuildState extends ProductionTaskState {
             let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(metalStockConfigs);
 
             if (cfgId == null) {
-                this.settlementController.Debug(`Unable to order mining production: no metal stock config available`);
+                this.task.Debug(`Unable to order mining production: no metal stock config available`);
                 return result;
             }
 
@@ -243,7 +250,7 @@ export class ExpandBuildState extends ProductionTaskState {
         let isSawmillPresent = false;
 
         for (let sawmillData of this.settlementController.MiningController.Sawmills) {
-            let distance = MaraUtils.ChebyshevDistance(sawmillData.Sawmill!.UnitRect.Center, this.expandCenter);
+            let distance = MaraUtils.ChebyshevDistance(sawmillData.Sawmill!.UnitRect.Center, this.expandCenter!);
             
             if (distance < this.settlementController.Settings.ResourceMining.WoodcuttingRadius) {
                 isSawmillPresent = true;
@@ -258,7 +265,7 @@ export class ExpandBuildState extends ProductionTaskState {
             let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(sawmillConfigs);
 
             if (cfgId == null) {
-                this.settlementController.Debug(`Unable to order woodcutting production: no sawmill config available`);
+                this.task.Debug(`Unable to order woodcutting production: no sawmill config available`);
                 return [];
             }
 
@@ -269,7 +276,7 @@ export class ExpandBuildState extends ProductionTaskState {
         let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(harvesterConfigs);
 
         if (cfgId == null) {
-            this.settlementController.Debug(`Unable to order woodcutting production: no harvester config available`);
+            this.task.Debug(`Unable to order woodcutting production: no harvester config available`);
             return [];
         }
 
@@ -285,7 +292,7 @@ export class ExpandBuildState extends ProductionTaskState {
         let cfgId = this.settlementController.ProductionController.SelectConfigIdToProduce(housingConfigs);
         
         if (cfgId == null) {
-            this.settlementController.Debug(`Unable to order housing production: no housing config available`);
+            this.task.Debug(`Unable to order housing production: no housing config available`);
             return [];
         }
 

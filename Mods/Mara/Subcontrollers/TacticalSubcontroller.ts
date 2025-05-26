@@ -1,6 +1,6 @@
-import { MaraSettlementController } from "Mara/MaraSettlementController";
+import { MaraSettlementController } from "../MaraSettlementController";
 import { SettlementClusterLocation } from "../Common/Settlement/SettlementClusterLocation";
-import { MaraUtils } from "Mara/MaraUtils";
+import { MaraUtils } from "../MaraUtils";
 import { MaraSubcontroller } from "./MaraSubcontroller";
 import { MaraControllableSquad } from "./Squads/MaraControllableSquad";
 import { MaraRect } from "../Common/MaraRect";

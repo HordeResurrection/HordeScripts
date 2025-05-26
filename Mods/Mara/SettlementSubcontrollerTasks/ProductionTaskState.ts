@@ -1,5 +1,5 @@
 
-import { MaraUtils } from "Mara/MaraUtils";
+import { MaraUtils } from "../MaraUtils";
 import { MaraProductionRequestItem } from "../Common/MaraProductionRequestItem";
 import { MaraPoint } from "../Common/MaraPoint";
 import { UnitComposition } from "../Common/UnitComposition";
@@ -169,7 +169,7 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
         
         let from = path.Nodes[0].Region.Center;
         let to = path.Nodes[path.Nodes.length - 1].Region.Center;
-        this.task.Debug(`Requesting bridge build from ${from.ToString()} to ${to.ToString()}`)
+        this.task.Debug(`Requesting bridge build from ${from.ToString()} to ${to.ToString()}`);
         
         let produceableCfgIds = this.settlementController.ProductionController.GetProduceableCfgIds();
         let bridgeCfgId = produceableCfgIds.find((cfgId) => MaraUtils.IsWalkableConfigId(cfgId));
@@ -207,8 +207,14 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
                         let bridgeSections = MaraMap.ConnectMapNodesByBridge(subpath, bridgeCfgId, this.settlementController.MasterMind);
 
                         if (bridgeSections.length == 0) {
-                            this.settlementController.Debug(`Unable to markup bridge from ${currentNode.Region.Center} to ${nextNode.Region.Center}`);
-                            return null;
+                            this.settlementController.Debug(`Unable to markup bridge from ${currentNode.Id} to ${nextNode.Id} (${currentNode.Region.Center.ToString()} - ${nextNode.Region.Center.ToString()})`);
+                            
+                            if (requestItems.length > 0) {
+                                return this.makeProductionQueueRequest(requestItems);
+                            }
+                            else {
+                                return null;
+                            }
                         }
 
                         for (let section of bridgeSections) {
@@ -216,7 +222,7 @@ export abstract class ProductionTaskState extends SubcontrollerTaskState {
                             requestItems.push(item);
                         }
                         
-                        curNodeIndex = nextNodeIndex + 1;
+                        curNodeIndex = nextNodeIndex - 1; //will be incremented up to nextNodeIndex at next iteration
                         break;
                     }
                 }

@@ -1,4 +1,4 @@
-import { MaraSettlementController } from "Mara/MaraSettlementController";
+import { MaraSettlementController } from "../MaraSettlementController";
 import { MaraTaskableSubcontroller } from "./MaraTaskableSubcontroller";
 import { SettlementSubcontrollerTask } from "../SettlementSubcontrollerTasks/SettlementSubcontrollerTask";
 import { MaraUtils } from "../MaraUtils";

@@ -1,4 +1,4 @@
-import { MaraUtils } from "Mara/MaraUtils";
+import { MaraUtils } from "../../MaraUtils";
 import { TacticalSubcontroller } from "../TacticalSubcontroller";
 import { MaraSquad } from "./MaraSquad";
 import { MaraSquadIdleState } from "./SquadStates/MaraSquadIdleState";

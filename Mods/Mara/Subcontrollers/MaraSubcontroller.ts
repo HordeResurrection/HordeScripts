@@ -1,4 +1,4 @@
-import { MaraSettlementController } from "Mara/MaraSettlementController";
+import { MaraSettlementController } from "../MaraSettlementController";
 import { MaraLogLevel } from "../Mara";
 import { MaraLogger } from "../Common/MaraLogger";
 

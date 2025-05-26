@@ -1,7 +1,7 @@
 import { MaraPoint } from "../MaraPoint";
 import { MaraUnitBushItem } from "./MaraUnitBushItem";
 import { MaraUnitCacheItem } from "./MaraUnitCacheItem";
-import RBush from "./../RBush/rbush.js"
+import RBush from "../RBush/rbush.js"
 import { MaraSettlementController } from "../../MaraSettlementController";
 import { Mara } from "../../Mara";
 import { Settlement, Unit, UnitDummyStateChangedEventArgs, UnitHealthChangedEventArgs, UnitLifeStateChangedEventArgs, UnitMovedToCellEventArgs } from "library/game-logic/horde-types";
@@ -21,32 +21,42 @@ export class MaraSettlementUnitsCache {
         this.cacheItemIndex = new Map<number, MaraUnitCacheItem>();
         
         settlement.Units.UnitsListChanged.connect(
-            (sender: any, UnitsListChangedEventArgs: UnitsListChangedEventArgs) => {
-                this.unitListChangedProcessor(sender, UnitsListChangedEventArgs);
+            (sender: any, UnitsListChangedEventArgs: UnitsListChangedEventArgs | null) => {
+                if (UnitsListChangedEventArgs) {
+                    this.unitListChangedProcessor(sender, UnitsListChangedEventArgs);
+                }
             }
         );
 
         settlement.Units.UnitUnitMovedToCell.connect(
-            (sender: any, args: UnitMovedToCellEventArgs) => {
-                this.unitPositionChangedProcessor(args);
+            (sender: any, args: UnitMovedToCellEventArgs | null) => {
+                if (args) {
+                    this.unitPositionChangedProcessor(args);
+                }
             }
         );
 
         settlement.Units.UnitHealthChanged.connect(
-            (sender: any, args: UnitHealthChangedEventArgs) => {
-                this.unitHealthChangedProcessor(args);
+            (sender: any, args: UnitHealthChangedEventArgs | null) => {
+                if (args) {
+                    this.unitHealthChangedProcessor(args);
+                }
             }
         );
 
         settlement.Units.UnitLifeStateChanged.connect(
-            (sender: any, args: UnitLifeStateChangedEventArgs) => {
-                this.unitLifeStateChangedProcessor(args);
+            (sender: any, args: UnitLifeStateChangedEventArgs | null) => {
+                if (args) {
+                    this.unitLifeStateChangedProcessor(args);
+                }
             }
         );
 
         settlement.Units.UnitDummyStateChangedEvent.connect(
-            (sender: any, args: UnitDummyStateChangedEventArgs) => {
-                this.unitDummyStateChangedProcessor(args);
+            (sender: any, args: UnitDummyStateChangedEventArgs | null) => {
+                if (args) {
+                    this.unitDummyStateChangedProcessor(args);
+                }
             }
         );
 

@@ -1,4 +1,4 @@
-import { MaraSettlementController } from "Mara/MaraSettlementController";
+import { MaraSettlementController } from "../MaraSettlementController";
 import { FsmState } from "../Common/FiniteStateMachine/FsmState";
 import { SettlementSubcontrollerTask } from "./SettlementSubcontrollerTask";
 
