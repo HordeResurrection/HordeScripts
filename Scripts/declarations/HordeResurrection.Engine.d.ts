@@ -57,6 +57,8 @@ declare namespace HordeResurrection.Engine.Logic.Battle {
 
 		static ForceReloadAllScripts(): void;
 
+		static ToggleReplayLocalInput(): void;
+
 		static SendChatMessage(
 			initiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
 			message: string | null,

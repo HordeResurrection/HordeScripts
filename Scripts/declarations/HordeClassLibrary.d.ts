@@ -3121,12 +3121,14 @@ declare namespace HordeClassLibrary.HordeContent.ContentPacks.Stamp {
 		// Constructors:
 		constructor(
 			uid: string | null,
-			hash: string | null
+			hash: string | null,
+			version: string | null
 		);
 
 		// Properties:
 		readonly Uid: string;
 		readonly Hash: string;
+		readonly Version: string;
 	}
 }
 //#endregion
@@ -6892,6 +6894,8 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		HasMotionDoNothingNow(): boolean;
 
 		GetFollowingOrders(): System.Collections.Generic.IEnumerable<HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase>;
+
+		ReviewQueuedInstinctOrder(): void;
 	}
 }
 //#endregion
@@ -7405,6 +7409,7 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications {
 		readonly Owner: HordeClassLibrary.World.Objects.Units.Unit;
 		readonly InitialCell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
 		readonly IsHandled: boolean;
+		readonly CreationTick: number;
 
 		// Methods:
 		UpdateOnGameTick(): void;
@@ -8855,7 +8860,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 			ticks: number
 		): void;
 
-		SetupDisableNotificationsTimer(
+		SetupDisableNotificationsTimerBy(
 			otherOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null
 		): void;
 
