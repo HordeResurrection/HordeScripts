@@ -6871,6 +6871,8 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 			otherUnit: HordeClassLibrary.World.Objects.Units.Unit | null
 		): void;
 
+		ReviewQueuedInstinctOrder(): void;
+
 		TryAddAutoHoldPosition(
 			assignOrderMode: HordeClassLibrary.UnitComponents.OrdersSystem.AssignOrderMode
 		): void;
@@ -6880,6 +6882,8 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): void;
 
 		IsSetHoldPosition(): boolean;
+
+		IsNextHoldPosition(): boolean;
 
 		IsMoving(): boolean;
 
@@ -6894,8 +6898,6 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		HasMotionDoNothingNow(): boolean;
 
 		GetFollowingOrders(): System.Collections.Generic.IEnumerable<HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase>;
-
-		ReviewQueuedInstinctOrder(): void;
 	}
 }
 //#endregion
@@ -8900,7 +8902,9 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 
 		AllowDissallowedCommands(): void;
 
-		SuggestComebackOrder(): HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderMoveToPoint;
+		SuggestComebackOrder(
+			/*out*/ comebackBeforeHoldPosition: boolean
+		): HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderMoveToPoint;
 
 		GetNotificationsInfoString(): string;
 
