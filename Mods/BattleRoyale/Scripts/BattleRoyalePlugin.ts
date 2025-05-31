@@ -37,14 +37,14 @@ enum GameState {
     END
 }
 
-var spellsTypes : Array<typeof ISpell> = [
-    Spell_Arrows_Volley,
-    Spell_Fireball,
-    Spell_golden_barracks_summon,
-    Spell_healing_aura,
-    Spell_teleportation_mark,
-    Spell_Teleportation
-];
+// var spellsTypes : Array<typeof ISpell> = [
+//     Spell_Arrows_Volley,
+//     Spell_Fireball,
+//     Spell_golden_barracks_summon,
+//     Spell_healing_aura,
+//     Spell_teleportation_mark,
+//     Spell_Teleportation
+// ];
 
 export class BattleRoyalePlugin extends HordePluginBase {
     _playerHordeSettlements: Array<Settlement>;
@@ -72,7 +72,7 @@ export class BattleRoyalePlugin extends HordePluginBase {
 
         this._units = new Array<IUnit>();
         this._playerUidToSettlement = new Map<number, number>();
-        this._spells = new Array<ISpell>();
+        //this._spells = new Array<ISpell>();
     }
 
     public onFirstRun() {
@@ -98,13 +98,13 @@ export class BattleRoyalePlugin extends HordePluginBase {
     _nextSpawnSpell: number = 0;
     _nextSpawnBuilding: number = 0;
     private _Run(gameTickNum: number) {
-        for (var spellNum = 0; spellNum < this._spells.length; spellNum++) {
-            if (this._spells[spellNum].OnEveryTick(gameTickNum)) {
-                if (this._spells[spellNum].IsEnd()) {
-                    this._spells.splice(spellNum--, 1);
-                }
-            }
-        }
+        // for (var spellNum = 0; spellNum < this._spells.length; spellNum++) {
+        //     if (this._spells[spellNum].OnEveryTick(gameTickNum)) {
+        //         if (this._spells[spellNum].IsEnd()) {
+        //             this._spells.splice(spellNum--, 1);
+        //         }
+        //     }
+        // }
         this._playerSettlements.forEach((playerSettlement) => playerSettlement.OnEveryTick(gameTickNum));
         this._gameField.OnEveryTick(gameTickNum);
 
@@ -154,25 +154,25 @@ export class BattleRoyalePlugin extends HordePluginBase {
         }
 
         // спавн способностей
-        if (this._nextSpawnSpell < gameTickNum && this._gameField.CurrentCircle()) {
-            this._nextSpawnSpell = gameTickNum + 50 * 50;
+        // if (this._nextSpawnSpell < gameTickNum && this._gameField.CurrentCircle()) {
+        //     this._nextSpawnSpell = gameTickNum + 50 * 50;
 
-            var rnd          = ActiveScena.GetRealScena().Context.Randomizer;
-            var spellTypeNum = rnd.RandomNumber(0, spellsTypes.length - 1);
-            var gameFieldRectangle  = this._gameField.GetCurrentRectangle();
-            var generator           = generateRandomCellInRect(
-                gameFieldRectangle.LD.X,
-                gameFieldRectangle.LD.Y,
-                gameFieldRectangle.RU.X,
-                gameFieldRectangle.RU.Y);
-            var spellCell    = generator.next().value;
-            this._spells.push(
-                new spellsTypes[spellTypeNum](
-                    new Cell(spellCell.X, spellCell.Y),
-                    this._buildingsTemplate,
-                    this._neutralSettlement,
-                    this._enemySettlement));
-        }
+        //     var rnd          = ActiveScena.GetRealScena().Context.Randomizer;
+        //     var spellTypeNum = rnd.RandomNumber(0, spellsTypes.length - 1);
+        //     var gameFieldRectangle  = this._gameField.GetCurrentRectangle();
+        //     var generator           = generateRandomCellInRect(
+        //         gameFieldRectangle.LD.X,
+        //         gameFieldRectangle.LD.Y,
+        //         gameFieldRectangle.RU.X,
+        //         gameFieldRectangle.RU.Y);
+        //     var spellCell    = generator.next().value;
+        //     this._spells.push(
+        //         new spellsTypes[spellTypeNum](
+        //             new Cell(spellCell.X, spellCell.Y),
+        //             this._buildingsTemplate,
+        //             this._neutralSettlement,
+        //             this._enemySettlement));
+        // }
 
         // спавн строений
         if (this._nextSpawnBuilding < gameTickNum && this._gameField.CurrentCircle()) {
@@ -301,6 +301,23 @@ export class BattleRoyalePlugin extends HordePluginBase {
         // поселение - враг
 
         this._enemySettlement = new GameSettlement(scenaSettlements.Item.get('6'));
+
+        // настраиваем дипломатию на карте
+
+        for (var playerSettlementNum = 0; playerSettlementNum < this._playerHordeSettlements.length; playerSettlementNum++) {
+            for (var otherPlayerSettlementNum = playerSettlementNum + 1; otherPlayerSettlementNum < this._playerHordeSettlements.length; otherPlayerSettlementNum++) {
+                this._playerHordeSettlements[playerSettlementNum].Diplomacy.DeclareWar(this._playerHordeSettlements[otherPlayerSettlementNum]);
+                this._playerHordeSettlements[otherPlayerSettlementNum].Diplomacy.DeclareWar(this._playerHordeSettlements[playerSettlementNum]);
+            }
+            this._playerHordeSettlements[playerSettlementNum].Diplomacy.DeclareWar(this._enemySettlement.hordeSettlement);
+            this._enemySettlement.hordeSettlement.Diplomacy.DeclareWar(this._playerHordeSettlements[playerSettlementNum]);
+
+            this._playerHordeSettlements[playerSettlementNum].Diplomacy.DeclarePeace(this._neutralSettlement.hordeSettlement);
+            this._neutralSettlement.hordeSettlement.Diplomacy.DeclarePeace(this._playerHordeSettlements[playerSettlementNum]);
+        }
+        this._neutralSettlement.hordeSettlement.Diplomacy.DeclarePeace(this._enemySettlement.hordeSettlement);
+        this._enemySettlement.hordeSettlement.Diplomacy.DeclarePeace(this._neutralSettlement.hordeSettlement);
+
         var that = this;
         // спавним юнитов после уничтожения постройки
         this._enemySettlement.hordeSettlement.Units.UnitsListChanged.connect(
@@ -344,22 +361,6 @@ export class BattleRoyalePlugin extends HordePluginBase {
             }
         );
 
-        // настраиваем дипломатию на карте
-
-        for (var playerSettlementNum = 0; playerSettlementNum < this._playerHordeSettlements.length; playerSettlementNum++) {
-            for (var otherPlayerSettlementNum = playerSettlementNum + 1; otherPlayerSettlementNum < this._playerHordeSettlements.length; otherPlayerSettlementNum++) {
-                this._playerHordeSettlements[playerSettlementNum].Diplomacy.DeclareWar(this._playerHordeSettlements[otherPlayerSettlementNum]);
-                this._playerHordeSettlements[otherPlayerSettlementNum].Diplomacy.DeclareWar(this._playerHordeSettlements[playerSettlementNum]);
-            }
-            this._playerHordeSettlements[playerSettlementNum].Diplomacy.DeclareWar(this._enemySettlement.hordeSettlement);
-            this._enemySettlement.hordeSettlement.Diplomacy.DeclareWar(this._playerHordeSettlements[playerSettlementNum]);
-
-            this._playerHordeSettlements[playerSettlementNum].Diplomacy.DeclarePeace(this._neutralSettlement.hordeSettlement);
-            this._neutralSettlement.hordeSettlement.Diplomacy.DeclarePeace(this._playerHordeSettlements[playerSettlementNum]);
-        }
-        this._neutralSettlement.hordeSettlement.Diplomacy.DeclarePeace(this._enemySettlement.hordeSettlement);
-        this._enemySettlement.hordeSettlement.Diplomacy.DeclarePeace(this._neutralSettlement.hordeSettlement);
-
         // спавним таверны на карте
 
         var generator   = this._gameField.GeneratorRandomCell();
@@ -400,6 +401,12 @@ export class BattleRoyalePlugin extends HordePluginBase {
                 }
             }
         }
+
+        // передаем ссылки в скиллы
+        ISpell.BuildingsTemplate = this._buildingsTemplate;
+        ISpell.NeutralSettlement = this._neutralSettlement;
+        ISpell.EnemySettlement   = this._enemySettlement;
+        ISpell.GameField         = this._gameField;
 
         broadcastMessage("Выбери своего героя", createHordeColor(255, 255, 55, 55));
     }
@@ -489,17 +496,17 @@ export class BattleRoyalePlugin extends HordePluginBase {
 
         // спавним несколько способностей
 
-        var spawnSpellsCount = Math.max(6, Math.round(Math.sqrt(gameFieldArea) / 20));
-        for (var i = 0; i < spawnSpellsCount; i++) {
-            var spellTypeNum = rnd.RandomNumber(0, spellsTypes.length - 1);
-            var spellCell    = generator.next().value;
-            this._spells.push(
-                new spellsTypes[spellTypeNum](
-                    new Cell(spellCell.X, spellCell.Y),
-                    this._buildingsTemplate,
-                    this._neutralSettlement,
-                    this._enemySettlement));
-        }
+        // var spawnSpellsCount = Math.max(6, Math.round(Math.sqrt(gameFieldArea) / 20));
+        // for (var i = 0; i < spawnSpellsCount; i++) {
+        //     var spellTypeNum = rnd.RandomNumber(0, spellsTypes.length - 1);
+        //     var spellCell    = generator.next().value;
+        //     this._spells.push(
+        //         new spellsTypes[spellTypeNum](
+        //             new Cell(spellCell.X, spellCell.Y),
+        //             this._buildingsTemplate,
+        //             this._neutralSettlement,
+        //             this._enemySettlement));
+        // }
 
         // перемещаем экран на героев игроков
 

@@ -5,10 +5,14 @@ import { generateCellInSpiral } from "library/common/position-tools";
 import { spawnUnits } from "library/game-logic/unit-spawn";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { IHero } from "./IHero";
+import { Spell_call_of_nature } from "./Spells/Spell_call_of_nature";
+import { ISpell } from "./Spells/ISpell";
 
 export class Hero_Hunter extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "Hunter";
     protected static BaseCfgUid  : string = "#UnitConfig_Slavyane_Archer";
+
+    public static SpellType: typeof ISpell = Spell_call_of_nature;
 
     private _bear : IUnit | null;
     private static _bearRevivePeriod : number = 500;
@@ -74,7 +78,7 @@ export class Hero_Hunter extends IHero {
     }
 }
 
-class Bear extends IUnit {
+export class Bear extends IUnit {
     protected static CfgUid      : string = this.CfgPrefix + "Bear";
     protected static BaseCfgUid  : string = "#UnitConfig_Nature_Bear";
 

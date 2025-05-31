@@ -6,9 +6,9 @@ import { IHero } from "../IHero";
 
 export class Spell_healing_aura extends ISpell {
     private static _MaxDistance : number = 7;
-    private static _HealTime    : number = 500;
+    private static _HealTime    : number = 250;
     private static _HealPeriod  : number = 50;
-    private static _HealHp      : number = 2;
+    private static _HealHp      : number = 3;
 
     protected static _CfgUid                : string = "Hero_healing_aura";
     protected static _AnimationsCatalogRef  : string = "#AnimCatalog_Command_healing_aura";

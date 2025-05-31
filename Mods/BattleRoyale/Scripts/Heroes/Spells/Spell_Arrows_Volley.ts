@@ -5,6 +5,8 @@ import { Cell } from "../../Core/Cell";
 import { IHero } from "../IHero";
 import { ISpell } from "./ISpell";
 import { ITargetPointSpell } from "./ITargetPointSpell";
+import { GameSettlement } from "../../Core/GameSettlement";
+import { BuildingTemplate } from "../../Units/IFactory";
 
 export class Spell_Arrows_Volley extends ITargetPointSpell {
     private static _MaxDistance : number = 6;

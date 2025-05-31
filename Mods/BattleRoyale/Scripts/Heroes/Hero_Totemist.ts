@@ -5,10 +5,14 @@ import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic
 import { createHordeColor, createPF, createPoint, createResourcesAmount } from "library/common/primitives";
 import { Cell } from "../Core/Cell";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
+import { ISpell } from "./Spells/ISpell";
+import { Spell_teleportation_mark } from "./Spells/Spell_teleportation_mark";
 
 export class Hero_Totemist extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "HeroTotemist";
     protected static BaseCfgUid  : string = "#UnitConfig_Slavyane_Worker1";
+
+    public static SpellType: typeof ISpell = Spell_teleportation_mark;
     
     private _formation_totems                   : Array<IFormationTotem>;
     private _formation_totems_buildingProgress  : Array<boolean>;

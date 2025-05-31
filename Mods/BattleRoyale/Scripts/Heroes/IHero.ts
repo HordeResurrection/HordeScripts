@@ -1,20 +1,25 @@
-import { ACommandArgs, GeometryCanvas, GeometryVisualEffect, OrderAttackUnit, OrderCapture, ScriptUnitWorkerGetOrder, Stride_Color, Stride_Vector2, TileType, Unit, UnitCommand, UnitCommandConfig, UnitConfig, UnitFlags } from "library/game-logic/horde-types";
+import { ACommandArgs, GeometryCanvas, GeometryVisualEffect, ScriptUnitWorkerGetOrder, Stride_Color, Stride_Vector2, TileType, Unit, UnitCommand, UnitConfig, UnitFlags } from "library/game-logic/horde-types";
 import { IUnit } from "../Units/IUnit";
 import { IConfig } from "../Units/IConfig";
 import { spawnGeometry } from "library/game-logic/decoration-spawn";
 import { Formation2 } from "../Core/Formation2";
 import { BuildingTemplate } from "../Units/IFactory";
 import { Cell } from "../Core/Cell";
-import { createGameMessageWithNoSound } from "library/common/messages";
 import { ISpell } from "./Spells/ISpell";
+import { Spell_Teleportation } from "./Spells/Spell_Teleportation";
+import { log } from "library/common/logging";
 
 export class IHero extends IUnit {
     public static OpUnitIdToHeroObject : Map<number, IHero> = new Map<number, IHero>();
+    /// скилл героя
+    public static SpellType : typeof ISpell = Spell_Teleportation;
+    protected static SpellReload : number = 50 * 60;
 
     private static _GetOrderWorkerSet : boolean = false;
     private static _baseGetOrderWorker : HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerGetOrder;
 
     private _spell : ISpell | null;
+    private _spellReloadTick : number;
 
     // настройки формации - начальный радиус
     protected static _formationStartRadius : number = 3;
@@ -38,6 +43,8 @@ export class IHero extends IUnit {
             Cell.ConvertHordePoint(this.hordeUnit.Cell),
             this.constructor['_formationStartRadius'],
             this.constructor['_formationDestiny']);
+
+        this._spellReloadTick = 0;
     }
 
     public static GetHordeConfig () : UnitConfig {
@@ -86,13 +93,9 @@ export class IHero extends IUnit {
                     (this.Cfg.Flags.HasFlag(UnitFlags.MagicResistant) ? "магии " : "") + "\n"
                 : "")
             + "  радиус видимости " + this.Cfg.Sight + " (в лесу " + this.Cfg.ForestVision + ")\n"
+            + "\nОбладает способностью: " + this.SpellType.GetName() + "\n"
+            + this.SpellType.GetDescription()
             );
-
-        // создаем кастомную команду
-
-        // if (!this.Cfg.AllowedCommands.ContainsKey(UnitCommand.Capture)) {
-        //     this.Cfg.AllowedCommands.Add(UnitCommand.Capture, ISpell.GetHordeConfig());
-        // }
     }
     
     private static _GetOrderWorker(unit: Unit, commandArgs: ACommandArgs): boolean {
@@ -120,6 +123,7 @@ export class IHero extends IUnit {
     }
 
     public OnEveryTick(gameTickNum: number): boolean {
+        this._spell?.OnEveryTick(gameTickNum);
         this._formation.OnEveryTick(gameTickNum);
         this._UpdateFrame();
 
@@ -127,10 +131,16 @@ export class IHero extends IUnit {
             return false;
         }
 
-        // если способность закончила действие
-        if (this._spell?.IsEnd()) {
-            this.hordeUnit.CommandsMind.RemoveAddedCommand(this._spell.GetUnitCommand());
-            this._spell = null;
+        // логика перезарядки способности
+        if (this._spell) {
+            if (this._spell.IsEnd()) {
+                this.hordeUnit.CommandsMind.RemoveAddedCommand(this._spell.GetUnitCommand());
+                this._spellReloadTick = gameTickNum + this.constructor['SpellReload'];
+                this._spell = null;
+            }
+        } else if (this._spellReloadTick < gameTickNum) {
+            var spell : ISpell = new this.constructor['SpellType'](Cell.ConvertHordePoint(this.hordeUnit.Cell));
+            spell.TryAttachToHero(this);
         }
 
         this._formation.SetCenter(Cell.ConvertHordePoint(this.hordeUnit.Cell));
@@ -145,8 +155,11 @@ export class IHero extends IUnit {
             if (targetHordeUnit) {
                 this._formation.SetAttackTarget(new IUnit(targetHordeUnit));
             } else {
-                this._formation.SetAttackTarget(null);
+                this._formation.SmartAttackCell(Cell.ConvertHordePoint(commandArgs.TargetCell));
             }
+        }
+        else if (commandArgs.CommandType == UnitCommand.Cancel) {
+            this._formation.SmartMoveToTargetCommand();
         }
         // кастомная команда
         else if (this._spell && commandArgs.CommandType == this._spell.GetUnitCommand()) {

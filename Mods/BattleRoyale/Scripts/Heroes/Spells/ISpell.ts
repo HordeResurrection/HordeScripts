@@ -6,6 +6,8 @@ import { spawnGeometry, spawnString } from "library/game-logic/decoration-spawn"
 import { createGameMessageWithNoSound } from "library/common/messages";
 import { BuildingTemplate } from "../../Units/IFactory";
 import { GameSettlement } from "../../Core/GameSettlement";
+import { printObjectItems } from "library/common/introspection";
+import { GameField } from "../../Core/GameField";
 
 export enum SpellState {
     DROPPED = 0,
@@ -16,6 +18,12 @@ export enum SpellState {
 }
 
 export class ISpell {
+    // ссылки на глобальные объекты, которые используют все скиллы
+    public static BuildingsTemplate: Array<BuildingTemplate>;
+    public static NeutralSettlement: GameSettlement;
+    public static EnemySettlement: GameSettlement;
+    public static GameField: GameField;
+
     protected static _CfgPrefix             : string = "#BattleRoyale_";
     protected static _CfgUid                : string = "Hero_CustomCommand";
     protected static _UnitCommand           : UnitCommand = UnitCommand.HoldPosition;
@@ -36,32 +44,33 @@ export class ISpell {
     private _visualEffect           : GeometryVisualEffect | null;
 
     protected _hero                 : IHero | null;
+    protected _heroUnitId           : number;
     protected _cell                 : Cell;
     protected _activateArgs         : ACommandArgs;
     protected _activatedGameTick    : number;
     protected _reloadPeriod         : number;
     protected _charges              : number;
-    protected _buildingsTemplate    : Array<BuildingTemplate>;
-    protected _neutralSettlement    : GameSettlement;
-    protected _enemySettlement      : GameSettlement;
 
-    constructor(cell: Cell,
-        buildingsTemplate: Array<BuildingTemplate>,
-        neutralSettlement: GameSettlement,
-        enemySettlement      : GameSettlement) {
+    constructor(cell: Cell) {
         this._state             = SpellState.DROPPED;
         this._hero              = null;
         this._cell              = cell;
         this._textEffect        = null;
         this._visualEffect      = null;
-        this._buildingsTemplate = buildingsTemplate;
-        this._neutralSettlement = neutralSettlement;
-        this._enemySettlement   = enemySettlement;
 
         this._processingTick    = ISpell._ProcessingTick++ % ISpell._ProcessingTickModule;
         this._commandConfig     = this._MakeCommandConfig();
+        // стандартные настройки для скиллов на карте
         this._charges           = 1;
         this._reloadPeriod      = 50;
+    }
+
+    public static GetName() : string {
+        return this._Name;
+    }
+
+    public static GetDescription() : string {
+        return this._Description;
     }
 
     public GetUnitCommand() : UnitCommand {
@@ -82,6 +91,9 @@ export class ISpell {
             this._activatedGameTick = BattleController.GameTimer.GameFramesCounter;
             this._activateArgs      = activateArgs;
 
+            // убираем видимость
+            //this._hero?.hordeUnit.CommandsMind.HideCommand(this.GetUnitCommand());
+
             this._textEffect             = spawnString(ActiveScena, this.constructor['_Name'],
                 Cell.ConvertHordePoint(this._hero?.hordeUnit.Cell as Point2D)
                 .Scale(32).Add(new Cell(-2.5*this.constructor['_Name'].length, 0)).Round().ToHordePoint(), 150);
@@ -98,6 +110,13 @@ export class ISpell {
     public OnEveryTick(gameTickNum: number): boolean {
         if (gameTickNum % ISpell._ProcessingTickModule != this._processingTick) {
             return false;
+        }
+
+        // если владельца нет, то заканчиваем
+        if (this._state != SpellState.ACTIVATED
+            && this._hero
+            && (this._hero.hordeUnit.Id != this._heroUnitId || this._hero.hordeUnit.IsDead)) {
+            this._state = SpellState.END;
         }
 
         switch (this._state) {
@@ -134,6 +153,16 @@ export class ISpell {
         return true;
     }
 
+    public TryAttachToHero(hero : IHero) : boolean {
+        if (hero.PickUpSpell(this)) {
+            this._hero       = hero;
+            this._heroUnitId = hero.hordeUnit.Id;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     protected _MakeCommandConfig() : UnitCommandConfig {
         var customCommandCfgUid = this.constructor['_CfgPrefix'] + this.constructor['_CfgUid'];
         var customCommand : UnitCommandConfig;
@@ -143,8 +172,8 @@ export class ISpell {
             customCommand = HordeContentApi.CloneConfig(
                 HordeContentApi.GetUnitCommand(this.constructor['_UnitCommandBaseCfg']), customCommandCfgUid) as UnitCommandConfig;
             // Настройка
-            ScriptUtils.SetValue(customCommand, "Name", "Активный навык");
-            ScriptUtils.SetValue(customCommand, "Tip", "Применить полученный активный навык");  // Это будет отображаться при наведении курсора
+            ScriptUtils.SetValue(customCommand, "Name", this.constructor['_Name']);
+            ScriptUtils.SetValue(customCommand, "Tip", this.constructor['_Description']);  // Это будет отображаться при наведении курсора
             //ScriptUtils.SetValue(customCommand, "UnitCommand", CUSTOM_COMMAND_ID);
             ScriptUtils.SetValue(customCommand, "Hotkey", "Q");
             ScriptUtils.SetValue(customCommand, "ShowButton", true);
@@ -159,34 +188,40 @@ export class ISpell {
     }
 
     protected _OnEveryTickDropped(gameTickNum: number) {
+        var isDropped = true;
+
         // создаем визуальный эффект
 
         if (!this._visualEffect) {
             this._MakeVisualEffect();
         }
 
-        // ищем обладателя способности
+        // обладатель пришел извне
 
-        var upperHordeUnit = ActiveScena.UnitsMap.GetUpperUnit(this._cell.ToHordePoint());
-        if (upperHordeUnit) {
-            var hero = IHero.OpUnitIdToHeroObject.get(upperHordeUnit.Id);
-            if (hero) {
-                this._hero = hero;
-                if (this._hero.PickUpSpell(this)) {
+        if (this._hero) {
+            isDropped = false;
+        } else {
+            // обладатель стоит на клетке
+
+            var upperHordeUnit = ActiveScena.UnitsMap.GetUpperUnit(this._cell.ToHordePoint());
+            if (upperHordeUnit) {
+                var hero = IHero.OpUnitIdToHeroObject.get(upperHordeUnit.Id);
+                if (hero && !this.TryAttachToHero(hero)) {
                     // оповещение о способности
-                    this._hero.hordeUnit.Owner.Messages.AddMessage(
+                    hero.hordeUnit.Owner.Messages.AddMessage(
                         createGameMessageWithNoSound(
                             "Вам доступна способность: " + this.constructor['_Name'] + "\n" + this.constructor['_Description']));
-
-                    // удалить визуальный эффект
-                    this._FreeVisualEffect();
-
-                    return false;
+                    isDropped = false;
                 }
             }
         }
 
-        return true;
+        // удалить визуальный эффект
+        if (!isDropped) {
+            this._FreeVisualEffect();
+        }
+
+        return isDropped;
     }
 
     protected _OnEveryTickPickup(gameTickNum: number) {

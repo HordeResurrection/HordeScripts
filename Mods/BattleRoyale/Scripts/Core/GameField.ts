@@ -1,7 +1,7 @@
 import { log } from "library/common/logging";
 import { broadcastMessage } from "library/common/messages";
 import { createHordeColor, createPoint } from "library/common/primitives";
-import { Stride_Color, TileType } from "library/game-logic/horde-types";
+import { Stride_Color, Tile, TileType } from "library/game-logic/horde-types";
 import { Cell } from "./Cell";
 import { GeometryCircle } from "./GeometryCircle";
 import { GeometryShrinkingCircle } from "./GeometryShrinkingCircle";
@@ -17,20 +17,53 @@ export class GameField {
     private _bigIslandCells: Array<Cell>;
     /// флаг, что ячейка в игровом поле
     private _cellsFlag: Array<Array<boolean>>;
+    /// типы ячеек
+    private _cellsTileType: Array<Array<TileType>>;
+    private _landscapeMap : HordeClassLibrary.World.ScenaComponents.Scena.ScenaLandscape;
 
     constructor(constrictionTimeoutTicks:number, constrictionsSpeedCoeff:number){
         this.constrictionTimeoutTicks   =   constrictionTimeoutTicks;
         this.constrictionsSpeedCoeff    =   constrictionsSpeedCoeff;
         this._constrictionNextTick      =   -1;
 
+        this._FindTilesType();
         this._FindSpawnField();
+    }
+
+    public GetTileType(cell: Cell) : TileType {
+        // если закэшировали лес, то актуализируем тип тайла
+        if (this._cellsTileType[cell.X][cell.Y] == TileType.Forest) {
+            let tile     = this._landscapeMap.Item.get(cell.ToHordePoint());
+            let tileType = tile.Cfg.Type;
+            this._cellsTileType[cell.X][cell.Y] = tileType;
+        }
+        return this._cellsTileType[cell.X][cell.Y];
+    }
+
+    public IsAchievableCell(cell: Cell) : boolean {
+        return this._cellsFlag[cell.X][cell.Y];
+    }
+
+    private _FindTilesType() {
+        // находим типы тайлов
+        let scenaWidth      = ActiveScena.GetRealScena().Size.Width;
+        let scenaHeight     = ActiveScena.GetRealScena().Size.Height;
+        this._landscapeMap    = ActiveScena.GetRealScena().LandscapeMap;
+        this._cellsTileType = new Array<Array<TileType>>(scenaWidth);
+        for (var x = 0; x < scenaWidth; x++) {
+            this._cellsTileType[x] = new Array<TileType>(scenaHeight);
+            for (var y = 0; y < scenaHeight; y++) {
+                let tile     = this._landscapeMap.Item.get(createPoint(x, y));
+                let tileType = tile.Cfg.Type;
+                this._cellsTileType[x][y] = tileType;
+            }
+        }
     }
 
     private _FindSpawnField() {
         var scenaSettlements = ActiveScena.GetRealScena().Settlements;
         let scenaWidth       = ActiveScena.GetRealScena().Size.Width;
         let scenaHeight      = ActiveScena.GetRealScena().Size.Height;
-        let landscapeMap     = ActiveScena.GetRealScena().LandscapeMap;
 
         var cellsIslandNum = new Array<Array<number>>(scenaWidth);
         for (var x = 0; x < scenaWidth; x++) {
@@ -67,9 +100,7 @@ export class GameField {
                 for (var x = Math.max(cell.X - 1, 0); x <= Math.min(cell.X + 1, scenaWidth - 1); x++) {
                     for (var y = Math.max(cell.Y - 1, 0); y <= Math.min(cell.Y + 1, scenaHeight -1); y++) {
                         if (cellsIslandNum[x][y] == -1) {
-                            let tile     = landscapeMap.Item.get(createPoint(x, y));
-                            let tileType = tile.Cfg.Type;
-
+                            let tileType = this._cellsTileType[x][y];
                             var isWalkableCell = !(tileType == TileType.Water || tileType == TileType.Mounts);
                             if (!isWalkableCell) {
                                 cellsIslandNum[x][y] = -2;
@@ -94,7 +125,6 @@ export class GameField {
         log.info("Найдем максимальный остров из ", this._bigIslandCells.length,
             " ячеек относительно поселения ", cellsIslandNum[this._bigIslandCells[0].X][this._bigIslandCells[0].Y]);
 
-        
         this._cellsFlag = new Array<Array<boolean>>(scenaWidth);
         for (var x = 0; x < scenaWidth; x++) {
             this._cellsFlag[x] = new Array<boolean>(scenaHeight);

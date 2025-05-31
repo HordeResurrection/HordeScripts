@@ -1,8 +1,12 @@
 import { IHero } from "./IHero";
+import { ISpell } from "./Spells/ISpell";
+import { Spell_healing_aura } from "./Spells/Spell_healing_aura";
 
 export class Hero_Crusader extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "Crusader";
     protected static BaseCfgUid  : string = "#UnitConfig_Slavyane_Spearman";
+
+    public static SpellType: typeof ISpell = Spell_healing_aura;
 
     constructor(hordeUnit: HordeClassLibrary.World.Objects.Units.Unit) {
         super(hordeUnit);

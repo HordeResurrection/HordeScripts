@@ -4,10 +4,14 @@ import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { IHero } from "./IHero";
 import { IConfig } from "../Units/IConfig";
 import { BuildingTemplate } from "../Units/IFactory";
+import { Spell_golden_barracks_summon } from "./Spells/Spell_golden_barracks_summon";
+import { ISpell } from "./Spells/ISpell";
 
 export class Hero_Scorpion extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "HeroScorpion";
     protected static BaseCfgUid  : string = "#UnitConfig_Nature_ScorpionMed";
+
+    public static SpellType: typeof ISpell = Spell_golden_barracks_summon;
 
     // настройки формации - начальный радиус
     protected static _formationStartRadius : number = 2;
@@ -89,6 +93,9 @@ export class Hero_Scorpion extends IHero {
 
             // удаляем из формации выбранного лидера
             this._formation.RemoveUnits([ this ]);
+
+            // добавляем в map для поддержки кликов
+            IHero.OpUnitIdToHeroObject.set(this.hordeUnit.Id, this);
         }
 
         return true;

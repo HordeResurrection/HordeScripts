@@ -1,9 +1,13 @@
 import { TileType } from "library/game-logic/horde-types";
 import { IHero } from "./IHero";
+import { ISpell } from "./Spells/ISpell";
+import { Spell_fiery_trail } from "./Spells/Spell_fiery_trail";
 
 export class Hero_Rider extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "Rider";
     protected static BaseCfgUid  : string = "#UnitConfig_Slavyane_Raider";
+
+    public static SpellType: typeof ISpell = Spell_fiery_trail;
 
     constructor(hordeUnit: HordeClassLibrary.World.Objects.Units.Unit) {
         super(hordeUnit);

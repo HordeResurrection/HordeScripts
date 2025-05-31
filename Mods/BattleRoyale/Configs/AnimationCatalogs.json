@@ -84,6 +84,34 @@
           "Disabled": "Spell_teleportation_disabled"
         }
       }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_Command_call_of_nature",
+      "Description": "Command button \"Spell_call_of_nature\"",
+      "InternalEditorPath": "Units\\Commands\\Capture\\Spell_call_of_nature",
+      "RootSection": {
+        "States": {
+          "Focused": "Spell_call_of_nature_focused",
+          "Pressed": "Spell_call_of_nature_pressed",
+          "Regular": "Spell_call_of_nature_regular",
+          "Disabled": "Spell_call_of_nature_disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_Command_fiery_trail",
+      "Description": "Command button \"Spell_fiery_trail\"",
+      "InternalEditorPath": "Units\\Commands\\Capture\\Spell_fiery_trail",
+      "RootSection": {
+        "States": {
+          "Focused": "Spell_fiery_trail_focused",
+          "Pressed": "Spell_fiery_trail_pressed",
+          "Regular": "Spell_fiery_trail_regular",
+          "Disabled": "Spell_fiery_trail_disabled"
+        }
+      }
     }
   ]
 }

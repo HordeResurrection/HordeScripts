@@ -7,6 +7,7 @@ import { generateCellInSpiral } from "library/common/position-tools";
 import { spawnUnits } from "library/game-logic/unit-spawn";
 import { ScriptData_Building } from "../../Core/ScriptData_Building";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
+import { ISpell } from "./ISpell";
 
 export class Spell_golden_barracks_summon extends ITargetPointSpell {
     private static _MaxDistance : number = 6;
@@ -37,11 +38,11 @@ export class Spell_golden_barracks_summon extends ITargetPointSpell {
         // спавним казарму в указанную точку
         var rnd                 = ActiveScena.GetRealScena().Context.Randomizer;
         var generator           = generateCellInSpiral(targetCell.X, targetCell.Y);
-        var buildingTemplateNum = rnd.RandomNumber(0, this._buildingsTemplate.length - 1);
-        var rarityNum           = this._buildingsTemplate[buildingTemplateNum].buildings.length - 1;
+        var buildingTemplateNum = rnd.RandomNumber(0, ISpell.BuildingsTemplate.length - 1);
+        var rarityNum           = ISpell.BuildingsTemplate[buildingTemplateNum].buildings.length - 1;
         var units               = spawnUnits(
-            this._enemySettlement.hordeSettlement,
-            this._buildingsTemplate[buildingTemplateNum].buildings[rarityNum].hordeConfig,
+            ISpell.EnemySettlement.hordeSettlement,
+            ISpell.BuildingsTemplate[buildingTemplateNum].buildings[rarityNum].hordeConfig,
             1,
             UnitDirection.RightDown,
             generator);
