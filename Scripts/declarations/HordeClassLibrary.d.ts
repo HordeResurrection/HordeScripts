@@ -9760,6 +9760,36 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem {
 		/** UnitCommand.SetRallypoint = 13 */ static readonly SetRallypoint: UnitCommand;
 		/** UnitCommand.StepAway = 14 */ static readonly StepAway: UnitCommand;
 		/** UnitCommand.HoldPosition = 15 */ static readonly HoldPosition: UnitCommand;
+		/** UnitCommand.OneClick_Custom_0 = 16 */ static readonly OneClick_Custom_0: UnitCommand;
+		/** UnitCommand.OneClick_Custom_1 = 17 */ static readonly OneClick_Custom_1: UnitCommand;
+		/** UnitCommand.OneClick_Custom_2 = 18 */ static readonly OneClick_Custom_2: UnitCommand;
+		/** UnitCommand.OneClick_Custom_3 = 19 */ static readonly OneClick_Custom_3: UnitCommand;
+		/** UnitCommand.OneClick_Custom_4 = 20 */ static readonly OneClick_Custom_4: UnitCommand;
+		/** UnitCommand.OneClick_Custom_5 = 21 */ static readonly OneClick_Custom_5: UnitCommand;
+		/** UnitCommand.OneClick_Custom_6 = 22 */ static readonly OneClick_Custom_6: UnitCommand;
+		/** UnitCommand.OneClick_Custom_7 = 23 */ static readonly OneClick_Custom_7: UnitCommand;
+		/** UnitCommand.OneClick_Custom_8 = 24 */ static readonly OneClick_Custom_8: UnitCommand;
+		/** UnitCommand.OneClick_Custom_9 = 25 */ static readonly OneClick_Custom_9: UnitCommand;
+		/** UnitCommand.PointBased_Custom_0 = 26 */ static readonly PointBased_Custom_0: UnitCommand;
+		/** UnitCommand.PointBased_Custom_1 = 27 */ static readonly PointBased_Custom_1: UnitCommand;
+		/** UnitCommand.PointBased_Custom_2 = 28 */ static readonly PointBased_Custom_2: UnitCommand;
+		/** UnitCommand.PointBased_Custom_3 = 29 */ static readonly PointBased_Custom_3: UnitCommand;
+		/** UnitCommand.PointBased_Custom_4 = 30 */ static readonly PointBased_Custom_4: UnitCommand;
+		/** UnitCommand.PointBased_Custom_5 = 31 */ static readonly PointBased_Custom_5: UnitCommand;
+		/** UnitCommand.PointBased_Custom_6 = 32 */ static readonly PointBased_Custom_6: UnitCommand;
+		/** UnitCommand.PointBased_Custom_7 = 33 */ static readonly PointBased_Custom_7: UnitCommand;
+		/** UnitCommand.PointBased_Custom_8 = 34 */ static readonly PointBased_Custom_8: UnitCommand;
+		/** UnitCommand.PointBased_Custom_9 = 35 */ static readonly PointBased_Custom_9: UnitCommand;
+		/** UnitCommand.Produce_Custom_0 = 36 */ static readonly Produce_Custom_0: UnitCommand;
+		/** UnitCommand.Produce_Custom_1 = 37 */ static readonly Produce_Custom_1: UnitCommand;
+		/** UnitCommand.Produce_Custom_2 = 38 */ static readonly Produce_Custom_2: UnitCommand;
+		/** UnitCommand.Produce_Custom_3 = 39 */ static readonly Produce_Custom_3: UnitCommand;
+		/** UnitCommand.Produce_Custom_4 = 40 */ static readonly Produce_Custom_4: UnitCommand;
+		/** UnitCommand.Produce_Custom_5 = 41 */ static readonly Produce_Custom_5: UnitCommand;
+		/** UnitCommand.Produce_Custom_6 = 42 */ static readonly Produce_Custom_6: UnitCommand;
+		/** UnitCommand.Produce_Custom_7 = 43 */ static readonly Produce_Custom_7: UnitCommand;
+		/** UnitCommand.Produce_Custom_8 = 44 */ static readonly Produce_Custom_8: UnitCommand;
+		/** UnitCommand.Produce_Custom_9 = 45 */ static readonly Produce_Custom_9: UnitCommand;
 	}
 }
 //#endregion
