@@ -5705,9 +5705,10 @@ declare namespace HordeClassLibrary.UnitComponents.Enumerations {
 		/** UnitSpecification.Church = 524288 */ static readonly Church: UnitSpecification;
 		/** UnitSpecification.Obstacle = 1048576 */ static readonly Obstacle: UnitSpecification;
 		/** UnitSpecification.Gate = 2097152 */ static readonly Gate: UnitSpecification;
-		/** UnitSpecification.DefensiveStructure = 4194304 */ static readonly DefensiveStructure: UnitSpecification;
-		/** UnitSpecification.DevelopmentBooster = 8388608 */ static readonly DevelopmentBooster: UnitSpecification;
-		/** UnitSpecification.MaxGrowthSpeedIncrease = 16777216 */ static readonly MaxGrowthSpeedIncrease: UnitSpecification;
+		/** UnitSpecification.Bridge = 4194304 */ static readonly Bridge: UnitSpecification;
+		/** UnitSpecification.DefensiveStructure = 8388608 */ static readonly DefensiveStructure: UnitSpecification;
+		/** UnitSpecification.DevelopmentBooster = 16777216 */ static readonly DevelopmentBooster: UnitSpecification;
+		/** UnitSpecification.MaxGrowthSpeedIncrease = 33554432 */ static readonly MaxGrowthSpeedIncrease: UnitSpecification;
 	}
 }
 //#endregion
@@ -9890,7 +9891,7 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 
 		GetContainerCell(): HordeResurrection.Basic.Primitives.Geometry.Point2D;
 
-		DeleteUnitInBuilding(): void;
+		DeleteInsideUnit(): void;
 
 		KillOperator(): void;
 
@@ -13658,6 +13659,10 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		// Constructors:
 		constructor();
 
+		constructor(
+			unitToDelete: HordeClassLibrary.World.Objects.Units.Unit | null
+		);
+
 		// Properties:
 		UnitToDelete: HordeClassLibrary.World.Objects.Units.Unit;
 		Silent: boolean;
@@ -13953,15 +13958,13 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 			effect: HordeClassLibrary.UnitComponents.Enumerations.UnitEffectFlag
 		): boolean;
 
-		Delete(
-			silent?: boolean /* = false */
-		): void;
-
 		ProcessDeath(): void;
 
 		ProcessNearDeath(): void;
 
-		ProcessDeleting(): void;
+		Delete(
+			silent?: boolean /* = false */
+		): void;
 
 		SwitchToDummy(): void;
 
@@ -15943,8 +15946,6 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Watcher {
 		constructor();
 
 		// Methods:
-		UpdateOnGameTick(): void;
-
 		CheckRegistration(
 			scena: HordeClassLibrary.World.ScenaComponents.Scena | null,
 			u: HordeClassLibrary.World.Objects.Units.Unit | null
