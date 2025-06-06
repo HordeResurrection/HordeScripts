@@ -12396,6 +12396,7 @@ declare namespace HordeClassLibrary.World.Context.Parameters {
 		// Properties:
 		GravityAcceleration: number;
 		AirAcceleration: number;
+		EnableWindUpdating: boolean;
 		WindSpeedMax: HordeResurrection.Basic.Primitives.PreciseFraction;
 		WindDeltaMax: HordeResurrection.Basic.Primitives.PreciseFraction;
 		WindSpeedUpdatePeriod: number;
@@ -15246,12 +15247,20 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		readonly SpeedVector: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector;
 		readonly Direction: number;
 		readonly UnitDirection: HordeClassLibrary.UnitComponents.Enumerations.UnitDirection;
-		readonly SpeedUpdateCountdown: HordeResurrection.Basic.Debugger.Countdowns.ResettableCountdown;
-		readonly DeltaUpdateCountdown: HordeResurrection.Basic.Debugger.Countdowns.ResettableCountdown;
 		readonly MaxSpeedComponent: HordeResurrection.Basic.Primitives.PreciseFraction;
 
 		// Methods:
 		UpdateOnGameTick(): void;
+
+		ApplyDelta(
+			speedDelta: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector,
+			boundToMinMax?: boolean /* = true */
+		): void;
+
+		SetSpeedVector(
+			speedVector: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector,
+			boundToMinMax?: boolean /* = true */
+		): void;
 	}
 }
 //#endregion
