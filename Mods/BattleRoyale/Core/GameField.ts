@@ -1,7 +1,7 @@
 import { log } from "library/common/logging";
 import { broadcastMessage } from "library/common/messages";
 import { createHordeColor, createPoint } from "library/common/primitives";
-import { Stride_Color, TileType } from "library/game-logic/horde-types";
+import { BattleController, Stride_Color, Tile, TileType } from "library/game-logic/horde-types";
 import { Cell } from "./Cell";
 import { GeometryCircle } from "./GeometryCircle";
 import { GeometryShrinkingCircle } from "./GeometryShrinkingCircle";
@@ -13,21 +13,57 @@ export class GameField {
     private _constrictionNextTick:number;
     private _geometryShrinkingCircle:GeometryShrinkingCircle;
 
+    /// ячейки игрового поля
     private _bigIslandCells: Array<Cell>;
+    /// флаг, что ячейка в игровом поле
+    private _cellsFlag: Array<Array<boolean>>;
+    /// типы ячеек
+    private _cellsTileType: Array<Array<TileType>>;
+    private _landscapeMap : HordeClassLibrary.World.ScenaComponents.Scena.ScenaLandscape;
 
     constructor(constrictionTimeoutTicks:number, constrictionsSpeedCoeff:number){
         this.constrictionTimeoutTicks   =   constrictionTimeoutTicks;
         this.constrictionsSpeedCoeff    =   constrictionsSpeedCoeff;
         this._constrictionNextTick      =   -1;
 
+        this._FindTilesType();
         this._FindSpawnField();
+    }
+
+    public GetTileType(cell: Cell) : TileType {
+        // если закэшировали лес, то актуализируем тип тайла
+        if (this._cellsTileType[cell.X][cell.Y] == TileType.Forest) {
+            let tile     = this._landscapeMap.Item.get(cell.ToHordePoint());
+            let tileType = tile.Cfg.Type;
+            this._cellsTileType[cell.X][cell.Y] = tileType;
+        }
+        return this._cellsTileType[cell.X][cell.Y];
+    }
+
+    public IsAchievableCell(cell: Cell) : boolean {
+        return this._cellsFlag[cell.X][cell.Y];
+    }
+
+    private _FindTilesType() {
+        // находим типы тайлов
+        let scenaWidth      = ActiveScena.GetRealScena().Size.Width;
+        let scenaHeight     = ActiveScena.GetRealScena().Size.Height;
+        this._landscapeMap    = ActiveScena.GetRealScena().LandscapeMap;
+        this._cellsTileType = new Array<Array<TileType>>(scenaWidth);
+        for (var x = 0; x < scenaWidth; x++) {
+            this._cellsTileType[x] = new Array<TileType>(scenaHeight);
+            for (var y = 0; y < scenaHeight; y++) {
+                let tile     = this._landscapeMap.Item.get(createPoint(x, y));
+                let tileType = tile.Cfg.Type;
+                this._cellsTileType[x][y] = tileType;
+            }
+        }
     }
 
     private _FindSpawnField() {
         var scenaSettlements = ActiveScena.GetRealScena().Settlements;
         let scenaWidth       = ActiveScena.GetRealScena().Size.Width;
         let scenaHeight      = ActiveScena.GetRealScena().Size.Height;
-        let landscapeMap     = ActiveScena.GetRealScena().LandscapeMap;
 
         var cellsIslandNum = new Array<Array<number>>(scenaWidth);
         for (var x = 0; x < scenaWidth; x++) {
@@ -64,9 +100,7 @@ export class GameField {
                 for (var x = Math.max(cell.X - 1, 0); x <= Math.min(cell.X + 1, scenaWidth - 1); x++) {
                     for (var y = Math.max(cell.Y - 1, 0); y <= Math.min(cell.Y + 1, scenaHeight -1); y++) {
                         if (cellsIslandNum[x][y] == -1) {
-                            let tile     = landscapeMap.Item.get(createPoint(x, y));
-                            let tileType = tile.Cfg.Type;
-
+                            let tileType = this._cellsTileType[x][y];
                             var isWalkableCell = !(tileType == TileType.Water || tileType == TileType.Mounts);
                             if (!isWalkableCell) {
                                 cellsIslandNum[x][y] = -2;
@@ -90,6 +124,17 @@ export class GameField {
 
         log.info("Найдем максимальный остров из ", this._bigIslandCells.length,
             " ячеек относительно поселения ", cellsIslandNum[this._bigIslandCells[0].X][this._bigIslandCells[0].Y]);
+
+        this._cellsFlag = new Array<Array<boolean>>(scenaWidth);
+        for (var x = 0; x < scenaWidth; x++) {
+            this._cellsFlag[x] = new Array<boolean>(scenaHeight);
+            for (var y = 0; y < scenaHeight; y++) {
+                this._cellsFlag[x][y] = false;
+            }
+        }
+        this._bigIslandCells.forEach(cell => {
+            this._cellsFlag[cell.X][cell.Y] = true;
+        });
     }
 
     public *GeneratorRandomCell() : Generator<{ X: number, Y: number }> {
@@ -113,7 +158,70 @@ export class GameField {
         return;
     }
 
-    public Area() : number {
+    public GetStartRectangle() : {LD: Cell, RU: Cell} {
+        var LD = this._bigIslandCells[0].Round();
+        var RU = this._bigIslandCells[0].Round();
+        this._bigIslandCells.forEach(cell => {
+            LD.X = Math.min(LD.X, cell.X);
+            LD.Y = Math.min(LD.Y, cell.Y);
+
+            RU.X = Math.max(RU.X, cell.X);
+            RU.Y = Math.max(RU.Y, cell.Y);
+        });
+
+        return {LD, RU};
+    }
+
+    public GetCurrentRectangle() : {LD: Cell, RU: Cell} {
+        var circle              = this.CurrentCircle() as GeometryCircle;
+        var circleCenter        = circle.center;
+        var circleRadius        = circle.radius;
+        var LD                  = circleCenter.Minus(new Cell(circleRadius, circleRadius)).Scale(1/32).Round();
+        var RU                  = circleCenter.Add(new Cell(circleRadius, circleRadius)).Scale(1/32).Round();
+        let scenaWidth          = ActiveScena.GetRealScena().Size.Width;
+        let scenaHeight         = ActiveScena.GetRealScena().Size.Height;
+        return {LD: new Cell(Math.max(LD.X, 0), Math.max(LD.Y, 0)),
+            RU: new Cell(Math.min(RU.X, scenaWidth - 1), Math.min(RU.Y, scenaHeight - 1))}
+    }
+
+    public GetEquidistantPositions(count: number) : Array<Cell> {
+        var res = new Array<Cell>(count);
+
+        // габариты игрового поля
+
+        var rectangle = this.GetStartRectangle();
+
+        // теперь строим правильный многоугольник
+
+        var center = rectangle.LD.Add(rectangle.RU).Scale(0.5).Round();
+        for (var position = 0; position < count; position++) {
+            var angle  = position * 2.0 * Math.PI / count;
+            var vector = new Cell(rectangle.RU.Minus(rectangle.LD).Length_Chebyshev(), 0).Rotate(angle).Scale(0.5);
+            var cell   = center.Add(vector);
+
+            // делаем так, чтобы ячейка была внутри
+            while (!(rectangle.LD.X < cell.X && cell.X < rectangle.RU.X && rectangle.LD.Y < cell.Y && cell.Y < rectangle.RU.Y)) {
+                vector = vector.Scale(0.95);
+                cell   = center.Add(vector);
+            }
+
+            // берем еще чуть внутри
+            vector = vector.Scale(0.95);
+            cell   = center.Add(vector);
+            res[position] = cell.Round();
+            
+            // теперь выбираем точку, которая есть в игровом поле
+            vector = vector.Scale(1.0 / vector.Length_L2());
+            while (!this._cellsFlag[res[position].X][res[position].Y]) {
+                cell = cell.Minus(vector);
+                res[position] = cell.Round();
+            }
+        }
+
+        return res;
+    }
+
+    public StartArea() : number {
         return this._bigIslandCells.length;
     }
 
@@ -202,7 +310,9 @@ export class GameField {
                 " Центр ", this._geometryShrinkingCircle.endCircle.center.X/32," ; ",this._geometryShrinkingCircle.endCircle.center.Y/32
             );
 
-            broadcastMessage("Область сражения сужается!", createHordeColor(255, 255, 55, 55));
+            broadcastMessage("Область сражения сужается! Следующее сужение через "
+                + (this._geometryShrinkingCircle.animationTotalTime + this._geometryShrinkingCircle.end_tiksToLive) / BattleController.GameTimer.CurrentFpsLimit
+                + " сек", createHordeColor(255, 255, 55, 55));
         }
         
         //  отрисовка

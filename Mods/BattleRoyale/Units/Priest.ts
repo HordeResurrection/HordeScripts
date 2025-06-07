@@ -35,13 +35,13 @@ export class Priest extends IUnit {
     }
 
     protected static _InitHordeConfig() {
-        IUnit._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Ворожей");
     }
 
     public OnEveryTick(gameTickNum: number): boolean {
-        if (!IUnit.prototype.OnEveryTick.call(this, gameTickNum)) {
+        if (!super.OnEveryTick(gameTickNum)) {
             return false;
         }
 

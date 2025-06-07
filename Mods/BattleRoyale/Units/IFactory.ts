@@ -4,6 +4,7 @@ import { Hero_Crusader } from "../Heroes/Hero_Crusader";
 import { CreateHordeUnitConfig, FactoryConfig, GetConfigsByWorker, IConfig } from "../Units/IConfig";
 import { createHordeColor } from "library/common/primitives";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
+import { log } from "library/common/logging";
 
 export class BuildingTemplate {
     public buildings : Array<IConfig>;
@@ -49,7 +50,7 @@ export class IFactory {
             createHordeColor(255, 255, 150, 255),
             createHordeColor(150, 255, 170, 0)];
         var rarity_NamePrefix = ["", "{храбрый}", "{ратник}", "{дружинник}", "{витязь}"];
-        var rarity_HpCoeff = [1.0, 1.25, 1.57, 3.735, 12.15];
+        var rarity_HpCoeff = [1.0, 1.25, 1.57, 3.735, 5.5];
 
         for (var rarity = 0; rarity < 5; rarity++) {
             var unitConfigUid    = String(config.unitConfig.hordeConfig.Uid).replace("#UnitConfig_Slavyane_", IConfig.CfgPrefix) + "_R" + rarity;
@@ -78,9 +79,8 @@ export class IFactory {
             });
             ScriptUtils.SetValue(unitConfig.hordeConfig, "Name", config.unitConfig.hordeConfig.Name + "\n" + rarity_NamePrefix[rarity]);
             ScriptUtils.SetValue(unitConfig.hordeConfig, "MaxHealth",
-                Math.round(config.unitConfig.hordeConfig.MaxHealth
-                    * Math.pow(rarity_HpCoeff[rarity]
-                        , 2.0 * config.unitConfig.hordeConfig.MainArmament.ShotParams.Damage / config.unitConfig.hordeConfig.MaxHealth)));
+                Math.round(config.unitConfig.hordeConfig.MaxHealth * Math.pow(rarity_HpCoeff[rarity],
+                    2.0 * config.unitConfig.hordeConfig.MainArmament.ShotParams.Damage / config.unitConfig.hordeConfig.MaxHealth)));
             ScriptUtils.SetValue(unitConfig.hordeConfig.MainArmament.ShotParams, "Damage", Math.round(config.unitConfig.hordeConfig.MainArmament.ShotParams.Damage*(1 + 0.15*rarity)));
             if (rarity_TintColor[rarity]) ScriptUtils.SetValue(unitConfig.hordeConfig, "TintColor", rarity_TintColor[rarity]);
             ScriptUtils.SetValue(unitConfig.hordeConfig, "Flags", mergeFlags(UnitFlags, unitConfig.hordeConfig.Flags, UnitFlags.NotChoosable));
@@ -91,10 +91,18 @@ export class IFactory {
             ScriptUtils.SetValue(unitConfig.hordeConfig.CostResources, "Metal",  0);
             ScriptUtils.SetValue(unitConfig.hordeConfig.CostResources, "Lumber", 0);
             ScriptUtils.SetValue(unitConfig.hordeConfig.CostResources, "People", 0);
+            if (rarity == 4) {
+                ScriptUtils.SetValue(unitConfig.hordeConfig, "PressureResist", 20);
+            }
             // убираем дружественный огонь
             if (unitConfig.hordeConfig.MainArmament) {
                 var bulletCfg = HordeContentApi.GetBulletConfig(unitConfig.hordeConfig.MainArmament.BulletConfig.Uid);
                 ScriptUtils.SetValue(bulletCfg, "CanDamageAllied", false);
+
+                // убираем дружественный огонь у прото снарядов
+                if (bulletCfg.SpecialParams && bulletCfg.SpecialParams.FragmentBulletConfig) {
+                    ScriptUtils.SetValue(bulletCfg.SpecialParams.FragmentBulletConfig, "CanDamageAllied", false);
+                }
             }
             // убираем захватываемость
             if (unitConfig.hordeConfig.ProfessionParams.ContainsKey(UnitProfession.Capturable)) {

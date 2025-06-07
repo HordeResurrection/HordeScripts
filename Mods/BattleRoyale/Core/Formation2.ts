@@ -29,6 +29,21 @@ class Agent {
         this.unit.DisallowCommands();
     }
 
+    /** атаковать точку */
+    public SmartAttackCommand(cell: Cell) {
+        var upperHordeUnit = ActiveScena.UnitsMap.GetUpperUnit(cell.ToHordePoint());
+        if (upperHordeUnit && upperHordeUnit.Owner.Uid != this.unit.hordeUnit.Owner.Uid) {
+            this.GivePointCommand(cell, UnitCommand.MoveToPoint, AssignOrderMode.Replace);
+        } else {
+            this.GivePointCommand(cell, UnitCommand.Attack, AssignOrderMode.Replace);
+        }
+    }
+
+    /** вернуться в целевую точку */
+    public SmartMoveToTargetCommand() {
+        this.GivePointCommand(this.targetCell, UnitCommand.MoveToPoint, AssignOrderMode.Replace);
+    }
+
     public OnEveryTick(gameTickNum: number) {
         // если агент здание и не достроился, то ничего не делаем
         if (this.unit.hordeUnit.EffectsMind.BuildingInProgress) {
@@ -49,7 +64,7 @@ class Agent {
                     var attackTargetCell = Cell.ConvertHordePoint(this.attackTarget.hordeUnit.Cell);
                     var distanceToAttackTargetCell = agentCell.Minus(attackTargetCell).Length_Chebyshev();
 
-                    if (distanceToAttackTargetCell < 14 && distanceToTargetCell < 12) {
+                    if (distanceToAttackTargetCell < 2*14 && distanceToTargetCell < 2*12) {
                         this.GivePointCommand(attackTargetCell, UnitCommand.Attack, AssignOrderMode.Replace);
                         return;
                     }
@@ -64,7 +79,7 @@ class Agent {
         }
 
         // если юнит ушел далеко, пытаемся вернуть его назад
-        if (distanceToTargetCell > 8) {
+        if (distanceToTargetCell > 2*8) {
             this.GivePointCommand(this.targetCell, UnitCommand.MoveToPoint, AssignOrderMode.Replace);
         }
         // если юнит не на целевой клетке и ничего не делает, то отправляем его в целевую точку
@@ -154,6 +169,20 @@ class Orbit {
             });
             this.prevCenterFormation = this.centerFormation;
         }
+    }
+
+    public SmartAttackCommand(cell: Cell) {
+        this.SetAttackTarget(null);
+        this.agents.forEach(agent => {
+            agent.SmartAttackCommand(cell.Add(this.cells[agent.cellNum]));
+        });
+    }
+
+    public SmartMoveToTargetCommand() {
+        this.SetAttackTarget(null);
+        this.agents.forEach(agent => {
+            agent.SmartMoveToTargetCommand();
+        });
     }
 
     AddAgents(agents: Array<Agent>) {
@@ -382,6 +411,19 @@ export class Formation2 {
     public SetAttackTarget(unit: IUnit | null) {
         this._orbits.forEach((orbit) => {
             orbit.SetAttackTarget(unit);
+        });
+    }
+
+    
+    public SmartAttackCell(cell: Cell) {
+        this._orbits.forEach(orbit => {
+            orbit.SmartAttackCommand(cell);
+        });
+    }
+
+    public SmartMoveToTargetCommand() {
+        this._orbits.forEach(orbit => {
+            orbit.SmartMoveToTargetCommand();
         });
     }
 

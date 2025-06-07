@@ -1,6 +1,7 @@
+import { createPoint } from "library/common/primitives";
 import { enumerate, eNext } from "library/dotnet/dotnet-utils";
 import { TileType, UnitCommand, UnitConfig, UnitFlags, UnitSpecification } from "library/game-logic/horde-types";
-import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
+import { getUnitProfessionParams, UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
 
 export function CreateHordeUnitConfig(BaseCfgUid: string, newCfgUid: string) : UnitConfig {
     var hordeConfig: UnitConfig;
@@ -14,6 +15,35 @@ export function CreateHordeUnitConfig(BaseCfgUid: string, newCfgUid: string) : U
     //}
 
     return hordeConfig;
+}
+
+/** добавить профессию найма юнитов, если была добавлена, то установит точки выхода и очистит список построек */
+export function CfgAddUnitProducer(Cfg: UnitConfig) {
+    // даем профессию найм войнов при отсутствии
+    if (!getUnitProfessionParams(Cfg, UnitProfession.UnitProducer)) {
+        var donorCfg = HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Barrack")) as UnitConfig;
+        var prof_unitProducer = getUnitProfessionParams(donorCfg, UnitProfession.UnitProducer);
+        Cfg.ProfessionParams.Item.set(UnitProfession.UnitProducer, prof_unitProducer);
+        
+        if (Cfg.BuildingConfig == null) {
+            ScriptUtils.SetValue(Cfg, "BuildingConfig", donorCfg.BuildingConfig);
+        }
+
+        // добавляем точки выхода
+        if (Cfg.BuildingConfig.EmergePoint == null) {
+            ScriptUtils.SetValue(Cfg.BuildingConfig, "EmergePoint", createPoint(0, 0));
+        }
+        if (Cfg.BuildingConfig.EmergePoint2 == null) {
+            ScriptUtils.SetValue(Cfg.BuildingConfig, "EmergePoint2", createPoint(0, 0));
+        }
+
+        // очищаем список
+        var producerParams = Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        var produceList    = producerParams.CanProduceList;
+        produceList.Clear();
+
+        HordeContentApi.RemoveConfig(donorCfg);
+    }
 }
 
 export class FactoryConfig {

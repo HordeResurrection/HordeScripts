@@ -1,72 +1,30 @@
-import { ACommandArgs, GeometryCanvas, GeometryVisualEffect, OrderAttackUnit, OrderCapture, ScriptUnitWorkerGetOrder, Stride_Color, Stride_Vector2, TileType, Unit, UnitCommand, UnitCommandConfig, UnitConfig, UnitFlags } from "library/game-logic/horde-types";
-import { IUnit } from "../Units/IUnit";
+import { ACommandArgs, GeometryCanvas, GeometryVisualEffect, Stride_Color, Stride_Vector2, TileType, Unit, UnitCommand, UnitFlags } from "library/game-logic/horde-types";
 import { IConfig } from "../Units/IConfig";
 import { spawnGeometry } from "library/game-logic/decoration-spawn";
 import { Formation2 } from "../Core/Formation2";
 import { BuildingTemplate } from "../Units/IFactory";
 import { Cell } from "../Core/Cell";
-import { createGameMessageWithNoSound } from "library/common/messages";
-import { ISpell } from "./Spells/ISpell";
+import { IUnitCaster } from "../Spells/IUnitCaster";
+import { IUnit } from "../Units/IUnit";
+import { ISpell } from "../Spells/ISpell";
 
-export class IHero extends IUnit {
-    public static OpUnitIdToHeroObject : Map<number, IHero> = new Map<number, IHero>();
-
-    private static _GetOrderWorkerSet : boolean = false;
-    private static _baseGetOrderWorker : HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerGetOrder;
-
-    private _spell : ISpell | null;
-
+export class IHero extends IUnitCaster {
+    // способности
+    protected static _Spells : Array<typeof ISpell>;
     // настройки формации - начальный радиус
-    protected static _formationStartRadius : number = 3;
+    protected static _FormationStartRadius : number = 3;
     // настройки формации - плотность орбит
-    protected static _formationDestiny : number = 1 / 3;
+    protected static _FormationDestiny : number = 1 / 3;
     
-    // формация
-    protected _formation : Formation2;
-
-    constructor(hordeUnit: Unit) {
-        super(hordeUnit);
-
-        this._frame = null;
-        this._spell  = null;
-
-        // регистрируем героя
-        IHero.OpUnitIdToHeroObject.set(hordeUnit.Id, this);
-        
-        // создаем класс формации
-        this._formation = new Formation2(
-            Cell.ConvertHordePoint(this.hordeUnit.Cell),
-            this.constructor['_formationStartRadius'],
-            this.constructor['_formationDestiny']);
-    }
-
-    public static GetHordeConfig () : UnitConfig {
-        IUnit.GetHordeConfig.call(this);
-
-        // добавляем кастомный обработчик команд
-        if (!this._GetOrderWorkerSet) {
-            this._GetOrderWorkerSet = true;
-
-            const workerName = `${this.CfgPrefix}_Hero_GetOrderWorker`
-            // Обертка для метода из плагина, чтобы работал "this"
-            const workerWrapper = (u: Unit, cmdArgs: ACommandArgs) => this._GetOrderWorker.call(this, u, cmdArgs);
-            // Прокидываем доступ к функции-обработчику в .Net через глобальную переменную
-            UnitWorkersRegistry.Register(workerName, workerWrapper);
-            // Объект-обработчик
-            const workerObject = new ScriptUnitWorkerGetOrder();
-            // Установка функции-обработчика
-            ScriptUtils.SetValue(workerObject, "FuncName", workerName);
-            // запоминаем базовый обработчик
-            this._baseGetOrderWorker = this.Cfg.GetOrderWorker;
-            // Установка обработчика в конфиг
-            ScriptUtils.SetValue(this.Cfg, "GetOrderWorker", workerObject);
-        }
-
-        return this.Cfg;
-    }
-
     protected static _InitHordeConfig() {
-        IUnit._InitHordeConfig.call(this);
+        super._InitHordeConfig();
+
+        var spellsInfo = "";
+        for (var spellNum = 0; spellNum < this._Spells.length; spellNum++) {
+            spellsInfo += "Способность " + (spellNum + 1) + ": "
+                + this._Spells[spellNum].GetName() + "\n"
+                + this._Spells[spellNum].GetDescription() + "\n";
+        }
 
         // формируем описание характеристик
 
@@ -86,25 +44,27 @@ export class IHero extends IUnit {
                     (this.Cfg.Flags.HasFlag(UnitFlags.MagicResistant) ? "магии " : "") + "\n"
                 : "")
             + "  радиус видимости " + this.Cfg.Sight + " (в лесу " + this.Cfg.ForestVision + ")\n"
-            );
-
-        // создаем кастомную команду
-
-        if (!this.Cfg.AllowedCommands.ContainsKey(UnitCommand.Capture)) {
-            this.Cfg.AllowedCommands.Add(UnitCommand.Capture, ISpell.GetHordeConfig());
-        }
+            + "\n" + spellsInfo);
     }
-    
-    private static _GetOrderWorker(unit: Unit, commandArgs: ACommandArgs): boolean {
-        var heroObj = IHero.OpUnitIdToHeroObject.get(unit.Id);
-        if (heroObj) {
-            if (!heroObj.OnOrder(commandArgs)) {
-                return true;
-            }
-        }
 
-        // запуск обычного обработчика получения приказа
-        return this._baseGetOrderWorker.GetOrder(unit, commandArgs);
+    // формация
+    protected _formation : Formation2;
+
+    constructor(hordeUnit: Unit) {
+        super(hordeUnit);
+
+        this._frame = null;
+        
+        // создаем класс формации
+        this._formation = new Formation2(
+            Cell.ConvertHordePoint(this.hordeUnit.Cell),
+            this.constructor['_FormationStartRadius'],
+            this.constructor['_FormationDestiny']);
+
+        var spells = this.constructor["_Spells"];
+        spells.forEach(spell => {
+            this.AddSpell(spell);
+        });
     }
 
     public IsDead() : boolean {
@@ -123,7 +83,7 @@ export class IHero extends IUnit {
         this._formation.OnEveryTick(gameTickNum);
         this._UpdateFrame();
 
-        if (!IUnit.prototype.OnEveryTick.call(this, gameTickNum)) {
+        if (!super.OnEveryTick(gameTickNum)) {
             return false;
         }
 
@@ -133,34 +93,25 @@ export class IHero extends IUnit {
     }
 
     public OnOrder(commandArgs: ACommandArgs) {
-        // сохраняем последнего атакованного юнита
+        if (!super.OnOrder(commandArgs)) {
+            return false;
+        }
+
+        // управление формацией
+
         if (commandArgs.CommandType == UnitCommand.Attack) {
             var targetHordeUnit = ActiveScena.UnitsMap.GetUpperUnit(commandArgs.TargetCell);
             if (targetHordeUnit) {
                 this._formation.SetAttackTarget(new IUnit(targetHordeUnit));
             } else {
-                this._formation.SetAttackTarget(null);
+                this._formation.SmartAttackCell(Cell.ConvertHordePoint(commandArgs.TargetCell));
             }
         }
-        // кастомная команда
-        else if (commandArgs.CommandType == UnitCommand.Capture) {
-            var targetCell = Cell.ConvertHordePoint(commandArgs.TargetCell);
-            if (this._spell) {
-                this._spell.Activate(targetCell);
-                this._spell = null;
-            } else {
-                this.hordeUnit.Owner.Messages.AddMessage(createGameMessageWithNoSound("У вас нету способности!"));
-            }
-            return false;
+        else if (commandArgs.CommandType == UnitCommand.Cancel) {
+            this._formation.SmartMoveToTargetCommand();
         }
 
         return true;
-    }
-
-    public PickUpSpell(spell: ISpell) {
-        if (!this._spell) {
-            this._spell = spell;
-        }
     }
 
     private _frame : GeometryVisualEffect | null;

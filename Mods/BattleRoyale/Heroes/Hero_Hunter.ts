@@ -4,11 +4,15 @@ import { UnitDirection, UnitFlags } from "library/game-logic/horde-types";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { spawnUnits } from "library/game-logic/unit-spawn";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
+import { ISpell } from "../Spells/ISpell";
+import { Spell_call_of_nature } from "../Spells/Spell_call_of_nature";
 import { IHero } from "./IHero";
+import { Spell_Teleportation } from "../Spells/Spell_Teleportation";
 
 export class Hero_Hunter extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "Hunter";
     protected static BaseCfgUid  : string = "#UnitConfig_Slavyane_Archer";
+    protected static _Spells : Array<typeof ISpell> = [Spell_call_of_nature, Spell_Teleportation];
 
     private _bear : IUnit | null;
     private static _bearRevivePeriod : number = 500;
@@ -39,19 +43,19 @@ export class Hero_Hunter extends IHero {
         ScriptUtils.SetValue(this.Cfg, "Weight", 9);
         ScriptUtils.SetValue(this.Cfg, "PressureResist", 20);
 
-        IHero._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         //ScriptUtils.SetValue(config, "Flags", mergeFlags(UnitFlags, config.Flags, UnitFlags.FireResistant, UnitFlags.MagicResistant));
         
         var bearConfig = Bear.GetHordeConfig();
 
-        ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n" +
+        ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n\n" +
             "Имеет подручного медведя (" + bearConfig.MaxHealth + " здоровья " + bearConfig.MainArmament.ShotParams.Damage + " урона), который респавнится после смерти в течении " + (this._bearRevivePeriod/50) + " сек"
         );
     }
 
     public OnEveryTick(gameTickNum: number): boolean {
-        if (!IHero.prototype.OnEveryTick.call(this, gameTickNum)) {
+        if (!super.OnEveryTick(gameTickNum)) {
             return false;
         }
 
@@ -61,7 +65,7 @@ export class Hero_Hunter extends IHero {
                 this._bearDeadTick = gameTickNum;
             }
         } else {
-            if (this._bearDeadTick + Hero_Hunter._bearRevivePeriod < gameTickNum) {
+            if (!this.IsDead() && this._bearDeadTick + Hero_Hunter._bearRevivePeriod < gameTickNum) {
                 var generator = generateCellInSpiral(this.hordeUnit.Cell.X, this.hordeUnit.Cell.Y);
                 var units     = spawnUnits(this.hordeUnit.Owner, Bear.GetHordeConfig(), 1, UnitDirection.RightDown, generator);
                 if (units.length > 0) {
@@ -74,7 +78,7 @@ export class Hero_Hunter extends IHero {
     }
 }
 
-class Bear extends IUnit {
+export class Bear extends IUnit {
     protected static CfgUid      : string = this.CfgPrefix + "Bear";
     protected static BaseCfgUid  : string = "#UnitConfig_Nature_Bear";
 
@@ -83,7 +87,7 @@ class Bear extends IUnit {
     }
 
     protected static _InitHordeConfig() {
-        IUnit._InitHordeConfig.call(this);
+        super._InitHordeConfig();
 
         ScriptUtils.SetValue(this.Cfg, "Name", "Подручный медведь");
         ScriptUtils.SetValue(this.Cfg, "Flags", mergeFlags(UnitFlags, this.Cfg.Flags, UnitFlags.NotChoosable));

@@ -1,5 +1,5 @@
 import { createPoint } from "library/common/primitives";
-import { UnitCommand, PointCommandArgs, UnitDirection, UnitConfig } from "library/game-logic/horde-types";
+import { UnitCommand, PointCommandArgs, UnitDirection, UnitConfig, Unit } from "library/game-logic/horde-types";
 import { Cell } from "../Core/Cell";
 import { IConfig } from "./IConfig";
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
@@ -68,6 +68,10 @@ export class IUnit extends IConfig {
 
     public OnEveryTick(gameTickNum:number) : boolean {
         return gameTickNum % this.processingTickModule == this.processingTick;
+    }
+
+    public ReplaceHordeUnit(unit: Unit) {
+        this.hordeUnit = unit;
     }
 
 // static

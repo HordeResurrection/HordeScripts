@@ -41,6 +41,11 @@ export class Cell {
     Round() {
         return new Cell(Math.round(this.X), Math.round(this.Y));
     }
+    Rotate(angle: number) {
+        var cosA = Math.cos(angle);
+        var sinA = Math.sin(angle);
+        return new Cell(this.X * cosA - this.Y * sinA, this.X * sinA + this.Y * cosA);
+    }
     ToHordePoint() : Point2D {
         return createPoint(this.X, this.Y);
     }
