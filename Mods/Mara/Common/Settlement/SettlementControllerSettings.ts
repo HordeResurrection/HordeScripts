@@ -25,21 +25,21 @@ class TimeoutsSettings {
     public ExpandBuild: number = 1.5 * 60 * 50;
     public ExpandPrepare: number = 5 * 60 * 50;
 
-    public StrategyActionSuccessMinCooldown = 5 * 50;
-    public StrategyActionSuccessMaxCooldown = 20 * 50;
+    public StrategyActionSuccessMinCooldown = 0 * 50;
+    public StrategyActionSuccessMaxCooldown = 10 * 50;
 
-    public StrategyActionFailReattemptMinCooldown = 10 * 50;
-    public StrategyActionFailReattemptMaxCooldown = 30 * 50;
+    public StrategyActionFailMinCooldown = 0 * 50;
+    public StrategyActionFailMaxCooldown = 10 * 50;
     
-    public StrategyActionUnavailReattemptMaxCooldown: number = 2 * 60 * 50;
-    public StrategyActionUnavailReattemptMinCooldown: number = 1 * 60 * 50;
+    public StrategyActionUnavailMaxCooldown: number = 1 * 60 * 50;
+    public StrategyActionUnavailMinCooldown: number = 0.5 * 60 * 50;
 
     public DefaultTaskReattemptMaxCooldown: number = 20 * 50;
 
     public StrategyReInitMin = 30 * 60 * 50;
     public StrategyReInitMax = 60 * 60 * 50;
 
-    public SettlementEnhanceMinCooldown = 1 * 60 * 50;
+    public SettlementEnhanceMinCooldown = 2 * 60 * 50;
     public SettlementEnhanceMaxCooldown = 3 * 60 * 50;
     
     public UnfinishedConstructionThreshold: number = 2 * 60 * 50;
@@ -50,20 +50,20 @@ class TimeoutsSettings {
 class Priorities {
     // Tasks
     public SettlementDefence: MaraPriority = MaraPriority.Absolute;
+    public Attack: MaraPriority = MaraPriority.Major;
+    public LandmarkCapture: MaraPriority = MaraPriority.Normal;
     public ExpandBuild: MaraPriority = MaraPriority.Normal;
     public SettlementDevelopment: MaraPriority = MaraPriority.Normal;
-    public Attack: MaraPriority = MaraPriority.Normal;
-    public LandmarkCapture: MaraPriority = MaraPriority.Normal;
     public DefenceBuild: MaraPriority = MaraPriority.Normal;
-    public ProduceAdditionalHarvesters: MaraPriority = MaraPriority.Low;
+    public ProduceAdditionalHarvesters: MaraPriority = MaraPriority.Normal;
     public ExpandUpgrade: MaraPriority = MaraPriority.Low;
 
     // Production Requests
     public DefenceUnitsProduction: MaraPriority = MaraPriority.Absolute;
+    public LandmarkCaptureUnitsProduction: MaraPriority = MaraPriority.Major;
+    public AttackUnitsProduction: MaraPriority = MaraPriority.Normal;
     public HarvesterProduction: MaraPriority = MaraPriority.Normal;
     public HousingProduction: MaraPriority = MaraPriority.Normal;
-    public AttackUnitsProduction: MaraPriority = MaraPriority.Normal;
-    public LandmarkCaptureUnitsProduction: MaraPriority = MaraPriority.Low;
     public ReinforcementUnitsProduction: MaraPriority = MaraPriority.Background;
 }
 
@@ -98,8 +98,8 @@ class ControllerStatesSettings {
 class ResourceMiningSettings {
     public MinMinersPerMine: number = 3;
     public WoodcutterBatchSize: number = 5;
-    public MinWoodcuttersPerSawmill: number = 3;
-    public MaxWoodcuttersPerSawmill: number = 10;
+    public MinWoodcuttersPerSawmill: number = 5;
+    public MaxWoodcuttersPerSawmill: number = 13;
     public HousingBatchSize: number = 3;
 
     public WoodcuttingRadius: number = 10;

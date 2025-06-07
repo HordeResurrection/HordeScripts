@@ -80,13 +80,30 @@ export class MaraResources {
     }
 
     public Add(other: MaraResources): void {
+        this.doMath(other, 1);
+    }
+
+    public Substract(other: MaraResources): void {
+        this.doMath(other, -1);
+    }
+
+    public Copy(): MaraResources {
+        return new MaraResources(
+            this.Wood,
+            this.Metal,
+            this.Gold,
+            this.People
+        );
+    }
+
+    private doMath(other: MaraResources, sign: number): void { // need to come up with better name...
         other.resources.forEach(
             (v, k) => {
                 let thisValue = this.resources.get(k) ?? 0;
                 let otherValue = other.resources.get(k) ?? 0;
                 
-                this.resources.set(k, thisValue + otherValue);
+                this.resources.set(k, thisValue + sign * otherValue);
             }
-        )
+        );
     }
 }

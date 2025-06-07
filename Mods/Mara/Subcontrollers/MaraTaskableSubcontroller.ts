@@ -20,7 +20,7 @@ export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
         
         if (this.activeTask) {
             if (this.activeTask.IsCompleted) {
-                this.Debug(`Task ${this.activeTask.constructor.name} completed with result ${this.activeTask.IsSuccess}`);
+                this.Debug(`Task ${this.activeTask.ToString()} completed with result ${this.activeTask.IsSuccess}`);
 
                 if (this.activeTask.IsSuccess) {
                     this.onTaskSuccess(tickNumber);
@@ -31,8 +31,14 @@ export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
 
                 this.activeTask = null;
             }
+            else if (this.activeTask.IsIdle) {
+                this.Debug(`Task ${this.activeTask.ToString()} put on idle`);
+                
+                this.allTasks.push(this.activeTask);
+                this.activeTask = null;
+            }
             else {
-                let priorityTask = MaraUtils.FindExtremum(this.allTasks, (c, e) => c.Priority - e.Priority);
+                let priorityTask = this.selectMaxPriorityTask();
 
                 if (priorityTask && priorityTask.Priority > this.activeTask.Priority) {
                     this.setActiveTask(priorityTask);
@@ -40,7 +46,7 @@ export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
             }
         }
         else if (this.allTasks.length > 0) {
-            let highestPriorityTask = MaraUtils.FindExtremum(this.allTasks, (c, e) => c.Priority - e.Priority);
+            let highestPriorityTask = this.selectMaxPriorityTask();
             
             if (highestPriorityTask) {
                 this.setActiveTask(highestPriorityTask);
@@ -59,21 +65,33 @@ export abstract class MaraTaskableSubcontroller extends MaraSubcontroller {
         if (this.activeTask) {
             this.activeTask.Tick(tickNumber);
         }
+
+        for (let task of this.allTasks) {
+            if (task.IsIdle) {
+                task.Tick(tickNumber);
+            }
+        }
     }
 
     AddTask(task: SettlementSubcontrollerTask): void {
         this.allTasks.push(task);
-        this.Debug(`Added task ${task.constructor.name} with priority ${task.Priority} to queue`);
+        this.Debug(`Added task ${task.ToString()} with priority ${task.Priority} to queue`);
     }
 
     private setActiveTask(task: SettlementSubcontrollerTask): void {
         if (this.activeTask) {
             this.activeTask.Complete(false);
-            this.Debug(`Task ${this.activeTask.constructor.name} cancelled`);
+            this.Debug(`Task ${this.activeTask.ToString()} cancelled`);
         }
 
         this.activeTask = task;
         this.allTasks = this.allTasks.filter((t) => t != this.activeTask);
-        this.Debug(`Start executing task ${this.activeTask.constructor.name}`);
+        this.Debug(`Start executing task ${this.activeTask.ToString()}`);
+    }
+
+    private selectMaxPriorityTask(): SettlementSubcontrollerTask | null {
+        let tasks = this.allTasks.filter((t) => !t.IsIdle);
+        
+        return MaraUtils.FindExtremum(tasks, (c, e) => c.Priority - e.Priority);
     }
 }
