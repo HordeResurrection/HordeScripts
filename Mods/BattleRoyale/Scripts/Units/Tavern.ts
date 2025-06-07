@@ -11,6 +11,7 @@ import { log } from "library/common/logging";
 import { IHero } from "../Heroes/IHero";
 import { createGameMessageWithNoSound } from "library/common/messages";
 import { createHordeColor } from "library/common/primitives";
+import { Hero_Necromancer } from "../Heroes/Hero_Necromancer";
 
 var opUnitIdToTavernObject : Map<number, Tavern> = new Map<number, Tavern>();
 
@@ -24,7 +25,8 @@ export class Tavern extends IUnit {
         Hero_Hunter,
         Hero_Rider,
         Hero_Scorpion,
-        Hero_Totemist
+        Hero_Totemist,
+        Hero_Necromancer
     ];
 
     private static _OnProducedCallbackInit = false;

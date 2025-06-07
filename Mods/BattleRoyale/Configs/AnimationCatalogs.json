@@ -112,6 +112,20 @@
           "Disabled": "Spell_fiery_trail_disabled"
         }
       }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_Command_army_of_dead",
+      "Description": "Command button \"Spell_army_of_dead\"",
+      "InternalEditorPath": "Units\\Commands\\Capture\\Spell_army_of_dead",
+      "RootSection": {
+        "States": {
+          "Focused": "Spell_army_of_dead_focused",
+          "Pressed": "Spell_army_of_dead_pressed",
+          "Regular": "Spell_army_of_dead_regular",
+          "Disabled": "Spell_army_of_dead_disabled"
+        }
+      }
     }
   ]
 }

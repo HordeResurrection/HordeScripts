@@ -1,18 +1,18 @@
+import { createResourcesAmount, createPoint, createPF, createHordeColor } from "library/common/primitives";
+import { spawnBullet } from "library/game-logic/bullet-spawn";
+import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
+import { Cell } from "../Core/Cell";
+import { ISpell } from "../Spells/ISpell";
+import { Spell_teleportation_mark } from "../Spells/Spell_teleportation_mark";
 import { IUnit } from "../Units/IUnit";
 import { BattleController, BulletConfig, GeometryCanvas, GeometryVisualEffect, ShotParams, Stride_Color, Stride_Vector2, Unit, UnitMapLayer } from "library/game-logic/horde-types";
 import { IHero } from "./IHero";
-import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
-import { createHordeColor, createPF, createPoint, createResourcesAmount } from "library/common/primitives";
-import { Cell } from "../Core/Cell";
-import { spawnBullet } from "library/game-logic/bullet-spawn";
-import { ISpell } from "./Spells/ISpell";
-import { Spell_teleportation_mark } from "./Spells/Spell_teleportation_mark";
+import { Spell_Teleportation } from "../Spells/Spell_Teleportation";
 
 export class Hero_Totemist extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "HeroTotemist";
     protected static BaseCfgUid  : string = "#UnitConfig_Slavyane_Worker1";
-
-    public static SpellType: typeof ISpell = Spell_teleportation_mark;
+    protected static _Spells : Array<typeof ISpell> = [Spell_teleportation_mark, Spell_Teleportation];
     
     private _formation_totems                   : Array<IFormationTotem>;
     private _formation_totems_buildingProgress  : Array<boolean>;
@@ -58,7 +58,7 @@ export class Hero_Totemist extends IHero {
 
         super._InitHordeConfig();
 
-        ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n" +
+        ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n\n" +
             "Сражается с помощью тотемов защиты (" + totemDefenceConfig.MaxHealth + " здоровья " + totemDefenceConfig.MainArmament.ShotParams.Damage + " урона, требуют "
             + totemDefenceConfig.CostResources.People + " населения) и тотемов формации (" + formationTotemFireConfig.MaxHealth +  " здоровья, требуют " 
             + formationTotemFireConfig.CostResources.People + " населения). Всего тотемщик имеет "

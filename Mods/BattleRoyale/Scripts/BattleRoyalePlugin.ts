@@ -1,8 +1,8 @@
 import { LogLevel } from "library/common/logging";
-import { generateCellInRect, generateCellInSpiral, generateRandomCellInRect } from "library/common/position-tools";
+import { generateCellInSpiral, generateRandomCellInRect } from "library/common/position-tools";
 import { isReplayMode } from "library/game-logic/game-tools";
 import { BattleController, Settlement, UnitDirection, UnitHurtType } from "library/game-logic/horde-types";
-import { spawnUnit, spawnUnits } from "library/game-logic/unit-spawn";
+import { spawnUnits } from "library/game-logic/unit-spawn";
 import HordePluginBase from "plugins/base-plugin";
 import { Factory_Slavyane } from "./Units/Factory_Slavyane";
 import { GameField } from "./Core/GameField";
@@ -11,20 +11,13 @@ import { broadcastMessage, createGameMessageWithNoSound } from "library/common/m
 import { ScriptData_Building } from "./Core/ScriptData_Building";
 import { PlayerSettlement } from "./Core/PlayerSettlement";
 import { GameSettlement } from "./Core/GameSettlement";
-import { GeometryCircle } from "./Core/GeometryCircle";
 import { Cell } from "./Core/Cell";
 import { IUnit } from "./Units/IUnit";
 import { Priest } from "./Units/Priest";
-import { IHero } from "./Heroes/IHero";
 import { BuildingTemplate, IFactory } from "./Units/IFactory";
 import { Tavern } from "./Units/Tavern";
-import { ISpell } from "./Heroes/Spells/ISpell";
-import { Spell_Teleportation } from "./Heroes/Spells/Spell_Teleportation";
-import { Spell_Fireball } from "./Heroes/Spells/Spell_Fireball";
-import { Spell_Arrows_Volley } from "./Heroes/Spells/Spell_Arrows_Volley";
-import { Spell_golden_barracks_summon } from "./Heroes/Spells/Spell_golden_barracks_summon";
-import { Spell_healing_aura } from "./Heroes/Spells/Spell_healing_aura";
-import { Spell_teleportation_mark } from "./Heroes/Spells/Spell_teleportation_mark";
+import { IHero } from "./Heroes/IHero";
+import { SpellGlobalRef } from "./Spells/ISpell";
 
 const PeopleIncomeLevel = HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
 type PeopleIncomeLevel = HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel;
@@ -55,7 +48,6 @@ export class BattleRoyalePlugin extends HordePluginBase {
     _gameState:            GameState;
     _buildingsTemplate:    Array<BuildingTemplate>;
     _playerTaverns:        Array<Tavern>;
-    _spells:               Array<ISpell>;
 
     _playerUidToSettlement: Map<number, number>;
 
@@ -403,10 +395,10 @@ export class BattleRoyalePlugin extends HordePluginBase {
         }
 
         // передаем ссылки в скиллы
-        ISpell.BuildingsTemplate = this._buildingsTemplate;
-        ISpell.NeutralSettlement = this._neutralSettlement;
-        ISpell.EnemySettlement   = this._enemySettlement;
-        ISpell.GameField         = this._gameField;
+        SpellGlobalRef.BuildingsTemplate = this._buildingsTemplate;
+        SpellGlobalRef.NeutralSettlement = this._neutralSettlement;
+        SpellGlobalRef.EnemySettlement   = this._enemySettlement;
+        SpellGlobalRef.GameField         = this._gameField;
 
         broadcastMessage("Выбери своего героя", createHordeColor(255, 255, 55, 55));
     }

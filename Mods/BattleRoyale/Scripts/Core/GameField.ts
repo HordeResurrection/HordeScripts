@@ -1,7 +1,7 @@
 import { log } from "library/common/logging";
 import { broadcastMessage } from "library/common/messages";
 import { createHordeColor, createPoint } from "library/common/primitives";
-import { Stride_Color, Tile, TileType } from "library/game-logic/horde-types";
+import { BattleController, Stride_Color, Tile, TileType } from "library/game-logic/horde-types";
 import { Cell } from "./Cell";
 import { GeometryCircle } from "./GeometryCircle";
 import { GeometryShrinkingCircle } from "./GeometryShrinkingCircle";
@@ -310,7 +310,9 @@ export class GameField {
                 " Центр ", this._geometryShrinkingCircle.endCircle.center.X/32," ; ",this._geometryShrinkingCircle.endCircle.center.Y/32
             );
 
-            broadcastMessage("Область сражения сужается!", createHordeColor(255, 255, 55, 55));
+            broadcastMessage("Область сражения сужается! Следующее сужение через "
+                + (this._geometryShrinkingCircle.animationTotalTime + this._geometryShrinkingCircle.end_tiksToLive) / BattleController.GameTimer.CurrentFpsLimit
+                + " сек", createHordeColor(255, 255, 55, 55));
         }
         
         //  отрисовка

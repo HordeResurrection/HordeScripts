@@ -10,7 +10,7 @@ export class PlayerSettlement extends GameSettlement {
         super(hordeSettlement);
 
         this.isDefeat      = false;
-        this.heroUnit      = hordeUnit;4
+        this.heroUnit      = hordeUnit;
         this.settlementUid = Number.parseInt(hordeSettlement.Uid);
     }
 

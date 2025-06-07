@@ -4,15 +4,15 @@ import { UnitDirection, UnitFlags } from "library/game-logic/horde-types";
 import { generateCellInSpiral } from "library/common/position-tools";
 import { spawnUnits } from "library/game-logic/unit-spawn";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
+import { ISpell } from "../Spells/ISpell";
+import { Spell_call_of_nature } from "../Spells/Spell_call_of_nature";
 import { IHero } from "./IHero";
-import { Spell_call_of_nature } from "./Spells/Spell_call_of_nature";
-import { ISpell } from "./Spells/ISpell";
+import { Spell_Teleportation } from "../Spells/Spell_Teleportation";
 
 export class Hero_Hunter extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "Hunter";
     protected static BaseCfgUid  : string = "#UnitConfig_Slavyane_Archer";
-
-    public static SpellType: typeof ISpell = Spell_call_of_nature;
+    protected static _Spells : Array<typeof ISpell> = [Spell_call_of_nature, Spell_Teleportation];
 
     private _bear : IUnit | null;
     private static _bearRevivePeriod : number = 500;
@@ -49,7 +49,7 @@ export class Hero_Hunter extends IHero {
         
         var bearConfig = Bear.GetHordeConfig();
 
-        ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n" +
+        ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n\n" +
             "Имеет подручного медведя (" + bearConfig.MaxHealth + " здоровья " + bearConfig.MainArmament.ShotParams.Damage + " урона), который респавнится после смерти в течении " + (this._bearRevivePeriod/50) + " сек"
         );
     }
@@ -65,7 +65,7 @@ export class Hero_Hunter extends IHero {
                 this._bearDeadTick = gameTickNum;
             }
         } else {
-            if (this._bearDeadTick + Hero_Hunter._bearRevivePeriod < gameTickNum) {
+            if (!this.IsDead() && this._bearDeadTick + Hero_Hunter._bearRevivePeriod < gameTickNum) {
                 var generator = generateCellInSpiral(this.hordeUnit.Cell.X, this.hordeUnit.Cell.Y);
                 var units     = spawnUnits(this.hordeUnit.Owner, Bear.GetHordeConfig(), 1, UnitDirection.RightDown, generator);
                 if (units.length > 0) {

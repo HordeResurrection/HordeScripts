@@ -91,6 +91,9 @@ export class IFactory {
             ScriptUtils.SetValue(unitConfig.hordeConfig.CostResources, "Metal",  0);
             ScriptUtils.SetValue(unitConfig.hordeConfig.CostResources, "Lumber", 0);
             ScriptUtils.SetValue(unitConfig.hordeConfig.CostResources, "People", 0);
+            if (rarity == 4) {
+                ScriptUtils.SetValue(unitConfig.hordeConfig, "PressureResist", 20);
+            }
             // убираем дружественный огонь
             if (unitConfig.hordeConfig.MainArmament) {
                 var bulletCfg = HordeContentApi.GetBulletConfig(unitConfig.hordeConfig.MainArmament.BulletConfig.Uid);

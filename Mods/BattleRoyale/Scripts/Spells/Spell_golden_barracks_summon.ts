@@ -1,30 +1,28 @@
-import { Cell } from "../../Core/Cell";
-import { IHero } from "../IHero";
+import { spawnDecoration } from "library/game-logic/decoration-spawn";
+import { SpellGlobalRef } from "./ISpell";
+import { generateCellInSpiral } from "library/common/position-tools";
 import { HordeColor } from "library/common/primitives";
 import { Stride_Color, UnitDirection } from "library/game-logic/horde-types";
-import { ITargetPointSpell } from "./ITargetPointSpell";
-import { generateCellInSpiral } from "library/common/position-tools";
 import { spawnUnits } from "library/game-logic/unit-spawn";
-import { ScriptData_Building } from "../../Core/ScriptData_Building";
-import { spawnDecoration } from "library/game-logic/decoration-spawn";
-import { ISpell } from "./ISpell";
+import { Cell } from "../Core/Cell";
+import { ScriptData_Building } from "../Core/ScriptData_Building";
+import { ITargetPointSpell } from "./ITargetPointSpell";
 
 export class Spell_golden_barracks_summon extends ITargetPointSpell {
     private static _MaxDistance : number = 6;
 
-    protected static _CfgUid                : string       = "Hero_golden_barracks_summon";
-    protected static _AnimationsCatalogRef  : string       = "#AnimCatalog_Command_golden_barracks_summon";
-    protected static _EffectStrideColor     : Stride_Color = new Stride_Color(252, 233, 177, 255);
-    protected static _EffectHordeColor      : HordeColor   = new HordeColor(255, 252, 233, 177);
-    protected static _Name                  : string = "Призыв золотой казармы";
-    protected static _Description           : string = "Призывает случайную золотую казарму в клетку, максимальное расстояние "
+    protected static _ButtonUid                     : string = "Spell_golden_barracks_summon";
+    protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_golden_barracks_summon";
+    protected static _EffectStrideColor             : Stride_Color = new Stride_Color(252, 233, 177, 255);
+    protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 252, 233, 177);
+    protected static _Name                          : string = "Призыв золотой казармы";
+    protected static _Description                   : string = "Призывает случайную золотую казарму в клетку, максимальное расстояние "
         + Spell_golden_barracks_summon._MaxDistance + " клеток.";
 
     protected _OnEveryTickActivated(gameTickNum: number): boolean {
         super._OnEveryTickActivated(gameTickNum);
 
-        var hero     = this._hero as IHero;
-        var heroCell = Cell.ConvertHordePoint(hero.hordeUnit.Cell);
+        var heroCell = Cell.ConvertHordePoint(this._caster.hordeUnit.Cell);
         var moveVec  = this._targetCell.Minus(heroCell);
         var distance = moveVec.Length_Chebyshev();
 
@@ -38,11 +36,11 @@ export class Spell_golden_barracks_summon extends ITargetPointSpell {
         // спавним казарму в указанную точку
         var rnd                 = ActiveScena.GetRealScena().Context.Randomizer;
         var generator           = generateCellInSpiral(targetCell.X, targetCell.Y);
-        var buildingTemplateNum = rnd.RandomNumber(0, ISpell.BuildingsTemplate.length - 1);
-        var rarityNum           = ISpell.BuildingsTemplate[buildingTemplateNum].buildings.length - 1;
+        var buildingTemplateNum = rnd.RandomNumber(0, SpellGlobalRef.BuildingsTemplate.length - 1);
+        var rarityNum           = SpellGlobalRef.BuildingsTemplate[buildingTemplateNum].buildings.length - 1;
         var units               = spawnUnits(
-            ISpell.EnemySettlement.hordeSettlement,
-            ISpell.BuildingsTemplate[buildingTemplateNum].buildings[rarityNum].hordeConfig,
+            SpellGlobalRef.EnemySettlement.hordeSettlement,
+            SpellGlobalRef.BuildingsTemplate[buildingTemplateNum].buildings[rarityNum].hordeConfig,
             1,
             UnitDirection.RightDown,
             generator);

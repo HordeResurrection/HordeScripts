@@ -2,7 +2,6 @@ import { ISpell } from "./ISpell";
 import { HordeColor } from "library/common/primitives";
 import { ACommandArgs, Stride_Color } from "library/game-logic/horde-types";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
-import { IHero } from "../IHero";
 
 export class Spell_healing_aura extends ISpell {
     private static _MaxDistance : number = 7;
@@ -10,19 +9,19 @@ export class Spell_healing_aura extends ISpell {
     private static _HealPeriod  : number = 50;
     private static _HealHp      : number = 3;
 
-    protected static _CfgUid                : string = "Hero_healing_aura";
-    protected static _AnimationsCatalogRef  : string = "#AnimCatalog_Command_healing_aura";
-    protected static _EffectStrideColor     : Stride_Color = new Stride_Color(75, 255, 59, 255);
-    protected static _EffectHordeColor      : HordeColor = new HordeColor(255, 75, 255, 59);
-    protected static _Name                  : string = "Аура лечения";
-    protected static _Description           : string = "Активация ауры лечения " + (Spell_healing_aura._HealHp * Spell_healing_aura._HealPeriod / 50)
+    protected static _ButtonUid                     : string = "Spell_healing_aura";
+    protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_healing_aura";
+    protected static _EffectStrideColor             : Stride_Color = new Stride_Color(75, 255, 59, 255);
+    protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 75, 255, 59);
+    protected static _Name                          : string = "Аура лечения";
+    protected static _Description                   : string = "Активация ауры лечения " + (Spell_healing_aura._HealHp * Spell_healing_aura._HealPeriod / 50)
         + " хп / сек на расстоянии" + Spell_healing_aura._MaxDistance + " клеток в течении " + (Spell_healing_aura._HealTime / 50) + " секунд.";
 
     private _healTick : number;
 
     public Activate(activateArgs: ACommandArgs): boolean {
         if (super.Activate(activateArgs)) {
-            this._healTick = this._activatedGameTick;
+            this._healTick = this._activatedTick;
             return true;
         } else {
             return false;
@@ -33,7 +32,7 @@ export class Spell_healing_aura extends ISpell {
         super._OnEveryTickActivated(gameTickNum);
 
         // проверяем, что лечение закончилось
-        if (this._activatedGameTick + Spell_healing_aura._HealTime <= gameTickNum) {
+        if (this._activatedTick + Spell_healing_aura._HealTime <= gameTickNum) {
             return false;
         }
 
@@ -41,10 +40,9 @@ export class Spell_healing_aura extends ISpell {
         if (this._healTick < gameTickNum) {
             this._healTick += Spell_healing_aura._HealPeriod;
 
-            var hero      = this._hero as IHero;
-            let unitsIter = iterateOverUnitsInBox(hero.hordeUnit.Cell, 6);
+            let unitsIter = iterateOverUnitsInBox(this._caster.hordeUnit.Cell, 6);
             for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
-                if (u.value.Owner.Uid != hero.hordeUnit.Owner.Uid) {
+                if (u.value.Owner.Uid != this._caster.hordeUnit.Owner.Uid) {
                     continue;
                 }
 

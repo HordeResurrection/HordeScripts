@@ -1,17 +1,17 @@
 import { IUnit } from "../Units/IUnit";
 import { ReplaceUnitParameters, TileType, UnitFlags } from "library/game-logic/horde-types";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
-import { IHero } from "./IHero";
+import { ISpell } from "../Spells/ISpell";
+import { Spell_golden_barracks_summon } from "../Spells/Spell_golden_barracks_summon";
 import { IConfig } from "../Units/IConfig";
 import { BuildingTemplate } from "../Units/IFactory";
-import { Spell_golden_barracks_summon } from "./Spells/Spell_golden_barracks_summon";
-import { ISpell } from "./Spells/ISpell";
+import { IHero } from "./IHero";
+import { Spell_teleportation_mark } from "../Spells/Spell_teleportation_mark";
 
 export class Hero_Scorpion extends IHero {
     protected static CfgUid      : string = this.CfgPrefix + "HeroScorpion";
     protected static BaseCfgUid  : string = "#UnitConfig_Nature_ScorpionMed";
-
-    public static SpellType: typeof ISpell = Spell_golden_barracks_summon;
+    protected static _Spells : Array<typeof ISpell> = [Spell_golden_barracks_summon, Spell_teleportation_mark];
 
     // настройки формации - начальный радиус
     protected static _formationStartRadius : number = 2;
@@ -39,7 +39,7 @@ export class Hero_Scorpion extends IHero {
         super._InitHordeConfig();
 
         var scorpionConfig = Scorpion.GetHordeConfig();
-        ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n" +
+        ScriptUtils.SetValue(this.Cfg, "Description", this.Cfg.Description + "\n\n" +
             "Из зданий на карте вместо ожидаемых юнитов появляются скорпионы ("
             + scorpionConfig.MaxHealth + " здоровья " + scorpionConfig.MainArmament.ShotParams.Damage
             + " урона), их количество зависит от редкости здания. После смерти главного скорпиона выбирается новый."
@@ -88,14 +88,12 @@ export class Hero_Scorpion extends IHero {
             replaceParams.Silent = true;                // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
     
             // повышаем выбранного скорпа до лидера
-            this.hordeUnit = this._scorpions[0].hordeUnit.Owner.Units.ReplaceUnit(replaceParams);
+            var newHero = this._scorpions[0].hordeUnit.Owner.Units.ReplaceUnit(replaceParams);
+            this.ReplaceHordeUnit(newHero);
             this._scorpions.splice(0, 1);
 
             // удаляем из формации выбранного лидера
             this._formation.RemoveUnits([ this ]);
-
-            // добавляем в map для поддержки кликов
-            IHero.OpUnitIdToHeroObject.set(this.hordeUnit.Id, this);
         }
 
         return true;
