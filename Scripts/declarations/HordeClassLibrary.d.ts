@@ -6167,15 +6167,20 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 			immediateDeathProcessing?: boolean /* = false */
 		): number;
 
-		CanBeCapturedNow(
-			ignoreAliveState?: boolean /* = false */
-		): boolean;
+		CanBeCapturedNow(): boolean;
 
 		CanBeCapturedNowAndHarmless(): boolean;
 
 		CanCaptureNow(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null,
-			ignoreTargetAliveState?: boolean /* = false */
+			target: HordeClassLibrary.World.Objects.Units.Unit | null
+		): boolean;
+
+		CanCaptureNow(
+			target: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+		): boolean;
+
+		CanCaptureNow(
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
 		): boolean;
 
 		CanCapture(
@@ -9898,6 +9903,10 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 		InsideUnitMustBeNull(): void;
 
 		CanBeCapturedNow(): boolean;
+
+		CanBeCapturedNow(
+			knownUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+		): boolean;
 
 		DisallowDestroyOrderFor(
 			disableDestroyOrderTicks: number
@@ -13731,6 +13740,8 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 			effect: HordeClassLibrary.UnitComponents.Enumerations.UnitEffectFlag
 		): boolean;
 
+		CanBeCapturedNow(): boolean;
+
 		Initialize(
 			realUnit: HordeClassLibrary.World.Objects.Units.Unit | null
 		): void;
@@ -13746,8 +13757,6 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		GetAccess(): boolean;
 
 		GetRenderAccess(): boolean;
-
-		GetPoolAccess(): boolean;
 
 		RestoreAccess(): void;
 	}
