@@ -13238,17 +13238,12 @@ declare namespace HordeClassLibrary.World.Objects.SoundEffects {
 		readonly IsInstantiated: boolean;
 		readonly Sound: HordeClassLibrary.HordeContent.ViewResources.Audio.SoundView;
 		SectionName: string;
-		readonly SoundInstance: any;
 		EmittingTime: Date | null;
 		IsLooping: boolean;
 		IsLoopingChanged: boolean;
 		IsRegistered: boolean;
 
 		// Methods:
-		AttachInstance(
-			soundInstance: any | null
-		): void;
-
 		StopAndFree(): void;
 
 		PauseSound(): void;
