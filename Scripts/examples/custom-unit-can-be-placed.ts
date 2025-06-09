@@ -1,6 +1,6 @@
 import { CanBePlacedByKnownMapJsResult, CanBePlacedByRealMapJsResult, KnownUnit, Scena, Settlement, Unit, UnitConfig } from "library/game-logic/horde-types";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
-import { setUnitCanBePlacedWorker } from "library/game-logic/workers-tools";
+import { setUnitCanBePlacedWorker } from "library/game-logic/workers";
 import HordeExampleBase from "./base-example";
 
 const BaseBuildingCanBePlaced = HordeClassLibrary.UnitComponents.Workers.BaseBuilding.Special.BaseBuildingCanBePlaced;
@@ -28,8 +28,14 @@ export class Example_CustomUnitCanBePlaced extends HordeExampleBase {
         // Создание конфига кастомного замка
         let unitCfg = this.getOrCreateUnitConfig();
 
-        // Создание и установка CanBePlaced-обработчика
-        setUnitCanBePlacedWorker(this, unitCfg, this.canBePlacedWorkerByKnownMap, this.canBePlacedWorkerByRealMap);
+        // Создание и установка CanBePlaced-обработчиков
+        let pluginWrapped_canBePlacedWorkerByKnownMap =
+            (settlement: Settlement, uCfg: UnitConfig, x: number, y: number, size1x1?: boolean, considerUnit?: boolean) =>
+                this.canBePlacedWorkerByKnownMap(settlement, uCfg, x, y, size1x1, considerUnit);
+        let pluginWrapped_canBePlacedWorkerByRealMap =
+            (scena: Scena, uCfg: UnitConfig, x: number, y: number, size1x1?: boolean, considerUnit?: boolean) =>
+                this.canBePlacedWorkerByRealMap(scena, uCfg, x, y, size1x1, considerUnit);
+        setUnitCanBePlacedWorker("Example", unitCfg, pluginWrapped_canBePlacedWorkerByKnownMap, pluginWrapped_canBePlacedWorkerByRealMap);
 
         this.log.info('Настройка воина завершена!');
     }
@@ -61,6 +67,9 @@ export class Example_CustomUnitCanBePlaced extends HordeExampleBase {
     }
 
 
+    /**
+     * Определяет возможность постройки здания по карте известной поселению (т.е. с учетом тумана войны).
+     */
     private canBePlacedWorkerByKnownMap(settlement: Settlement, uCfg: UnitConfig, x: number, y: number, size1x1?: boolean, considerUnit?: boolean) {
 
         // Запуск обычного CanBePlaced-обработчика на известной карте
@@ -106,6 +115,9 @@ export class Example_CustomUnitCanBePlaced extends HordeExampleBase {
     }
 
 
+    /**
+     * Определяет возможность постройки здания по реальной карте сцены (т.е. без учета тумана войны).
+     */
     private canBePlacedWorkerByRealMap(scena: Scena, uCfg: UnitConfig, x: number, y: number, size1x1?: boolean, considerUnit?: boolean) {
 
         // Запуск обычного CanBePlaced-обработчика на реальной карте

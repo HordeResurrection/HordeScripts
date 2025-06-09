@@ -3,7 +3,7 @@ import { BulletState, ShotParams, UnitMapLayer, TilePayload, BaseBullet, BulletE
 import { createPF, createPoint } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
 import { spawnDecoration, spawnSound } from "library/game-logic/decoration-spawn";
-import { setBulletInitializeWorker, setBulletProcessWorker } from "library/game-logic/workers-tools";
+import { setBulletInitializeWorker, setBulletProcessWorker } from "library/game-logic/workers";
 import { positionToCell } from "library/common/position-tools";
 
 
@@ -45,8 +45,10 @@ export class Example_CustomBullet extends HordeExampleBase {
         this.log.info('Конфиг снаряда для теста:', this.customBullCfg);
 
         // Установка функций-обработчиков для созданного снаряда
-        setBulletInitializeWorker(this, this.customBullCfg, this.initializeWorker);
-        setBulletProcessWorker(this, this.customBullCfg, this.processWorker);
+        let pluginWrappedInitWorker =(bull: BaseBullet, emitArgs: BulletEmittingArgs) => this.initializeWorker(bull, emitArgs);
+        setBulletInitializeWorker("CustomBullet", this.customBullCfg, pluginWrappedInitWorker);
+        let pluginWrappedProcessWorker = (bull: BaseBullet) => this.processWorker(bull);
+        setBulletProcessWorker("CustomBullet", this.customBullCfg, pluginWrappedProcessWorker);
     }
 
     /**

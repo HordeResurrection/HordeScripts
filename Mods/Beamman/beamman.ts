@@ -1,7 +1,7 @@
-import { createPoint, Point2D } from "library/common/primitives";
+import { Point2D } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
 import { UnitState, StateMotion, UnitAnimState, AnimatorScriptTasks, WorldConstants, SoundsCatalog, Unit, MotionHit } from "library/game-logic/horde-types";
-import { setUnitStateWorker } from "library/game-logic/workers-tools";
+import { setUnitStateWorker } from "library/game-logic/workers";
 import HordePluginBase from "plugins/base-plugin";
 
 
@@ -17,18 +17,20 @@ export class BeammanPlugin extends HordePluginBase {
      */
     public constructor() {
         super("Воин с дубиной");
+
+        this.hitTable = createHitTable();
+        this.hitSounds = HordeContentApi.GetSoundsCatalog("#SoundsCatalog_Hits_Mele_Dubina_02eb130f59b6");
     }
 
     /**
      * Метод вызывается при загрузке сцены и после hot-reload.
      */
     public onFirstRun() {
-        this.hitTable = createHitTable();
-        this.hitSounds = HordeContentApi.GetSoundsCatalog("#SoundsCatalog_Hits_Mele_Dubina_02eb130f59b6");
-
         // Установка обработчика удара
         let unitCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Beamman");
-        setUnitStateWorker(this, unitCfg, UnitState.Hit, this.stateWorker_Hit);
+
+        let pluginWrappedWorker = (u: Unit) => this.stateWorker_Hit(u);
+        setUnitStateWorker("Beamman", unitCfg, UnitState.Hit, pluginWrappedWorker);
     }
 
     /**
@@ -100,7 +102,7 @@ export class BeammanPlugin extends HordePluginBase {
         }
 
         // Координаты текущего удара
-        let targetPosition = createPoint(hitBias.X + u.Position.X,
+        let targetPosition = new Point2D(hitBias.X + u.Position.X,
             hitBias.Y + u.Position.Y);
 
         // Дружественным воинам урон не наносим
@@ -130,44 +132,44 @@ export class BeammanPlugin extends HordePluginBase {
 function createHitTable(): HitTable {
     return {
         "Up": [
-            createPoint(25, -25),
-            createPoint(0, -25),
-            createPoint(-25, -25),
+            new Point2D(25, -25),
+            new Point2D(0, -25),
+            new Point2D(-25, -25),
         ],
         "RightUp": [
-            createPoint(25, -3),
-            createPoint(25, -25),
-            createPoint(0, -25),
+            new Point2D(25, -3),
+            new Point2D(25, -25),
+            new Point2D(0, -25),
         ],
         "Right": [
-            createPoint(25, 25),
-            createPoint(25, -3),
-            createPoint(25, -25),
+            new Point2D(25, 25),
+            new Point2D(25, -3),
+            new Point2D(25, -25),
         ],
         "RightDown": [
-            createPoint(0, 20),
-            createPoint(25, 25),
-            createPoint(25, -3),
+            new Point2D(0, 20),
+            new Point2D(25, 25),
+            new Point2D(25, -3),
         ],
         "Down": [
-            createPoint(-25, 25),
-            createPoint(0, 20),
-            createPoint(25, 25),
+            new Point2D(-25, 25),
+            new Point2D(0, 20),
+            new Point2D(25, 25),
         ],
         "LeftDown": [
-            createPoint(-25, 3),
-            createPoint(-25, 25),
-            createPoint(0, 20),
+            new Point2D(-25, 3),
+            new Point2D(-25, 25),
+            new Point2D(0, 20),
         ],
         "Left": [
-            createPoint(-25, -25),
-            createPoint(-25, 3),
-            createPoint(-25, 25),
+            new Point2D(-25, -25),
+            new Point2D(-25, 3),
+            new Point2D(-25, 25),
         ],
         "LeftUp": [
-            createPoint(0, -25),
-            createPoint(-25, -25),
-            createPoint(-25, 3),
+            new Point2D(0, -25),
+            new Point2D(-25, -25),
+            new Point2D(-25, 3),
         ],
     };
 }

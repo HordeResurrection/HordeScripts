@@ -1,6 +1,6 @@
 import { createPoint } from "library/common/primitives";
 import { ACommandArgs, Unit, UnitCommand, UnitCommandConfig } from "library/game-logic/horde-types";
-import { setUnitGetOrderWorker } from "library/game-logic/workers-tools";
+import { setUnitGetOrderWorker } from "library/game-logic/workers";
 import HordeExampleBase from "./base-example";
 
 
@@ -58,7 +58,8 @@ export class Example_CustomUnitCommand extends HordeExampleBase {
         }
 
         // Установка обработчика команды в конфиг замка (нужно проделать только один раз)
-        setUnitGetOrderWorker(this, someCastle.Cfg, this.worker_getUnitOrder);
+        let pluginWrappedWorker = (u: Unit, commandArgs: ACommandArgs): boolean => this.worker_getUnitOrder(u, commandArgs);
+        setUnitGetOrderWorker("Castle_CustomCommand", someCastle.Cfg, pluginWrappedWorker);
 
         // Добавление команды юниту
         someCastle.CommandsMind.AddCommand(CUSTOM_COMMAND_ID, cmdCfg);
