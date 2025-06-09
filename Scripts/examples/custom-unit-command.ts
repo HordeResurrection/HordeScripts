@@ -33,6 +33,8 @@ export class Example_CustomUnitCommand extends HordeExampleBase {
 
         // Создание конфига команды
         let cmdCfg = this.getOrCreateUnitCommandConfig();
+
+        // Добавление возможности выдачи команды для замка
         if (!this.addCommandToCastle(cmdCfg)) {
             this.log.warning('Не удалось настроить кастомную команду');
             return;
@@ -112,7 +114,7 @@ export class Example_CustomUnitCommand extends HordeExampleBase {
 
         if (commandArgs.CommandType == CUSTOM_COMMAND_ID) {
             // Была прожата кастомная команда
-            this.log.info("Зафиксированно нажатие кастомной команды. Здесь можно выполнить любые действия.");
+            this.log.info("Зафиксировано нажатие кастомной команды. Здесь можно выполнить любые действия.");
             return true;
         } else {
             // Это не кастомная команда - запуск обычного обработчика получения приказа
