@@ -14031,7 +14031,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 			repairTarget: HordeClassLibrary.World.Objects.Units.Unit | null
 		): boolean;
 
-		CanBeBuildedNow(): boolean;
+		CanBeBuiltNow(): boolean;
 
 		IsAbandonedUnfinishedBuilding(): boolean;
 
@@ -17452,7 +17452,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 		UnitOrderChanged: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.UnitOrderChangedEventArgs>>;
 		UnitLifeStateChanged: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.UnitLifeStateChangedEventArgs>>;
 		UnitBuildingComplete: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.UnitBuildingCompleteEventArgs>>;
-		UnitUnitMovedToCell: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.UnitMovedToCellEventArgs>>;
+		UnitMovedToCell: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.UnitMovedToCellEventArgs>>;
 		UnitCauseDamage: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.CauseDamageEventArgs>>;
 		UnitTakeDamage: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.TakeDamageEventArgs>>;
 		UnitTakeDamageByUnknownSource: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.TakeDamageByUnknownSourceEventArgs>>;
