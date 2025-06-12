@@ -86,6 +86,10 @@ export class Example_GetUnitsInArea_KdTree extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
+        // Создание древа юнитов (актуально только на первом такте, т.к. древо ещё не создана)
+        if (DataStorage.gameTickNum == 0)
+            ActiveScena.UnitsMap.UnitsTree.Recreate();
+
         let center = createPoint((X_1 - X_0) / 2, (Y_1 - Y_0) / 2);
         let radius = (X_1 - X_0) / 2;
         let unitsIter = iterateOverUnitsInBox(center, radius);

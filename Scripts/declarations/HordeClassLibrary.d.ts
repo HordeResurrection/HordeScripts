@@ -15545,10 +15545,6 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		Recreate(): void;
 
 		GetUnitsInBox(
-			/*in*/ box: HordeResurrection.Basic.Primitives.Geometry.Box3D
-		): HordeClassLibrary.World.ScenaComponents.Intrinsics.UnitsQueryResult;
-
-		GetUnitsInBox(
 			box: HordeResurrection.Basic.Primitives.Geometry.Box3D
 		): HordeClassLibrary.World.ScenaComponents.Intrinsics.UnitsQueryResult;
 	}
