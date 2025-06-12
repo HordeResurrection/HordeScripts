@@ -7742,14 +7742,11 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 		// Constructors:
 		constructor(
 			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			chopsLeft: number
+			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
 		// Properties:
 		readonly TargetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
-		readonly ChopsLeft: number;
-		readonly IsTreeChoppedDown: boolean;
 	}
 }
 //#endregion
@@ -8364,13 +8361,11 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 		// Constructors:
 		constructor(
 			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			lastChop: boolean
+			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
 		// Properties:
 		readonly TargetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
-		readonly LastChop: boolean;
 	}
 }
 //#endregion
@@ -8858,6 +8853,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 		readonly SpecialUnitBehavior: HordeClassLibrary.UnitComponents.Enumerations.UnitBehaviorByOrderFlag;
 		readonly NextSuggestedOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase;
 		readonly NextOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase;
+		readonly IsSimpleMoveOrder: boolean;
 
 		// Methods:
 		ToInstinct(
@@ -8906,7 +8902,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 			commands: System.Collections.Generic.IEnumerable<HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand> | null
 		): void;
 
-		AllowDissallowedCommands(): void;
+		AllowDisallowedCommands(): void;
 
 		SuggestComebackOrder(
 			/*out*/ comebackBeforeHoldPosition: boolean
@@ -9114,6 +9110,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 
 		// Properties:
 		readonly Target: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly ChoppingNow: boolean;
 	}
 }
 //#endregion
@@ -9948,8 +9945,9 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 		// Properties:
 		readonly ItemInInventory: HordeClassLibrary.UnitComponents.Enumerations.ResourceItemType;
 		readonly ItemsCount: number;
-		readonly TakeFrame: number;
 		readonly HasItems: boolean;
+		readonly TakeFrame: number;
+		readonly Chops: HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData.ChopsCounter;
 
 		// Methods:
 		GiveItem(
@@ -9981,6 +9979,24 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 		IsEmptyFor(
 			itemType: HordeClassLibrary.UnitComponents.Enumerations.ResourceItemType
 		): boolean;
+	}
+}
+//#endregion
+
+//#region HarvesterProfessionData.ChopsCounter
+declare namespace HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData {
+	class ChopsCounter extends System.Object {
+
+		// Constructors:
+		constructor();
+
+		// Properties:
+		readonly Count: number;
+
+		// Methods:
+		OneChop(): void;
+
+		Reset(): void;
 	}
 }
 //#endregion
@@ -12308,6 +12324,7 @@ declare namespace HordeClassLibrary.World.Context {
 
 		// Properties:
 		readonly World: HordeClassLibrary.World.Context.Parameters.WorldParameters;
+		readonly Wind: HordeClassLibrary.World.Context.Parameters.WindParameters;
 		readonly Units: HordeClassLibrary.World.Context.Parameters.UnitParameters;
 	}
 }
@@ -12383,6 +12400,29 @@ declare namespace HordeClassLibrary.World.Context.Parameters {
 }
 //#endregion
 
+//#region WindParameters
+declare namespace HordeClassLibrary.World.Context.Parameters {
+	class WindParameters extends System.Object {
+
+		// Constructors:
+		constructor();
+
+		// Fields:
+		static readonly MaxSpeedDefault: HordeResurrection.Basic.Primitives.PreciseFraction;
+		static readonly MaxDeltaDefault: HordeResurrection.Basic.Primitives.PreciseFraction;
+		static readonly ChangingPhasePeriodDefault: HordeResurrection.Basic.Primitives.MinMaxSpan;
+		static readonly StaticPhasePeriodDefault: HordeResurrection.Basic.Primitives.MinMaxSpan;
+
+		// Properties:
+		EnableWindUpdating: boolean;
+		MaxSpeed: HordeResurrection.Basic.Primitives.PreciseFraction;
+		MaxDelta: HordeResurrection.Basic.Primitives.PreciseFraction;
+		ChangingPhasePeriod: HordeResurrection.Basic.Primitives.MinMaxSpan;
+		StaticPhasePeriod: HordeResurrection.Basic.Primitives.MinMaxSpan;
+	}
+}
+//#endregion
+
 //#region WorldParameters
 declare namespace HordeClassLibrary.World.Context.Parameters {
 	class WorldParameters extends System.Object {
@@ -12391,12 +12431,8 @@ declare namespace HordeClassLibrary.World.Context.Parameters {
 		constructor();
 
 		// Fields:
-		static readonly WindSpeedMaxDefault: HordeResurrection.Basic.Primitives.PreciseFraction;
-		static readonly WindDeltaMaxDefault: HordeResurrection.Basic.Primitives.PreciseFraction;
 		static readonly /* const */ GravityAccelerationDefault: number; // = 0,72
 		static readonly /* const */ AirAccelerationDefault: number; // = 0,1875
-		static readonly /* const */ WindSpeedUpdatePeriodDefault: number; // = 24
-		static readonly /* const */ WindDeltaUpdatePeriodDefault: number; // = 256
 		static readonly /* const */ FireFadingPeriodOnRepairingDefault: number; // = 100
 		static readonly /* const */ RepairHelperExtinguishingFactorDefault: number; // = 10
 		static readonly /* const */ PopulationTerritoryAroundActiveBuildingDefault: number; // = 6
@@ -12405,11 +12441,6 @@ declare namespace HordeClassLibrary.World.Context.Parameters {
 		// Properties:
 		GravityAcceleration: number;
 		AirAcceleration: number;
-		EnableWindUpdating: boolean;
-		WindSpeedMax: HordeResurrection.Basic.Primitives.PreciseFraction;
-		WindDeltaMax: HordeResurrection.Basic.Primitives.PreciseFraction;
-		WindSpeedUpdatePeriod: number;
-		WindDeltaUpdatePeriod: number;
 		FireFadingPeriodOnRepairing: number;
 		RepairHelperExtinguishingFactor: number;
 		PopulationTerritoryAroundActiveBuilding: number;
@@ -15254,6 +15285,8 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		readonly MaxSpeedComponent: HordeResurrection.Basic.Primitives.PreciseFraction;
 
 		// Methods:
+		ReinitializeStates(): void;
+
 		UpdateOnGameTick(): void;
 
 		ApplyDelta(
@@ -19287,6 +19320,8 @@ export const CompoundProfessionData = HordeClassLibrary.UnitComponents.Professio
 export type CompoundProfessionData = HordeClassLibrary.UnitComponents.ProfessionData.CompoundProfessionData;
 export const HarvesterProfessionData = HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData;
 export type HarvesterProfessionData = HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData;
+export const ChopsCounter = HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData.ChopsCounter;
+export type ChopsCounter = HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData.ChopsCounter;
 export const IUnitContainerProfession = HordeClassLibrary.UnitComponents.ProfessionData.Interfaces.IUnitContainerProfession;
 export type IUnitContainerProfession = HordeClassLibrary.UnitComponents.ProfessionData.Interfaces.IUnitContainerProfession;
 export const MetalStockProfessionData = HordeClassLibrary.UnitComponents.ProfessionData.MetalStockProfessionData;
@@ -19541,6 +19576,8 @@ export const BattleSettings = HordeClassLibrary.World.Context.BattleSettings;
 export type BattleSettings = HordeClassLibrary.World.Context.BattleSettings;
 export const UnitParameters = HordeClassLibrary.World.Context.Parameters.UnitParameters;
 export type UnitParameters = HordeClassLibrary.World.Context.Parameters.UnitParameters;
+export const WindParameters = HordeClassLibrary.World.Context.Parameters.WindParameters;
+export type WindParameters = HordeClassLibrary.World.Context.Parameters.WindParameters;
 export const WorldParameters = HordeClassLibrary.World.Context.Parameters.WorldParameters;
 export type WorldParameters = HordeClassLibrary.World.Context.Parameters.WorldParameters;
 export const Episode = HordeClassLibrary.World.Episode;
