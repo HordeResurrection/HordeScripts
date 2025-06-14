@@ -15,6 +15,7 @@ declare namespace HordeResurrection.Engine.Logic.Battle {
 		static readonly Camera: HordeResurrection.Engine.Logic.Battle.Camera.BattleCamera;
 		static readonly StoppingNow: boolean;
 		static readonly IsNetworkGame: boolean;
+		static readonly BlockInputFragmentsOnScenaUpdating: boolean;
 
 		// Methods:
 		static Initialize(): void;
@@ -3006,6 +3007,7 @@ declare namespace HordeResurrection.Engine.Settings {
 		readonly DisableMouseBorderScroll: boolean;
 		readonly MouseBorderScrollZone: number;
 		readonly KeyboardModifiersPhantomTime: number;
+		readonly BlockInputFragmentsOnScenaUpdating: boolean;
 	}
 }
 //#endregion
@@ -3101,6 +3103,7 @@ declare namespace HordeResurrection.Engine.Settings {
 		readonly UnsafeMode: boolean;
 		readonly AllowContentPackScripts: boolean;
 		readonly EnableDebugPlugins: boolean;
+		readonly ExecutingTimeoutSeconds: number;
 
 		// Methods:
 		GetIsEnabled(

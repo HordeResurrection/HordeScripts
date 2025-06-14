@@ -3053,6 +3053,8 @@ declare namespace HordeClassLibrary.HordeContent.ContentPacks {
 		readonly GameVersion: HordeClassLibrary.Basic.GameVersion.HordeVersion;
 		readonly ModVersion: HordeClassLibrary.Basic.GameVersion.HordeVersion;
 		readonly RootDir: string;
+		readonly RootDirRelative: string;
+		readonly VirtualScriptsDir: string;
 		readonly DisplayDescription: string;
 
 		// Methods:
@@ -3062,6 +3064,7 @@ declare namespace HordeClassLibrary.HordeContent.ContentPacks {
 
 		static TryMakeContentPackInfo(
 			rootDir: string | null,
+			contentPackDir: string | null,
 			/*out*/ contentPackInfo: HordeClassLibrary.HordeContent.ContentPacks.ContentPackInfo | null
 		): boolean;
 	}
@@ -4724,10 +4727,6 @@ declare namespace HordeClassLibrary.PathFinders.ContourPathFinder {
 		CheckPoint(
 			newPoint: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			newDist: number
-		): void;
-
-		UpdateBy(
-			other: HordeClassLibrary.PathFinders.ContourPathFinder.CpfNearestPointsSet | null
 		): void;
 	}
 }
