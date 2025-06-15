@@ -2610,6 +2610,10 @@ declare namespace HordeResurrection.Engine.Logic.Main.Players {
 		readonly InputFuzzer: HordeResurrection.Engine.Logic.Main.Players.Input.PlayerInputFuzzer;
 
 		// Methods:
+		SetBotNickname(
+			nickname: string | null
+		): void;
+
 		TrySetPause(
 			checkOnly?: boolean /* = false */
 		): boolean;
