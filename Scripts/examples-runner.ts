@@ -79,6 +79,7 @@ export function allExamples() {
     addExample(new Example_CustomBullet());
     addExample(new Example_CustomUnit());
     addExample(new Example_CustomUnitCommand());
+    addExample(new Example_CustomUnitOrder());
     addExample(new Example_CustomUnitCanBePlaced());
 }
 
@@ -123,4 +124,4 @@ import { Example_SettlementResourcesBonus } from "examples/settlement-resources-
 import { Example_UnitEnumerateEvents, Example_UnitHandleEvents } from "examples/unit-event-examples";
 import { Example_StringDecoration } from "examples/decoration-string";
 import { Example_GeometryDecoration } from "examples/decoration-geometry";
-
+import { Example_CustomUnitOrder } from "examples/custom-unit-order";

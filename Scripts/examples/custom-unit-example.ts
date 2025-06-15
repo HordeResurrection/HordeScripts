@@ -21,7 +21,7 @@ export class Example_CustomUnit extends HordeExampleBase {
     public constructor() {
         super("Custom unit (арбалетчик)");
 
-        this.armament = createArmamament();
+        this.armament = createArmament();
         this.baseMoveWorker = createBaseMoveWorker();
     }
 
@@ -143,7 +143,7 @@ function createBaseMoveWorker() {
 /**
  * Создание дополнительного вооружения для юнита.
  */
-function createArmamament() {
+function createArmament() {
 
     // Смещение арбалета по направлениям
     let gunCoord = new DictionaryT<UnitDirection, Point2D>(UnitDirection, Point2D);

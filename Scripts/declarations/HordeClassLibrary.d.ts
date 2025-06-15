@@ -5741,7 +5741,8 @@ declare namespace HordeClassLibrary.UnitComponents.Enumerations {
 		/** UnitState.Death = 23 */ static readonly Death: UnitState;
 		/** UnitState.DestroySelf = 24 */ static readonly DestroySelf: UnitState;
 		/** UnitState.Deleted = 25 */ static readonly Deleted: UnitState;
-		/** UnitState.Unknown = 26 */ static readonly Unknown: UnitState;
+		/** UnitState.Custom = 26 */ static readonly Custom: UnitState;
+		/** UnitState.Unknown = 27 */ static readonly Unknown: UnitState;
 	}
 }
 //#endregion
@@ -7750,6 +7751,19 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 }
 //#endregion
 
+//#region ActCustom
+declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
+	class ActCustom
+		extends HordeClassLibrary.UnitComponents.OrdersSystem.Acts.AActBase
+	{
+		// Constructors:
+		constructor(
+			u: HordeClassLibrary.World.Objects.Units.Unit | null
+		);
+	}
+}
+//#endregion
+
 //#region ActDeath
 declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	class ActDeath
@@ -8365,6 +8379,19 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 
 		// Properties:
 		readonly TargetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+	}
+}
+//#endregion
+
+//#region MotionCustom
+declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
+	class MotionCustom
+		extends HordeClassLibrary.UnitComponents.OrdersSystem.Motions.AMotionBase
+	{
+		// Constructors:
+		constructor(
+			u: HordeClassLibrary.World.Objects.Units.Unit | null
+		);
 	}
 }
 //#endregion
@@ -9050,6 +9077,24 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 		IsActual(): boolean;
 
 		CheckInstinctChaseDistance(): boolean;
+	}
+}
+//#endregion
+
+//#region OrderCustom
+declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
+	class OrderCustom
+		extends HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase
+	{
+		// Constructors:
+		constructor(
+			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs | null
+		);
+
+		// Properties:
+		readonly CommandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs;
 	}
 }
 //#endregion
@@ -11693,7 +11738,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Units.Builder {
 
 		// Fields:
 		static readonly /* const */ DisbandPeriod: number; // = 17
-		static readonly /* const */ DisbandRetriesMaxCount: number; // = 10
+		static readonly /* const */ DisbandRetriesMaxCount: number; // = 32
 	}
 }
 //#endregion
@@ -19107,6 +19152,8 @@ export const ActCapture = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.Act
 export type ActCapture = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActCapture;
 export const ActChopDownTree = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActChopDownTree;
 export type ActChopDownTree = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActChopDownTree;
+export const ActCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActCustom;
+export type ActCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActCustom;
 export const ActDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActDeath;
 export type ActDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActDeath;
 export const ActDestroySelf = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActDestroySelf;
@@ -19175,6 +19222,8 @@ export const CaptureStage = HordeClassLibrary.UnitComponents.OrdersSystem.Motion
 export type CaptureStage = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionCaptureMachine.CaptureStage;
 export const MotionChopDown = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionChopDown;
 export type MotionChopDown = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionChopDown;
+export const MotionCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionCustom;
+export type MotionCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionCustom;
 export const MotionDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionDeath;
 export type MotionDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionDeath;
 export const MotionDestroySelf = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionDestroySelf;
@@ -19235,6 +19284,8 @@ export const OrderBuildingAttackUnit = HordeClassLibrary.UnitComponents.OrdersSy
 export type OrderBuildingAttackUnit = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderBuildingAttackUnit;
 export const OrderCapture = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderCapture;
 export type OrderCapture = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderCapture;
+export const OrderCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderCustom;
+export type OrderCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderCustom;
 export const OrderDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderDeath;
 export type OrderDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderDeath;
 export const OrderDestroySelf = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderDestroySelf;
