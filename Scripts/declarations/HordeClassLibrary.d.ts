@@ -11,12 +11,20 @@ declare namespace HordeClassLibrary.Basic.GameVersion {
 			postfix: string | null
 		);
 
+		// Fields:
+		static readonly Zero: HordeClassLibrary.Basic.GameVersion.HordeVersion;
+		static readonly /* const */ ZeroVersion: string; // = "v0.00"
+
 		// Properties:
 		readonly Version: System.Version;
 		readonly Postfix: string;
 
 		// Methods:
 		static Parse(
+			rawVersion: string | null
+		): HordeClassLibrary.Basic.GameVersion.HordeVersion;
+
+		static SafeParse(
 			rawVersion: string | null
 		): HordeClassLibrary.Basic.GameVersion.HordeVersion;
 
@@ -6879,6 +6887,8 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 
 		ReviewQueuedInstinctOrder(): void;
 
+		SkipFollowingAggressiveCapture(): void;
+
 		TryAddAutoHoldPosition(
 			assignOrderMode: HordeClassLibrary.UnitComponents.OrdersSystem.AssignOrderMode
 		): void;
@@ -8854,6 +8864,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem {
 		): void;
 
 		GetNextExpectedOrder(): HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase;
+
+		SkipNextOrder(): void;
 
 		IsIdle(): boolean;
 
@@ -13760,6 +13772,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		readonly Rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D;
 		readonly Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
 		readonly Position: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly MapLayer: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer;
 		readonly DrawLayer: HordeClassLibrary.World.Simple.DrawLayer;
 		readonly RealUnit: HordeClassLibrary.World.Objects.Units.Unit;
 		readonly IsExistent: boolean;
@@ -13796,6 +13809,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		readonly Region: HordeClassLibrary.World.Objects.Units.KnownUnitRegion;
 		readonly Rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D;
 		readonly Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly MapLayer: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer;
 		readonly IsExistent: boolean;
 		readonly Cfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
 		readonly Owner: HordeClassLibrary.World.Settlements.Settlement;
@@ -14721,7 +14735,9 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 		// Properties:
 		readonly FileInfo: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaFileInfo;
 		readonly HashInfo: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaHashInfo;
-		readonly Version: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaVersion;
+		readonly Format: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaFormat;
+		readonly GameVersion: HordeClassLibrary.Basic.GameVersion.HordeVersion;
+		readonly ScenaVersion: HordeClassLibrary.Basic.GameVersion.HordeVersion;
 		readonly Name: string;
 		readonly Description: string;
 		readonly Size: HordeResurrection.Basic.Primitives.Geometry.Size2D;
@@ -14812,9 +14828,9 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 
 		// Properties:
 		readonly ScenaFileInfo: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaFileInfo;
-		readonly Hash: number[];
+		readonly HashBytes: number[];
 		readonly ShortHash: number;
-		readonly HashHex: string;
+		readonly Hash: string;
 		readonly IsHashCalculated: boolean;
 
 		// Methods:
@@ -14840,7 +14856,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 		);
 
 		// Properties:
-		readonly Version: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaVersion;
+		readonly Format: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaFormat;
 		readonly ScenaName: string;
 		readonly Size: HordeResurrection.Basic.Primitives.Geometry.Size2D;
 		readonly Rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D;
@@ -14900,13 +14916,8 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 		constructor(
 			fileName: string | null,
 			fileLength: number,
-			hashHex: string | null
-		);
-
-		constructor(
-			fileName: string | null,
-			fileLength: number,
-			hash: number[] | null
+			hash: number[] | null,
+			version: string | null
 		);
 
 		constructor();
@@ -14914,8 +14925,9 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 		// Properties:
 		readonly FileName: string;
 		readonly FileLength: number;
-		readonly HashHex: string;
-		readonly Hash: number[];
+		readonly Hash: string;
+		readonly Version: string;
+		readonly HashBytes: number[];
 		readonly ShortHash: number;
 	}
 }
@@ -14957,6 +14969,17 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		// Default parameterless constructor for value types
 		constructor();
+	}
+}
+//#endregion
+
+//#region ScenaFormat
+declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
+	abstract class ScenaFormat extends System.Enum {
+		/** ScenaFormat.None = 0 */ static readonly None: ScenaFormat;
+		/** ScenaFormat.NorthWind = 1 */ static readonly NorthWind: ScenaFormat;
+		/** ScenaFormat.Citadel = 2 */ static readonly Citadel: ScenaFormat;
+		/** ScenaFormat.Resurrection = 3 */ static readonly Resurrection: ScenaFormat;
 	}
 }
 //#endregion
@@ -15297,17 +15320,6 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		): HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig;
 
 		Dispose(): void;
-	}
-}
-//#endregion
-
-//#region ScenaVersion
-declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
-	abstract class ScenaVersion extends System.Enum {
-		/** ScenaVersion.None = 0 */ static readonly None: ScenaVersion;
-		/** ScenaVersion.NorthWind = 1 */ static readonly NorthWind: ScenaVersion;
-		/** ScenaVersion.Citadel = 2 */ static readonly Citadel: ScenaVersion;
-		/** ScenaVersion.Resurrection = 3 */ static readonly Resurrection: ScenaVersion;
 	}
 }
 //#endregion
@@ -15670,7 +15682,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents {
 
 		// Properties:
 		readonly FileStamp: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaStamp;
-		readonly Version: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaVersion;
+		readonly Format: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaFormat;
 		readonly ScenaName: string;
 		readonly Size: HordeResurrection.Basic.Primitives.Geometry.Size2D;
 		readonly SizePixels: HordeResurrection.Basic.Primitives.Geometry.Size2D;
@@ -19866,6 +19878,8 @@ export const LandscapeMapModification = HordeClassLibrary.World.ScenaComponents.
 export type LandscapeMapModification = HordeClassLibrary.World.ScenaComponents.Intrinsics.LandscapeMapModification;
 export const ResourcesMapModification = HordeClassLibrary.World.ScenaComponents.Intrinsics.ResourcesMapModification;
 export type ResourcesMapModification = HordeClassLibrary.World.ScenaComponents.Intrinsics.ResourcesMapModification;
+export const ScenaFormat = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaFormat;
+export type ScenaFormat = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaFormat;
 export const ScenaGlobalObjects = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaGlobalObjects;
 export type ScenaGlobalObjects = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaGlobalObjects;
 export const ScenaObjectsCollection = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaObjectsCollection;
@@ -19902,8 +19916,6 @@ export const ScenaSettlements = HordeClassLibrary.World.ScenaComponents.Intrinsi
 export type ScenaSettlements = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaSettlements;
 export const ScenaTileset = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaTileset;
 export type ScenaTileset = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaTileset;
-export const ScenaVersion = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaVersion;
-export type ScenaVersion = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaVersion;
 export const ScenaWind = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaWind;
 export type ScenaWind = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaWind;
 export const UnitsMap = HordeClassLibrary.World.ScenaComponents.Intrinsics.UnitsMap;
