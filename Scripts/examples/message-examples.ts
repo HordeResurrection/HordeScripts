@@ -1,5 +1,5 @@
 import { broadcastMessage } from "library/common/messages";
-import { createHordeColor } from "library/common/primitives";
+import { createHordeColor, Point2D } from "library/common/primitives";
 import HordeExampleBase from "./base-example";
 import { BattleController } from "library/game-logic/horde-types";
 
@@ -33,7 +33,7 @@ export class Example_SendMessageToAll extends HordeExampleBase {
 
 
 /**
- * В этом примере выполняется отправка чат-сообщения от имени бота (как от обычного игрока, только от бота).
+ * В этом примере выполняется отправка чат-сообщения и attention-меток от имени бота (как от обычного игрока, только от бота).
  */
 export class Example_SendBotMessage extends HordeExampleBase {
 
@@ -56,8 +56,17 @@ export class Example_SendBotMessage extends HordeExampleBase {
             }
 
             if (((gameTickNum + player.Slot * 100) % 1000) == 0) {
+
+                // Отправка чат-сообщения всем игрокам
                 BattleController.SendBotChatMessage(player, `Hello to all (P-${player.Slot})`, HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets.All);
+
+                // Отправка чат-сообщения союзникам
                 BattleController.SendBotChatMessage(player, `Hello allies (P-${player.Slot})`, HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets.Allies);
+
+                // Отправка метки на карте
+                let rnd = ActiveScena.Context.Randomizer;
+                let attentionCell = new Point2D(player.Slot + 10, rnd.RandomNumber(0, player.Slot) + 10);
+                BattleController.SendBotAttention(player, attentionCell);
             }
         }
     }

@@ -89,10 +89,10 @@ declare namespace HordeResurrection.Engine.Logic.Battle {
 		static GameLogicExceptionThrown: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.GameLogicExceptionThrownEventArgs>>;
 		static GameMessageEvent: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.GameMessageEventArgs>>;
 		static BeforeStop: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.BeforeStopEventArgs>>;
-		static ChatMessageSent: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageSentEventArgs>>;
-		static ChatMessageReceived: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageReceivedEventArgs>>;
-		static AttentionSent: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.AttentionSentEventArgs>>;
-		static AttentionReceived: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.AttentionReceivedEventArgs>>;
+		static ChatMessageSent: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageEventArgs>>;
+		static ChatMessageReceived: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageEventArgs>>;
+		static AttentionSent: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.AttentionEventArgs>>;
+		static AttentionReceived: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.AttentionEventArgs>>;
 
 		// Dummy constructor for some magic:
 		protected constructor(...dummy: any[]);
@@ -155,82 +155,44 @@ declare namespace HordeResurrection.Engine.Logic.Battle.BattleController {
 }
 //#endregion
 
-//#region BattleController.ChatMessageSentEventArgs
+//#region BattleController.ChatMessageEventArgs
 declare namespace HordeResurrection.Engine.Logic.Battle.BattleController {
-	class ChatMessageSentEventArgs extends System.Object
-		implements System.IEquatable<HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageSentEventArgs>
+	class ChatMessageEventArgs extends System.Object
+		implements System.IEquatable<HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageEventArgs>
 	{
 		// Constructors:
 		constructor(
 			InitiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
 			Message: string | null,
 			Targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets,
-			RecepientSettlements: HordeClassLibrary.World.Settlements.Settlement[] | null
+			RecepientSettlements: System.Collections.Generic.HashSet<HordeClassLibrary.World.Settlements.Settlement> | null
 		);
 
 		// Properties:
 		InitiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player;
 		Message: string;
 		Targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets;
-		RecepientSettlements: HordeClassLibrary.World.Settlements.Settlement[];
+		RecepientSettlements: System.Collections.Generic.HashSet<HordeClassLibrary.World.Settlements.Settlement>;
 	}
 }
 //#endregion
 
-//#region BattleController.ChatMessageReceivedEventArgs
+//#region BattleController.AttentionEventArgs
 declare namespace HordeResurrection.Engine.Logic.Battle.BattleController {
-	class ChatMessageReceivedEventArgs extends System.Object
-		implements System.IEquatable<HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageReceivedEventArgs>
+	class AttentionEventArgs extends System.Object
+		implements System.IEquatable<HordeResurrection.Engine.Logic.Battle.BattleController.AttentionEventArgs>
 	{
 		// Constructors:
 		constructor(
 			InitiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
-			Message: string | null,
-			Targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets,
-			RecepientSettlements: HordeClassLibrary.World.Settlements.Settlement[] | null
-		);
-
-		// Properties:
-		InitiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player;
-		Message: string;
-		Targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets;
-		RecepientSettlements: HordeClassLibrary.World.Settlements.Settlement[];
-	}
-}
-//#endregion
-
-//#region BattleController.AttentionSentEventArgs
-declare namespace HordeResurrection.Engine.Logic.Battle.BattleController {
-	class AttentionSentEventArgs extends System.Object
-		implements System.IEquatable<HordeResurrection.Engine.Logic.Battle.BattleController.AttentionSentEventArgs>
-	{
-		// Constructors:
-		constructor(
-			InitiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
-			Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
+			Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
+			RecepientSettlements: System.Collections.Generic.HashSet<HordeClassLibrary.World.Settlements.Settlement> | null
 		);
 
 		// Properties:
 		InitiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player;
 		Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
-	}
-}
-//#endregion
-
-//#region BattleController.AttentionReceivedEventArgs
-declare namespace HordeResurrection.Engine.Logic.Battle.BattleController {
-	class AttentionReceivedEventArgs extends System.Object
-		implements System.IEquatable<HordeResurrection.Engine.Logic.Battle.BattleController.AttentionReceivedEventArgs>
-	{
-		// Constructors:
-		constructor(
-			InitiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
-			Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
-		);
-
-		// Properties:
-		InitiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player;
-		Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		RecepientSettlements: System.Collections.Generic.HashSet<HordeClassLibrary.World.Settlements.Settlement>;
 	}
 }
 //#endregion
@@ -3342,14 +3304,10 @@ export const GameMessageEventArgs = HordeResurrection.Engine.Logic.Battle.Battle
 export type GameMessageEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.GameMessageEventArgs;
 export const BeforeStopEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.BeforeStopEventArgs;
 export type BeforeStopEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.BeforeStopEventArgs;
-export const ChatMessageSentEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageSentEventArgs;
-export type ChatMessageSentEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageSentEventArgs;
-export const ChatMessageReceivedEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageReceivedEventArgs;
-export type ChatMessageReceivedEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageReceivedEventArgs;
-export const AttentionSentEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.AttentionSentEventArgs;
-export type AttentionSentEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.AttentionSentEventArgs;
-export const AttentionReceivedEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.AttentionReceivedEventArgs;
-export type AttentionReceivedEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.AttentionReceivedEventArgs;
+export const ChatMessageEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageEventArgs;
+export type ChatMessageEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageEventArgs;
+export const AttentionEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.AttentionEventArgs;
+export type AttentionEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.AttentionEventArgs;
 export const BattleCamera = HordeResurrection.Engine.Logic.Battle.Camera.BattleCamera;
 export type BattleCamera = HordeResurrection.Engine.Logic.Battle.Camera.BattleCamera;
 export const CameraConfiguration = HordeResurrection.Engine.Logic.Battle.Camera.CameraConfiguration;

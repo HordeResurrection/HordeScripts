@@ -3,7 +3,7 @@ import { BattleController, Scena, VisualEffectConfig, VisualEffectFogOfWarMode, 
 import * as primitives from "library/common/primitives";
 import * as decorations from "library/game-logic/decoration-spawn";
 
-type AttentionReceivedEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.AttentionReceivedEventArgs;
+type AttentionEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.AttentionEventArgs;
 
 
 /**
@@ -22,15 +22,12 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
 
 
     public onFirstRun() {
-        // Обработчик alt-кликов
         this._setupAttentionClicksHandler();
-
-        // Обработчик приёме alt-сообщений
-        this._setupAttentionReceiver();
+        this._setupAttentionReceiverHandler();
     }
 
     /**
-     * Обработка alt-кликов.
+     * Настройка обработки alt-кликов (исходящий Attention).
      */
     private _setupAttentionClicksHandler() {
         if (this.globalStorage.attentionClickHandler) {
@@ -43,9 +40,9 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
     }
 
     /**
-     * Обработка alt-сообщений.
+     * Настройка обработки alt-сообщений (входящий Attention).
      */
-    private _setupAttentionReceiver() {
+    private _setupAttentionReceiverHandler() {
         if (this.globalStorage.attentionReceivedHandler) {
             this.globalStorage.attentionReceivedHandler.disconnect();
         }
@@ -55,14 +52,21 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
         this.globalStorage.attentionReceivedHandler = handler;
     }
 
-
-    private _attentionHandler(sender: any, args: AttentionReceivedEventArgs) {
+    /**
+     * Обработчик Attention-событий.
+     */
+    private _attentionHandler(sender: any, args: AttentionEventArgs) {
         try {
             let info: AttentionClickInfo = {
                 tick: BattleController.GameTimer.GameFramesCounter,
                 player: args.InitiatorPlayer,
                 cell: args.Cell
             };
+            
+            let activePlayer = HordeResurrection.Engine.Logic.Main.PlayersController.ActivePlayer;
+            if (!args.RecepientSettlements.Contains(activePlayer.GetRealSettlement())) {
+                return;
+            }
 
             this._createDecoration(info);
         } catch (ex) {
@@ -70,7 +74,9 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
         }
     }
 
-
+    /**
+     * Создание декораций для Attention-событий.
+     */
     private _createDecoration(attentionInfo: AttentionClickInfo) {
         let position = primitives.createPoint(
             attentionInfo.cell.X * WorldConstants.CellSize + WorldConstants.HalfCellSize,
