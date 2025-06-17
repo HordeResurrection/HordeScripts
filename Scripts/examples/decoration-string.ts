@@ -9,15 +9,12 @@ import { DrawLayer, FontUtils } from "library/game-logic/horde-types";
 export class Example_StringDecoration extends HordeExampleBase {
     private decorationString: any;
     private center: any;
-    private startTick: number;
 
     /**
      * Конструктор.
      */
     public constructor() {
         super("String decoration");
-        this.startTick = DataStorage.gameTickNum;
-
         this.center = createPoint(600, 600);
     }
 

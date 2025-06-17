@@ -5,10 +5,12 @@ import HordePluginBase from "plugins/base-plugin";
  */
 export default class HordeExampleBase extends HordePluginBase {
     public exampleDisplayName: string;
+    public startTick: number;
 
     public constructor(exampleDisplayName: string) {
         super('[Example] ' + exampleDisplayName);
         this.exampleDisplayName = exampleDisplayName;
+        this.startTick = DataStorage.gameTickNum;
     }
 
     /**

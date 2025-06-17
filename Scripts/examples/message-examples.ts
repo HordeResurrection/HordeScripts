@@ -7,7 +7,6 @@ import { BattleController } from "library/game-logic/horde-types";
 // ===================================================
 // --- Отправка сообщений
 
-
 /**
  * Отправка игровых сообщений всем поселениям на сцене.
  */
@@ -33,14 +32,43 @@ export class Example_SendMessageToAll extends HordeExampleBase {
 }
 
 
+/**
+ * В этом примере выполняется отправка чат-сообщения от имени бота (как от обычного игрока, только от бота).
+ */
+export class Example_SendBotMessage extends HordeExampleBase {
+
+    public constructor() {
+        super("Send bot chat message");
+    }
+
+    public onFirstRun(): void {
+        this.logMessageOnRun();
+    }
+
+    public onEveryTick(gameTickNum: number) {
+        if (DataStorage.gameTickNum > this.startTick + 3000) {
+            return;
+        }
+
+        for (let player of Players) {
+            if (!player.IsBot) {
+                continue;
+            }
+
+            if (((gameTickNum + player.Slot * 100) % 1000) == 0) {
+                BattleController.SendBotChatMessage(player, `Hello to all (P-${player.Slot})`, HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets.All);
+                BattleController.SendBotChatMessage(player, `Hello allies (P-${player.Slot})`, HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets.Allies);
+            }
+        }
+    }
+}
+
+
 // ===================================================
 // --- Перехват чат-сообщений
 
-
 /**
  * Обработка отправляемых сообщений в чате.
- * 
- * Так же это пример корректной обработки .net-событий.
  */
 export class Example_HookSentChatMessages extends HordeExampleBase {
 
@@ -79,7 +107,8 @@ export class Example_HookSentChatMessages extends HordeExampleBase {
 
 /**
  * Обработка принимаемых сообщений в чате.
- * Работает только в сетевом режиме.
+ * 
+ * Работает только в сетевом режиме. Для одиночного режима см. обработку отправляемых сообщений.
  */
 export class Example_HookReceivedChatMessages extends HordeExampleBase {
 

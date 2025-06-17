@@ -60,10 +60,21 @@ declare namespace HordeResurrection.Engine.Logic.Battle {
 
 		static ToggleReplayLocalInput(): void;
 
+		static SendBotChatMessage(
+			initiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
+			message: string | null,
+			targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets
+		): void;
+
 		static SendChatMessage(
 			initiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
 			message: string | null,
 			targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets
+		): void;
+
+		static SendBotAttention(
+			initiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
+			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): void;
 
 		static SendAttention(
@@ -153,13 +164,15 @@ declare namespace HordeResurrection.Engine.Logic.Battle.BattleController {
 		constructor(
 			InitiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
 			Message: string | null,
-			Targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets
+			Targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets,
+			RecepientSettlements: HordeClassLibrary.World.Settlements.Settlement[] | null
 		);
 
 		// Properties:
 		InitiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player;
 		Message: string;
 		Targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets;
+		RecepientSettlements: HordeClassLibrary.World.Settlements.Settlement[];
 	}
 }
 //#endregion
@@ -173,13 +186,15 @@ declare namespace HordeResurrection.Engine.Logic.Battle.BattleController {
 		constructor(
 			InitiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
 			Message: string | null,
-			Targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets
+			Targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets,
+			RecepientSettlements: HordeClassLibrary.World.Settlements.Settlement[] | null
 		);
 
 		// Properties:
 		InitiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player;
 		Message: string;
 		Targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets;
+		RecepientSettlements: HordeClassLibrary.World.Settlements.Settlement[];
 	}
 }
 //#endregion
