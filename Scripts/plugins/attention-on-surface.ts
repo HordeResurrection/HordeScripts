@@ -64,7 +64,7 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
             };
             
             let activePlayer = HordeResurrection.Engine.Logic.Main.PlayersController.ActivePlayer;
-            if (!args.RecepientSettlements.Contains(activePlayer.GetRealSettlement())) {
+            if (!args.RecepientSettlements.Contains(activePlayer.GetWorkUISettlement())) {
                 return;
             }
 
