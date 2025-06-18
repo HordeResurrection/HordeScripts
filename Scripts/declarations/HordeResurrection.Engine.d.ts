@@ -46,10 +46,6 @@ declare namespace HordeResurrection.Engine.Logic.Battle {
 			desyncPlayers: System.Collections.Generic.IEnumerable<HordeResurrection.Engine.Logic.Main.Players.Player> | null
 		): void;
 
-		static ShowGameMessage(
-			message: HordeClassLibrary.World.Simple.GameMessage | null
-		): void;
-
 		static TicksToSeconds(
 			ticks: number
 		): number;
@@ -87,8 +83,8 @@ declare namespace HordeResurrection.Engine.Logic.Battle {
 		static GameTickEnd: EventSource<System.EventHandler<System.EventArgs>>;
 		static PlayerDesynchronized: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.PlayerDesynchronizedEventArgs>>;
 		static GameLogicExceptionThrown: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.GameLogicExceptionThrownEventArgs>>;
-		static GameMessageEvent: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.GameMessageEventArgs>>;
 		static BeforeStop: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.BeforeStopEventArgs>>;
+		static GameMessageEvent: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.GameMessageEventArgs>>;
 		static ChatMessageSent: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageEventArgs>>;
 		static ChatMessageReceived: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageEventArgs>>;
 		static AttentionSent: EventSource<System.EventHandler<HordeResurrection.Engine.Logic.Battle.BattleController.AttentionEventArgs>>;
@@ -128,6 +124,17 @@ declare namespace HordeResurrection.Engine.Logic.Battle.BattleController {
 }
 //#endregion
 
+//#region BattleController.BeforeStopEventArgs
+declare namespace HordeResurrection.Engine.Logic.Battle.BattleController {
+	class BeforeStopEventArgs extends System.Object
+		implements System.IEquatable<HordeResurrection.Engine.Logic.Battle.BattleController.BeforeStopEventArgs>
+	{
+		// Constructors:
+		constructor();
+	}
+}
+//#endregion
+
 //#region BattleController.GameMessageEventArgs
 declare namespace HordeResurrection.Engine.Logic.Battle.BattleController {
 	class GameMessageEventArgs extends System.Object
@@ -140,17 +147,6 @@ declare namespace HordeResurrection.Engine.Logic.Battle.BattleController {
 
 		// Properties:
 		Message: HordeClassLibrary.World.Simple.GameMessage;
-	}
-}
-//#endregion
-
-//#region BattleController.BeforeStopEventArgs
-declare namespace HordeResurrection.Engine.Logic.Battle.BattleController {
-	class BeforeStopEventArgs extends System.Object
-		implements System.IEquatable<HordeResurrection.Engine.Logic.Battle.BattleController.BeforeStopEventArgs>
-	{
-		// Constructors:
-		constructor();
 	}
 }
 //#endregion
@@ -2125,7 +2121,12 @@ declare namespace HordeResurrection.Engine.Logic.Main {
 		static IsFastStartNow(): boolean;
 
 		static ShowSystemMessage(
-			text: string | null
+			msg: HordeClassLibrary.World.Simple.GameMessage | null
+		): void;
+
+		static ShowSystemMessage(
+			text: string | null,
+			color?: HordeResurrection.Basic.Primitives.HordeColor | null /* = null */
 		): void;
 
 		// Events:
@@ -3300,10 +3301,10 @@ export const PlayerDesynchronizedEventArgs = HordeResurrection.Engine.Logic.Batt
 export type PlayerDesynchronizedEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.PlayerDesynchronizedEventArgs;
 export const GameLogicExceptionThrownEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.GameLogicExceptionThrownEventArgs;
 export type GameLogicExceptionThrownEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.GameLogicExceptionThrownEventArgs;
-export const GameMessageEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.GameMessageEventArgs;
-export type GameMessageEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.GameMessageEventArgs;
 export const BeforeStopEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.BeforeStopEventArgs;
 export type BeforeStopEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.BeforeStopEventArgs;
+export const GameMessageEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.GameMessageEventArgs;
+export type GameMessageEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.GameMessageEventArgs;
 export const ChatMessageEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageEventArgs;
 export type ChatMessageEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.ChatMessageEventArgs;
 export const AttentionEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.AttentionEventArgs;
