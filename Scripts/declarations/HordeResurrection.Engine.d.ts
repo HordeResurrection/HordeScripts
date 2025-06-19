@@ -62,12 +62,6 @@ declare namespace HordeResurrection.Engine.Logic.Battle {
 			targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets
 		): void;
 
-		static SendChatMessage(
-			initiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
-			message: string | null,
-			targets: HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets
-		): void;
-
 		static SendBotAttention(
 			initiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
