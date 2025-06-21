@@ -8892,6 +8892,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 		readonly NextSuggestedOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase;
 		readonly NextOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase;
 		readonly IsSimpleMoveOrder: boolean;
+		readonly IsBuildOrder: boolean;
+		readonly IsHarvestRelatedOrder: boolean;
 
 		// Methods:
 		ToInstinct(
@@ -12232,6 +12234,9 @@ declare namespace HordeClassLibrary.World.Const {
 		static readonly /* const */ ReplaysPathMaskExt: string; // = "Content/UserData/Replays/{0:yyyy-MM-dd_HH-mm-ss}_{1}.json"
 		static readonly /* const */ LogsDir: string; // = "Content/UserData/Logs/"
 		static readonly /* const */ LogPathMask: string; // = "Content/UserData/Logs/{0}.log"
+		static readonly /* const */ ReportsDir: string; // = "Content/UserData/Reports/"
+		static readonly /* const */ DesyncReportsDir: string; // = "Content/UserData/Reports/Desync/"
+		static readonly /* const */ DesyncReportMask: string; // = "Content/UserData/Reports/Desync/{0:yyyy-MM-dd_HH-mm-ss}.zip"
 		static readonly /* const */ CrashLogsDir: string; // = "Reports/CrashLogs/"
 		static readonly /* const */ MinidumpsDir: string; // = "Reports/CrashLogs/"
 		static readonly /* const */ TmpDir: string; // = "Content/UserData/Tmp/"

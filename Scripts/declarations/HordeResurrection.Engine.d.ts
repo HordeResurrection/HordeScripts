@@ -2993,6 +2993,7 @@ declare namespace HordeResurrection.Engine.Settings {
 	class InternetSettings extends System.Object {
 
 		// Properties:
+		LastSelectedScena: string;
 		readonly LobbyAllowSameNations: boolean;
 		readonly LobbyCheckAllowedNations: boolean;
 		readonly ShowServerEndpoints: boolean;
@@ -3007,6 +3008,7 @@ declare namespace HordeResurrection.Engine.Settings {
 	class LanSettings extends System.Object {
 
 		// Properties:
+		LastSelectedScena: string;
 		readonly DefaultAddressText: string;
 		readonly LobbyAllowSameNations: boolean;
 		readonly LobbyCheckAllowedNations: boolean;
@@ -3020,7 +3022,9 @@ declare namespace HordeResurrection.Engine.Settings {
 //#region LocalSettings
 declare namespace HordeResurrection.Engine.Settings {
 	class LocalSettings extends System.Object {
-		// Nothing to declare
+
+		// Properties:
+		LastSelectedScena: string;
 	}
 }
 //#endregion
@@ -3040,6 +3044,7 @@ declare namespace HordeResurrection.Engine.Settings {
 	class ReplaySettings extends System.Object {
 
 		// Properties:
+		LastSelectedReplay: string;
 		readonly SaveReplay: boolean;
 		readonly CheckScenaIntegrity: boolean;
 		readonly CheckReplayNations: boolean;
