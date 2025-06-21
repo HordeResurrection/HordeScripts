@@ -1,6 +1,7 @@
 import { ACommandArgs, ScriptUnitWorkerGetOrder, Unit, UnitConfig } from "library/game-logic/horde-types";
 import { IUnit } from "../Units/IUnit";
 import { ISpell } from "./ISpell";
+import { log } from "library/common/logging";
 
 export class IUnitCaster extends IUnit {
     private static _OpUnitIdToUnitCasterObject : Map<number, IUnitCaster> = new Map<number, IUnitCaster>();
@@ -48,13 +49,34 @@ export class IUnitCaster extends IUnit {
 
     constructor(hordeUnit: Unit) {
         super(hordeUnit);
-    
+
         this._spells = new Array<ISpell>();
         IUnitCaster._OpUnitIdToUnitCasterObject.set(this.hordeUnit.Id, this);
+
+        // \todo вернуть когда починят горячие клавиши
+        //this.hordeUnit.CommandsMind.HideCommand(UnitCommand.MoveToPoint);
+        //this.hordeUnit.CommandsMind.HideCommand(UnitCommand.Attack);
+        //this.hordeUnit.CommandsMind.HideCommand(UnitCommand.Cancel);
     }
 
     public AddSpell(spellType: typeof ISpell) {
-        this._spells.push(new spellType(this));
+        // если добавляется тот же скилл, то прокачиваем скилл
+        var spellNum;
+        for (spellNum = 0; spellNum < this._spells.length; spellNum++) {
+            if (this._spells[spellNum].GetUid() == spellType.GetUid()) {
+                break;
+            }
+        }
+
+        if (spellNum == this._spells.length) {
+            this._spells.push(new spellType(this));
+        } else {
+            this._spells[spellNum].LevelUp();
+        }
+    }
+
+    public Spells() : Array<ISpell> {
+        return this._spells;
     }
 
     public OnEveryTick(gameTickNum: number): boolean {
@@ -66,6 +88,10 @@ export class IUnitCaster extends IUnit {
     public OnOrder(commandArgs: ACommandArgs) {
         for (var spellNum = 0; spellNum < this._spells.length; spellNum++) {
             if (this._spells[spellNum].GetUnitCommand() != commandArgs.CommandType) {
+                continue;
+            }
+            // способность заблокирована
+            if (this._disallowedCommands.ContainsKey(this._spells[spellNum].GetUnitCommand())){
                 continue;
             }
 
@@ -81,5 +107,23 @@ export class IUnitCaster extends IUnit {
 
         IUnitCaster._OpUnitIdToUnitCasterObject.set(this.hordeUnit.Id, this);
         this._spells.forEach(spell => spell.OnReplacedCaster(this));
+    }
+
+    public DisallowCommands() {
+        super.DisallowCommands();
+        this._spells.forEach(spell => {
+            if (!this._disallowedCommands.ContainsKey(spell.GetUnitCommand())){
+                this._disallowedCommands.Add(spell.GetUnitCommand(), 1);
+            }
+        });
+    }
+    
+    public AllowCommands() {
+        super.AllowCommands();
+        this._spells.forEach(spell => {
+            if (this._disallowedCommands.ContainsKey(spell.GetUnitCommand())){
+                this._disallowedCommands.Remove(spell.GetUnitCommand());
+            }
+        });
     }
 }

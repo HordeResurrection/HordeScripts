@@ -5,7 +5,7 @@ import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
 
 export class Spell_healing_aura extends ISpell {
     private static _MaxDistance : number = 7;
-    private static _HealTime    : number = 250;
+    private static _HealTime    : number = 350;
     private static _HealPeriod  : number = 50;
     private static _HealHp      : number = 3;
 
@@ -17,6 +17,7 @@ export class Spell_healing_aura extends ISpell {
     protected static _Description                   : string = "Активация ауры лечения " + (Spell_healing_aura._HealHp * Spell_healing_aura._HealPeriod / 50)
         + " хп / сек на расстоянии" + Spell_healing_aura._MaxDistance + " клеток в течении " + (Spell_healing_aura._HealTime / 50) + " секунд.";
 
+    // @ts-expect-error
     private _healTick : number;
 
     public Activate(activateArgs: ACommandArgs): boolean {

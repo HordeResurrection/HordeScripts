@@ -11,20 +11,25 @@ export class GameField {
     constrictionsSpeedCoeff:number;
 
     private _constrictionNextTick:number;
-    private _geometryShrinkingCircle:GeometryShrinkingCircle;
+    private _geometryShrinkingCircle:GeometryShrinkingCircle | null;
 
     /// ячейки игрового поля
+    // @ts-expect-error
     private _bigIslandCells: Array<Cell>;
     /// флаг, что ячейка в игровом поле
+    // @ts-expect-error
     private _cellsFlag: Array<Array<boolean>>;
     /// типы ячеек
+    // @ts-expect-error
     private _cellsTileType: Array<Array<TileType>>;
+    // @ts-expect-error
     private _landscapeMap : HordeClassLibrary.World.ScenaComponents.Scena.ScenaLandscape;
 
     constructor(constrictionTimeoutTicks:number, constrictionsSpeedCoeff:number){
         this.constrictionTimeoutTicks   =   constrictionTimeoutTicks;
         this.constrictionsSpeedCoeff    =   constrictionsSpeedCoeff;
         this._constrictionNextTick      =   -1;
+        this._geometryShrinkingCircle   = null;
 
         this._FindTilesType();
         this._FindSpawnField();
@@ -311,7 +316,7 @@ export class GameField {
             );
 
             broadcastMessage("Область сражения сужается! Следующее сужение через "
-                + (this._geometryShrinkingCircle.animationTotalTime + this._geometryShrinkingCircle.end_tiksToLive) / BattleController.GameTimer.CurrentFpsLimit
+                + Math.round((this._geometryShrinkingCircle.animationTotalTime + this._geometryShrinkingCircle.end_tiksToLive) / BattleController.GameTimer.CurrentFpsLimit)
                 + " сек", createHordeColor(255, 255, 55, 55));
         }
         

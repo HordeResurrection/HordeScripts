@@ -13,6 +13,7 @@ import { log } from "library/common/logging";
 import { iterateOverUnitsInBox, unitCheckPathTo } from "library/game-logic/unit-and-map";
 import { setBulletInitializeWorker, setBulletProcessWorker } from "library/game-logic/workers-tools";
 import { createGameMessageWithSound } from "library/common/messages";
+import { Hero_Crusader } from "./Player_units";
 
 const ReplaceUnitParameters = HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
 
@@ -325,7 +326,9 @@ export class Teimur_Legendary_RAIDER extends ILegendaryUnit {
         GlobalVars.configs[this.CfgUid].Speeds.Item.set(TileType.Sand,  14);
     }
 
-    public OnEveryTick(gameTickNum: number): void {
+    public OnEveryTick(gameTickNum: number): boolean {
+        if (!this._NeedUpdate(gameTickNum)) return false;
+
         // каждые SpawnPeriod/50 секунд спавним юнитов вокруг всадника
         if (gameTickNum - this.spawnPrevStart > Teimur_Legendary_RAIDER.SpawnPeriod) {
             this.spawnPrevStart = gameTickNum;
@@ -368,6 +371,8 @@ export class Teimur_Legendary_RAIDER extends ILegendaryUnit {
                 }
             }
         }
+
+        return true;
     }
 }
 export class Teimur_Legendary_WORKER extends ILegendaryUnit {
@@ -457,7 +462,9 @@ export class Teimur_Legendary_WORKER extends ILegendaryUnit {
         }
     }
 
-    public OnEveryTick(gameTickNum: number): void {
+    public OnEveryTick(gameTickNum: number): boolean {
+        if (!this._NeedUpdate(gameTickNum)) return false;
+
         // состояние идти на базу врага
         if (this.state == 0) {
             // если ничего не делаем, то идем на замок
@@ -520,6 +527,8 @@ export class Teimur_Legendary_WORKER extends ILegendaryUnit {
             }
         }
         // state = 3, ничего не делаем
+
+        return true;
     }
 
     public OnDead(gameTickNum: number) {
@@ -586,7 +595,9 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
         this.CaptureUnitsLimit = Math.floor(this.CaptureUnitsLimit * Math.sqrt(GlobalVars.difficult));
     }
 
-    public OnEveryTick(gameTickNum: number): void {
+    public OnEveryTick(gameTickNum: number): boolean {
+        if (!this._NeedUpdate(gameTickNum)) return false;
+
         // каждые CapturePeriod/50 секунд захватываем юнитов в пределах захвата
         if (this.captureUnits.length < Teimur_Legendary_HORSE.CaptureUnitsLimit &&
             gameTickNum - this.capturePrevStart > Teimur_Legendary_HORSE.CapturePeriod &&
@@ -612,6 +623,10 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
                 
                 // пропускаем союзников и здания
                 if (Number.parseInt(_unitOwnerUid) == GlobalVars.teams[this.teamNum].teimurSettlementId || _unit.Cfg.IsBuilding) {
+                    continue;
+                }
+                // пропускаем героев
+                if (Hero_Crusader.CfgUid == _unit.Cfg.Uid) {
                     continue;
                 }
                 // достигнут предел захвата за раз
@@ -645,6 +660,8 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
                 }
             }
         }
+
+        return true;
     }
 
     public OnDead(gameTickNum: number) {
@@ -672,15 +689,17 @@ export class Teimur_RevivedUnit extends ITeimurUnit {
         this.reviveTickNum = -1;
     }
 
-    public OnEveryTick(gameTickNum: number) {
+    public OnEveryTick(gameTickNum: number) : boolean {
+        if (!this._NeedUpdate(gameTickNum)) return false;
+
         if (this.reviveTickNum < 0) {
             this.reviveTickNum = gameTickNum;
         } else if (this.reviveTickNum + Teimur_RevivedUnit.LifeTime < gameTickNum) {
             this.unit.BattleMind.InstantDeath(null, UnitHurtType.Mele);
-            return;
+            return false;
         }
 
-        ITeimurUnit.prototype.OnEveryTick.call(this, gameTickNum);
+        return super.OnEveryTick(gameTickNum);
     }
 }
 export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
@@ -731,7 +750,9 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
         this.ReviveUnitsLimit = Math.floor(this.ReviveUnitsLimit * Math.sqrt(GlobalVars.difficult));
     }
 
-    public OnEveryTick(gameTickNum: number): void {
+    public OnEveryTick(gameTickNum: number): boolean {
+        if (!this._NeedUpdate(gameTickNum)) return false;
+
         // ресаем юнитов
         {
             this.revivePrevStart = gameTickNum;
@@ -791,7 +812,7 @@ export class Teimur_Legendary_DARK_DRAIDER extends ILegendaryUnit {
             }
         }
 
-        ITeimurUnit.prototype.OnEveryTick.call(this, gameTickNum);
+        return super.OnEveryTick(gameTickNum);
     }
 
     public OnDead(gameTickNum: number) {
@@ -856,8 +877,8 @@ export class Teimur_Legendary_FIRE_MAGE extends ILegendaryUnit {
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "ReloadTime", 300);
     }
 
-    public OnEveryTick(gameTickNum: number): void {
-        ITeimurUnit.prototype.OnEveryTick.call(this, gameTickNum);
+    public OnEveryTick(gameTickNum: number): boolean {
+        if (!super.OnEveryTick(gameTickNum)) return false;
 
         // кастуем огненную вспышку вокруг себя
         if (this.spellFireFlashPrevCast + Teimur_Legendary_FIRE_MAGE.SpellFireFlashCooldown < gameTickNum) {
@@ -876,6 +897,8 @@ export class Teimur_Legendary_FIRE_MAGE extends ILegendaryUnit {
                 }
             }
         }
+
+        return true;
     }
 
     protected static Fireball_initializeWorker(bull: any, emitArgs: any) {
@@ -1039,7 +1062,9 @@ export class Teimur_Legendary_GREED_HORSE extends ILegendaryUnit {
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "PressureResist", 21);
     }
 
-    public OnEveryTick(gameTickNum: number): void {
+    public OnEveryTick(gameTickNum: number): boolean {
+        if (!this._NeedUpdate(gameTickNum)) return false;
+
         // если в очереди меньше 2 приказов, то генерируем новые
         if (this.unit_ordersMind.OrdersCount <= 1) {
             // генерируем 5 рандомных достижимых точек вокруг цели
@@ -1085,6 +1110,8 @@ export class Teimur_Legendary_GREED_HORSE extends ILegendaryUnit {
                 }
             }
         }
+
+        return true;
     }
 
     public OnDead(gameTickNum: number) {

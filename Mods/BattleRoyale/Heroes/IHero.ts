@@ -56,12 +56,11 @@ export class IHero extends IUnitCaster {
         this._frame = null;
         
         // создаем класс формации
-        this._formation = new Formation2(
-            Cell.ConvertHordePoint(this.hordeUnit.Cell),
-            this.constructor['_FormationStartRadius'],
-            this.constructor['_FormationDestiny']);
+        // @ts-expect-error
+        this._formation = new Formation2(Cell.ConvertHordePoint(this.hordeUnit.Cell), this.constructor['_FormationStartRadius'], this.constructor['_FormationDestiny']);
 
-        var spells = this.constructor["_Spells"];
+        // @ts-expect-error
+        var spells = this.constructor["_Spells"] as Array<typeof ISpell>;
         spells.forEach(spell => {
             this.AddSpell(spell);
         });
@@ -100,10 +99,12 @@ export class IHero extends IUnitCaster {
         // управление формацией
 
         if (commandArgs.CommandType == UnitCommand.Attack) {
+            // @ts-expect-error
             var targetHordeUnit = ActiveScena.UnitsMap.GetUpperUnit(commandArgs.TargetCell);
             if (targetHordeUnit) {
                 this._formation.SetAttackTarget(new IUnit(targetHordeUnit));
             } else {
+                // @ts-expect-error
                 this._formation.SmartAttackCell(Cell.ConvertHordePoint(commandArgs.TargetCell));
             }
         }
@@ -114,6 +115,24 @@ export class IHero extends IUnitCaster {
         return true;
     }
 
+    public ReplaceHordeUnit(unit: Unit): void {
+        super.ReplaceHordeUnit(unit);
+
+        // удаляем из формации выбранного лидера
+        this._formation.RemoveUnits([ this ]);
+
+        // если конфиг невидимого коня, то прячем рамку
+        if (unit.Cfg.Uid == "#UnitConfig_Nature_Invisibility_Horse") {
+            this._frameHideFlag = true;
+            if (this._frame) {
+                this._frame.Visible = false;
+            }
+        } else {
+            this._frameHideFlag = false;
+        }
+    }
+
+    private _frameHideFlag : boolean = false;
     private _frame : GeometryVisualEffect | null;
     private _UpdateFrame() {
         if (this.IsDead()) {
@@ -132,7 +151,7 @@ export class IHero extends IUnitCaster {
             // в лесу рамка должна быть невидимой
             let landscapeMap = ActiveScena.GetRealScena().LandscapeMap;
             var tile = landscapeMap.Item.get(this.hordeUnit.Cell);
-            if (tile.Cfg.Type == TileType.Forest) {
+            if (this._frameHideFlag || tile.Cfg.Type == TileType.Forest) {
                 this._frame.Visible = false;
             } else {
                 this._frame.Visible = true;
