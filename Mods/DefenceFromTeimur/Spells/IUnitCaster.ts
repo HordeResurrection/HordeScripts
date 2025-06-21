@@ -61,7 +61,7 @@ export class IUnitCaster extends IReviveUnit {
         //this.unit.CommandsMind.HideCommand(UnitCommand.Cancel);
     }
 
-    public AddSpell(spellType: typeof ISpell) {
+    public AddSpell(spellType: typeof ISpell) : boolean {
         // если добавляется тот же скилл, то прокачиваем скилл
         var spellNum;
         for (spellNum = 0; spellNum < this._spells.length; spellNum++) {
@@ -70,10 +70,14 @@ export class IUnitCaster extends IReviveUnit {
             }
         }
 
-        if (spellNum == this._spells.length) {
-            this._spells.push(new spellType(this));
-        } else {
+        if (spellNum < this._spells.length) {
             this._spells[spellNum].LevelUp();
+            return true;
+        } else if (spellNum == this._spells.length && this._spells.length < 4) {
+            this._spells.push(new spellType(this));
+            return true;
+        } else {
+            return false;
         }
     }
 

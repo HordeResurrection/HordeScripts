@@ -436,13 +436,19 @@ export class Player_worker_gamemode2 extends IUnitCaster {
                     continue;
                 }
 
-                if (!this.unit.Owner.Resources.TakeResourcesIfEnough(commandArgs.ProductCfg.CostResources)) {
+                if (!this.unit.Owner.Resources.IsEnoughResources(commandArgs.ProductCfg.CostResources)) {
                     let msg = createGameMessageWithNoSound("Не хватает ресурсов!", createHordeColor(255, 255, 100, 100));
                     this.unit.Owner.Messages.AddMessage(msg);
-                    continue;
+                    return false;
                 }
 
-                this.hero.AddSpell(spell);
+                if (!this.hero.AddSpell(spell)) {
+                    let msg = createGameMessageWithNoSound("Нет свободных слотов", createHordeColor(255, 255, 100, 100));
+                    this.unit.Owner.Messages.AddMessage(msg);
+                    return false;
+                }
+
+                this.unit.Owner.Resources.TakeResources(commandArgs.ProductCfg.CostResources);
 
                 return false;
             }
