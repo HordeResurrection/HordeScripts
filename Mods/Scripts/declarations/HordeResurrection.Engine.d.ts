@@ -11,6 +11,7 @@ declare namespace HordeResurrection.Engine.Logic.Battle {
 		static readonly FpsCounter: HordeClassLibrary.World.Simple.FpsCounter;
 		static readonly ReplayModuleWorkMode: HordeResurrection.Engine.Logic.Battle.ReplaySystem.ReplayWorkMode;
 		static readonly IsReplayMode: boolean;
+		static readonly InputModule: HordeResurrection.Engine.Logic.Battle.InputSystem.InputModule;
 		static readonly Camera: HordeResurrection.Engine.Logic.Battle.Camera.BattleCamera;
 		static readonly StoppingNow: boolean;
 		static readonly IsNetworkGame: boolean;
@@ -55,6 +56,8 @@ declare namespace HordeResurrection.Engine.Logic.Battle {
 		static ReloadChangedScripts(): void;
 
 		static ForceReloadAllScripts(): void;
+
+		static ToggleReplayLocalInput(): void;
 
 		static SendChatMessage(
 			initiatorPlayer: HordeResurrection.Engine.Logic.Main.Players.Player | null,
@@ -256,16 +259,12 @@ declare namespace HordeResurrection.Engine.Logic.Battle.Camera {
 			delta: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): void;
 
-		SetCenterPosition(
-			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
-		): void;
-
-		SetCenterPosition(
+		SetCenterToCell(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		): void;
 
-		SetPositionInCells(
-			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
+		SetCenterToPosition(
+			pos: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		): void;
 
 		UpdateVariables(
@@ -678,6 +677,11 @@ declare namespace HordeResurrection.Engine.Logic.Battle.Cheats.Implementations {
 	{
 		// Constructors:
 		constructor();
+
+		// Methods:
+		static GetDamageFor(
+			u: HordeClassLibrary.World.Objects.Units.Unit | null
+		): number;
 	}
 }
 //#endregion
@@ -1250,6 +1254,12 @@ declare namespace HordeResurrection.Engine.Logic.Battle.InputSystem.InputItemBui
 
 		constructor(
 			p: HordeResurrection.Engine.Logic.Main.Players.Player | null,
+			selectMode: HordeResurrection.Engine.Logic.Battle.InputSystem.Enums.VirtualSelectUnitsMode,
+			unitIds: HordeClassLibrary.World.Objects.Units.UnitIdLabel[] | null
+		);
+
+		constructor(
+			p: HordeResurrection.Engine.Logic.Main.Players.Player | null,
 			dragStartFragment: HordeResurrection.Engine.Logic.Battle.InputSystem.InputFragments.InputFragmentBattleUiMouseDragStart | null
 		);
 
@@ -1283,6 +1293,7 @@ declare namespace HordeResurrection.Engine.Logic.Battle.InputSystem.InputItemBui
 		readonly UnitIds: HordeClassLibrary.World.Objects.Units.UnitIdLabel[];
 		readonly PatternSettlement: HordeClassLibrary.World.Settlements.Settlement;
 		readonly PatternConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
+		SelectUiSquadWithSound: boolean;
 	}
 }
 //#endregion
@@ -1692,6 +1703,22 @@ declare namespace HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems {
 }
 //#endregion
 
+//#region InputModule
+declare namespace HordeResurrection.Engine.Logic.Battle.InputSystem {
+	class InputModule extends System.Object {
+
+		// Properties:
+		readonly InputExecutionPeriod: number;
+		AllowLocalInput: boolean;
+		AllowReplayBotInput: boolean;
+		BotReproducingMode: boolean;
+
+		// Methods:
+		ToggleReplayLocalInput(): void;
+	}
+}
+//#endregion
+
 //#region RecordChecksumItem
 declare namespace HordeResurrection.Engine.Logic.Battle.ReplaySystem {
 	class RecordChecksumItem
@@ -1713,14 +1740,14 @@ declare namespace HordeResurrection.Engine.Logic.Battle.ReplaySystem {
 	class RecordInfo extends System.Object {
 
 		// Properties:
-		readonly PlayersList: System.Collections.Generic.IReadOnlyList<HordeResurrection.Engine.Logic.Main.Players.PlayerReplayModel>;
-		readonly RecorderSlot: number;
-		readonly RandomSeed: number;
+		readonly GameVersion: string;
 		readonly Scena: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaStamp;
 		readonly BattleSettings: HordeClassLibrary.World.Context.BattleSettings;
-		readonly ContentPackStamps: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStampsCollection;
-		readonly GameVersion: string;
+		readonly RandomSeed: number;
 		readonly InputExecutionPeriod: number;
+		readonly RecorderSlot: number;
+		readonly PlayersList: System.Collections.Generic.IReadOnlyList<HordeResurrection.Engine.Logic.Main.Players.PlayerReplayModel>;
+		readonly ContentPackStamps: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStampsCollection;
 
 		// Methods:
 		static MakeRecordInfo(
@@ -1761,12 +1788,21 @@ declare namespace HordeResurrection.Engine.Logic.Battle.ReplaySystem {
 declare namespace HordeResurrection.Engine.Logic.Battle.ReplaySystem {
 	class ReplayBuffer extends System.Object {
 
+		// Fields:
+		static readonly /* const */ RecordsPropName: string; // = "Records"
+
 		// Properties:
 		readonly Info: HordeResurrection.Engine.Logic.Battle.ReplaySystem.RecordInfo;
-		readonly Records: System.Collections.ObjectModel.ReadOnlyDictionary<number, System.Collections.Generic.List<HordeResurrection.Engine.Logic.Battle.ReplaySystem.RecordItemBase>>;
 		readonly ReplayFilePath: string;
+		readonly RecordsCount: number;
+		readonly LatestFrame: number;
 
 		// Methods:
+		TryGetRecords(
+			gameFrameNumber: number,
+			/*out*/ records: System.Collections.Generic.List<HordeResurrection.Engine.Logic.Battle.ReplaySystem.RecordItemBase> | null
+		): boolean;
+
 		static LoadFromJson(
 			replayFilePath: string | null
 		): HordeResurrection.Engine.Logic.Battle.ReplaySystem.ReplayBuffer;
@@ -2141,10 +2177,6 @@ declare namespace HordeResurrection.Engine.Logic.Main {
 			gameTick: number
 		): void;
 
-		static UpdateMasterMinds(
-			gameTick: number
-		): void;
-
 		static ResetAll(
 			setState: HordeResurrection.Engine.Logic.Main.Players.PlayerState
 		): void;
@@ -2178,14 +2210,25 @@ declare namespace HordeResurrection.Engine.Logic.Main {
 		): HordeResurrection.Engine.Logic.Main.Players.Player;
 
 		static AddReplayPlayer(
-			player: HordeResurrection.Engine.Logic.Main.Players.Player | null
+			player: HordeResurrection.Engine.Logic.Main.Players.Player | null,
+			botReproducingMode: boolean
 		): HordeResurrection.Engine.Logic.Main.Players.Player;
+
+		static RemovePlayer(
+			player: HordeResurrection.Engine.Logic.Main.Players.Player | null
+		): void;
 
 		static RemoveByGuid(
 			playerGuid: string
 		): void;
 
 		static RemoveAllNetPlayers(): void;
+
+		static DoNetPlayersAudit(): void;
+
+		static DoNetPlayerAudit(
+			player: HordeResurrection.Engine.Logic.Main.Players.Player | null
+		): void;
 
 		static CheckPlayerSlots(): void;
 
@@ -2572,6 +2615,8 @@ declare namespace HordeResurrection.Engine.Logic.Main.Players {
 
 		ReplanTerritoryPlanner(): void;
 
+		RepeatSquadSelecting(): void;
+
 		Update(
 			totalTime: string,
 			gameTick: number
@@ -2643,7 +2688,7 @@ declare namespace HordeResurrection.Engine.Logic.Main.Players {
 		): HordeClassLibrary.World.Settlements.Territory.TerritoryPlanner;
 
 		InitMasterMind(
-			name?: string | null /* = "MasterMind" */
+			name?: string | null /* = null */
 		): void;
 
 		ActivateMasterMind(): void;
@@ -2667,7 +2712,8 @@ declare namespace HordeResurrection.Engine.Logic.Main.Players {
 		ToReplayModel(): HordeResurrection.Engine.Logic.Main.Players.PlayerReplayModel;
 
 		static FromReplayModel(
-			playerReplayModel: HordeResurrection.Engine.Logic.Main.Players.PlayerReplayModel | null
+			playerReplayModel: HordeResurrection.Engine.Logic.Main.Players.PlayerReplayModel | null,
+			botReproducingMode: boolean
 		): HordeResurrection.Engine.Logic.Main.Players.Player;
 
 		GetRealPlayer(): HordeResurrection.Engine.Logic.Main.Players.Player;
@@ -3019,6 +3065,8 @@ declare namespace HordeResurrection.Engine.Settings {
 		readonly SaveReplay: boolean;
 		readonly CheckScenaIntegrity: boolean;
 		readonly CheckReplayNations: boolean;
+		readonly AllowInputDuringReplayPlaying: boolean;
+		readonly BotReproducingMode: boolean;
 	}
 }
 //#endregion
@@ -3438,6 +3486,8 @@ export const VirtualSquadMemorize = HordeResurrection.Engine.Logic.Battle.InputS
 export type VirtualSquadMemorize = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSquadMemorize;
 export const VirtualSquadSelect = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSquadSelect;
 export type VirtualSquadSelect = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSquadSelect;
+export const InputModule = HordeResurrection.Engine.Logic.Battle.InputSystem.InputModule;
+export type InputModule = HordeResurrection.Engine.Logic.Battle.InputSystem.InputModule;
 export const RecordChecksumItem = HordeResurrection.Engine.Logic.Battle.ReplaySystem.RecordChecksumItem;
 export type RecordChecksumItem = HordeResurrection.Engine.Logic.Battle.ReplaySystem.RecordChecksumItem;
 export const RecordInfo = HordeResurrection.Engine.Logic.Battle.ReplaySystem.RecordInfo;

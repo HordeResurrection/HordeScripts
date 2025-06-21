@@ -1,20 +1,20 @@
 import { CreateUnitConfig } from "../Utils";
 import { Cell } from "./Geometry";
-import { PointCommandArgs, ProduceAtCommandArgs } from "library/game-logic/horde-types";
+import { PointCommandArgs, ProduceAtCommandArgs, Unit, UnitDirection } from "library/game-logic/horde-types";
 import { createPoint } from "library/common/primitives";
 import { GlobalVars } from "../GlobalData";
 
 export class IUnit {
     /** ссылка на юнита */
-    unit: any;
+    unit: Unit;
     /** ссылка на отдел приказов юнита */
     unit_ordersMind: any;
     /** номер команды к которому принадлежит юнит */
     teamNum: number;
     /** тик на котором нужно обрабатывать юнита */
-    processingTick: number;
+    protected processingTick: number;
     /** модуль на который делится игровой тик, если остаток деления равен processingTick, то юнит обрабатывается */
-    processingTickModule: number;
+    protected processingTickModule: number;
 
     /** флаг, что юнита нужно удалить из списка юнитов, чтобы отключить обработку */
     needDeleted: boolean;
@@ -22,13 +22,13 @@ export class IUnit {
     static CfgUid      : string = "";
     static BaseCfgUid  : string = "";
 
-    constructor (unit: any, teamNum: number) {
+    constructor (unit: Unit, teamNum: number) {
         this.unit                   = unit;
         this.teamNum                = teamNum;
         this.unit_ordersMind        = this.unit.OrdersMind;
         this.processingTickModule   = 50;
         this.processingTick         = this.unit.PseudoTickCounter % this.processingTickModule;
-        this.needDeleted            = true;
+        this.needDeleted            = false;
     }
 
     public static InitConfig() {
@@ -37,8 +37,19 @@ export class IUnit {
         }
     }
 
-    public OnEveryTick(gameTickNum: number) {}
-    public OnDead(gameTickNum: number) {}
+    public OnEveryTick(gameTickNum: number) : boolean {
+        if (!this._NeedUpdate(gameTickNum)) return false;
+
+        if (this.unit.IsDead) {
+            this.needDeleted = true;
+            this.OnDead(gameTickNum);
+        }
+
+        return true;
+    }
+    public OnDead(gameTickNum: number) {
+
+    }
     /** отдать приказ в точку */
     public GivePointCommand(cell: Cell, command: any, orderMode: any) {
         var pointCommandArgs = new PointCommandArgs(createPoint(cell.X, cell.Y), command, orderMode);
@@ -51,6 +62,34 @@ export class IUnit {
             cfg,
             createPoint(cell.X, cell.Y));
         this.unit.Cfg.GetOrderDelegate(this.unit, produceAtCommandArgs);
+    }
+    protected _NeedUpdate(gameTickNum) : boolean {
+        return gameTickNum % this.processingTickModule == this.processingTick;
+    }
+    public ReplaceUnit(unit: Unit): void {
+        this.unit = unit;
+    }
+    public DirectionVector() : Cell {
+        switch (this.unit.Direction) {
+            case UnitDirection.Down:
+                return new Cell(0, 1);
+            case UnitDirection.LeftDown:
+                return new Cell(-0.70710678118654752440084436210485, 0.70710678118654752440084436210485);
+            case UnitDirection.Left:
+                return new Cell(-1, 0);
+            case UnitDirection.LeftUp:
+                return new Cell(-0.70710678118654752440084436210485, -0.70710678118654752440084436210485);
+            case UnitDirection.Up:
+                return new Cell(0, -1);
+            case UnitDirection.RightUp:
+                return new Cell(0.70710678118654752440084436210485, -0.70710678118654752440084436210485);
+            case UnitDirection.Right:
+                return new Cell(1, 0);
+            case UnitDirection.RightDown:
+                return new Cell(0.70710678118654752440084436210485, 0.70710678118654752440084436210485);
+            default:
+                return new Cell(0, 0);
+        }
     }
 }
 

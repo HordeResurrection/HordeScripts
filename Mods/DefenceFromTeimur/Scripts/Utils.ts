@@ -1,5 +1,6 @@
 import { log } from "library/common/logging";
 import { createPoint } from "library/common/primitives";
+import { BulletConfig } from "library/game-logic/horde-types";
 
 export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
     if (HordeContentApi.HasUnitConfig(newConfigUid)) {
@@ -11,13 +12,13 @@ export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
     }
 }
 
-export function CreateBulletConfig(baseConfigUid: string, newConfigUid: string) {
+export function CreateBulletConfig(baseConfigUid: string, newConfigUid: string) : BulletConfig{
     if (HordeContentApi.HasBulletConfig(newConfigUid)) {
         log.info("GET baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
         return HordeContentApi.GetBulletConfig(newConfigUid);
     } else {
         log.info("CREATE baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
-        return HordeContentApi.CloneConfig(HordeContentApi.GetBulletConfig(baseConfigUid), newConfigUid);
+        return HordeContentApi.CloneConfig(HordeContentApi.GetBulletConfig(baseConfigUid), newConfigUid) as BulletConfig;
     }
 }
 

@@ -19,13 +19,15 @@ declare namespace HordeResurrection.Intellect.Actions {
 		constructor(
 			producerUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
 			productConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
-			position: HordeResurrection.Basic.Primitives.Geometry.Point2D
+			cellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D,
+			cellEnd: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		);
 
 		// Properties:
 		readonly ProducerUnit: HordeClassLibrary.World.Objects.Units.Unit;
 		readonly ProductConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
-		readonly Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly CellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly CellEnd: HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 	}
 }
 //#endregion
@@ -515,7 +517,6 @@ declare namespace HordeResurrection.Intellect {
 		readonly Requests: HordeResurrection.Intellect.Collections.RequestsCollection;
 		readonly Actions: HordeResurrection.Intellect.Collections.ActionsCollection;
 		IsWorkMode: boolean;
-		readonly LastUpdatedGameTick: number;
 		readonly Departments: HordeResurrection.Intellect.Collections.DepartmentsCollection;
 		readonly ArmyDepartment: HordeResurrection.Intellect.Departments.ArmyDepartment;
 		readonly ProductionDepartment: HordeResurrection.Intellect.Departments.ProductionDepartment;
@@ -538,10 +539,6 @@ declare namespace HordeResurrection.Intellect {
 		): void;
 
 		Deinitialize(): void;
-
-		Update(
-			gameTick: number
-		): void;
 
 		UpdateOnGameTick(
 			gameTick: number
@@ -632,6 +629,7 @@ declare namespace HordeResurrection.Intellect.Requests {
 		readonly Id: number;
 		readonly ReferencedRequest: HordeResurrection.Intellect.Requests.ARequest;
 		readonly Tracker: HordeResurrection.Intellect.Requests.Trackers.ARequestTracker;
+		readonly State: HordeResurrection.Intellect.Requests.State.RequestStateMachine;
 		readonly LastHandledGameFrame: number;
 
 		// Methods:
@@ -703,6 +701,7 @@ declare namespace HordeResurrection.Intellect.Requests.CreationArgs {
 		Count: number;
 		AllowAuxiliaryProduceRequests: boolean;
 		TargetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
+		TargetEndCell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 		DisableBuildPlaceChecking: boolean;
 		MaxRetargetAttempts: number | null;
 		ProductEntranceCheckRadius: number;
@@ -731,6 +730,7 @@ declare namespace HordeResurrection.Intellect.Requests {
 		Count: number;
 		AllowAuxiliaryProduceRequests: boolean;
 		TargetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
+		TargetEndCell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 		DisableBuildPlaceChecking: boolean;
 		SearchBuildingPlaceAttempts: number;
 		ProductEntranceCheckRadius: number;
@@ -751,6 +751,28 @@ declare namespace HordeResurrection.Intellect.Requests.State {
 		/** RequestState.Unsuccessful = 5 */ static readonly Unsuccessful: RequestState;
 		/** RequestState.CantBeCompleted = 6 */ static readonly CantBeCompleted: RequestState;
 		/** RequestState.AttemptsIsOver = 7 */ static readonly AttemptsIsOver: RequestState;
+	}
+}
+//#endregion
+
+//#region RequestStateMachine
+declare namespace HordeResurrection.Intellect.Requests.State {
+	class RequestStateMachine extends System.Object {
+
+		// Methods:
+		IsInitial(): boolean;
+
+		IsUnfinished(): boolean;
+
+		IsSuccessfullyCompleted(): boolean;
+
+		IsUnsuccessfullyCompleted(): boolean;
+
+		IsWorkStarted(): boolean;
+
+		IsSuspended(): boolean;
+
+		IsUnsuccessful(): boolean;
 	}
 }
 //#endregion
@@ -990,6 +1012,8 @@ export const ProduceRequest = HordeResurrection.Intellect.Requests.ProduceReques
 export type ProduceRequest = HordeResurrection.Intellect.Requests.ProduceRequest;
 export const RequestState = HordeResurrection.Intellect.Requests.State.RequestState;
 export type RequestState = HordeResurrection.Intellect.Requests.State.RequestState;
+export const RequestStateMachine = HordeResurrection.Intellect.Requests.State.RequestStateMachine;
+export type RequestStateMachine = HordeResurrection.Intellect.Requests.State.RequestStateMachine;
 export const StateProcessResult = HordeResurrection.Intellect.Requests.State.StateProcessResult;
 export type StateProcessResult = HordeResurrection.Intellect.Requests.State.StateProcessResult;
 export const RequestPerformPossibility = HordeResurrection.Intellect.Requests.Stuff.RequestPerformPossibility;

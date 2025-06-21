@@ -43,6 +43,9 @@ declare namespace HordeResurrection.Basic.Debugger.Countdowns {
 			initialValue: number
 		);
 
+		// Fields:
+		static readonly /* const */ InfiniteTicks: number; // = 2147483647
+
 		// Properties:
 		readonly ExpirationTicks: number;
 		readonly LeftTicks: number;
@@ -57,6 +60,8 @@ declare namespace HordeResurrection.Basic.Debugger.Countdowns {
 		Reinit(
 			expirationTicks: number
 		): void;
+
+		static CreateInfiniteCountdown(): HordeResurrection.Basic.Debugger.Countdowns.ResettableCountdown;
 	}
 }
 //#endregion

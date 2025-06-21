@@ -34,6 +34,7 @@ export class Example_SettlementDiplomacy extends HordeExampleBase {
             let settlement = scenaSettlements.GetByUid(settlementId);
 
             let oldDipStatuses = this.getCurrentStatuses(settlement);
+            this.declareWarToAll(settlement);
             this.declarePeaceToAll(settlement);
             this.declareAllianceToAll(settlement);
             this.restoreStatuses(settlement, oldDipStatuses);
@@ -59,6 +60,25 @@ export class Example_SettlementDiplomacy extends HordeExampleBase {
         this.log.info("Получены все дипломатические статусы с", townName);
 
         return dipStatuses;
+    }
+
+    /**
+     * Установка войны со всеми
+     */
+    private declareWarToAll(settlement: Settlement) {
+        const townName = '"' + settlement.TownName + '"';
+        let scenaSettlements = ActiveScena.GetRealScena().Settlements;
+
+        this.log.info("Установка войны с", townName);
+        ForEach(scenaSettlements, (otherSettlement: Settlement) => {
+            if (otherSettlement == settlement) { return; }
+
+            settlement.Diplomacy.DeclareWar(otherSettlement);
+            otherSettlement.Diplomacy.DeclareWar(settlement);
+
+            this._logDipAction("Объявлена война между", settlement.LeaderName, "и", otherSettlement.LeaderName);
+        });
+        this.log.info("Все поселения обявили войну с", townName);
     }
 
     /**

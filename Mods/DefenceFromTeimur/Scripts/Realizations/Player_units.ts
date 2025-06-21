@@ -3,12 +3,26 @@ import { IUnit } from "../Types/IUnit";
 import { CreateUnitConfig } from "../Utils";
 import { AttackPlansClass } from "./AttackPlans";
 import { GlobalVars } from "../GlobalData";
-import { UnitCommand, UnitFlags, UnitHurtType, UnitSpecification } from "library/game-logic/horde-types";
+import { ACommandArgs, TileType, UnitCommand, UnitConfig, UnitFlags, UnitHurtType, UnitSpecification } from "library/game-logic/horde-types";
 import { TeimurLegendaryUnitsClass, Teimur_Legendary_GREED_HORSE } from "./Teimur_units";
 import { log } from "library/common/logging";
 import { WaveUnit } from "../Types/IAttackPlan";
 import { eNext, enumerate } from "library/dotnet/dotnet-utils";
 import { ITeimurUnit } from "../Types/ITeimurUnit";
+import { IReviveUnit } from "../Types/IReviveUnit";
+import { IUnitCaster } from "../Spells/IUnitCaster";
+import { ISpell } from "../Spells/ISpell";
+import { Spell_Fireball } from "../Spells/Spell_Fireball";
+import { Spell_fiery_dash } from "../Spells/Spell_fiery_dash";
+import { createGameMessageWithNoSound } from "library/common/messages";
+import { createHordeColor } from "library/common/primitives";
+import { printObjectItems } from "library/common/introspection";
+import { Spell_fear_attack } from "../Spells/Spell_fear_attack";
+import { Spell_FireArrowsRain } from "../Spells/Spell_FireArrowsRain";
+import { Spell_fortress } from "../Spells/Spell_fortress";
+import { Spell_healing_aura } from "../Spells/Spell_healing_aura";
+import { Spell_PoisonBomb } from "../Spells/Spell_PoisonBomb";
+import { Spell_Teleportation } from "../Spells/Spell_Teleportation";
 
 export class Player_GOALCASTLE extends IUnit {
     static CfgUid      : string = "#DefenceTeimur_GoalCastle";
@@ -78,6 +92,63 @@ export class Player_CASTLE_CHOISE_DIFFICULT extends IUnit {
                     ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Рекомендуемая сложность");
                 } else {
                     ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Эта сложность больше рекомендуемой");
+                }
+                // убираем цену
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Gold",   0);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Metal",  0);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Lumber", 0);
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "People", 0);
+                // убираем требования
+                GlobalVars.configs[unitChoise_CfgUid].TechConfig.Requirements.Clear();
+
+                produceList.Add(GlobalVars.configs[unitChoise_CfgUid]);
+            }
+        }
+    }
+}
+
+export class Player_CASTLE_CHOISE_GAMEMODE extends IUnit {
+    static CfgUid      : string = "#DefenceTeimur_Castle_CHOISE_GAMEMODE";
+    static BaseCfgUid  : string = "#UnitConfig_Slavyane_StoneCastle";
+
+    constructor (unit: any, teamNum: number) {
+        super(unit, teamNum);
+    }
+
+    public static InitConfig() {
+        IUnit.InitConfig.call(this);
+
+        // описание
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Выберите режим игры");
+        // ХП
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 2000);
+        // Броня
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Shield", 1000);
+        // убираем починку
+        GlobalVars.configs[this.CfgUid].ProfessionParams.Remove(UnitProfession.Reparable);
+        // запрещаем самоуничтожение
+        GlobalVars.configs[this.CfgUid].AllowedCommands.Remove(UnitCommand.DestroySelf);
+        // добавляем постройку волн
+        {
+            var producerParams = GlobalVars.configs[this.CfgUid].GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+            var produceList    = producerParams.CanProduceList;
+            produceList.Clear();
+
+            var choise_BaseCfgUid = "#UnitConfig_Barbarian_Swordmen";
+            var choise_CfgUid     = this.CfgUid + "_";
+            for (var gameMode = 1; gameMode <= 2; gameMode++) {
+                var unitChoise_CfgUid = choise_CfgUid + gameMode;
+                GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(choise_BaseCfgUid, unitChoise_CfgUid);
+
+                // назначаем имя
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Name", "Выбрать режим игры " + gameMode);
+                // Броня
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Shield", gameMode);
+                // описание
+                if (gameMode == 1) {
+                    ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Режим игры за поселение");
+                } else if (gameMode == 2) {
+                    ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Режим игры за героев");
                 }
                 // убираем цену
                 ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Gold",   0);
@@ -237,8 +308,8 @@ export class Player_Teimur_Dovehouse extends IUnit {
     }
 }
 
-class Player_worker extends IUnit {
-    static CfgUid      : string = "#UnitConfig_Slavyane_Worker1";
+export class Player_worker_gamemode1 extends IReviveUnit {
+    static CfgUid      : string = "#DefenceTeimur_Player_worker_gamemode1";
     static BaseCfgUid  : string = "#UnitConfig_Slavyane_Worker1";
 
     constructor (unit: any, teamNum: number) {
@@ -293,7 +364,7 @@ class Player_worker extends IUnit {
                 cfgCache.set(cfgUid, val);
             }
         }
-        RemoveTechRequirements(Player_worker.CfgUid);
+        RemoveTechRequirements(Player_worker_gamemode1.CfgUid);
 
         // удаляем лишние конфиги
 
@@ -311,8 +382,150 @@ class Player_worker extends IUnit {
     }
 }
 
+export class Player_worker_gamemode2 extends IUnitCaster {
+    static CfgUid      : string = "#DefenceTeimur_Player_worker_gamemode2";
+    static BaseCfgUid  : string = "#UnitConfig_Slavyane_Worker1";
+
+    static Spells : Array<typeof ISpell> = 
+    [
+        Spell_fear_attack,
+        Spell_fiery_dash,
+        Spell_FireArrowsRain,
+        Spell_Fireball,
+        Spell_fortress,
+        Spell_healing_aura,
+        Spell_PoisonBomb,
+        Spell_Teleportation
+    ];
+
+    public hero : IUnitCaster;
+
+    constructor (unit: any, teamNum: number) {
+        super(unit, teamNum);
+    }
+
+    public static InitConfig() {
+        super.InitConfig();
+
+        // добавляем постройку голубятни Теймура если на карте более 1-ой команды
+        var cfg = GlobalVars.configs[this.CfgUid] as UnitConfig;
+        var producerParams = cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        var produceList    = producerParams.CanProduceList;
+        produceList.Clear();
+
+        this.Spells.forEach(spell => {
+            produceList.Add(spell.GetUnitConfig());
+        });
+
+        var setSpawnPointConfig = CreateUnitConfig("#UnitConfig_Barbarian_Swordmen", "#DefenceTeimur_Set_spawn_point") as UnitConfig;
+        ScriptUtils.SetValue(setSpawnPointConfig, "Name", "Обновить точку респа");
+        ScriptUtils.SetValue(setSpawnPointConfig, "Description", "Обновить точку респа");
+        ScriptUtils.SetValue(setSpawnPointConfig.CostResources, "Gold",   0);
+        ScriptUtils.SetValue(setSpawnPointConfig.CostResources, "Metal",  0);
+        ScriptUtils.SetValue(setSpawnPointConfig.CostResources, "Lumber", 1000);
+        ScriptUtils.SetValue(setSpawnPointConfig.CostResources, "People", 0);
+        produceList.Add(setSpawnPointConfig);
+
+        ScriptUtils.SetValue(cfg, "Specification", UnitSpecification.None);
+    }
+
+    public OnOrder(commandArgs: ACommandArgs): boolean {
+        if (commandArgs.CommandType == UnitCommand.Produce) {
+            for (var spell of Player_worker_gamemode2.Spells) {
+                if (spell.GetUnitConfig().Uid != commandArgs.ProductCfg.Uid) {
+                    continue;
+                }
+
+                if (!this.unit.Owner.Resources.IsEnoughResources(commandArgs.ProductCfg.CostResources)) {
+                    let msg = createGameMessageWithNoSound("Не хватает ресурсов!", createHordeColor(255, 255, 100, 100));
+                    this.unit.Owner.Messages.AddMessage(msg);
+                    return false;
+                }
+
+                if (!this.hero.AddSpell(spell)) {
+                    let msg = createGameMessageWithNoSound("Нет свободных слотов", createHordeColor(255, 255, 100, 100));
+                    this.unit.Owner.Messages.AddMessage(msg);
+                    return false;
+                }
+
+                this.unit.Owner.Resources.TakeResources(commandArgs.ProductCfg.CostResources);
+
+                return false;
+            }
+
+            if ("#DefenceTeimur_Set_spawn_point" == commandArgs.ProductCfg.Uid) {
+                if (!this.unit.Owner.Resources.TakeResourcesIfEnough(commandArgs.ProductCfg.CostResources)) {
+                    let msg = createGameMessageWithNoSound("Не хватает ресурсов!", createHordeColor(255, 255, 100, 100));
+                }
+
+                for (var settlementNum = 0; settlementNum < GlobalVars.teams[this.teamNum].settlements.length; settlementNum++) {
+                    if (GlobalVars.teams[this.teamNum].settlements[settlementNum].Uid == this.unit.Owner.Uid) {
+                        GlobalVars.teams[this.teamNum].spawnCell[settlementNum] = this.unit.Cell;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
+export class Hero_Crusader extends IUnitCaster {
+    static CfgUid      : string = "#DefenceTeimur_Teimur_Crusader";
+    static BaseCfgUid  : string = "#UnitConfig_Slavyane_Spearman";
+    protected static _Spells : Array<typeof ISpell> = [];
+
+    public static InitConfig() {
+        super.InitConfig();
+
+        var cfg = GlobalVars.configs[this.CfgUid];
+        
+        ScriptUtils.SetValue(cfg, "Name", "Герой {рыцарь}");
+        ScriptUtils.SetValue(cfg, "MaxHealth", 60);
+        ScriptUtils.SetValue(cfg, "Shield", 2);
+        ScriptUtils.SetValue(cfg.MainArmament.ShotParams, "Damage", 5);
+        ScriptUtils.SetValue(cfg, "Sight", 5);
+        // скорость как у рыцаря
+        cfg.Speeds.Item.set(TileType.Grass, 10);
+        cfg.Speeds.Item.set(TileType.Forest, 6);
+        cfg.Speeds.Item.set(TileType.Marsh, 7);
+        cfg.Speeds.Item.set(TileType.Sand, 8);
+        cfg.Speeds.Item.set(TileType.Road, 13);
+        cfg.Speeds.Item.set(TileType.Ice, 10);
+
+        // убираем дружественный огонь
+        if (cfg.MainArmament) {
+            var bulletCfg = HordeContentApi.GetBulletConfig(cfg.MainArmament.BulletConfig.Uid);
+            ScriptUtils.SetValue(bulletCfg, "CanDamageAllied", false);
+        }
+        // убираем захватываемость
+        if (cfg.ProfessionParams.ContainsKey(UnitProfession.Capturable)) {
+            cfg.ProfessionParams.Remove(UnitProfession.Capturable);
+        }
+        // убираем команду захвата
+        if (cfg.AllowedCommands.ContainsKey(UnitCommand.Capture)) {
+            cfg.AllowedCommands.Remove(UnitCommand.Capture);
+        }
+        // убираем команду удержания позиции
+        if (cfg.AllowedCommands.ContainsKey(UnitCommand.HoldPosition)) {
+            cfg.AllowedCommands.Remove(UnitCommand.HoldPosition);
+        }
+        // убираем профессию добычу
+        if (cfg.ProfessionParams.ContainsKey(UnitProfession.Harvester)) {
+            cfg.ProfessionParams.Remove(UnitProfession.Harvester);
+        }
+
+        // убираем дружественный огонь у огня
+        ScriptUtils.SetValue(HordeContentApi.GetBulletConfig("#BulletConfig_Fire"), "CanDamageAllied", false);
+    }
+}
+
 export const PlayerUnitsClass : Array<typeof IUnit> = [
     Player_GOALCASTLE,
     Player_Teimur_Dovehouse,
-    Player_worker
+    Player_worker_gamemode1,
+    Player_worker_gamemode2,
+    Hero_Crusader
 ];

@@ -4,6 +4,13 @@ import { UnitAnimState, UnitLifeState } from "library/game-logic/horde-types";
 import HordeExampleBase from "./base-example";
 import { BooleanT, StringT } from "library/dotnet/dotnet-types";
 
+
+const BattleController = HordeResurrection.Engine.Logic.Battle.BattleController;
+type BattleController = HordeResurrection.Engine.Logic.Battle.BattleController;
+const MainController = HordeResurrection.Engine.Logic.Main.MainController;
+type MainController = HordeResurrection.Engine.Logic.Main.MainController;
+
+
 /**
  * Пример работы с данными игры
  */
@@ -17,7 +24,6 @@ export class Example_GameWorks extends HordeExampleBase {
         this.logMessageOnRun();
 
         // Инфо по тактам
-        const BattleController = HordeResurrection.Engine.Logic.Battle.BattleController;
         this.log.info('Текущий такт:', BattleController.GameTimer.GameFramesCounter);
         this.log.info('Текущий FPS:', BattleController.GameTimer.CurrentFpsLimit);
 
@@ -28,12 +34,12 @@ export class Example_GameWorks extends HordeExampleBase {
             this.log.info('В данный момент идет одиночное сражение');
         }
 
-        // Реплей? (недоступно при инициализации сцены, т.е. в onFirstRun)
+        // Сейчас воспроизводится реплей?
         if (isReplayMode()) {
             this.log.info('В данный момент идет воспроизведение реплея (проверка 1)');
         }
 
-        // Инфо по реплею (недоступно при инициализации сцены, т.е. в onFirstRun)
+        // Инфо по реплею
         const ReplayWorkMode = HordeResurrection.Engine.Logic.Battle.ReplaySystem.ReplayWorkMode;
         let replayWorkMode = BattleController.ReplayModuleWorkMode;
         if (replayWorkMode == ReplayWorkMode.Play) {
@@ -41,7 +47,13 @@ export class Example_GameWorks extends HordeExampleBase {
         } else if (replayWorkMode == ReplayWorkMode.Record) {
             this.log.info('В данный момент запущена запись реплея');
         } else {
-            this.log.info('В данный момент невозможно определить статус реплея:', '"' + replayWorkMode + '"', '(Недоступно в момент инициализации сражения)');
+            this.log.info('В данный момент невозможно определить статус реплея:', '"' + replayWorkMode + '"');
+        }
+        
+        // Проверка на отладочный режим ботов в реплее
+        if (MainController.HordeSettings.ReplaySettings.BotReproducingMode) {
+            this.log.info("Ввод ботов будет проигнорирован при воспроизведении реплея.");
+            this.log.info("Это отладочный режим реплея, в котором боты должны самостоятельно повторить весь свой ввод.");
         }
     }
 }

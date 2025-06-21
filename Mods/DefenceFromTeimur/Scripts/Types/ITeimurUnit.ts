@@ -25,10 +25,13 @@ export class ITeimurUnit extends IUnit {
         this._canAttackBuilding = this.constructor['canAttackBuilding'];
         this._isIdleCounter     = 0;
         this._unitPrevCell      = new Cell();
-        this.needDeleted        = false;
     }
 
-    public OnEveryTick(gameTickNum: number) {
+    public OnEveryTick(gameTickNum: number) : boolean {
+        if (!super.OnEveryTick(gameTickNum)) {
+            return false;
+        }
+
         // защита от перекрытых заборов
         if (this._isIdleCounter > 10) {
             this._isIdleCounter = 0;
@@ -46,7 +49,7 @@ export class ITeimurUnit extends IUnit {
             }
 
             if (nearEnemyCells.length == 0) {
-                return;
+                return true;
             }
 
             // если юнит умеет атаковать, то атакуем любое строение, иначе отходим назад
@@ -65,7 +68,7 @@ export class ITeimurUnit extends IUnit {
                 this.GivePointCommand(new Cell(Math.round(unitCell.X + moveVec.X), Math.round(unitCell.Y + moveVec.Y)), UnitCommand.MoveToPoint, AssignOrderMode.Queue);
             }
 
-            return;
+            return true;
         }
 
         var unitCell = new Cell(this.unit.Cell.X, this.unit.Cell.Y);
@@ -75,7 +78,7 @@ export class ITeimurUnit extends IUnit {
             if (this._unitPrevCell.X != unitCell.X || this._unitPrevCell.Y != unitCell.Y) {
                 this._isIdleCounter = 0;
             }
-            return;
+            return true;
         }
         this._isIdleCounter++;
         this._unitPrevCell = new Cell(this.unit.Cell.X, this.unit.Cell.Y);
@@ -96,6 +99,8 @@ export class ITeimurUnit extends IUnit {
             }
             this.GivePointCommand(goalPosition.value, UnitCommand.Attack, AssignOrderMode.Queue);
         //}
+
+        return true;
     }
 
     public static InitConfig() {

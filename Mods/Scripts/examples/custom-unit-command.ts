@@ -5,8 +5,11 @@ import HordeExampleBase from "./base-example";
 
 
 // Тут нужно указать любую команду, которую не использует целевой юнит.
-// В дальнейшем здесь будет возможность задать произвольный числовой идентификатор (или строковый, как пойдет)
-const CUSTOM_COMMAND_ID = UnitCommand.StepAway;
+// Сейчас доступны следующие Id специально под кастомные команды:
+// - UnitCommand.OneClick_Custom_N - для команд активируемых обычным кликом по кнопке
+// - UnitCommand.PointBased_Custom_N - команды которым можно задать целевую точку
+// - UnitCommand.Produce_Custom_N - команды с возможностью выбора юнита из списка
+const CUSTOM_COMMAND_ID = UnitCommand.OneClick_Custom_0;
 
 
 /**

@@ -3,16 +3,18 @@ import HordePluginBase from "plugins/base-plugin";
 import { AttackPlansClass } from "./Realizations/AttackPlans";
 import { Cell, Rectangle } from "./Types/Geometry";
 import { Team } from "./Types/Team";
-import { createHordeColor, createPoint } from "library/common/primitives";
-import { UnitHurtType, UnitDirection } from "library/game-logic/horde-types";
+import { createHordeColor, createPoint, Point2D } from "library/common/primitives";
+import { UnitHurtType, UnitDirection, DiplomacyStatus, Settlement } from "library/game-logic/horde-types";
 import { spawnUnit } from "library/game-logic/unit-spawn";
-import { PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_GOALCASTLE } from "./Realizations/Player_units";
+import { Hero_Crusader, PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_CASTLE_CHOISE_GAMEMODE, Player_GOALCASTLE, Player_worker_gamemode1, Player_worker_gamemode2 } from "./Realizations/Player_units";
 import { TeimurUnitsClass, TeimurLegendaryUnitsClass } from "./Realizations/Teimur_units";
 import { broadcastMessage, createGameMessageWithNoSound, createGameMessageWithSound } from "library/common/messages";
 import { GameState, GlobalVars } from "./GlobalData";
 import { IUnit } from "./Types/IUnit";
 import { RandomSpawner, RectangleSpawner, RingSpawner } from "./Realizations/Spawners";
 import { ITeimurUnit } from "./Types/ITeimurUnit";
+import { generateCellInSpiral } from "library/common/position-tools";
+import { spawnUnits } from "./Utils";
 
 const DeleteUnitParameters  = HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
 const ReplaceUnitParameters = HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
@@ -121,6 +123,9 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             case GameState.ChoiseDifficult:
                 this.ChoiseDifficult(gameTickNum);
                 break;
+            case GameState.ChoiseGameMode:
+                this.ChoiseGameMode(gameTickNum);
+                break;
             case GameState.ChoiseWave:
                 this.ChoiseWave(gameTickNum);
                 break;
@@ -140,7 +145,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
     private Init(gameTickNum: number) {
         GlobalVars.rnd = ActiveScena.GetRealScena().Context.Randomizer;
-        
+
         //////////////////////////////////////////
         // инициализируем игроков в командах
         //////////////////////////////////////////
@@ -148,13 +153,14 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
             GlobalVars.teams[teamNum].settlementsIdx = new Array<number>();
             GlobalVars.teams[teamNum].settlements    = new Array<any>();
+            GlobalVars.teams[teamNum].spawnCell = new Array<Point2D>();
             GlobalVars.teams[teamNum].teimurSettlement = ActiveScena.GetRealScena().Settlements.GetByUid('' + GlobalVars.teams[teamNum].teimurSettlementId);
         }
 
         for (var player of GlobalVars.Players) {
             var realPlayer   = player.GetRealPlayer();
             var settlement   = realPlayer.GetRealSettlement();
-            var settlementId = settlement.Uid;
+            var settlementId = Number.parseInt(settlement.Uid);
 
             this.log.info("player of settlementId ", settlementId);
 
@@ -194,6 +200,20 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             GlobalVars.teams[teamNum].settlementsIdx.push(settlementId);
             GlobalVars.teams[teamNum].settlements.push(settlement);
 
+            // место спавна героя
+
+            let enumerator = settlement.Units.GetEnumerator();
+            while (enumerator.MoveNext()) {
+                var unit = enumerator.Current;
+                if (!unit) continue;
+
+                if (unit.Cfg.Uid == Player_worker_gamemode1.BaseCfgUid) {
+                    GlobalVars.teams[teamNum].spawnCell.push(unit.Cell);
+                    break;
+                }
+            }
+            enumerator.Dispose();
+            
             // убираем налоги
             var censusModel = ScriptUtils.GetValue(settlement.Census, "Model");
             // Установить период сбора налогов и выплаты жалования (чтобы отключить сбор, необходимо установить 0)
@@ -284,14 +304,47 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         // проверяем, что выбрана сложность
 
         // проверяем выбирается ли сложность
+        // @ts-expect-error
         if (!GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig) {
             return;
         }
 
         // выбранная сложность
+        // @ts-expect-error
         GlobalVars.difficult = parseInt(GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
         this.log.info("selected difficult = ", GlobalVars.difficult);
         broadcastMessage("Была выбрана сложность " + GlobalVars.difficult, createHordeColor(255, 100, 100, 100));
+
+        // заменяем данный замок на замок выбора волны
+        Player_CASTLE_CHOISE_GAMEMODE.InitConfig();
+
+        let replaceParams = new ReplaceUnitParameters();
+        replaceParams.OldUnit = GlobalVars.teams[this.hostPlayerTeamNum].castle.unit;
+        replaceParams.NewUnitConfig = GlobalVars.configs[Player_CASTLE_CHOISE_GAMEMODE.CfgUid];
+        replaceParams.Cell = null;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
+        replaceParams.PreserveHealthLevel = false;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
+        replaceParams.PreserveOrders = false;        // Нужно ли передать приказы?
+        replaceParams.Silent = true;                 // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
+        GlobalVars.teams[this.hostPlayerTeamNum].castle = new Player_CASTLE_CHOISE_GAMEMODE(GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.Owner.Units.ReplaceUnit(replaceParams), this.hostPlayerTeamNum);
+
+        // меняем состояние игры
+        GlobalVars.gameState = GameState.ChoiseGameMode;
+    }
+
+    private ChoiseGameMode(gameTickNum: number) {
+        // проверяем, что выбрана сложность
+
+        // проверяем выбирается ли сложность
+        // @ts-expect-error
+        if (!GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig) {
+            return;
+        }
+
+        // выбранная сложность
+        // @ts-expect-error
+        GlobalVars.gameMode = parseInt(GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
+        this.log.info("selected gameMode = ", GlobalVars.gameMode);
+        broadcastMessage("Был выбран режим игры " + GlobalVars.gameMode, createHordeColor(255, 100, 100, 100));
 
         // заменяем данный замок на замок выбора волны
         Player_CASTLE_CHOISE_ATTACKPLAN.InitConfig();
@@ -307,39 +360,6 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
         // меняем состояние игры
         GlobalVars.gameState = GameState.ChoiseWave;
-
-        // for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-        //     if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
-        //         continue;
-        //     }
-
-        //     // проверяем выбирается ли сложность
-        //     if (!GlobalVars.teams[teamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig) {
-        //         return;
-        //     }
-
-        //     // выбранная сложность
-        //     GlobalVars.difficult = parseInt(GlobalVars.teams[teamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
-        //     this.log.info("selected difficult = ", GlobalVars.difficult);
-        //     broadcastMessage("Была выбрана сложность " + GlobalVars.difficult, createHordeColor(255, 100, 100, 100));
-
-        //     // заменяем данный замок на замок выбора волны
-        //     Player_CASTLE_CHOISE_ATTACKPLAN.InitConfig();
-
-        //     let replaceParams = new ReplaceUnitParameters();
-        //     replaceParams.OldUnit = GlobalVars.teams[teamNum].castle.unit;
-        //     replaceParams.NewUnitConfig = GlobalVars.configs[Player_CASTLE_CHOISE_ATTACKPLAN.CfgUid];
-        //     replaceParams.Cell = null;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
-        //     replaceParams.PreserveHealthLevel = false;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
-        //     replaceParams.PreserveOrders = false;        // Нужно ли передать приказы?
-        //     replaceParams.Silent = true;                 // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
-        //     GlobalVars.teams[teamNum].castle = new Player_CASTLE_CHOISE_ATTACKPLAN(GlobalVars.teams[teamNum].castle.unit.Owner.Units.ReplaceUnit(replaceParams), teamNum);
-
-        //     // меняем состояние игры
-        //     GlobalVars.gameState = GameState.ChoiseWave;
-
-        //     break;
-        // }
     }
 
     private ChoiseWave(gameTickNum: number) {
@@ -352,11 +372,13 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         var choisedAttackPlanIdx = -1;
 
         // проверяем выбирается ли волна
+        // @ts-expect-error
         if (!GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig) {
             return;
         }
 
         // выбранная волна
+        // @ts-expect-error
         choisedAttackPlanIdx = parseInt(GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
 
         // проверяем, что выбран план атаки
@@ -424,6 +446,65 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             GlobalVars.teams[teamNum].castle = new Player_GOALCASTLE(GlobalVars.teams[teamNum].castle.unit.Owner.Units.ReplaceUnit(replaceParams), teamNum);
         }
 
+        // регистрируем юнита рабочего
+        for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+            // проверяем, что команда в игре
+            if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
+                continue;
+            }
+
+            for (var settlementNum = 0; settlementNum < GlobalVars.teams[teamNum].settlements.length; settlementNum++) {
+                let enumerator = GlobalVars.teams[teamNum].settlements[settlementNum].Units.GetEnumerator();
+                while (enumerator.MoveNext()) {
+                    var unit = enumerator.Current;
+                    if (!unit) continue;
+
+                    if (unit.Cfg.Uid == Player_worker_gamemode1.BaseCfgUid) {
+                        unit.Delete();
+
+                        // Добавляем героя
+                        if (GlobalVars.gameMode == 1) {
+                            var generator = generateCellInSpiral(unit.Cell.X, unit.Cell.Y);
+                            var spawnedUnits = spawnUnits(unit.Owner,
+                                GlobalVars.configs[Player_worker_gamemode1.CfgUid],
+                                1,
+                                UnitDirection.Down,
+                                generator);
+                            if (spawnedUnits.length != 0) {
+                                GlobalVars.units.push(new Player_worker_gamemode1(spawnedUnits[0], teamNum));
+                            }
+                        } else if (GlobalVars.gameMode == 2) {
+                            var worker : Player_worker_gamemode2;
+
+                            var generator = generateCellInSpiral(unit.Cell.X, unit.Cell.Y);
+                            var spawnedUnits = spawnUnits(unit.Owner,
+                                GlobalVars.configs[Player_worker_gamemode2.CfgUid],
+                                1,
+                                UnitDirection.Down,
+                                generator);
+                            if (spawnedUnits.length != 0) {
+                                worker = new Player_worker_gamemode2(spawnedUnits[0], teamNum);
+                                GlobalVars.units.push(worker);
+
+                                var spawnedUnits = spawnUnits(unit.Owner,
+                                    GlobalVars.configs[Hero_Crusader.CfgUid],
+                                    1,
+                                    UnitDirection.Down,
+                                    generator);
+                                if (spawnedUnits.length != 0) {
+                                    var hero = new Hero_Crusader(spawnedUnits[0], teamNum)
+                                    GlobalVars.units.push(hero);
+                                    worker.hero = hero;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+                enumerator.Dispose();
+            }
+        }
+
         // даем стартовый капитал
         GlobalVars.incomePlan.OnStart();
 
@@ -456,6 +537,20 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
                     }
             });
         }
+
+        GlobalVars.diplomacyTable = new Array<Array<DiplomacyStatus>>(scenaSettlements.Count);
+        for (var settlementNum = 0; settlementNum < scenaSettlements.Count; settlementNum++) {
+            GlobalVars.diplomacyTable[settlementNum] = new Array<DiplomacyStatus>(scenaSettlements.Count);
+        }
+        ForEach(scenaSettlements, (settlement : Settlement) => {
+            ForEach(scenaSettlements, (otherSettlement : Settlement) => {
+                GlobalVars.diplomacyTable[settlement.Uid][otherSettlement.Uid]
+                = GlobalVars.diplomacyTable[otherSettlement.Uid][settlement.Uid]
+                = (settlement.Diplomacy.IsWarStatus(otherSettlement)
+                ? DiplomacyStatus.War
+                : DiplomacyStatus.Alliance);
+            });
+        });
 
         GlobalVars.startGameTickNum = gameTickNum;
         GlobalVars.gameState        = GameState.Run;
@@ -595,18 +690,10 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         // обработка юнитов
 
         for (var unitNum = 0; unitNum < GlobalVars.units.length; unitNum++) {
-            // юнит умер, удаляем из списка
-            if (GlobalVars.units[unitNum].unit.IsDead) {
-                GlobalVars.units[unitNum].OnDead(gameTickNum);
-                GlobalVars.units.splice(unitNum--, 1);
-            }
-            // юнит сам запросил, что его нужно удалить из списка
-            else if (GlobalVars.units[unitNum].needDeleted) {
-                GlobalVars.units.splice(unitNum--, 1);
-            }
-            // настало время для обработки юнита
-            else if (gameTickNum % GlobalVars.units[unitNum].processingTickModule == GlobalVars.units[unitNum].processingTick) {
-                GlobalVars.units[unitNum].OnEveryTick(gameTickNum);
+            if (GlobalVars.units[unitNum].OnEveryTick(gameTickNum)) {
+                if (GlobalVars.units[unitNum].needDeleted) {
+                    GlobalVars.units.splice(unitNum--, 1);
+                }
             }
         }
 
