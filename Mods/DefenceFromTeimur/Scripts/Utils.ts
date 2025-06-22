@@ -65,31 +65,3 @@ export function spawnUnit(settlement, uCfg, direction, position) {
         return null;
     }
 }
-
-export function* generateRandomCellInRect(rectX, rectY, rectW, rectH) {
-    let scenaWidth = ActiveScena.GetRealScena().Size.Width;
-    let scenaHeight = ActiveScena.GetRealScena().Size.Height;
-    // Рандомизатор
-    let rnd = ActiveScena.GetRealScena().Context.Randomizer;
-
-    rectX = Math.max(0, rectX);
-    rectY = Math.max(0, rectY);
-    rectW = Math.min(scenaWidth - rectX, rectW);
-    rectH = Math.min(scenaHeight - rectY, rectH);
-
-    let randomNumbers : Array<any> = [];
-    for (let x = rectX; x < rectX + rectW; x++) {
-        for (let y = rectY; y < rectY + rectH; y++) {
-            randomNumbers.push({ X: x, Y: y });
-        }
-    }
-
-    while (randomNumbers.length > 0) {
-        let num = rnd.RandomNumber(0, randomNumbers.length - 1);
-        let randomNumber = randomNumbers[num];
-        randomNumbers.splice(num, 1);
-        yield randomNumber;
-    }
-
-    return;
-}

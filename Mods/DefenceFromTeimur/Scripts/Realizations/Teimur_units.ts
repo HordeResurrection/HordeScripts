@@ -1,10 +1,10 @@
 import { createHordeColor, createPF, createPoint, createResourcesAmount } from "library/common/primitives";
 import { UnitFlags, UnitCommand, UnitDirection, UnitHurtType, UnitSpecification, BattleController, BulletState, UnitMapLayer, UnitEffectFlag, TileType } from "library/game-logic/horde-types";
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
-import { ChebyshevDistance, CreateBulletConfig, CreateUnitConfig, EuclidDistance, generateRandomCellInRect, spawnUnit, spawnUnits, unitCanBePlacedByRealMap } from "../Utils";
+import { ChebyshevDistance, CreateBulletConfig, CreateUnitConfig, EuclidDistance, spawnUnit, spawnUnits, unitCanBePlacedByRealMap } from "../Utils";
 import { ILegendaryUnit } from "../Types/ILegendaryUnit";
 import { ITeimurUnit } from "../Types/ITeimurUnit";
-import { generateCellInSpiral } from "library/common/position-tools";
+import { generateCellInSpiral, generateRandomCellInRect } from "library/common/position-tools";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
 import { GlobalVars } from "../GlobalData";
 import { IUnit } from "../Types/IUnit";
@@ -14,8 +14,7 @@ import { iterateOverUnitsInBox, unitCheckPathTo } from "library/game-logic/unit-
 import { setBulletInitializeWorker, setBulletProcessWorker } from "library/game-logic/workers-tools";
 import { createGameMessageWithSound } from "library/common/messages";
 import { Hero_Crusader } from "./Player_units";
-
-const ReplaceUnitParameters = HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;
+import { Cell } from "../Types/Geometry";
 
 export class Teimur_Swordmen extends ITeimurUnit {
     static CfgUid      : string = "#DefenceTeimur_Swordmen";
@@ -487,7 +486,7 @@ export class Teimur_Legendary_WORKER extends ILegendaryUnit {
                         if (unitCanBePlacedByRealMap(GlobalVars.configs[Teimur_Legendary_WORKER.CfgUid + "_tower"], position.value.X, position.value.Y)) {
                             this.GivePointProduceCommand(
                                 GlobalVars.configs[Teimur_Legendary_WORKER.CfgUid + "_tower"],
-                                createPoint(position.value.X, position.value.Y),
+                                new Cell(position.value.X, position.value.Y),
                                 AssignOrderMode.Replace);
                             break;
                         }
