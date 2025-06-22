@@ -16,7 +16,6 @@ import { Spell_Fireball } from "../Spells/Spell_Fireball";
 import { Spell_fiery_dash } from "../Spells/Spell_fiery_dash";
 import { createGameMessageWithNoSound } from "library/common/messages";
 import { createHordeColor } from "library/common/primitives";
-import { printObjectItems } from "library/common/introspection";
 import { Spell_fear_attack } from "../Spells/Spell_fear_attack";
 import { Spell_FireArrowsRain } from "../Spells/Spell_FireArrowsRain";
 import { Spell_fortress } from "../Spells/Spell_fortress";
@@ -410,6 +409,7 @@ export class Player_worker_gamemode2 extends IUnitCaster {
         // добавляем постройку голубятни Теймура если на карте более 1-ой команды
         var cfg = GlobalVars.configs[this.CfgUid] as UnitConfig;
         var producerParams = cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        // @ts-expect-error
         var produceList    = producerParams.CanProduceList;
         produceList.Clear();
 
@@ -432,10 +432,12 @@ export class Player_worker_gamemode2 extends IUnitCaster {
     public OnOrder(commandArgs: ACommandArgs): boolean {
         if (commandArgs.CommandType == UnitCommand.Produce) {
             for (var spell of Player_worker_gamemode2.Spells) {
+                // @ts-expect-error
                 if (spell.GetUnitConfig().Uid != commandArgs.ProductCfg.Uid) {
                     continue;
                 }
 
+                // @ts-expect-error
                 if (!this.unit.Owner.Resources.IsEnoughResources(commandArgs.ProductCfg.CostResources)) {
                     let msg = createGameMessageWithNoSound("Не хватает ресурсов!", createHordeColor(255, 255, 100, 100));
                     this.unit.Owner.Messages.AddMessage(msg);
@@ -448,14 +450,18 @@ export class Player_worker_gamemode2 extends IUnitCaster {
                     return false;
                 }
 
+                // @ts-expect-error
                 this.unit.Owner.Resources.TakeResources(commandArgs.ProductCfg.CostResources);
 
                 return false;
             }
 
+            // @ts-expect-error
             if ("#DefenceTeimur_Set_spawn_point" == commandArgs.ProductCfg.Uid) {
+                // @ts-expect-error
                 if (!this.unit.Owner.Resources.TakeResourcesIfEnough(commandArgs.ProductCfg.CostResources)) {
                     let msg = createGameMessageWithNoSound("Не хватает ресурсов!", createHordeColor(255, 255, 100, 100));
+                    this.unit.Owner.Messages.AddMessage(msg);
                 }
 
                 for (var settlementNum = 0; settlementNum < GlobalVars.teams[this.teamNum].settlements.length; settlementNum++) {

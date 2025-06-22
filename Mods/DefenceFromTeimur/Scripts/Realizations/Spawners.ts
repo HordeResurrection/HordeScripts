@@ -1,7 +1,7 @@
+import { generateRandomCellInRect } from "library/common/position-tools";
 import { GlobalVars } from "../GlobalData";
 import { Rectangle, Cell } from "../Types/Geometry";
 import { ISpawner } from "../Types/ISpawner";
-import { generateRandomCellInRect } from "../Utils";
 
 export class RectangleSpawner extends ISpawner {
     rect: Rectangle;
@@ -76,7 +76,7 @@ export class RingSpawner extends ISpawner {
         return {
             next: function() {
                 if (set.length <= 0) {
-                    return { value: new Cell(), done: true };
+                    return { value: new Cell(0, 0), done: true };
                 }
 
                 var i       = rnd.RandomNumber(0, set.length - 1); 
