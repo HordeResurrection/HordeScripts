@@ -3,9 +3,9 @@ import { GlobalVars } from "../GlobalData";
 import { createGameMessageWithSound } from "library/common/messages";
 import { createHordeColor } from "library/common/primitives";
 import { UnitDirection } from "library/game-logic/horde-types";
-import { spawnUnits } from "../Utils";
 import { ILegendaryUnit } from "./ILegendaryUnit";
 import { WaveUnit, Wave } from "./IAttackPlan";
+import { spawnUnits } from "library/game-logic/unit-spawn";
 
 export abstract class ISpawner {
     name: string;
@@ -22,7 +22,7 @@ export abstract class ISpawner {
     public Generator() : any {
         return {
             next: function() {
-              return { value: new Cell(), done: true };
+              return { value: new Cell(0 ,0), done: true };
             }
         };
     }

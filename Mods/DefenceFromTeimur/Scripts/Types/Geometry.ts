@@ -18,11 +18,17 @@ export class Cell {
     Scale(b: number) : Cell {
         return new Cell(this.X * b, this.Y * b);
     }
+    Length_L1() : number {
+        return Math.abs(this.X) + Math.abs(this.Y);
+    }
     Length_L2() : number {
         return Math.sqrt(this.X*this.X + this.Y*this.Y);
     }
     Length_L2_2() : number {
         return this.X*this.X + this.Y*this.Y;
+    }
+    Length_Euclid() : number {
+        return this.Length_L2();
     }
     Length_Chebyshev() : number {
         return Math.max(Math.abs(this.X), Math.abs(this.Y));

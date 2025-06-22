@@ -5,7 +5,7 @@ import { Cell, Rectangle } from "./Types/Geometry";
 import { Team } from "./Types/Team";
 import { createHordeColor, createPoint, Point2D } from "library/common/primitives";
 import { UnitHurtType, UnitDirection, DiplomacyStatus, Settlement } from "library/game-logic/horde-types";
-import { spawnUnit } from "library/game-logic/unit-spawn";
+import { spawnUnit, spawnUnits } from "library/game-logic/unit-spawn";
 import { Hero_Crusader, PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_CASTLE_CHOISE_GAMEMODE, Player_GOALCASTLE, Player_worker_gamemode1, Player_worker_gamemode2 } from "./Realizations/Player_units";
 import { TeimurUnitsClass, TeimurLegendaryUnitsClass } from "./Realizations/Teimur_units";
 import { broadcastMessage, createGameMessageWithNoSound, createGameMessageWithSound } from "library/common/messages";
@@ -14,7 +14,6 @@ import { IUnit } from "./Types/IUnit";
 import { RandomSpawner, RectangleSpawner, RingSpawner } from "./Realizations/Spawners";
 import { ITeimurUnit } from "./Types/ITeimurUnit";
 import { generateCellInSpiral } from "library/common/position-tools";
-import { spawnUnits } from "./Utils";
 
 const DeleteUnitParameters  = HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
 const ReplaceUnitParameters = HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters;

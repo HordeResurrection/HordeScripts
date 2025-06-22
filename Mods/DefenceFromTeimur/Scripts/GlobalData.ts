@@ -2,7 +2,6 @@ import { IUnit } from "./Types/IUnit";
 import { Team } from "./Types/Team";
 import { IIncomePlan } from "./Types/IIncomePlan";
 import { IAttackPlan } from "./Types/IAttackPlan";
-import { Point2D } from "library/common/primitives";
 import { DiplomacyStatus, Player } from "library/game-logic/horde-types";
 
 export enum GameState { PreInit, Init, ChoiseDifficult, ChoiseGameMode, ChoiseWave, Run, End };

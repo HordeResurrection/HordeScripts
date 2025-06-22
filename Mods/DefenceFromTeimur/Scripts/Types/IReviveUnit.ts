@@ -1,8 +1,8 @@
 import { generateCellInSpiral } from "library/common/position-tools";
 import { IUnit } from "./IUnit";
-import { spawnUnits } from "../Utils";
 import { UnitDirection } from "library/game-logic/horde-types";
 import { GlobalVars } from "../GlobalData";
+import { spawnUnits } from "library/game-logic/unit-spawn";
 
 export class IReviveUnit extends IUnit {
     protected _reviveTick : number = -1;
