@@ -28,7 +28,7 @@ export class Spell_invisibility extends ISpell {
             replaceParams.OldUnit       = this._caster.unit;
             //replaceParams.NewUnitConfig = Horse_invisibility.GetHordeConfig();
             replaceParams.NewUnitConfig = HordeContentApi.GetUnitConfig("#UnitConfig_Nature_Invisibility_Horse");
-            replaceParams.Cell = null;                  // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
+            replaceParams.Cell = this._caster.unit.Cell;                  // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
             replaceParams.PreserveHealthLevel = true;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
             replaceParams.PreserveExperience = true;    // Нужно ли передать опыт?
             replaceParams.PreserveOrders = true;        // Нужно ли передать приказы?
@@ -58,7 +58,7 @@ export class Spell_invisibility extends ISpell {
             let replaceParams           = new ReplaceUnitParameters();
             replaceParams.OldUnit       = this._caster.unit;
             replaceParams.NewUnitConfig = this._casterCfg;
-            replaceParams.Cell = null;                  // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
+            replaceParams.Cell = this._caster.unit.Cell;                  // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
             replaceParams.PreserveHealthLevel = true;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
             replaceParams.PreserveExperience = true;    // Нужно ли передать опыт?
             replaceParams.PreserveOrders = true;        // Нужно ли передать приказы?

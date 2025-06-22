@@ -264,7 +264,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         let replaceParams                 = new ReplaceUnitParameters();
         replaceParams.OldUnit             = GlobalVars.teams[this.hostPlayerTeamNum].castle.unit;
         replaceParams.NewUnitConfig       = GlobalVars.configs[Player_CASTLE_CHOISE_DIFFICULT.CfgUid];
-        replaceParams.Cell                = null;  // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
+        replaceParams.Cell                = GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.Cell;  // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
         replaceParams.PreserveHealthLevel = false; // Нужно ли передать уровень здоровья? (в процентном соотношении)
         replaceParams.PreserveOrders      = false; // Нужно ли передать приказы?
         replaceParams.Silent              = true;  // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
@@ -320,7 +320,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         let replaceParams = new ReplaceUnitParameters();
         replaceParams.OldUnit = GlobalVars.teams[this.hostPlayerTeamNum].castle.unit;
         replaceParams.NewUnitConfig = GlobalVars.configs[Player_CASTLE_CHOISE_GAMEMODE.CfgUid];
-        replaceParams.Cell = null;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
+        replaceParams.Cell = GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.Cell;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
         replaceParams.PreserveHealthLevel = false;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
         replaceParams.PreserveOrders = false;        // Нужно ли передать приказы?
         replaceParams.Silent = true;                 // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
@@ -351,7 +351,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         let replaceParams = new ReplaceUnitParameters();
         replaceParams.OldUnit = GlobalVars.teams[this.hostPlayerTeamNum].castle.unit;
         replaceParams.NewUnitConfig = GlobalVars.configs[Player_CASTLE_CHOISE_ATTACKPLAN.CfgUid];
-        replaceParams.Cell = null;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
+        replaceParams.Cell = GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.Cell;                   // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
         replaceParams.PreserveHealthLevel = false;   // Нужно ли передать уровень здоровья? (в процентном соотношении)
         replaceParams.PreserveOrders = false;        // Нужно ли передать приказы?
         replaceParams.Silent = true;                 // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)
@@ -438,7 +438,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
             let replaceParams                 = new ReplaceUnitParameters();
             replaceParams.OldUnit             = GlobalVars.teams[teamNum].castle.unit;
             replaceParams.NewUnitConfig       = GlobalVars.configs[Player_GOALCASTLE.CfgUid];
-            replaceParams.Cell                = null;  // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
+            replaceParams.Cell                = GlobalVars.teams[teamNum].castle.unit.Cell;  // Можно задать клетку, в которой должен появиться новый юнит. Если null, то центр создаваемого юнита совпадет с предыдущим
             replaceParams.PreserveHealthLevel = false; // Нужно ли передать уровень здоровья? (в процентном соотношении)
             replaceParams.PreserveOrders      = false; // Нужно ли передать приказы?
             replaceParams.Silent              = true;  // Отключение вывода в лог возможных ошибок (при регистрации и создании модели)

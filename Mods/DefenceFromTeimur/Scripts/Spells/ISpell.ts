@@ -2,7 +2,6 @@ import { ACommandArgs, BattleController, DrawLayer, Stride_Color, StringVisualEf
 import { HordeColor, ResourcesAmount } from "library/common/primitives";
 import { spawnString } from "library/game-logic/decoration-spawn";
 import { IUnitCaster } from "./IUnitCaster";
-import { log } from "library/common/logging";
 import { Cell } from "../Types/Geometry";
 import { GlobalVars } from "../GlobalData";
 
@@ -46,7 +45,6 @@ export class ISpell {
                     + " (перезарядка " + this._ChargesReloadTime / 50 + " сек). ";
             }
             this._Description += " Перезарядка способности " + this._ReloadTime / 50 + " сек. ";
-            log.info(this._Description);
 
             customCommand = HordeContentApi.CloneConfig(
                 HordeContentApi.GetUnitCommand(this._ButtonCommandBaseUid), customCommandCfgUid) as UnitCommandConfig;

@@ -41,11 +41,6 @@ export class IUnit {
     public OnEveryTick(gameTickNum: number) : boolean {
         if (!this._NeedUpdate(gameTickNum)) return false;
 
-        if (this.unit.IsDead) {
-            this.needDeleted = true;
-            this.OnDead(gameTickNum);
-        }
-
         return true;
     }
     public OnDead(gameTickNum: number) {
@@ -56,30 +51,18 @@ export class IUnit {
         if (!cell || !isFinite(cell.X) || !isFinite(cell.Y)) {
             return;
         }
-        // потом расскоментировать
-        // if (cell.X < 0) {
-        //     cell.X = 0;
-        // } else if (cell.X > GlobalVars.scenaWidth) {
-        //     cell.X = GlobalVars.scenaWidth;
-        // }
-        // if (cell.Y < 0) {
-        //     cell.Y = 0;
-        // } else if (cell.Y > GlobalVars.scenaHeight) {
-        //     cell.Y = GlobalVars.scenaHeight;
-        // }
-
-        var capture = false;
+        
         if (cell.X < 0) {
-            capture = true;
+            cell.X = 0;
         } else if (cell.X > GlobalVars.scenaWidth) {
-            capture = true;
+            cell.X = GlobalVars.scenaWidth;
         }
         if (cell.Y < 0) {
-            capture = true;
+            cell.Y = 0;
         } else if (cell.Y > GlobalVars.scenaHeight) {
-            capture = true;
+            cell.Y = GlobalVars.scenaHeight;
         }
-        if (capture) log.info("CAPTURE");
+
         var pointCommandArgs = new PointCommandArgs(createPoint(Math.round(cell.X), Math.round(cell.Y)), command, orderMode);
         this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs);
     }
@@ -92,7 +75,15 @@ export class IUnit {
         this.unit.Cfg.GetOrderDelegate(this.unit, produceAtCommandArgs);
     }
     protected _NeedUpdate(gameTickNum) : boolean {
-        return gameTickNum % this.processingTickModule == this.processingTick;
+        if (gameTickNum % this.processingTickModule == this.processingTick) {
+            if (this.unit.IsDead) {
+                this.needDeleted = true;
+                this.OnDead(gameTickNum);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
     public ReplaceUnit(unit: Unit): void {
         this.unit = unit;

@@ -4,20 +4,20 @@ import { BulletConfig } from "library/game-logic/horde-types";
 
 export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
     if (HordeContentApi.HasUnitConfig(newConfigUid)) {
-        log.info("GET baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
+        //log.info("GET baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
         return HordeContentApi.GetUnitConfig(newConfigUid);
     } else {
-        log.info("CREATE baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
+        //log.info("CREATE baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
         return HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig(baseConfigUid), newConfigUid);
     }
 }
 
 export function CreateBulletConfig(baseConfigUid: string, newConfigUid: string) : BulletConfig{
     if (HordeContentApi.HasBulletConfig(newConfigUid)) {
-        log.info("GET baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
+        //log.info("GET baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
         return HordeContentApi.GetBulletConfig(newConfigUid);
     } else {
-        log.info("CREATE baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
+        //log.info("CREATE baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
         return HordeContentApi.CloneConfig(HordeContentApi.GetBulletConfig(baseConfigUid), newConfigUid) as BulletConfig;
     }
 }

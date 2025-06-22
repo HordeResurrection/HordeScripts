@@ -548,9 +548,15 @@ export class Teimur_CapturedUnit extends ITeimurUnit {
     }
 
     RegainControlOwner() {
+        log.info("Возвращаем контроль юниту ", this.unit.IsDead, " ", this.unit.Name, " ", this.unit.Id);
+
         this.unit_ordersMind.CancelOrdersSafe();
         this.unit.ChangeOwner(ActiveScena.GetRealScena().Settlements.GetByUid(this.ownerSettlementUid));
         this.needDeleted = true;
+    }
+
+    public OnDead(gameTickNum: number): void {
+        this.RegainControlOwner();
     }
 }
 export class Teimur_Legendary_HORSE extends ILegendaryUnit {
@@ -612,6 +618,10 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
             for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
                 var _unit = u.value;
 
+                // юнит мертв
+                if (_unit.IsDead) {
+                    continue;
+                }
                 // проверка, что уже учли
                 if (unitsShowFlag[_unit.Id]) {
                     continue;
@@ -634,6 +644,8 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
                 }
 
                 var prevOwnerUid = _unit.Owner.Uid;
+
+                log.info("Захватили юнита ", _unit.IsDead, " ", _unit.Name, " ", _unit.Id);
 
                 _unit.OrdersMind.CancelOrdersSafe();
                 _unit.ChangeOwner(GlobalVars.teams[this.teamNum].teimurSettlement);
