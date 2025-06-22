@@ -33,9 +33,6 @@ export class Spell_fiery_dash extends ISpell {
                 targetCell = targetCell.Minus(moveVec).Round();
             }
 
-            log.info("FIRE DASH START ", heroCell.X, " ", heroCell.Y);
-            log.info("FIRE DASH END ", targetCell.X, " ", targetCell.Y);
-
             while (!(targetCell.X == heroCell.X && targetCell.Y == heroCell.Y)) {
                 var dashPoint = heroCell.Scale(32).Add(new Cell(16, 16)).ToHordePoint();
                 spawnDecoration(
@@ -49,8 +46,6 @@ export class Spell_fiery_dash extends ISpell {
                     HordeClassLibrary.World.Objects.Bullets.Implementations.Fire.BaseFireBullet.MakeFire(
                         this._caster.unit, dashPoint, UnitMapLayer.Main, Spell_fiery_dash._FireConfig);
                 }
-
-                log.info("FIRE DASH ", heroCell.X, " ", heroCell.Y);
 
                 heroCell = heroCell.Add(moveVec).Round();
             }

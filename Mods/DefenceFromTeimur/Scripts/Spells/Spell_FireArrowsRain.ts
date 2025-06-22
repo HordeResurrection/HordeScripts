@@ -5,6 +5,7 @@ import { ITargetPointSpell } from "./ITargetPointSpell";
 import { generateRandomCellInRect } from "library/common/position-tools";
 import { CreateBulletConfig } from "../Utils";
 import { Cell } from "../Types/Geometry";
+import { log } from "library/common/logging";
 
 export class Spell_FireArrowsRain extends ITargetPointSpell {
     private static _MaxDistance : number = 10;
@@ -28,12 +29,17 @@ export class Spell_FireArrowsRain extends ITargetPointSpell {
 
         if (!this._Init) {
             this._BulletConfig = CreateBulletConfig("#BulletConfig_FireArrow", "#Spell_FireArrowsRain_Bullet");
-            ScriptUtils.SetValue(this._BulletConfig, "BaseBulletSpeed", 0.1);
+            //log.info("CAPTURE 1");
+            //ScriptUtils.SetValue(this._BulletConfig, "BaseBulletSpeed", 0.1);
+            //log.info("CAPTURE 2");
             ScriptUtils.SetValue(this._BulletConfig, "IsBallistic", true);
+            //log.info("CAPTURE 3");
 
             this._ShotParams = ShotParams.CreateInstance();
             ScriptUtils.SetValue(this._ShotParams, "Damage", 4);
+            //log.info("CAPTURE 4");
             ScriptUtils.SetValue(this._ShotParams, "AdditiveBulletSpeed", createPF(0, 0));
+            //log.info("CAPTURE 5");
         }
 
         return config;

@@ -3,6 +3,7 @@ import { Cell } from "./Geometry";
 import { PointCommandArgs, ProduceAtCommandArgs, Unit, UnitDirection } from "library/game-logic/horde-types";
 import { createPoint } from "library/common/primitives";
 import { GlobalVars } from "../GlobalData";
+import { log } from "library/common/logging";
 
 export class IUnit {
     /** ссылка на юнита */
@@ -55,6 +56,30 @@ export class IUnit {
         if (!cell || !isFinite(cell.X) || !isFinite(cell.Y)) {
             return;
         }
+        // потом расскоментировать
+        // if (cell.X < 0) {
+        //     cell.X = 0;
+        // } else if (cell.X > GlobalVars.scenaWidth) {
+        //     cell.X = GlobalVars.scenaWidth;
+        // }
+        // if (cell.Y < 0) {
+        //     cell.Y = 0;
+        // } else if (cell.Y > GlobalVars.scenaHeight) {
+        //     cell.Y = GlobalVars.scenaHeight;
+        // }
+
+        var capture = false;
+        if (cell.X < 0) {
+            capture = true;
+        } else if (cell.X > GlobalVars.scenaWidth) {
+            capture = true;
+        }
+        if (cell.Y < 0) {
+            capture = true;
+        } else if (cell.Y > GlobalVars.scenaHeight) {
+            capture = true;
+        }
+        if (capture) log.info("CAPTURE");
         var pointCommandArgs = new PointCommandArgs(createPoint(Math.round(cell.X), Math.round(cell.Y)), command, orderMode);
         this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs);
     }
