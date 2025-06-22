@@ -4,7 +4,6 @@ import { ACommandArgs, BulletConfig, DiplomacyStatus, ShotParams, Stride_Color, 
 import { ITargetPointSpell } from "./ITargetPointSpell";
 import { IUnitCaster } from "./IUnitCaster";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
-import { log } from "library/common/logging";
 import { Cell } from "../Types/Geometry";
 
 export class Spell_PoisonBomb extends ITargetPointSpell {

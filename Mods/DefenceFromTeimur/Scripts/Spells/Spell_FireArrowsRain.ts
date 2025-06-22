@@ -2,7 +2,7 @@ import { createPF, HordeColor } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
 import { BulletConfig, ShotParams, Stride_Color, UnitCommandConfig, UnitMapLayer } from "library/game-logic/horde-types";
 import { ITargetPointSpell } from "./ITargetPointSpell";
-import { generateCellInRect, generateRandomCellInRect } from "library/common/position-tools";
+import { generateRandomCellInRect } from "library/common/position-tools";
 import { CreateBulletConfig } from "../Utils";
 import { Cell } from "../Types/Geometry";
 

@@ -1,6 +1,6 @@
 import { ISpell } from "./ISpell";
 import { HordeColor } from "library/common/primitives";
-import { ACommandArgs, DiplomacyStatus, Stride_Color, Unit, UnitCommand, VisualEffectConfig } from "library/game-logic/horde-types";
+import { ACommandArgs, DiplomacyStatus, Stride_Color, UnitCommand, VisualEffectConfig } from "library/game-logic/horde-types";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
 import { IUnitCaster } from "./IUnitCaster";
 import { AssignOrderMode } from "library/mastermind/virtual-input";

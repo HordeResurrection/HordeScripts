@@ -1,7 +1,5 @@
-import { ACommandArgs, ScriptUnitWorkerGetOrder, Unit, UnitConfig } from "library/game-logic/horde-types";
+import { ACommandArgs, ScriptUnitWorkerGetOrder, Unit } from "library/game-logic/horde-types";
 import { ISpell } from "./ISpell";
-import { log } from "library/common/logging";
-import { IUnit } from "../Types/IUnit";
 import { GlobalVars } from "../GlobalData";
 import { IReviveUnit } from "../Types/IReviveUnit";
 

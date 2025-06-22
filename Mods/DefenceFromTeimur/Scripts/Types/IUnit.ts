@@ -8,7 +8,7 @@ export class IUnit {
     /** ссылка на юнита */
     unit: Unit;
     /** ссылка на отдел приказов юнита */
-    unit_ordersMind: any;
+    unit_ordersMind: HordeClassLibrary.UnitComponents.Minds.OrdersMind;
     /** номер команды к которому принадлежит юнит */
     teamNum: number;
     /** тик на котором нужно обрабатывать юнита */
@@ -52,7 +52,10 @@ export class IUnit {
     }
     /** отдать приказ в точку */
     public GivePointCommand(cell: Cell, command: any, orderMode: any) {
-        var pointCommandArgs = new PointCommandArgs(createPoint(cell.X, cell.Y), command, orderMode);
+        if (!cell || !isFinite(cell.X) || !isFinite(cell.Y)) {
+            return;
+        }
+        var pointCommandArgs = new PointCommandArgs(createPoint(Math.round(cell.X), Math.round(cell.Y)), command, orderMode);
         this.unit.Cfg.GetOrderDelegate(this.unit, pointCommandArgs);
     }
     /** отдать приказ о постройке в точке */

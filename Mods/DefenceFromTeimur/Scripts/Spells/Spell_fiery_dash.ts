@@ -1,7 +1,6 @@
 import { ISpell } from "./ISpell";
 import { HordeColor } from "library/common/primitives";
-import { ACommandArgs, BulletConfig, DiplomacyStatus, Stride_Color, UnitDirection, UnitMapLayer, VisualEffectConfig } from "library/game-logic/horde-types";
-import { IUnitCaster } from "./IUnitCaster";
+import { ACommandArgs, BulletConfig, DiplomacyStatus, Stride_Color, UnitMapLayer, VisualEffectConfig } from "library/game-logic/horde-types";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
 import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
 import { log } from "library/common/logging";

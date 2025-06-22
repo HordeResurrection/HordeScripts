@@ -1,9 +1,8 @@
-import { ACommandArgs, BattleController, DrawLayer, Stride_Color, StringVisualEffect, Unit, UnitCommand, UnitCommandConfig, UnitConfig } from "library/game-logic/horde-types";
+import { ACommandArgs, BattleController, DrawLayer, Stride_Color, StringVisualEffect, UnitCommand, UnitCommandConfig, UnitConfig } from "library/game-logic/horde-types";
 import { HordeColor, ResourcesAmount } from "library/common/primitives";
 import { spawnString } from "library/game-logic/decoration-spawn";
 import { IUnitCaster } from "./IUnitCaster";
 import { log } from "library/common/logging";
-import { printObjectItems } from "library/common/introspection";
 import { Cell } from "../Types/Geometry";
 import { GlobalVars } from "../GlobalData";
 
