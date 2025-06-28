@@ -1,28 +1,39 @@
-import { ISpell } from "./ISpell";
+import { ISpell } from "../ISpell";
 import { HordeColor } from "library/common/primitives";
-import { ACommandArgs, DiplomacyStatus, Stride_Color, UnitCommand, VisualEffectConfig } from "library/game-logic/horde-types";
+import { ACommandArgs, DiplomacyStatus, Stride_Color, UnitCommand, UnitFlags, VisualEffectConfig } from "library/game-logic/horde-types";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
-import { IUnitCaster } from "./IUnitCaster";
+import { IUnitCaster } from "../IUnitCaster";
 import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
-import { IUnit } from "../Types/IUnit";
-import { Cell } from "../Types/Geometry";
+import { IUnit } from "../../Types/IUnit";
+import { Cell } from "../../Types/Geometry";
 
 export class Spell_fear_attack extends ISpell {
-    private static _FearTime   : number = 7*50;
-    private static _FearRadius : number = 3;
-    private static _FearEffectConfig : VisualEffectConfig = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_MagicCircle");
-    
     protected static _ButtonUid                     : string = "Spell_fear_attack";
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_fear_attack";
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(81, 207, 207, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 81, 207, 207);
-    protected static _Name                          : string = "Приступ страха";
-    protected static _Description                   : string = "Вселяет страх во вражеских юнитов на расстоянии " + Spell_fear_attack._FearRadius
-        + " клеток в течении " + (Spell_fear_attack._FearTime / 50) + " секунд";
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(1, 0);
 
-    private _fearUnits : Array<IUnit>;
-    private _fearCell : Cell;
+    private static _FearTimePerLevel   : Array<number> = [
+        7*50, 9*50, 11*50, 13*50, 15*50, 17*50, 19*50, 21*50, 23*50, 25*50
+    ];
+    private static _FearRadiusPerLevel : Array<number> = [
+        3, 4, 4, 5, 5, 6, 6, 7, 7, 12
+    ];
+    private static _FearEffectConfig : VisualEffectConfig = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_MagicCircle");
+
+    protected static _MaxLevel                      : number = 9;
+    protected static _NamePrefix                    : string = "Приступ страха";
+    protected static _DescriptionTemplate           : string
+        = "Вселяет страх во вражеских юнитов (без иммуна к магии) в радиусе {0} клеток на {1} секунд.";
+    protected static _DescriptionParamsPerLevel     : Array<Array<any>>
+        = [this._FearRadiusPerLevel, this._FearTimePerLevel.map(ticks => ticks / 50)];
+
+    ///////////////////////////////////
+    
+    private _fearUnits  : Array<IUnit>;
+    private _fearCell   : Cell;
 
     constructor(caster: IUnitCaster) {
         super(caster);
@@ -34,21 +45,10 @@ export class Spell_fear_attack extends ISpell {
         if (super.Activate(activateArgs)) {
             this._fearCell = Cell.ConvertHordePoint(this._caster.unit.Cell);
             
-            var scenaWidth  = ActiveScena.GetRealScena().Size.Width;
-            var scenaHeight = ActiveScena.GetRealScena().Size.Height;
-            for (var x = Math.max(0, this._fearCell.X - Spell_fear_attack._FearRadius); x <= Math.min(scenaWidth, this._fearCell.X + Spell_fear_attack._FearRadius); x++) {
-                for (var y = Math.max(0, this._fearCell.Y - Spell_fear_attack._FearRadius); y <= Math.min(scenaHeight, this._fearCell.Y + Spell_fear_attack._FearRadius); y++) {
-                    var targetCell = new Cell(x, y).Scale(32).Add(new Cell(16, 16)).ToHordePoint();
-                    spawnDecoration(
-                        ActiveScena.GetRealScena(),
-                        Spell_fear_attack._FearEffectConfig,
-                        targetCell);
-                }
-            }
-
-            let unitsIter = iterateOverUnitsInBox(this._caster.unit.Cell, Spell_fear_attack._FearRadius);
+            let unitsIter = iterateOverUnitsInBox(this._caster.unit.Cell, Spell_fear_attack._FearRadiusPerLevel[this.level]);
             for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
                 if (this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(u.value.Owner) == DiplomacyStatus.War
+                    && !u.value.Cfg.Flags.HasFlag(UnitFlags.MagicResistant)
                     && u.value.Cfg.IsBuilding == false) {
                     if (u.value.ScriptData.IUnit) {
                         this._fearUnits.push(u.value.ScriptData.IUnit);
@@ -69,10 +69,9 @@ export class Spell_fear_attack extends ISpell {
     protected _OnEveryTickActivated(gameTickNum: number): boolean {
         super._OnEveryTickActivated(gameTickNum);
 
-        // проверяем, что лечение закончилось
-        if (this._activatedTick + Spell_fear_attack._FearTime <= gameTickNum) {
+        if (this._activatedTick + Spell_fear_attack._FearTimePerLevel[this.level] <= gameTickNum) {
             for (var unit of this._fearUnits) {
-                //unit.AllowCommands();
+                unit.unit_ordersMind.CancelOrdersSafe(true);
             }
 
             return false;

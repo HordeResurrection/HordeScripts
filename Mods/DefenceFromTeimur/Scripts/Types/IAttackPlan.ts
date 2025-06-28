@@ -1,4 +1,4 @@
-import { ITeimurUnit } from "./ITeimurUnit";
+import { ITeimurUnit, TeimurUnitsModificators } from "./ITeimurUnit";
 import { GlobalVars } from "../GlobalData";
 import { IncomePlan_0 } from "../Realizations/IncomePlans";
 import { IIncomePlan } from "./IIncomePlan";
@@ -8,8 +8,8 @@ export class WaveUnit {
     count: number;
 
     constructor (unitClass: typeof ITeimurUnit, count: number) {
-        this.unitClass = unitClass;
-        this.count  = count;
+        this.unitClass   = unitClass;
+        this.count       = count;
     }
 }
 

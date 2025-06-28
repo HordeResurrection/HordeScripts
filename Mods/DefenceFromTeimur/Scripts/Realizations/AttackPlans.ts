@@ -657,12 +657,9 @@ export class AttackPlan_test extends IAttackPlan {
     constructor () {
         super();
 
-        var waveUnits = new Array<WaveUnit>();
-        waveUnits.push(new WaveUnit(Teimur_Olga, 4));
-
         this.waves = [];
         this.waves.push(
-            new Wave("ТЕСТ", 0, [new WaveUnit(Teimur_Legendary_RAIDER, 1)]),
+            new Wave("ТЕСТ", 0, [new WaveUnit(Teimur_Balista, 1), new WaveUnit(Teimur_Catapult, 1), new WaveUnit(Teimur_Villur, 1)]),
             new Wave("END", 20*60*50, [])
         );
     }

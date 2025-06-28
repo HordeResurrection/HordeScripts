@@ -1,11 +1,12 @@
 import { Cell } from "./Geometry";
 import { GlobalVars } from "../GlobalData";
-import { createGameMessageWithSound } from "library/common/messages";
+import { broadcastMessage, createGameMessageWithSound } from "library/common/messages";
 import { createHordeColor } from "library/common/primitives";
-import { UnitDirection } from "library/game-logic/horde-types";
+import { UnitConfig, UnitDirection } from "library/game-logic/horde-types";
 import { ILegendaryUnit } from "./ILegendaryUnit";
 import { WaveUnit, Wave } from "./IAttackPlan";
 import { spawnUnits } from "library/game-logic/unit-spawn";
+import { TeimurUnitsModificators } from "./ITeimurUnit";
 
 export abstract class ISpawner {
     name: string;
@@ -49,8 +50,15 @@ export abstract class ISpawner {
         var generator = this.Generator();
 
         for (var i = 0; i < this.queue.length; i++) {
+            var modificator : TeimurUnitsModificators.Type;
+            if (this.queue[i].unitClass.IsLegendaryUnit()) {
+                modificator = TeimurUnitsModificators.Type.NULL;
+            } else {
+                modificator = TeimurUnitsModificators.RandomModificator();
+            }
+            var spawnedCfg   = this.queue[i].unitClass.GetConfigWithModificator(modificator);
             var spawnedUnits = spawnUnits(GlobalVars.teams[this.teamNum].teimurSettlement,
-                GlobalVars.configs[this.queue[i].unitClass.CfgUid],
+                spawnedCfg,
                 this.queue[i].count,
                 UnitDirection.Down,
                 generator);
@@ -59,11 +67,11 @@ export abstract class ISpawner {
                 GlobalVars.units.push(new this.queue[i].unitClass(spawnedUnit, this.teamNum));
             }
 
-            if (spawnedUnits.length > 0 && GlobalVars.units[GlobalVars.units.length - 1] instanceof ILegendaryUnit) {
+            if (spawnedUnits.length > 0 && this.queue[i].unitClass.IsLegendaryUnit()) {
                 for (var settlement of GlobalVars.teams[this.teamNum].settlements) {
-                    let msg1 = createGameMessageWithSound("Замечен " + GlobalVars.configs[this.queue[i].unitClass.CfgUid].Name, createHordeColor(255, 255, 165, 10));
+                    let msg1 = createGameMessageWithSound("Замечен " + spawnedCfg.Name, createHordeColor(255, 255, 165, 10));
                     settlement.Messages.AddMessage(msg1);
-                    let msg2 = createGameMessageWithSound((this.queue[i].unitClass as unknown as typeof ILegendaryUnit).Description, createHordeColor(255, 200, 130, 10));
+                    let msg2 = createGameMessageWithSound(spawnedCfg.Description, createHordeColor(255, 200, 130, 10));
                     settlement.Messages.AddMessage(msg2);
                 }
             }

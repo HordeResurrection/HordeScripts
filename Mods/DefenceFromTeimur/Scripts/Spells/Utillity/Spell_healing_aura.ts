@@ -1,12 +1,12 @@
-import { ISpell } from "./ISpell";
+import { ISpell, SpellState } from "../ISpell";
 import { HordeColor } from "library/common/primitives";
 import { ACommandArgs, DiplomacyStatus, Stride_Color } from "library/game-logic/horde-types";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
-import { GlobalVars } from "../GlobalData";
+import { GlobalVars } from "../../GlobalData";
+import { Cell } from "../../Types/Geometry";
 
 export class Spell_healing_aura extends ISpell {
     private static _MaxDistance : number = 7;
-    private static _HealTime    : number = 350;
     private static _HealPeriod  : number = 50;
     private static _HealHp      : number = 4;
 
@@ -14,9 +14,21 @@ export class Spell_healing_aura extends ISpell {
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_healing_aura";
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(75, 255, 59, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 75, 255, 59);
-    protected static _Name                          : string = "Аура лечения";
-    protected static _Description                   : string = "Активация ауры лечения " + (Spell_healing_aura._HealHp * Spell_healing_aura._HealPeriod / 50)
-        + " хп / сек на расстоянии" + Spell_healing_aura._MaxDistance + " клеток в течении " + (Spell_healing_aura._HealTime / 50) + " секунд.";
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(3, 0);
+
+    private static _AuraDurationPerLevel   : Array<number> = [
+        7, 8, 9, 10, 12
+    ].map(sec => sec*50);
+    protected static _ChargesCountPerLevel   : Array<number> = [
+        1, 1, 2, 2, 3
+    ];
+
+    protected static _MaxLevel                      : number = 4;
+    protected static _NamePrefix                    : string = "Аура лечения";
+    protected static _DescriptionTemplate           : string = "Активация ауры лечения " + (Spell_healing_aura._HealHp * Spell_healing_aura._HealPeriod / 50)
+        + " хп / сек на расстоянии " + Spell_healing_aura._MaxDistance + " клеток в течении {0} секунд.";
+    protected static _DescriptionParamsPerLevel     : Array<Array<any>> = 
+        [this._AuraDurationPerLevel.map(ticks => ticks / 50)];
 
     private _healTick : number;
 
@@ -33,7 +45,7 @@ export class Spell_healing_aura extends ISpell {
         super._OnEveryTickActivated(gameTickNum);
 
         // проверяем, что лечение закончилось
-        if (this._activatedTick + Spell_healing_aura._HealTime <= gameTickNum) {
+        if (this._activatedTick + Spell_healing_aura._AuraDurationPerLevel[this.level] <= gameTickNum) {
             return false;
         }
 

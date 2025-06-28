@@ -3,7 +3,7 @@ import { IUnit } from "../Types/IUnit";
 import { CreateUnitConfig } from "../Utils";
 import { AttackPlansClass } from "./AttackPlans";
 import { GlobalVars } from "../GlobalData";
-import { ACommandArgs, TileType, UnitCommand, UnitConfig, UnitFlags, UnitHurtType, UnitSpecification } from "library/game-logic/horde-types";
+import { ACommandArgs, GeometryCanvas, GeometryVisualEffect, Stride_Color, Stride_Vector2, TileType, Unit, UnitCommand, UnitConfig, UnitFlags, UnitHurtType, UnitSpecification } from "library/game-logic/horde-types";
 import { TeimurLegendaryUnitsClass, Teimur_Legendary_GREED_HORSE } from "./Teimur_units";
 import { log } from "library/common/logging";
 import { WaveUnit } from "../Types/IAttackPlan";
@@ -11,17 +11,24 @@ import { eNext, enumerate } from "library/dotnet/dotnet-utils";
 import { ITeimurUnit } from "../Types/ITeimurUnit";
 import { IReviveUnit } from "../Types/IReviveUnit";
 import { IUnitCaster } from "../Spells/IUnitCaster";
-import { ISpell } from "../Spells/ISpell";
-import { Spell_Fireball } from "../Spells/Spell_Fireball";
-import { Spell_fiery_dash } from "../Spells/Spell_fiery_dash";
 import { createGameMessageWithNoSound } from "library/common/messages";
 import { createHordeColor } from "library/common/primitives";
-import { Spell_fear_attack } from "../Spells/Spell_fear_attack";
-import { Spell_FireArrowsRain } from "../Spells/Spell_FireArrowsRain";
-import { Spell_fortress } from "../Spells/Spell_fortress";
-import { Spell_healing_aura } from "../Spells/Spell_healing_aura";
-import { Spell_PoisonBomb } from "../Spells/Spell_PoisonBomb";
-import { Spell_Teleportation } from "../Spells/Spell_Teleportation";
+import { spawnGeometry } from "library/game-logic/decoration-spawn";
+import { Spell_fiery_dash } from "../Spells/Fire/Spell_fiery_dash";
+import { Spell_fiery_trail } from "../Spells/Fire/Spell_fiery_trail";
+import { Spell_Fireball } from "../Spells/Fire/Spell_Fireball";
+import { ISpell } from "../Spells/ISpell";
+import { Spell_fear_attack } from "../Spells/Magic/Spell_fear_attack";
+import { Spell_PoisonBomb } from "../Spells/Magic/Spell_PoisonBomb";
+import { Spell_Teleportation } from "../Spells/Magic/Spell_Teleportation";
+import { Spell_Agr_attack } from "../Spells/Melle/Spell_Agr_attack";
+import { Spell_Blocking } from "../Spells/Melle/Spell_Blocking";
+import { Spell_Power_Attack } from "../Spells/Melle/Spell_Power_Attack";
+import { Spell_Vampirism } from "../Spells/Melle/Spell_Vampirism";
+import { Spell_FireArrowsRain } from "../Spells/Utillity/Spell_FireArrowsRain";
+import { Spell_fortress } from "../Spells/Utillity/Spell_fortress";
+import { Spell_healing_aura } from "../Spells/Utillity/Spell_healing_aura";
+import { Spell_Magic_shield } from "../Spells/Utillity/Spell_Magic_shield";
 
 export class Player_GOALCASTLE extends IUnit {
     static CfgUid      : string = "#DefenceTeimur_GoalCastle";
@@ -36,6 +43,7 @@ export class Player_GOALCASTLE extends IUnit {
 
         // ХП
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", 2000);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Sight", 25);
         // убираем починку
         GlobalVars.configs[this.CfgUid].ProfessionParams.Remove(UnitProfession.Reparable);
         // запрещаем самоуничтожение
@@ -147,7 +155,7 @@ export class Player_CASTLE_CHOISE_GAMEMODE extends IUnit {
                 if (gameMode == 1) {
                     ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Режим игры за поселение");
                 } else if (gameMode == 2) {
-                    ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Режим игры за героев");
+                    ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Режим игры за героев. Каждый тип юнитов в волне получает случайный модификатор (защита, иммун к огню, иммун к магии, двойное хп).");
                 }
                 // убираем цену
                 ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Gold",   0);
@@ -389,12 +397,18 @@ export class Player_worker_gamemode2 extends IUnitCaster {
     [
         Spell_fear_attack,
         Spell_fiery_dash,
+        Spell_fiery_trail,
         Spell_FireArrowsRain,
         Spell_Fireball,
         Spell_fortress,
         Spell_healing_aura,
         Spell_PoisonBomb,
-        Spell_Teleportation
+        Spell_Teleportation,
+        Spell_Vampirism,
+        Spell_Blocking,
+        Spell_Agr_attack,
+        Spell_Power_Attack,
+        Spell_Magic_shield
     ];
 
     public hero : IUnitCaster;
@@ -426,6 +440,11 @@ export class Player_worker_gamemode2 extends IUnitCaster {
         ScriptUtils.SetValue(setSpawnPointConfig.CostResources, "People", 0);
         produceList.Add(setSpawnPointConfig);
 
+        // убираем профессию добычу
+        if (cfg.ProfessionParams.ContainsKey(UnitProfession.Harvester)) {
+            cfg.ProfessionParams.Remove(UnitProfession.Harvester);
+        }
+
         ScriptUtils.SetValue(cfg, "Specification", UnitSpecification.None);
     }
 
@@ -445,8 +464,6 @@ export class Player_worker_gamemode2 extends IUnitCaster {
                 }
 
                 if (!this.hero.AddSpell(spell)) {
-                    let msg = createGameMessageWithNoSound("Нет свободных слотов", createHordeColor(255, 255, 100, 100));
-                    this.unit.Owner.Messages.AddMessage(msg);
                     return false;
                 }
 
@@ -483,6 +500,14 @@ export class Hero_Crusader extends IUnitCaster {
     static BaseCfgUid  : string = "#UnitConfig_Slavyane_Spearman";
     protected static _Spells : Array<typeof ISpell> = [];
 
+    constructor(hordeUnit: Unit, teamNum: number) {
+        super(hordeUnit, teamNum);
+    }
+
+    public ReplaceUnit(unit: Unit): void {
+        super.ReplaceUnit(unit);
+    }
+
     public static InitConfig() {
         super.InitConfig();
 
@@ -514,17 +539,67 @@ export class Hero_Crusader extends IUnitCaster {
         if (cfg.AllowedCommands.ContainsKey(UnitCommand.Capture)) {
             cfg.AllowedCommands.Remove(UnitCommand.Capture);
         }
-        // убираем команду удержания позиции
-        if (cfg.AllowedCommands.ContainsKey(UnitCommand.HoldPosition)) {
-            cfg.AllowedCommands.Remove(UnitCommand.HoldPosition);
-        }
-        // убираем профессию добычу
-        if (cfg.ProfessionParams.ContainsKey(UnitProfession.Harvester)) {
-            cfg.ProfessionParams.Remove(UnitProfession.Harvester);
-        }
-
+        
         // убираем дружественный огонь у огня
         ScriptUtils.SetValue(HordeContentApi.GetBulletConfig("#BulletConfig_Fire"), "CanDamageAllied", false);
+    }
+
+    public OnEveryTick(gameTickNum: number): boolean {
+        this._UpdateFrame();   
+
+        return super.OnEveryTick(gameTickNum);
+    }
+
+    private _frameHideFlag : boolean = false;
+    private _frame : GeometryVisualEffect | null;
+    private _UpdateFrame() {
+        if (this.unit.IsDead) {
+            if (this._frame) {
+                this._frame.Free();
+                this._frame = null;
+            }
+            return;
+        }
+
+        if (!this._frame) {
+            this._MakeFrame();
+        } else {
+            this._frame.Position = this.unit.Position;
+
+            // в лесу рамка должна быть невидимой
+            let landscapeMap = ActiveScena.GetRealScena().LandscapeMap;
+            var tile = landscapeMap.Item.get(this.unit.Cell);
+            if (this._frameHideFlag || tile.Cfg.Type == TileType.Forest) {
+                this._frame.Visible = false;
+            } else {
+                this._frame.Visible = true;
+            }
+        }
+    }
+
+    private _MakeFrame() {
+        // Объект для низкоуровневого формирования геометрии
+        let geometryCanvas = new GeometryCanvas();
+        
+        const width  = 32;
+        const height = 32;
+
+        var points = host.newArr(Stride_Vector2, 5)  as Stride_Vector2[];;
+        points[0] = new Stride_Vector2(Math.round(-0.7*width),  Math.round(-0.7*height));
+        points[1] = new Stride_Vector2(Math.round( 0.7*width),  Math.round(-0.7*height));
+        points[2] = new Stride_Vector2(Math.round( 0.7*width),  Math.round( 0.7*height));
+        points[3] = new Stride_Vector2(Math.round(-0.7*width),  Math.round( 0.7*height));
+        points[4] = new Stride_Vector2(Math.round(-0.7*width),  Math.round(-0.7*height));
+
+        geometryCanvas.DrawPolyLine(points,
+            new Stride_Color(
+                this.unit.Owner.SettlementColor.R,
+                this.unit.Owner.SettlementColor.G,
+                this.unit.Owner.SettlementColor.B),
+            3.0, false);
+
+        let ticksToLive = GeometryVisualEffect.InfiniteTTL;
+        this._frame = spawnGeometry(ActiveScena, geometryCanvas.GetBuffers(), this.unit.Position, ticksToLive);
     }
 }
 

@@ -15,4 +15,8 @@ export abstract class ILegendaryUnit extends ITeimurUnit {
             ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", this.Description);
         }
     }
+
+    public static IsLegendaryUnit() : boolean {
+        return true;
+    }
 }

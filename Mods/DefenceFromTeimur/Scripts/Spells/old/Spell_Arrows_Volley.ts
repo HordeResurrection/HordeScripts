@@ -1,9 +1,9 @@
 import { HordeColor, createPF } from "library/common/primitives";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
 import { Stride_Color, ShotParams, UnitMapLayer } from "library/game-logic/horde-types";
-import { ITargetPointSpell } from "./ITargetPointSpell";
-import { IUnitCaster } from "./IUnitCaster";
-import { Cell } from "../Types/Geometry";
+import { ITargetPointSpell } from "../ITargetPointSpell";
+import { IUnitCaster } from "../IUnitCaster";
+import { Cell } from "../../Types/Geometry";
 
 export class Spell_Arrows_Volley extends ITargetPointSpell {
     private static _MaxDistance : number = 6;

@@ -1,5 +1,7 @@
 import { log } from "library/common/logging";
 import { createPoint } from "library/common/primitives";
+import { Int32T } from "library/dotnet/dotnet-types";
+import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { BulletConfig } from "library/game-logic/horde-types";
 
 export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
@@ -64,4 +66,27 @@ export function spawnUnit(settlement, uCfg, direction, position) {
     } else {
         return null;
     }
+}
+
+/**
+ * Складывает массив enum-флагов в один флаг.
+ * Функция нужна из-за того, что здесь в js не получается использовать перегруженный оператор "|".
+ * 
+ * @param flagsType тип флага. Задаётся отдельно, т.к. нельзя использовать "GetType()" без GodMode.
+ * @param flags массив флагов, которые нужно объединить
+ */
+export function removeFlags(flagsType: object, flagsInput: any, ...removeFlagsArray: any[]): any {
+    let mask = 0;
+    for (let f of removeFlagsArray) {
+        mask |= host.cast(Int32T, f) as number;
+    }
+    mask = ~mask;
+
+    return host.cast(flagsType, (flagsInput as number) & mask);
+}
+
+export function formatStringStrict(template: string, params: any[]): string {
+    return template.replace(/\{(\d+)\}/g, (_, index) => 
+        params[Number(index)] !== undefined ? params[Number(index)] : "N/A"
+    );
 }

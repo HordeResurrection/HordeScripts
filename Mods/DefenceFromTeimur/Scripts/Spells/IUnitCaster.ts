@@ -1,14 +1,25 @@
-import { ACommandArgs, ScriptUnitWorkerGetOrder, Unit } from "library/game-logic/horde-types";
+import { ACommandArgs, ScriptUnitWorkerGetOrder, Unit, UnitCommand } from "library/game-logic/horde-types";
 import { ISpell } from "./ISpell";
 import { GlobalVars } from "../GlobalData";
 import { IReviveUnit } from "../Types/IReviveUnit";
+import { createGameMessageWithNoSound } from "library/common/messages";
+import { createHordeColor } from "library/common/primitives";
+import { log } from "library/common/logging";
+import { printObjectItems } from "library/common/introspection";
 
 export class IUnitCaster extends IReviveUnit {
     private static _OpUnitIdToUnitCasterObject : Map<number, IUnitCaster> = new Map<number, IUnitCaster>();
     private static _GetOrderWorkerSet : boolean = false;
     private static _baseGetOrderWorker : HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerGetOrder;
 
+    private static _SpellsMaxCount : number = 5;
+
     public static InitConfig() {
+        // удаляем конфиг, чтобы был скопирован обработчик из базового конфига
+        if (HordeContentApi.HasUnitConfig(this.CfgUid)) {
+            HordeContentApi.RemoveConfig(HordeContentApi.GetUnitConfig(this.CfgUid));
+        }
+
         super.InitConfig();
 
         var cfg = GlobalVars.configs[this.CfgUid];
@@ -46,6 +57,8 @@ export class IUnitCaster extends IReviveUnit {
     }
 
     protected _spells : Array<ISpell>;
+    private _causeDamageHandler : any;
+    private _takeDamageHandler : any;
 
     constructor(hordeUnit: Unit, teamNum: number) {
         super(hordeUnit, teamNum);
@@ -53,10 +66,13 @@ export class IUnitCaster extends IReviveUnit {
         this._spells = new Array<ISpell>();
         IUnitCaster._OpUnitIdToUnitCasterObject.set(this.unit.Id, this);
 
-        // \todo вернуть когда починят горячие клавиши
-        //this.unit.CommandsMind.HideCommand(UnitCommand.MoveToPoint);
-        //this.unit.CommandsMind.HideCommand(UnitCommand.Attack);
-        //this.unit.CommandsMind.HideCommand(UnitCommand.Cancel);
+        this.unit.CommandsMind.HideCommand(UnitCommand.Attack);
+        this.unit.CommandsMind.HideCommand(UnitCommand.MoveToPoint);
+        this.unit.CommandsMind.HideCommand(UnitCommand.Cancel);
+
+        var that = this;
+        this._causeDamageHandler = this.unit.EventsMind.CauseDamage.connect((sender, args) => that.OnCauseDamage(sender, args));
+        this._takeDamageHandler  = this.unit.EventsMind.TakeDamage.connect((sender, args) => that.OnTakeDamage(sender, args));
     }
 
     public AddSpell(spellType: typeof ISpell) : boolean {
@@ -69,12 +85,21 @@ export class IUnitCaster extends IReviveUnit {
         }
 
         if (spellNum < this._spells.length) {
-            this._spells[spellNum].LevelUp();
-            return true;
-        } else if (spellNum == this._spells.length && this._spells.length < 4) {
+            if (this._spells[spellNum].LevelUp()) {
+                let msg = createGameMessageWithNoSound("Способность улучшена!", createHordeColor(255, 255, 100, 100));
+                this.unit.Owner.Messages.AddMessage(msg);
+                return true;
+            } else {
+                let msg = createGameMessageWithNoSound("Способность максимального уровня!", createHordeColor(255, 255, 100, 100));
+                this.unit.Owner.Messages.AddMessage(msg);
+                return false;
+            }
+        } else if (spellNum == this._spells.length && this._spells.length < this.constructor["_SpellsMaxCount"]) {
             this._spells.push(new spellType(this));
             return true;
         } else {
+            let msg = createGameMessageWithNoSound("Нет свободных слотов!", createHordeColor(255, 255, 100, 100));
+            this.unit.Owner.Messages.AddMessage(msg);
             return false;
         }
     }
@@ -87,6 +112,14 @@ export class IUnitCaster extends IReviveUnit {
         this._spells.forEach(spell => spell.OnEveryTick(gameTickNum));
 
         return super.OnEveryTick(gameTickNum);
+    }
+
+    public OnCauseDamage(sender: any, args: any) {
+        this._spells.forEach(spell => spell.OnCauseDamage(args.VictimUnit, args.Damage, args.EffectiveDamage, args.HurtType));
+    }
+
+    public OnTakeDamage(sender: any, args: any) {
+        this._spells.forEach(spell => spell.OnTakeDamage(args.AttackerUnit, args.Damage, args.HurtType));
     }
 
     public OnOrder(commandArgs: ACommandArgs) {
@@ -104,6 +137,16 @@ export class IUnitCaster extends IReviveUnit {
 
     public ReplaceUnit(unit: Unit): void {
         super.ReplaceUnit(unit);
+
+        this.unit.CommandsMind.HideCommand(UnitCommand.Attack);
+        this.unit.CommandsMind.HideCommand(UnitCommand.MoveToPoint);
+        this.unit.CommandsMind.HideCommand(UnitCommand.Cancel);
+
+        this._causeDamageHandler.disconnect();
+        this._takeDamageHandler.disconnect();
+        var that = this;
+        this._causeDamageHandler = this.unit.EventsMind.CauseDamage.connect((sender, args) => that.OnCauseDamage(sender, args));
+        this._takeDamageHandler  = this.unit.EventsMind.TakeDamage.connect((sender, args) => that.OnTakeDamage(sender, args));
 
         IUnitCaster._OpUnitIdToUnitCasterObject.set(this.unit.Id, this);
         this._spells.forEach(spell => spell.OnReplacedCaster(this));

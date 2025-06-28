@@ -211,7 +211,77 @@
         }
       }
     },
-	  {
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_Command_Agr_attack",
+      "Description": "Command button \"Spell_Agr_attack\"",
+      "InternalEditorPath": "Units\\Commands\\Capture\\Spell_Agr_attack",
+      "RootSection": {
+        "States": {
+          "Focused": "Spell_Agr_attack_focused",
+          "Pressed": "Spell_Agr_attack_pressed",
+          "Regular": "Spell_Agr_attack_regular",
+          "Disabled": "Spell_Agr_attack_disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_Command_Blocking",
+      "Description": "Command button \"Spell_Blocking\"",
+      "InternalEditorPath": "Units\\Commands\\Capture\\Spell_Blocking",
+      "RootSection": {
+        "States": {
+          "Focused": "Spell_Blocking_focused",
+          "Pressed": "Spell_Blocking_pressed",
+          "Regular": "Spell_Blocking_regular",
+          "Disabled": "Spell_Blocking_disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_Command_Power_Attack",
+      "Description": "Command button \"Spell_Power_Attack\"",
+      "InternalEditorPath": "Units\\Commands\\Capture\\Spell_Power_Attack",
+      "RootSection": {
+        "States": {
+          "Focused": "Spell_Power_Attack_focused",
+          "Pressed": "Spell_Power_Attack_pressed",
+          "Regular": "Spell_Power_Attack_regular",
+          "Disabled": "Spell_Power_Attack_disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_Command_Vampirism",
+      "Description": "Command button \"Spell_Vampirism\"",
+      "InternalEditorPath": "Units\\Commands\\Capture\\Spell_Vampirism",
+      "RootSection": {
+        "States": {
+          "Focused": "Spell_Vampirism_focused",
+          "Pressed": "Spell_Vampirism_pressed",
+          "Regular": "Spell_Vampirism_regular",
+          "Disabled": "Spell_Vampirism_disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_Command_Magic_shield",
+      "Description": "Command button \"Spell_Magic_shield\"",
+      "InternalEditorPath": "Units\\Commands\\Capture\\Spell_Magic_shield",
+      "RootSection": {
+        "States": {
+          "Focused": "Spell_Magic_shield_focused",
+          "Pressed": "Spell_Magic_shield_pressed",
+          "Regular": "Spell_Magic_shield_regular",
+          "Disabled": "Spell_Magic_shield_disabled"
+        }
+      }
+    },
+    {
       "$type": "HordeClassLibrary::UnitAnimationsCatalog",
       "Uid": "#AnimCatalog_Nature_Invisibility_Horse",
       "Description": "invisibility_horse",
@@ -392,6 +462,28 @@
       "RootSection": {
         "Variations": [
           "635d995199d74f33914c907344762ed7_green"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "d8ca2086c4e5409d9411006751e3f4a0_red",
+      "Description": "magic1",
+      "InternalEditorPath": "Effects\\magic1",
+      "RootSection": {
+        "Variations": [
+          "ad059387086f497dba3d5f10225c562f_red"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "d8ca2086c4e5409d9411006751e3f4a0_babble",
+      "Description": "magic1",
+      "InternalEditorPath": "Effects\\magic1",
+      "RootSection": {
+        "Variations": [
+          "ad059387086f497dba3d5f10225c562f_babble"
         ]
       }
     }
