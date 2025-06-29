@@ -12643,6 +12643,10 @@ declare namespace HordeClassLibrary.World.Objects.Bullets {
 			layerType: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer
 		): boolean;
 
+		CanFlyOverUnitAtLayer(
+			layerType: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer
+		): boolean;
+
 		CheckDetailedCollideWithUnit(
 			unit: HordeClassLibrary.World.Objects.Units.Unit | null
 		): boolean;
@@ -12659,6 +12663,8 @@ declare namespace HordeClassLibrary.World.Objects.Bullets {
 		DamageCell(
 			magicDamage: boolean
 		): void;
+
+		ForceFinish(): void;
 
 		UtterSound(
 			sectionName: string | null,
