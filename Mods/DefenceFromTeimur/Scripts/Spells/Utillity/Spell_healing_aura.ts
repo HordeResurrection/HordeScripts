@@ -8,16 +8,16 @@ import { Cell } from "../../Types/Geometry";
 export class Spell_healing_aura extends ISpell {
     private static _MaxDistance : number = 7;
     private static _HealPeriod  : number = 50;
-    private static _HealHp      : number = 4;
+    private static _HealHp      : number = 5;
 
     protected static _ButtonUid                     : string = "Spell_healing_aura";
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_healing_aura";
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(75, 255, 59, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 75, 255, 59);
-    protected static _SpellPreferredProductListPosition : Cell = new Cell(3, 0);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(4, 0);
 
     private static _AuraDurationPerLevel   : Array<number> = [
-        7, 8, 9, 10, 12
+        8, 10, 12, 14, 16
     ].map(sec => sec*50);
     protected static _ChargesCountPerLevel   : Array<number> = [
         1, 1, 2, 2, 3

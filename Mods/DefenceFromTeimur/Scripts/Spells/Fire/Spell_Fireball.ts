@@ -13,18 +13,19 @@ export class Spell_Fireball extends ITargetPointSpell {
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_fireball";
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(228, 18, 47, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 228, 18, 47);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(1, 0);
 
     private static _FireballMaxDistancePerLevel   : Array<number> = [
-        10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+        10, 11, 12, 13, 14
     ];
     private static _FireballDamagePerLevel   : Array<number> = [
-        10, 11, 12, 13, 14, 15, 16, 17, 18, 22
+        10, 11, 12, 13, 14
     ];
     protected static _ChargesCountPerLevel   : Array<number> = [
-        1, 1, 1, 1, 2, 2, 2, 2, 2, 3
+        1, 2, 3, 4, 5
     ];
 
-    protected static _MaxLevel                      : number = 9;
+    protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Огненный шар";
     protected static _DescriptionTemplate           : string =
         "Запускает огненный шар в выбранном направлении до {0} клеток, который наносит {1} магического урона и поджигает врагов.";
@@ -37,7 +38,7 @@ export class Spell_Fireball extends ITargetPointSpell {
         var config = super.GetCommandConfig(slotNum, level);
 
         if (!this._Init) {
-            this._BulletConfig = HordeContentApi.GetBulletConfig("#BulletConfig_Fireball");
+            this._BulletConfig = HordeContentApi.GetBulletConfig("#BulletConfig_DragonFire");
             // убираем дружественный огонь у огня
             ScriptUtils.SetValue(this._BulletConfig, "CanDamageAllied", false);
             this._ShotParamsPerLevel = new Array<ShotParams>(this._MaxLevel + 1);

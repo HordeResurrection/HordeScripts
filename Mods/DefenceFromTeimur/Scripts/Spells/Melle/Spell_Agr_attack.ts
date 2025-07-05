@@ -13,17 +13,20 @@ export class Spell_Agr_attack extends ISpell {
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_Agr_attack";
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(81, 207, 207, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 81, 207, 207);
-    protected static _SpellPreferredProductListPosition : Cell = new Cell(2, 0);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(3, 0);
 
     private static _AgrTimePerLevel   : Array<number> = [
-        7*50, 9*50, 11*50, 13*50, 15*50, 17*50, 19*50, 21*50, 23*50, 25*50
-    ];
+        7, 9, 11, 13, 15
+    ].map(sec => sec*50);
     private static _AgrRadiusPerLevel : Array<number> = [
-        3, 4, 4, 5, 5, 6, 6, 7, 7, 12
+        4, 5, 6, 7, 8
+    ];
+    protected static _ChargesCountPerLevel : Array<number> = [
+        1, 1, 2, 2, 3
     ];
     private static _AgrEffectConfig : VisualEffectConfig = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_MagicCircle_red");
 
-    protected static _MaxLevel                      : number = 9;
+    protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Приступ ярости";
     protected static _DescriptionTemplate           : string
         = "Вселяет ярость к вам во вражеских юнитов в радиусе {0} клеток на {1} секунд.";
@@ -89,7 +92,7 @@ export class Spell_Agr_attack extends ISpell {
                 unitPoint);
 
             //unit.AllowCommands();
-            unit.GivePointCommand(agrCell, UnitCommand.Attack, AssignOrderMode.Replace);
+            unit.GivePointCommand(agrCell, UnitCommand.MoveToPoint, AssignOrderMode.Replace);
             //unit.DisallowCommands();
         }
 

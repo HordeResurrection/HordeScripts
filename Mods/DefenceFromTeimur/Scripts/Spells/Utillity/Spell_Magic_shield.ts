@@ -9,9 +9,9 @@ import { log } from "library/common/logging";
 export class Spell_Magic_shield extends IPassiveSpell {
     protected static _ButtonUid                     : string = "Spell_Magic_shield";
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_Magic_shield";
-    protected static _SpellPreferredProductListPosition : Cell = new Cell(3, 0);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(4, 0);
 
-    protected static _ChargesCountPerLevel          : Array<number> = [ 1, 2, 4, 6, 8 ];
+    protected static _ChargesCountPerLevel          : Array<number> = [ 3, 5, 7, 9, 11 ];
 
     private static _ShieldEffect : VisualEffectConfig = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_MagicBabble");
 

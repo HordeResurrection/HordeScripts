@@ -12,18 +12,18 @@ export class Spell_Teleportation extends ITargetPointSpell {
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_teleportation";
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(139, 133, 172, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 139, 133, 172);
-    protected static _SpellPreferredProductListPosition : Cell = new Cell(1, 0);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(2, 0);
 
     private static _TeleportDamageEffectConfig : VisualEffectConfig = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_MagicCircle");
 
     private static _TeleportMaxDistancePerLevel : Array<number> = [
-        6, 8, 10, 12, 18
+        8, 10, 12, 14, 16
     ];
     protected static _ChargesCountPerLevel : Array<number> = [
-        1, 1, 2, 2, 3
+        1, 2, 3, 4, 5
     ];
     private static _TeleportAddDamagePerLevel : Array<number> = [
-        0, 0, 1, 2, 3
+        5, 7, 9, 11, 14
     ]
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Телепортация";
@@ -65,8 +65,11 @@ export class Spell_Teleportation extends ITargetPointSpell {
                     for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
                         if (this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(u.value.Owner) == DiplomacyStatus.War
                             && !u.value.Cfg.Flags.HasFlag(UnitFlags.MagicResistant)) {
-                            u.value.BattleMind.TakeDamage(Spell_Teleportation._TeleportAddDamagePerLevel[this.level]
-                                + u.value.Cfg.Shield,
+                            // u.value.BattleMind.TakeDamage(Spell_Teleportation._TeleportAddDamagePerLevel[this.level]
+                            //     + u.value.Cfg.Shield,
+                            //     UnitHurtType.Any);
+                            this._caster.unit.BattleMind.CauseDamage(u.value,
+                                Spell_Teleportation._TeleportAddDamagePerLevel[this.level] + u.value.Cfg.Shield,
                                 UnitHurtType.Any);
                             spawnDecoration(
                                 ActiveScena.GetRealScena(),

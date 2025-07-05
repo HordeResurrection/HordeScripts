@@ -1,12 +1,10 @@
 import { Cell } from "./Geometry";
 import { GlobalVars } from "../GlobalData";
-import { broadcastMessage, createGameMessageWithSound } from "library/common/messages";
+import { createGameMessageWithSound } from "library/common/messages";
 import { createHordeColor } from "library/common/primitives";
-import { UnitConfig, UnitDirection } from "library/game-logic/horde-types";
-import { ILegendaryUnit } from "./ILegendaryUnit";
+import { UnitDirection } from "library/game-logic/horde-types";
 import { WaveUnit, Wave } from "./IAttackPlan";
 import { spawnUnits } from "library/game-logic/unit-spawn";
-import { TeimurUnitsModificators } from "./ITeimurUnit";
 
 export abstract class ISpawner {
     name: string;
@@ -19,7 +17,7 @@ export abstract class ISpawner {
 
         this.queue = new Array<WaveUnit>();
     }
-
+ 
     public Generator() : any {
         return {
             next: function() {
@@ -34,7 +32,7 @@ export abstract class ISpawner {
                 continue;
             }
 
-            this.queue.push(new WaveUnit(wave.waveUnits[i].unitClass, wave.waveUnits[i].unitClass.GetSpawnCount(wave.waveUnits[i].count)));
+            this.queue.push(new WaveUnit(wave.waveUnits[i].unitClass, wave.waveUnits[i].unitClass.GetSpawnCount(wave.waveUnits[i].count), wave.waveUnits[i].modificator));
         }
     }
 
@@ -43,19 +41,14 @@ export abstract class ISpawner {
             return;
         }
 
-        this.queue.push(new WaveUnit(waveUnit.unitClass, waveUnit.count));
+        this.queue.push(new WaveUnit(waveUnit.unitClass, waveUnit.count, waveUnit.modificator));
     }
 
     public OnEveryTick (gameTickNum: number) {
         var generator = this.Generator();
 
         for (var i = 0; i < this.queue.length; i++) {
-            var modificator : TeimurUnitsModificators.Type;
-            if (this.queue[i].unitClass.IsLegendaryUnit()) {
-                modificator = TeimurUnitsModificators.Type.NULL;
-            } else {
-                modificator = TeimurUnitsModificators.RandomModificator();
-            }
+            var modificator  = this.queue[i].modificator;
             var spawnedCfg   = this.queue[i].unitClass.GetConfigWithModificator(modificator);
             var spawnedUnits = spawnUnits(GlobalVars.teams[this.teamNum].teimurSettlement,
                 spawnedCfg,

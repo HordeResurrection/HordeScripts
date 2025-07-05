@@ -11,7 +11,8 @@ export enum SpellState {
     READY,
     ACTIVATED,
     ACTIVATED_DELAY,
-    WAIT_CHARGE
+    WAIT_CHARGE,
+    WAIT_DELETE
 }
 
 export class ISpell {
@@ -39,6 +40,11 @@ export class ISpell {
     protected static _ChargesReloadTime             : number = 50*60;
     protected static _ActivateDelay                 : number = 50;
     protected static _ChargesCountPerLevel          : Array<number> = [ 1 ];
+
+    /** флаг, что расходник */
+    protected static _IsConsumables                 : boolean = false;
+
+    protected static _IsPassive : boolean = false;
 
     public static GetName(level: number) : string {
         if (level == -1) {
@@ -169,9 +175,17 @@ export class ISpell {
 
         // ищем свободный слот
         var casterSpells = this._caster.Spells();
-        for (this._slotNum = 0; this._slotNum < 4; this._slotNum++) {
-            if (casterSpells.findIndex(spell => spell._slotNum == this._slotNum) == -1) {
-                break;
+        if (this.constructor["_IsPassive"]) {
+            for (this._slotNum = 4; this._slotNum >= 0; this._slotNum--) {
+                if (casterSpells.findIndex(spell => spell._slotNum == this._slotNum) == -1) {
+                    break;
+                }
+            }
+        } else {
+            for (this._slotNum = 0; this._slotNum < 5; this._slotNum++) {
+                if (casterSpells.findIndex(spell => spell._slotNum == this._slotNum) == -1) {
+                    break;
+                }
             }
         }
 
@@ -215,10 +229,11 @@ export class ISpell {
             this._activatedEffect.Color     = this.constructor['_EffectHordeColor'];
             this._activatedEffect.DrawLayer = DrawLayer.Birds;
 
-            // запускаем перезарядку заряда
-            log.info("заряд пошел на перезарядку");
-            this._charges--;
-            this._chargesReloadTicks.push(this._activatedTick + this.constructor['_ChargesReloadTime']);
+            // запускаем перезарядку заряда если не расходник
+            if (!this.constructor["_IsConsumables"]) {
+                this._charges--;
+                this._chargesReloadTicks.push(this._activatedTick + this.constructor['_ChargesReloadTime']);
+            }
 
             return true;
         } else {
@@ -248,8 +263,12 @@ export class ISpell {
             case SpellState.ACTIVATED:
                 if (!this._OnEveryTickActivated(gameTickNum)) {
                     if (this._charges == 0) {
-                        this._state = SpellState.WAIT_CHARGE;
-                        this._caster.unit.CommandsMind.RemoveAddedCommand(this.GetUnitCommand());
+                        if (this.constructor["_IsConsumables"]) {
+                            this._state = SpellState.WAIT_DELETE;
+                        } else {
+                            this._state = SpellState.WAIT_CHARGE;
+                            this._caster.unit.CommandsMind.RemoveAddedCommand(this.GetUnitCommand());
+                        }
                     } else {
                         this._state = SpellState.ACTIVATED_DELAY;
                     }
@@ -269,6 +288,10 @@ export class ISpell {
         }
 
         return true;
+    }
+
+    public State() : SpellState {
+        return this._state;
     }
 
     public LevelUp() : boolean {

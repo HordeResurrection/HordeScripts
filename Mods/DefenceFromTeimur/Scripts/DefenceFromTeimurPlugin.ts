@@ -3,8 +3,8 @@ import HordePluginBase from "plugins/base-plugin";
 import { AttackPlansClass } from "./Realizations/AttackPlans";
 import { Cell, Rectangle } from "./Types/Geometry";
 import { Team } from "./Types/Team";
-import { createHordeColor, createPoint, Point2D } from "library/common/primitives";
-import { UnitHurtType, UnitDirection, DiplomacyStatus, Settlement } from "library/game-logic/horde-types";
+import { createHordeColor, createPoint, createResourcesAmount, Point2D } from "library/common/primitives";
+import { UnitHurtType, UnitDirection, DiplomacyStatus, Settlement, UnitConfig, BulletConfig } from "library/game-logic/horde-types";
 import { spawnUnit, spawnUnits } from "library/game-logic/unit-spawn";
 import { Hero_Crusader, PlayerUnitsClass, Player_CASTLE_CHOISE_ATTACKPLAN, Player_CASTLE_CHOISE_DIFFICULT, Player_CASTLE_CHOISE_GAMEMODE, Player_GOALCASTLE, Player_worker_gamemode1, Player_worker_gamemode2 } from "./Realizations/Player_units";
 import { TeimurUnitsClass, TeimurLegendaryUnitsClass } from "./Realizations/Teimur_units";
@@ -38,6 +38,8 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         GlobalVars.unitsMap        = ActiveScena.GetRealScena().UnitsMap;
 
         GlobalVars.plugin          = this;
+
+        GlobalVars.unionResourcesActived = false;
     }
 
     public onFirstRun() {
@@ -144,6 +146,17 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
     private Init(gameTickNum: number) {
         GlobalVars.rnd = ActiveScena.GetRealScena().Context.Randomizer;
+
+        // настройка конфига огня
+
+        var fireCfg = HordeContentApi.GetBulletConfig("#BulletConfig_Fire");
+        fireCfg.SpecialParams.DamagePeriod[0] = 16;
+        fireCfg.SpecialParams.DamagePeriod[1] = 16;
+        fireCfg.SpecialParams.DamagePeriod[2] = 16;
+        //ScriptUtils.SetValue(fireCfg.SpecialParams, "BurningPhaseChangePeriod", 64);
+        //ScriptUtils.SetValue(fireCfg.SpecialParams, "MaxNoDamageTicks", 2);
+        ScriptUtils.SetValue(fireCfg.SpecialParams, "MinDamageToFade", 1);
+        ScriptUtils.SetValue(fireCfg.SpecialParams, "MaxDamageToFade", 1);
 
         //////////////////////////////////////////
         // инициализируем игроков в командах
@@ -368,20 +381,27 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         // выбор волны
         //////////////////////////////////////////
 
-        var choisedAttackPlanIdx = -1;
+        var choisedAttackPlanIdx = 0;
 
         // проверяем выбирается ли волна
         // @ts-expect-error
         if (!GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig) {
             return;
         }
+        // @ts-expect-error
+        var producedUnitConfigUid = GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Uid;
 
         // выбранная волна
-        // @ts-expect-error
-        choisedAttackPlanIdx = parseInt(GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
+        for (choisedAttackPlanIdx = 0; choisedAttackPlanIdx < AttackPlansClass.length; choisedAttackPlanIdx++) {
+            if (AttackPlansClass[choisedAttackPlanIdx].GetUnitConfig().Uid == producedUnitConfigUid) {
+                break;
+            }
+        }
+        
+        //= parseInt(GlobalVars.teams[this.hostPlayerTeamNum].castle.unit.OrdersMind.ActiveOrder.ProductUnitConfig.Shield);
 
         // проверяем, что выбран план атаки
-        if (choisedAttackPlanIdx == -1) {
+        if (choisedAttackPlanIdx == AttackPlansClass.length) {
             return;
         }
 
@@ -404,7 +424,7 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
         GlobalVars.attackPlan = new AttackPlansClass[choisedAttackPlanIdx]();
         broadcastMessage("Был выбран план атаки " + choisedAttackPlanIdx, createHordeColor(255, 100, 100, 100));
-        broadcastMessage(AttackPlansClass[choisedAttackPlanIdx].Description, createHordeColor(255, 255, 50, 10));
+        broadcastMessage(AttackPlansClass[choisedAttackPlanIdx].GetUnitConfig().Description, createHordeColor(255, 255, 50, 10));
         {
             var secondsLeft = Math.round(GlobalVars.attackPlan.waves[0].gameTickNum) / FPS;
             var minutesLeft = Math.floor(secondsLeft / 60);
@@ -417,7 +437,9 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
         GlobalVars.incomePlan = new AttackPlansClass[choisedAttackPlanIdx].IncomePlanClass();
         broadcastMessage(AttackPlansClass[choisedAttackPlanIdx].IncomePlanClass.Description, createHordeColor(255, 255, 50, 10));
-        broadcastMessage("Активирован режим общих ресурсов, каждый 10 секунд идет усреднение ресов", createHordeColor(255, 255, 50, 10));
+        if (GlobalVars.unionResourcesActived) {
+            broadcastMessage("Активирован режим общих ресурсов, каждый 10 секунд идет усреднение ресов", createHordeColor(255, 255, 50, 10));
+        }
 
         // считаем сколько будет врагов
 
@@ -704,34 +726,34 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
 
         // усредняем ресурсы игроков
 
-        // if (gameTickNum % 500 == 0) {
-        //     for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
-        //         // проверяем, что поселение в игре
-        //         if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
-        //             continue;
-        //         }
+        if (GlobalVars.unionResourcesActived && gameTickNum % 500 == 0) {
+            for (var teamNum = 0; teamNum < GlobalVars.teams.length; teamNum++) {
+                // проверяем, что поселение в игре
+                if (GlobalVars.teams[teamNum].settlementsIdx.length == 0) {
+                    continue;
+                }
 
-        //         var avgGold   : number = 0;
-        //         var avgMetal  : number = 0;
-        //         var avgLumber : number = 0;
-        //         var avgPeople : number = 0;
-        //         for (var settlement of GlobalVars.teams[teamNum].settlements) {
-        //             avgGold   += settlement.Resources.Gold;
-        //             avgMetal  += settlement.Resources.Metal;
-        //             avgLumber += settlement.Resources.Lumber;
-        //             avgPeople += settlement.Resources.FreePeople;
-        //         }
-        //         avgGold   = Math.round(avgGold   / GlobalVars.teams[teamNum].settlements.length);
-        //         avgMetal  = Math.round(avgMetal  / GlobalVars.teams[teamNum].settlements.length);
-        //         avgLumber = Math.round(avgLumber / GlobalVars.teams[teamNum].settlements.length);
-        //         avgPeople = Math.round(avgPeople / GlobalVars.teams[teamNum].settlements.length);
+                var avgGold   : number = 0;
+                var avgMetal  : number = 0;
+                var avgLumber : number = 0;
+                var avgPeople : number = 0;
+                for (var settlement of GlobalVars.teams[teamNum].settlements) {
+                    avgGold   += settlement.Resources.Gold;
+                    avgMetal  += settlement.Resources.Metal;
+                    avgLumber += settlement.Resources.Lumber;
+                    avgPeople += settlement.Resources.FreePeople;
+                }
+                avgGold   = Math.round(avgGold   / GlobalVars.teams[teamNum].settlements.length);
+                avgMetal  = Math.round(avgMetal  / GlobalVars.teams[teamNum].settlements.length);
+                avgLumber = Math.round(avgLumber / GlobalVars.teams[teamNum].settlements.length);
+                avgPeople = Math.round(avgPeople / GlobalVars.teams[teamNum].settlements.length);
                 
-        //         for (var settlement of GlobalVars.teams[teamNum].settlements) {
-        //             settlement.Resources.TakeResources(settlement.Resources.GetCopy());
-        //             settlement.Resources.AddResources(createResourcesAmount(avgGold, avgMetal, avgLumber, avgPeople));
-        //         }
-        //     }
-        // }
+                for (var settlement of GlobalVars.teams[teamNum].settlements) {
+                    settlement.Resources.TakeResources(settlement.Resources.GetCopy());
+                    settlement.Resources.AddResources(createResourcesAmount(avgGold, avgMetal, avgLumber, avgPeople));
+                }
+            }
+        }
     }
 
     private End(gameTickNum: number) {

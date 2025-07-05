@@ -15,23 +15,23 @@ export class Spell_FireArrowsRain extends ITargetPointSpell {
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_FireArrowsRain";
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(228, 18, 47, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 228, 18, 47);
-    protected static _SpellPreferredProductListPosition : Cell = new Cell(3, 0);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(1, 0);
 
     protected static _ChargesCountPerLevel          : Array<number> = [
-        1, 1, 1, 1, 1, 2, 2, 2, 2, 3
+        3, 5, 7, 9, 12
     ];
 
     private static _RainArrowsCountPerLevel   : Array<number> = [
-        10, 15, 20, 25, 30, 35, 40, 45, 50, 70
+        10, 15, 20, 25, 30
     ];
     private static _RainRadiusPerLevel : Array<number> = [
-        2, 2, 2, 3, 3, 3, 4, 4, 4, 4
+        2, 2, 2, 3, 3
     ];
     private static _RainLaunchMaxDistancePerLevel   : Array<number> = [
-        10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+        10, 12, 14, 16, 18
     ];
 
-    protected static _MaxLevel                      : number = 9;
+    protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Дождь огненных стрел";
     protected static _DescriptionTemplate           : string =
         "Запускает дождь из {0} огненных стрел радиусом в {1} клеток на расстояние до {2} клеток.";

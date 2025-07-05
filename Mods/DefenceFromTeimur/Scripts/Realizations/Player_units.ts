@@ -12,7 +12,7 @@ import { ITeimurUnit } from "../Types/ITeimurUnit";
 import { IReviveUnit } from "../Types/IReviveUnit";
 import { IUnitCaster } from "../Spells/IUnitCaster";
 import { createGameMessageWithNoSound } from "library/common/messages";
-import { createHordeColor } from "library/common/primitives";
+import { createHordeColor, createPoint } from "library/common/primitives";
 import { spawnGeometry } from "library/game-logic/decoration-spawn";
 import { Spell_fiery_dash } from "../Spells/Fire/Spell_fiery_dash";
 import { Spell_fiery_trail } from "../Spells/Fire/Spell_fiery_trail";
@@ -25,7 +25,7 @@ import { Spell_Agr_attack } from "../Spells/Melle/Spell_Agr_attack";
 import { Spell_Blocking } from "../Spells/Melle/Spell_Blocking";
 import { Spell_Power_Attack } from "../Spells/Melle/Spell_Power_Attack";
 import { Spell_Vampirism } from "../Spells/Melle/Spell_Vampirism";
-import { Spell_FireArrowsRain } from "../Spells/Utillity/Spell_FireArrowsRain";
+import { Spell_FireArrowsRain } from "../Spells/Fire/Spell_FireArrowsRain";
 import { Spell_fortress } from "../Spells/Utillity/Spell_fortress";
 import { Spell_healing_aura } from "../Spells/Utillity/Spell_healing_aura";
 import { Spell_Magic_shield } from "../Spells/Utillity/Spell_Magic_shield";
@@ -82,11 +82,20 @@ export class Player_CASTLE_CHOISE_DIFFICULT extends IUnit {
             var produceList    = producerParams.CanProduceList;
             produceList.Clear();
 
-            var choise_BaseCfgUid = "#UnitConfig_Barbarian_Swordmen";
+            var choise_BaseCfgUids = ["#UnitConfig_Slavyane_Worker1", "#UnitConfig_Barbarian_Swordmen", "#UnitConfig_Slavyane_Heavymen"];
             var choise_CfgUid     = this.CfgUid + "_";
             for (var difficultIdx = 1; difficultIdx <= GlobalVars.difficult + 2; difficultIdx++) {
+                var baseCfgUid : string;
+                if (difficultIdx < GlobalVars.difficult) {
+                    baseCfgUid = choise_BaseCfgUids[0];
+                } else if (difficultIdx == GlobalVars.difficult) {
+                    baseCfgUid = choise_BaseCfgUids[1];
+                } else {
+                    baseCfgUid = choise_BaseCfgUids[2];
+                }
+
                 var unitChoise_CfgUid = choise_CfgUid + difficultIdx;
-                GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(choise_BaseCfgUid, unitChoise_CfgUid);
+                GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(baseCfgUid, unitChoise_CfgUid);
 
                 // назначаем имя
                 ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Name", "Выбрать сложность " + difficultIdx);
@@ -107,6 +116,7 @@ export class Player_CASTLE_CHOISE_DIFFICULT extends IUnit {
                 ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "People", 0);
                 // убираем требования
                 GlobalVars.configs[unitChoise_CfgUid].TechConfig.Requirements.Clear();
+                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "PreferredProductListPosition", createPoint(0, difficultIdx - 1));
 
                 produceList.Add(GlobalVars.configs[unitChoise_CfgUid]);
             }
@@ -141,11 +151,11 @@ export class Player_CASTLE_CHOISE_GAMEMODE extends IUnit {
             var produceList    = producerParams.CanProduceList;
             produceList.Clear();
 
-            var choise_BaseCfgUid = "#UnitConfig_Barbarian_Swordmen";
+            var choise_BaseCfgUids = ["#UnitConfig_Slavyane_Worker1", "#UnitConfig_Slavyane_Spearman"];
             var choise_CfgUid     = this.CfgUid + "_";
             for (var gameMode = 1; gameMode <= 2; gameMode++) {
                 var unitChoise_CfgUid = choise_CfgUid + gameMode;
-                GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(choise_BaseCfgUid, unitChoise_CfgUid);
+                GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(choise_BaseCfgUids[gameMode - 1], unitChoise_CfgUid);
 
                 // назначаем имя
                 ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Name", "Выбрать режим игры " + gameMode);
@@ -155,7 +165,7 @@ export class Player_CASTLE_CHOISE_GAMEMODE extends IUnit {
                 if (gameMode == 1) {
                     ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Режим игры за поселение");
                 } else if (gameMode == 2) {
-                    ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Режим игры за героев. Каждый тип юнитов в волне получает случайный модификатор (защита, иммун к огню, иммун к магии, двойное хп).");
+                    ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", "Режим игры за героев");
                 }
                 // убираем цену
                 ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Gold",   0);
@@ -198,27 +208,8 @@ export class Player_CASTLE_CHOISE_ATTACKPLAN extends IUnit {
             var produceList    = producerParams.CanProduceList;
             produceList.Clear();
 
-            var choise_BaseCfgUid = "#UnitConfig_Barbarian_Swordmen";
-            var choise_CfgUid     = this.CfgUid + "_";
             for (var planIdx = 0; planIdx < AttackPlansClass.length; planIdx++) {
-                var unitChoise_CfgUid = choise_CfgUid + planIdx;
-                GlobalVars.configs[unitChoise_CfgUid] = CreateUnitConfig(choise_BaseCfgUid, unitChoise_CfgUid);
-
-                // назначаем имя
-                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Name", "Выбрать волну " + planIdx);
-                // Броня
-                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Shield", planIdx);
-                // описание
-                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid], "Description", AttackPlansClass[planIdx].Description + "\nИнком:" + AttackPlansClass[planIdx].IncomePlanClass.Description);
-                // убираем цену
-                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Gold",   0);
-                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Metal",  0);
-                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "Lumber", 0);
-                ScriptUtils.SetValue(GlobalVars.configs[unitChoise_CfgUid].CostResources, "People", 0);
-                // убираем требования
-                GlobalVars.configs[unitChoise_CfgUid].TechConfig.Requirements.Clear();
-
-                produceList.Add(GlobalVars.configs[unitChoise_CfgUid]);
+                produceList.Add(AttackPlansClass[planIdx].GetUnitConfig());
             }
         }
     }
@@ -496,8 +487,8 @@ export class Player_worker_gamemode2 extends IUnitCaster {
 }
 
 export class Hero_Crusader extends IUnitCaster {
-    static CfgUid      : string = "#DefenceTeimur_Teimur_Crusader";
-    static BaseCfgUid  : string = "#UnitConfig_Slavyane_Spearman";
+    public static CfgUid      : string = "#DefenceTeimur_Teimur_Crusader";
+    public static BaseCfgUid  : string = "#UnitConfig_Slavyane_Spearman";
     protected static _Spells : Array<typeof ISpell> = [];
 
     constructor(hordeUnit: Unit, teamNum: number) {
@@ -585,18 +576,18 @@ export class Hero_Crusader extends IUnitCaster {
         const height = 32;
 
         var points = host.newArr(Stride_Vector2, 5)  as Stride_Vector2[];;
-        points[0] = new Stride_Vector2(Math.round(-0.7*width),  Math.round(-0.7*height));
-        points[1] = new Stride_Vector2(Math.round( 0.7*width),  Math.round(-0.7*height));
-        points[2] = new Stride_Vector2(Math.round( 0.7*width),  Math.round( 0.7*height));
-        points[3] = new Stride_Vector2(Math.round(-0.7*width),  Math.round( 0.7*height));
-        points[4] = new Stride_Vector2(Math.round(-0.7*width),  Math.round(-0.7*height));
+        points[0] = new Stride_Vector2(Math.round(-0.6*width),  Math.round(-0.6*height));
+        points[1] = new Stride_Vector2(Math.round( 0.6*width),  Math.round(-0.6*height));
+        points[2] = new Stride_Vector2(Math.round( 0.6*width),  Math.round( 0.6*height));
+        points[3] = new Stride_Vector2(Math.round(-0.6*width),  Math.round( 0.6*height));
+        points[4] = new Stride_Vector2(Math.round(-0.6*width),  Math.round(-0.6*height));
 
         geometryCanvas.DrawPolyLine(points,
             new Stride_Color(
                 this.unit.Owner.SettlementColor.R,
                 this.unit.Owner.SettlementColor.G,
                 this.unit.Owner.SettlementColor.B),
-            3.0, false);
+            2.0, false);
 
         let ticksToLive = GeometryVisualEffect.InfiniteTTL;
         this._frame = spawnGeometry(ActiveScena, geometryCanvas.GetBuffers(), this.unit.Position, ticksToLive);

@@ -373,6 +373,15 @@ export class Teimur_Legendary_RAIDER extends ILegendaryUnit {
 
         return true;
     }
+
+    static GetSpawnCount(spawnCount: number) {
+        if (GlobalVars.gameMode == 1) {
+            return spawnCount;
+        } else {
+            ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(150 * Math.sqrt(GlobalVars.difficult) * Math.max(1, spawnCount * 0.4)));
+            return 1;
+        }
+    }
 }
 export class Teimur_Legendary_WORKER extends ILegendaryUnit {
     static CfgUid      : string = "#DefenceTeimur_legendary_worker";

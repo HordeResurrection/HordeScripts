@@ -15,13 +15,13 @@ export class Spell_fortress extends ISpell {
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_fortress";
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(200, 160, 100, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 200, 160, 100);
-    protected static _SpellPreferredProductListPosition : Cell = new Cell(3, 0);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(4, 0);
 
     private static _FortressDurationPerLevel   : Array<number> = [
-        10, 12, 14, 16, 18
+        10, 14, 16, 18, 20
     ].map(sec => sec*50);
     private static _FortressRadiusPerLevel   : Array<number> = [
-        3, 3, 4, 4, 5
+        4, 5, 6, 7, 8
     ];
     protected static _ChargesCountPerLevel   : Array<number> = [
         1, 1, 2, 2, 3

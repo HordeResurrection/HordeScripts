@@ -13,17 +13,20 @@ export class Spell_fear_attack extends ISpell {
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_fear_attack";
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(81, 207, 207, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 81, 207, 207);
-    protected static _SpellPreferredProductListPosition : Cell = new Cell(1, 0);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(2, 0);
 
     private static _FearTimePerLevel   : Array<number> = [
-        7*50, 9*50, 11*50, 13*50, 15*50, 17*50, 19*50, 21*50, 23*50, 25*50
-    ];
+        7, 8, 9, 10, 11
+    ].map(sec => sec*50);
     private static _FearRadiusPerLevel : Array<number> = [
-        3, 4, 4, 5, 5, 6, 6, 7, 7, 12
+        3, 4, 5, 6, 7
+    ];
+    protected static _ChargesCountPerLevel   : Array<number> = [
+        1, 1, 2, 2, 3
     ];
     private static _FearEffectConfig : VisualEffectConfig = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_MagicCircle");
 
-    protected static _MaxLevel                      : number = 9;
+    protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Приступ страха";
     protected static _DescriptionTemplate           : string
         = "Вселяет страх во вражеских юнитов (без иммуна к магии) в радиусе {0} клеток на {1} секунд.";

@@ -9,9 +9,9 @@ import { log } from "library/common/logging";
 export class Spell_Power_Attack extends IPassiveSpell {
     protected static _ButtonUid                     : string = "Spell_Power_Attack";
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_Power_Attack";
-    protected static _SpellPreferredProductListPosition : Cell = new Cell(2, 0);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(3, 0);
 
-    protected static _ChargesCountPerLevel          : Array<number> = [ 5, 8, 12, 17, 25];
+    protected static _ChargesCountPerLevel          : Array<number> = [ 5, 10, 15, 20, 30];
 
     protected static _AddDamage : number = 10;
     private static _PowerAttackEffect : VisualEffectConfig = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_Blood");
@@ -27,14 +27,17 @@ export class Spell_Power_Attack extends IPassiveSpell {
         }
 
         if (HurtType == UnitHurtType.Mele) {
-            VictimUnit.BattleMind.TakeDamage(Spell_Power_Attack._AddDamage, UnitHurtType.Mele);
-            this._caster.OnCauseDamage(this,
-                {
-                    VictimUnit: VictimUnit,
-                    Damage: Spell_Power_Attack._AddDamage,
-                    EffectiveDamage: Math.max(0, Spell_Power_Attack._AddDamage - VictimUnit.Cfg.Shield),
-                    HurtType : UnitHurtType.Heavy
-                });
+            this._caster.unit.BattleMind.CauseDamage(VictimUnit,
+                Spell_Power_Attack._AddDamage,
+                UnitHurtType.Heavy);
+            // VictimUnit.BattleMind.TakeDamage(Spell_Power_Attack._AddDamage, UnitHurtType.Mele);
+            // this._caster.OnCauseDamage(this,
+            //     {
+            //         VictimUnit: VictimUnit,
+            //         Damage: Spell_Power_Attack._AddDamage,
+            //         EffectiveDamage: Math.max(0, Spell_Power_Attack._AddDamage - VictimUnit.Cfg.Shield),
+            //         HurtType : UnitHurtType.Heavy
+            //     });
 
             var decorCell = Cell.ConvertHordePoint(VictimUnit.Cell).Scale(32);
             for (var x = 0; x <= 32; x += 32) {

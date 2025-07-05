@@ -2,15 +2,15 @@ import { log } from "library/common/logging";
 import { createPoint } from "library/common/primitives";
 import { Int32T } from "library/dotnet/dotnet-types";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
-import { BulletConfig } from "library/game-logic/horde-types";
+import { BulletConfig, UnitConfig } from "library/game-logic/horde-types";
 
-export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) {
+export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) : UnitConfig {
     if (HordeContentApi.HasUnitConfig(newConfigUid)) {
         //log.info("GET baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
         return HordeContentApi.GetUnitConfig(newConfigUid);
     } else {
         //log.info("CREATE baseConfigUid ", baseConfigUid, " newConfigUid ", newConfigUid);
-        return HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig(baseConfigUid), newConfigUid);
+        return HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig(baseConfigUid), newConfigUid) as UnitConfig;
     }
 }
 

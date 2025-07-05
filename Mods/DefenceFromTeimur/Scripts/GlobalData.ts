@@ -18,6 +18,8 @@ export class GlobalVars {
     public static difficult: number;
     /** режим игры */
     public static gameMode: number;
+    /** режим общих ресурсов */
+    public static unionResourcesActived: boolean;
     /** план атаки */
     public static attackPlan: IAttackPlan;
     /** план инкома */

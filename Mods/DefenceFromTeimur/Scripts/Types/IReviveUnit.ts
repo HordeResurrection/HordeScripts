@@ -30,6 +30,8 @@ export class IReviveUnit extends IUnit {
                 }
             }
 
+            var kills = this.unit.KillsCounter;
+
             // спавним юнита в точке
             var generator = generateCellInSpiral(spawnCell.X, spawnCell.Y);
             var spawnedUnit = spawnUnits(this.unit.Owner,
@@ -39,6 +41,7 @@ export class IReviveUnit extends IUnit {
                 generator);
             if (spawnedUnit.length != 0) {
                 this.ReplaceUnit(spawnedUnit[0]);
+                spawnedUnit[0].KillsCounter = kills;
             }
         }
     }

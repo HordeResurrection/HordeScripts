@@ -11,7 +11,7 @@ export class Spell_PoisonBomb extends ITargetPointSpell {
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_PoisonBomb";
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(0, 200, 0, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 0, 200, 0);
-    protected static _SpellPreferredProductListPosition : Cell = new Cell(1, 0);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(2, 0);
 
     private static _Init : boolean = false;
     private static _BombConfig : BulletConfig;
@@ -21,13 +21,16 @@ export class Spell_PoisonBomb extends ITargetPointSpell {
     private static _CloudIncreasePeriod : number = 1.2*50;
     private static _CloudEffect : VisualEffectConfig = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_BloodGreenPool");
     private static _CloudDurationPerLevel : Array<number> = [
-        8, 10, 12, 14, 16, 18, 20, 22, 24, 20
+        8, 10, 12, 14, 16
     ].map(sec => sec * 50);
     private static _CloudDamagePerLevel : Array<number> = [
-        1, 1, 1, 2, 2, 2, 2, 2, 2, 3
+        1, 1, 2, 2, 3
+    ];
+    protected static _ChargesCountPerLevel   : Array<number> = [
+        1, 1, 2, 2, 3
     ];
 
-    protected static _MaxLevel                      : number = 9;
+    protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Ядовитая бомба";
     protected static _DescriptionTemplate           : string =
         "Запускает ядовитую бомбу в выбранном направлении до " + Spell_PoisonBomb._MaxDistance
@@ -145,7 +148,10 @@ export class Spell_PoisonBomb extends ITargetPointSpell {
             if (upperHordeUnit
                 && !upperHordeUnit.Cfg.Flags.HasFlag(UnitFlags.MagicResistant)
                 && this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(upperHordeUnit.Owner) == DiplomacyStatus.War) {
-                upperHordeUnit.BattleMind.TakeDamage(Spell_PoisonBomb._CloudDamagePerLevel[this.level] + upperHordeUnit.Cfg.Shield,
+                // upperHordeUnit.BattleMind.TakeDamage(Spell_PoisonBomb._CloudDamagePerLevel[this.level] + upperHordeUnit.Cfg.Shield,
+                //     UnitHurtType.Any);
+                this._caster.unit.BattleMind.CauseDamage(upperHordeUnit,
+                    Spell_PoisonBomb._CloudDamagePerLevel[this.level] + upperHordeUnit.Cfg.Shield,
                     UnitHurtType.Any);
             }
         });

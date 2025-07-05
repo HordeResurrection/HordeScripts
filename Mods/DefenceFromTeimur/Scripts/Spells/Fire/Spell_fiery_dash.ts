@@ -10,20 +10,24 @@ export class Spell_fiery_dash extends ISpell {
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_fiery_dash";
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(228, 18, 47, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 228, 18, 47);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(1, 0);
 
     private static _FireDashMaxDistancePerLevel   : Array<number> = [
-        10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+        10, 12, 14, 16, 18
     ];
     private static _FireDashAddDamagePerLevel : Array<number> = [
-        0, 0, 1, 1, 2, 2, 3, 3, 4, 4
+        5, 7, 9, 11, 14
     ];
     private static _FireDashWidthPerLevel : Array<number> = [
-        1, 1, 1, 1, 1, 3, 3, 3, 3, 5
+        1, 1, 2, 2, 2
+    ];
+    protected static _ChargesCountPerLevel   : Array<number> = [
+        1, 2, 3, 4, 5
     ];
     private static _FireConfig : BulletConfig = HordeContentApi.GetBulletConfig("#BulletConfig_Fire");
     private static _FireDashEffect : VisualEffectConfig = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleRedDust");
 
-    protected static _MaxLevel                      : number = 9;
+    protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Огненный рывок";
     protected static _DescriptionTemplate           : string = 
         "Делает рывок в сторону взгляда, максимум на {0} клеток, поджигая все на своем пути, дополнительно наносит {1} огненного урона, ширина воздействия {2}.";
@@ -68,9 +72,13 @@ export class Spell_fiery_dash extends ISpell {
                         && this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(upperHordeUnit.Owner) == DiplomacyStatus.War) {
                         HordeClassLibrary.World.Objects.Bullets.Implementations.Fire.BaseFireBullet.MakeFire(
                             this._caster.unit, dashPoint, UnitMapLayer.Main, Spell_fiery_dash._FireConfig);
-                        upperHordeUnit.BattleMind.TakeDamage(
+                        this._caster.unit.BattleMind.CauseDamage(upperHordeUnit,
                             Spell_fiery_dash._FireDashAddDamagePerLevel[this.level] + upperHordeUnit.Cfg.Shield,
-                            UnitHurtType.Any);
+                            UnitHurtType.Fire
+                        );
+                        // upperHordeUnit.BattleMind.TakeDamage(
+                        //     Spell_fiery_dash._FireDashAddDamagePerLevel[this.level] + upperHordeUnit.Cfg.Shield,
+                        //     UnitHurtType.Any);
                     }
                     dashCells[i] = dashCells[i].Add(moveVec).Round();
                 }

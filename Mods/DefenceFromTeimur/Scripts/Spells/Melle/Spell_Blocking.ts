@@ -7,7 +7,7 @@ export class Spell_Blocking extends IPassiveSpell {
     protected static _ButtonUid                     : string = "Spell_Blocking";
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_Blocking";
     protected static _ChargesCountPerLevel          : Array<number> = [];
-    protected static _SpellPreferredProductListPosition : Cell = new Cell(2, 0);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(3, 0);
 
     private static _BlockPeriodPerLevel   : Array<number> = [
         10, 8, 6, 5, 4

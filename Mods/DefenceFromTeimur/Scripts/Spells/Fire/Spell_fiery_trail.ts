@@ -10,17 +10,21 @@ export class Spell_fiery_trail extends ISpell {
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_fiery_trail";
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(228, 18, 47, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 228, 18, 47);
+    protected static _SpellPreferredProductListPosition : Cell = new Cell(1, 0);
     
     private static _TrailDurationPerLevel   : Array<number> = [
-        7*50, 9*50, 11*50, 13*50, 15*50, 17*50, 19*50, 21*50, 23*50, 25*50
-    ];
+        10, 12, 15, 18, 20
+    ].map(sec => sec*50);
     private static _TrailAddDamagePerLevel : Array<number> = [
-        0, 0, 0, 1, 1, 1, 2, 2, 2, 3
+        2, 3, 4, 5, 6
+    ];
+    protected static _ChargesCountPerLevel   : Array<number> = [
+        1, 1, 2, 2, 3
     ];
     private static _FireConfig : BulletConfig = HordeContentApi.GetBulletConfig("#BulletConfig_Fire");
     private static _TrailEffect : VisualEffectConfig = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleRedDust");
 
-    protected static _MaxLevel                      : number = 9;
+    protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Огненный след";
     protected static _DescriptionTemplate           : string =
         "В течении {0} секунд оставляет огненный след, который поджигает врагов и дополнительно наносит {1} огненного урона/сек.";
@@ -65,9 +69,12 @@ export class Spell_fiery_trail extends ISpell {
                 && this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(upperHordeUnit.Owner) == DiplomacyStatus.War) {
                 HordeClassLibrary.World.Objects.Bullets.Implementations.Fire.BaseFireBullet.MakeFire(
                     this._caster.unit, trailPoint, UnitMapLayer.Main, Spell_fiery_trail._FireConfig);
-                upperHordeUnit.BattleMind.TakeDamage(
+                this._caster.unit.BattleMind.CauseDamage(upperHordeUnit,
                     Spell_fiery_trail._TrailAddDamagePerLevel[this.level] + upperHordeUnit.Cfg.Shield,
-                    UnitHurtType.Any);
+                    UnitHurtType.Fire);
+                // upperHordeUnit.BattleMind.TakeDamage(
+                //     Spell_fiery_trail._TrailAddDamagePerLevel[this.level] + upperHordeUnit.Cfg.Shield,
+                //     UnitHurtType.Any);
             }
             
             spawnDecoration(
