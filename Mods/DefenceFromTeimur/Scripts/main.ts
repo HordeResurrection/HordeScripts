@@ -1,6 +1,10 @@
 import { activePlugins } from "active-plugins";
 import { DefenceFromTeimurPlugin } from "./DefenceFromTeimurPlugin";
 
+// 20250706
+// --- СКИЛЛЫ:
+// Перешел на новый обработчик, теперь команды можно через Shift использовать
+
 // 20250701
 // --- СКИЛЛЫ:
 // Огненный шар теперь летит от героя до цели

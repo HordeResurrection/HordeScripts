@@ -5,8 +5,8 @@ import { IUnitCaster } from "./IUnitCaster";
 export class IPassiveSpell extends ISpell {
     protected static _IsPassive : boolean = true;
 
-    constructor(caster: IUnitCaster) {
-        super(caster);
+    constructor(caster: IUnitCaster, ...spellArgs: any[]) {
+        super(caster, spellArgs);
 
         this._state = SpellState.ACTIVATED;
     }

@@ -21,8 +21,8 @@ export class ISpell {
 
     protected static _MaxLevel                      : number = 0;
     protected static _NamePrefix                    : string = "Способность";
-    protected static _DescriptionTemplate           : string = "Описание {0}, {1}.";
-    protected static _DescriptionParamsPerLevel     : Array<Array<any>> = [["0", "1"]];
+    protected static _DescriptionTemplate           : string = "Описание.";
+    protected static _DescriptionParamsPerLevel     : Array<Array<any>> = [[]];
 
     protected static _ButtonUidPrefix               : string = "#BattleRoyale_";
     protected static _ButtonUid                     : string = "Spell_CustomCommand";
@@ -163,7 +163,7 @@ export class ISpell {
     private   _processingTack         : number;
     private   _slotNum                : number;
 
-    constructor(caster: IUnitCaster) {
+    constructor(caster: IUnitCaster, ...spellArgs: any[]) {
         this._processingTack = this.constructor["_ProcessingTack"]++ % this.constructor["_ProcessingModule"];
         this._caster               = caster;
         this._state                = SpellState.READY;

@@ -1,17 +1,17 @@
-import { ACommandArgs, ScriptUnitWorkerGetOrder, Unit, UnitCommand } from "library/game-logic/horde-types";
+import { ACommandArgs, MotionCustom, OrderCustom, ScriptUnitWorkerGetOrder, StateMotion, Unit, UnitCommand, UnitState } from "library/game-logic/horde-types";
 import { ISpell, SpellState } from "./ISpell";
 import { IReviveUnit } from "../Types/IReviveUnit";
 import { createGameMessageWithNoSound } from "library/common/messages";
 import { createHordeColor } from "library/common/primitives";
+import { setUnitStateWorker } from "library/game-logic/workers";
 import { printObjectItems } from "library/common/introspection";
 import { log } from "library/common/logging";
 
-var opUnitCfgUidToBaseWorker : Map<string, HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerGetOrder> = new Map<string, HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerGetOrder>();
-var opUnitIdToCasterObj : Map<number, IUnitCaster> = new Map<number, IUnitCaster>();
+var pluginWrappedWorker     : any = null;
+var cfgUidWithWrappedWorker : Map<string, boolean> = new Map<string, boolean>();
 
 export class IUnitCaster extends IReviveUnit {
     private static _SpellsMaxCount : number = 5;
-    private static _WorkerObject : ScriptUnitWorkerGetOrder | null = null;
 
     public static InitConfig() {
         // удаляем конфиг, чтобы был скопирован обработчик из базового конфига
@@ -20,34 +20,55 @@ export class IUnitCaster extends IReviveUnit {
         }
 
         super.InitConfig();
-
-        if (!this._WorkerObject) {
-            const workerName = `${this.CfgUid}_Caster_GetOrderWorker`
-            // Обертка для метода из плагина, чтобы работал "this"
-            const workerWrapper = (u: Unit, cmdArgs: ACommandArgs) => this._GetOrderWorker.call(this, u, cmdArgs);
-            // Прокидываем доступ к функции-обработчику в .Net через глобальную переменную
-            UnitWorkersRegistry.Register(workerName, workerWrapper);
-            // Объект-обработчик
-            this._WorkerObject = new ScriptUnitWorkerGetOrder();
-            // Установка функции-обработчика
-            ScriptUtils.SetValue(this._WorkerObject, "FuncName", workerName);
-        }
     }
 
-    private static _GetOrderWorker(unit: Unit, commandArgs: ACommandArgs): boolean {
-        var heroObj = opUnitIdToCasterObj.get(unit.Id);
-        
-        if (!heroObj) {
-            return unit.Cfg.GetOrderWorker.GetOrder(unit, commandArgs);
+    public static _StateWorkerCustom(u: Unit) {
+        let motion = u.OrdersMind.ActiveMotion;
+        var caster : IUnitCaster = (u.ScriptData.IUnitCasterRef as IUnitCaster);
+
+        // костыль
+        // @ts-expect-error
+        if (u.OrdersMind.ActiveOrder.ProductUnitConfig) {
+            for (var spellNum = 0; spellNum < caster._spells.length; spellNum++) {
+                if (caster._spells[spellNum].GetUnitCommand() == UnitCommand.Produce) {
+                    // @ts-expect-error
+                    caster._spells[spellNum].Activate({ProductCfg: u.OrdersMind.ActiveOrder.ProductUnitConfig});
+                    motion.State = StateMotion.Done;
+                    return;
+                }
+            }
+            motion.State = StateMotion.Failed;
+            return;
         }
 
-        if (!heroObj.OnOrder(commandArgs)) {
-            return true;
+        // Проверяем, что сейчас действительно выполняется кастомный приказ
+        if (!host.isType(MotionCustom, motion)) {
+            motion.State = StateMotion.Failed;
+            return;
         }
 
-        // запуск обычного обработчика получения приказа
-        return (opUnitCfgUidToBaseWorker.get(unit.Cfg.Uid) as ScriptUnitWorkerGetOrder)
-            .GetOrder(unit, commandArgs);
+        // Настройка при первом запуске обработки состояния Custom
+        if (motion.IsUnprepared) {
+            // Команда с которой был выдан приказ
+            let cmdArgs = (u.OrdersMind.ActiveOrder as OrderCustom).CommandArgs;
+
+            // способность которая была вызвана
+            var spellNum = 0;
+            for (; spellNum < caster._spells.length; spellNum++) {
+                if (caster._spells[spellNum].GetUnitCommand() == cmdArgs.CommandType) {
+                    break;
+                }
+            }
+
+            // проверяем, что способность найдена
+            if (spellNum == caster._spells.length) {
+                motion.State = StateMotion.Failed;
+            }
+
+            // активируем способность
+            caster._spells[spellNum].Activate(cmdArgs);
+            motion.State = StateMotion.Done;
+        }
     }
 
     protected _spells : Array<ISpell>;
@@ -70,14 +91,19 @@ export class IUnitCaster extends IReviveUnit {
     }
 
     private _SetWorker () {
-        opUnitIdToCasterObj.set(this.unit.Id, this);
-        if (!opUnitCfgUidToBaseWorker.has(this.unit.Cfg.Uid)) {
-            opUnitCfgUidToBaseWorker.set(this.unit.Cfg.Uid, this.unit.Cfg.GetOrderWorker);
-            ScriptUtils.SetValue(this.unit.Cfg, "GetOrderWorker", this.constructor["_WorkerObject"]);
+        this.unit.ScriptData.IUnitCasterRef = this;
+
+        if (!pluginWrappedWorker) {
+            pluginWrappedWorker = (u: Unit) => IUnitCaster._StateWorkerCustom(u);
+        }
+
+        if (!cfgUidWithWrappedWorker.has(this.unit.Cfg.Uid)) {
+            setUnitStateWorker("CustomOrder", this.unit.Cfg, UnitState.Custom, pluginWrappedWorker);
+            cfgUidWithWrappedWorker.set(this.unit.Cfg.Uid, true);
         }
     }
 
-    public AddSpell(spellType: typeof ISpell) : boolean {
+    public AddSpell(spellType: typeof ISpell, ...spellArgs: any[]) : boolean {
         // если добавляется тот же скилл, то прокачиваем скилл
         var spellNum;
         for (spellNum = 0; spellNum < this._spells.length; spellNum++) {
@@ -97,7 +123,7 @@ export class IUnitCaster extends IReviveUnit {
                 return false;
             }
         } else if (spellNum == this._spells.length && this._spells.length < this.constructor["_SpellsMaxCount"]) {
-            this._spells.push(new spellType(this));
+            this._spells.push(new spellType(this, ...spellArgs));
             return true;
         } else {
             let msg = createGameMessageWithNoSound("Нет свободных слотов!", createHordeColor(255, 255, 100, 100));
@@ -129,18 +155,18 @@ export class IUnitCaster extends IReviveUnit {
         this._spells.forEach(spell => spell.OnTakeDamage(args.AttackerUnit, args.Damage, args.HurtType));
     }
 
-    public OnOrder(commandArgs: ACommandArgs) {
-        for (var spellNum = 0; spellNum < this._spells.length; spellNum++) {
-            if (this._spells[spellNum].GetUnitCommand() != commandArgs.CommandType) {
-                continue;
-            }
+    // public OnOrder(commandArgs: ACommandArgs) {
+    //     for (var spellNum = 0; spellNum < this._spells.length; spellNum++) {
+    //         if (this._spells[spellNum].GetUnitCommand() != commandArgs.CommandType) {
+    //             continue;
+    //         }
 
-            this._spells[spellNum].Activate(commandArgs);
-            return false;
-        }
+    //         this._spells[spellNum].Activate(commandArgs);
+    //         return false;
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 
     public ReplaceUnit(unit: Unit): void {
         super.ReplaceUnit(unit);

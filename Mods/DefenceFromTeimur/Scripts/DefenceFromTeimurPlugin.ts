@@ -498,24 +498,24 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
                             var worker : Player_worker_gamemode2;
 
                             var generator = generateCellInSpiral(unit.Cell.X, unit.Cell.Y);
+
                             var spawnedUnits = spawnUnits(unit.Owner,
-                                GlobalVars.configs[Player_worker_gamemode2.CfgUid],
+                                GlobalVars.configs[Hero_Crusader.CfgUid],
                                 1,
                                 UnitDirection.Down,
                                 generator);
                             if (spawnedUnits.length != 0) {
-                                worker = new Player_worker_gamemode2(spawnedUnits[0], teamNum);
-                                GlobalVars.units.push(worker);
-
+                                var hero = new Hero_Crusader(spawnedUnits[0], teamNum)
+                                GlobalVars.units.push(hero);
+                                
                                 var spawnedUnits = spawnUnits(unit.Owner,
-                                    GlobalVars.configs[Hero_Crusader.CfgUid],
+                                    GlobalVars.configs[Player_worker_gamemode2.CfgUid],
                                     1,
                                     UnitDirection.Down,
                                     generator);
                                 if (spawnedUnits.length != 0) {
-                                    var hero = new Hero_Crusader(spawnedUnits[0], teamNum)
-                                    GlobalVars.units.push(hero);
-                                    worker.hero = hero;
+                                    worker = new Player_worker_gamemode2(spawnedUnits[0], teamNum, hero);
+                                    GlobalVars.units.push(worker);
                                 }
                             }
                         }

@@ -29,6 +29,7 @@ import { Spell_FireArrowsRain } from "../Spells/Fire/Spell_FireArrowsRain";
 import { Spell_fortress } from "../Spells/Utillity/Spell_fortress";
 import { Spell_healing_aura } from "../Spells/Utillity/Spell_healing_aura";
 import { Spell_Magic_shield } from "../Spells/Utillity/Spell_Magic_shield";
+import { Spell_WorkerSaleList } from "../Spells/Worker/Spell_WorkerSaleList";
 
 export class Player_GOALCASTLE extends IUnit {
     static CfgUid      : string = "#DefenceTeimur_GoalCastle";
@@ -384,106 +385,70 @@ export class Player_worker_gamemode2 extends IUnitCaster {
     static CfgUid      : string = "#DefenceTeimur_Player_worker_gamemode2";
     static BaseCfgUid  : string = "#UnitConfig_Slavyane_Worker1";
 
-    static Spells : Array<typeof ISpell> = 
-    [
-        Spell_fear_attack,
-        Spell_fiery_dash,
-        Spell_fiery_trail,
-        Spell_FireArrowsRain,
-        Spell_Fireball,
-        Spell_fortress,
-        Spell_healing_aura,
-        Spell_PoisonBomb,
-        Spell_Teleportation,
-        Spell_Vampirism,
-        Spell_Blocking,
-        Spell_Agr_attack,
-        Spell_Power_Attack,
-        Spell_Magic_shield
-    ];
-
     public hero : IUnitCaster;
 
-    constructor (unit: any, teamNum: number) {
+    constructor (unit: any, teamNum: number, targetHero: IUnitCaster) {
         super(unit, teamNum);
+
+        this.AddSpell(Spell_WorkerSaleList, targetHero);
     }
 
     public static InitConfig() {
         super.InitConfig();
-
-        // добавляем постройку голубятни Теймура если на карте более 1-ой команды
-        var cfg = GlobalVars.configs[this.CfgUid] as UnitConfig;
-        var producerParams = cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
-        // @ts-expect-error
-        var produceList    = producerParams.CanProduceList;
-        produceList.Clear();
-
-        this.Spells.forEach(spell => {
-            produceList.Add(spell.GetUnitConfig());
-        });
-
-        var setSpawnPointConfig = CreateUnitConfig("#UnitConfig_Barbarian_Swordmen", "#DefenceTeimur_Set_spawn_point") as UnitConfig;
-        ScriptUtils.SetValue(setSpawnPointConfig, "Name", "Обновить точку респа");
-        ScriptUtils.SetValue(setSpawnPointConfig, "Description", "Обновить точку респа");
-        ScriptUtils.SetValue(setSpawnPointConfig.CostResources, "Gold",   0);
-        ScriptUtils.SetValue(setSpawnPointConfig.CostResources, "Metal",  0);
-        ScriptUtils.SetValue(setSpawnPointConfig.CostResources, "Lumber", 1000);
-        ScriptUtils.SetValue(setSpawnPointConfig.CostResources, "People", 0);
-        produceList.Add(setSpawnPointConfig);
-
+        
         // убираем профессию добычу
-        if (cfg.ProfessionParams.ContainsKey(UnitProfession.Harvester)) {
-            cfg.ProfessionParams.Remove(UnitProfession.Harvester);
+        if (GlobalVars.configs[this.CfgUid].ProfessionParams.ContainsKey(UnitProfession.Harvester)) {
+            GlobalVars.configs[this.CfgUid].ProfessionParams.Remove(UnitProfession.Harvester);
         }
 
-        ScriptUtils.SetValue(cfg, "Specification", UnitSpecification.None);
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Specification", UnitSpecification.None);
     }
 
-    public OnOrder(commandArgs: ACommandArgs): boolean {
-        if (commandArgs.CommandType == UnitCommand.Produce) {
-            for (var spell of Player_worker_gamemode2.Spells) {
-                // @ts-expect-error
-                if (spell.GetUnitConfig().Uid != commandArgs.ProductCfg.Uid) {
-                    continue;
-                }
+    // public OnOrder(commandArgs: ACommandArgs): boolean {
+    //     if (commandArgs.CommandType == UnitCommand.Produce) {
+    //         for (var spell of Player_worker_gamemode2.Spells) {
+    //             // @ts-expect-error
+    //             if (spell.GetUnitConfig().Uid != commandArgs.ProductCfg.Uid) {
+    //                 continue;
+    //             }
 
-                // @ts-expect-error
-                if (!this.unit.Owner.Resources.IsEnoughResources(commandArgs.ProductCfg.CostResources)) {
-                    let msg = createGameMessageWithNoSound("Не хватает ресурсов!", createHordeColor(255, 255, 100, 100));
-                    this.unit.Owner.Messages.AddMessage(msg);
-                    return false;
-                }
+    //             // @ts-expect-error
+    //             if (!this.unit.Owner.Resources.IsEnoughResources(commandArgs.ProductCfg.CostResources)) {
+    //                 let msg = createGameMessageWithNoSound("Не хватает ресурсов!", createHordeColor(255, 255, 100, 100));
+    //                 this.unit.Owner.Messages.AddMessage(msg);
+    //                 return false;
+    //             }
 
-                if (!this.hero.AddSpell(spell)) {
-                    return false;
-                }
+    //             if (!this.hero.AddSpell(spell)) {
+    //                 return false;
+    //             }
 
-                // @ts-expect-error
-                this.unit.Owner.Resources.TakeResources(commandArgs.ProductCfg.CostResources);
+    //             // @ts-expect-error
+    //             this.unit.Owner.Resources.TakeResources(commandArgs.ProductCfg.CostResources);
 
-                return false;
-            }
+    //             return false;
+    //         }
 
-            // @ts-expect-error
-            if ("#DefenceTeimur_Set_spawn_point" == commandArgs.ProductCfg.Uid) {
-                // @ts-expect-error
-                if (!this.unit.Owner.Resources.TakeResourcesIfEnough(commandArgs.ProductCfg.CostResources)) {
-                    let msg = createGameMessageWithNoSound("Не хватает ресурсов!", createHordeColor(255, 255, 100, 100));
-                    this.unit.Owner.Messages.AddMessage(msg);
-                }
+    //         // @ts-expect-error
+    //         if ("#DefenceTeimur_Set_spawn_point" == commandArgs.ProductCfg.Uid) {
+    //             // @ts-expect-error
+    //             if (!this.unit.Owner.Resources.TakeResourcesIfEnough(commandArgs.ProductCfg.CostResources)) {
+    //                 let msg = createGameMessageWithNoSound("Не хватает ресурсов!", createHordeColor(255, 255, 100, 100));
+    //                 this.unit.Owner.Messages.AddMessage(msg);
+    //             }
 
-                for (var settlementNum = 0; settlementNum < GlobalVars.teams[this.teamNum].settlements.length; settlementNum++) {
-                    if (GlobalVars.teams[this.teamNum].settlements[settlementNum].Uid == this.unit.Owner.Uid) {
-                        GlobalVars.teams[this.teamNum].spawnCell[settlementNum] = this.unit.Cell;
-                    }
-                }
+    //             for (var settlementNum = 0; settlementNum < GlobalVars.teams[this.teamNum].settlements.length; settlementNum++) {
+    //                 if (GlobalVars.teams[this.teamNum].settlements[settlementNum].Uid == this.unit.Owner.Uid) {
+    //                     GlobalVars.teams[this.teamNum].spawnCell[settlementNum] = this.unit.Cell;
+    //                 }
+    //             }
 
-                return false;
-            }
-        }
+    //             return false;
+    //         }
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 }
 
 export class Hero_Crusader extends IUnitCaster {

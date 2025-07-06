@@ -3,6 +3,7 @@ import { createPoint } from "library/common/primitives";
 import { Int32T } from "library/dotnet/dotnet-types";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { BulletConfig, UnitConfig } from "library/game-logic/horde-types";
+import { getUnitProfessionParams, UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 
 export function CreateUnitConfig(baseConfigUid: string, newConfigUid: string) : UnitConfig {
     if (HordeContentApi.HasUnitConfig(newConfigUid)) {
@@ -89,4 +90,34 @@ export function formatStringStrict(template: string, params: any[]): string {
     return template.replace(/\{(\d+)\}/g, (_, index) => 
         params[Number(index)] !== undefined ? params[Number(index)] : "N/A"
     );
+}
+
+/** добавить профессию найма юнитов, если была добавлена, то установит точки выхода и очистит список построек */
+export function CfgAddUnitProducer(Cfg: UnitConfig) {
+    // даем профессию найм войнов при отсутствии
+    if (!getUnitProfessionParams(Cfg, UnitProfession.UnitProducer)) {
+        var donorCfg = HordeContentApi.CloneConfig(HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Barrack")) as UnitConfig;
+        var prof_unitProducer = getUnitProfessionParams(donorCfg, UnitProfession.UnitProducer);
+        Cfg.ProfessionParams.Item.set(UnitProfession.UnitProducer, prof_unitProducer);
+        
+        if (Cfg.BuildingConfig == null) {
+            ScriptUtils.SetValue(Cfg, "BuildingConfig", donorCfg.BuildingConfig);
+        }
+
+        // добавляем точки выхода
+        if (Cfg.BuildingConfig.EmergePoint == null) {
+            ScriptUtils.SetValue(Cfg.BuildingConfig, "EmergePoint", createPoint(0, 0));
+        }
+        if (Cfg.BuildingConfig.EmergePoint2 == null) {
+            ScriptUtils.SetValue(Cfg.BuildingConfig, "EmergePoint2", createPoint(0, 0));
+        }
+
+        // очищаем список
+        var producerParams = Cfg.GetProfessionParams(UnitProducerProfessionParams, UnitProfession.UnitProducer);
+        // @ts-expect-error
+        var produceList    = producerParams.CanProduceList;
+        produceList.Clear();
+
+        HordeContentApi.RemoveConfig(donorCfg);
+    }
 }
