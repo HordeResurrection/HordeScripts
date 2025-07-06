@@ -118,7 +118,7 @@ declare namespace Stride.Core.Mathematics {
 		);
 
 		constructor(
-			values: number[] | null
+			values: number[]
 		);
 
 		// Fields:
@@ -392,13 +392,13 @@ declare namespace Stride.Core.Mathematics {
 		): Stride.Core.Mathematics.Vector2;
 
 		static Orthogonalize(
-			destination: Stride.Core.Mathematics.Vector2[] | null,
-			source: Stride.Core.Mathematics.Vector2[] | null
+			destination: Stride.Core.Mathematics.Vector2[],
+			source: Stride.Core.Mathematics.Vector2[]
 		): void;
 
 		static Orthonormalize(
-			destination: Stride.Core.Mathematics.Vector2[] | null,
-			source: Stride.Core.Mathematics.Vector2[] | null
+			destination: Stride.Core.Mathematics.Vector2[],
+			source: Stride.Core.Mathematics.Vector2[]
 		): void;
 
 		ToString(
@@ -489,11 +489,11 @@ declare namespace Stride.Core.Mathematics {
 		);
 
 		constructor(
-			values: number[] | null
+			values: number[]
 		);
 
 		constructor(
-			values: number[] | null
+			values: number[]
 		);
 
 		// Fields:

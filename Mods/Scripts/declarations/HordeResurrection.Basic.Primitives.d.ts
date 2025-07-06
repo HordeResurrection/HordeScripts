@@ -127,6 +127,10 @@ declare namespace HordeResurrection.Basic.Primitives.Geometry {
 
 		NormalizeEuclid(): HordeResurrection.Basic.Primitives.Geometry.Point2D;
 
+		AbsClamp(
+			bound: number
+		): HordeResurrection.Basic.Primitives.Geometry.Point2D;
+
 		Equals(
 			other: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): boolean;
@@ -181,6 +185,10 @@ declare namespace HordeResurrection.Basic.Primitives.Geometry {
 		GetNormChebushev(): HordeResurrection.Basic.Primitives.PreciseFraction;
 
 		ToPoint2D(): HordeResurrection.Basic.Primitives.Geometry.Point2D;
+
+		AbsClamp(
+			bound: HordeResurrection.Basic.Primitives.PreciseFraction
+		): HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector;
 
 		Equals(
 			other: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector
@@ -527,6 +535,26 @@ declare namespace HordeResurrection.Basic.Primitives {
 }
 //#endregion
 
+//#region MinMaxSpan
+declare namespace HordeResurrection.Basic.Primitives {
+	class /* struct */ MinMaxSpan extends System.ValueType {
+
+		// Constructors:
+		constructor(
+			min: number,
+			max: number
+		);
+
+		// Properties:
+		readonly Min: number;
+		readonly Max: number;
+
+		// Default parameterless constructor for value types
+		constructor();
+	}
+}
+//#endregion
+
 //#region PreciseFraction
 declare namespace HordeResurrection.Basic.Primitives {
 	class /* struct */ PreciseFraction extends System.ValueType {
@@ -564,6 +592,11 @@ declare namespace HordeResurrection.Basic.Primitives {
 		Ceiling(): HordeResurrection.Basic.Primitives.PreciseFraction;
 
 		Floor(): HordeResurrection.Basic.Primitives.PreciseFraction;
+
+		Clamp(
+			minBound: HordeResurrection.Basic.Primitives.PreciseFraction,
+			maxBound: HordeResurrection.Basic.Primitives.PreciseFraction
+		): HordeResurrection.Basic.Primitives.PreciseFraction;
 
 		// Default parameterless constructor for value types
 		constructor();
@@ -650,6 +683,8 @@ export const HordeRandomizer = HordeResurrection.Basic.Primitives.HordeRandomize
 export type HordeRandomizer = HordeResurrection.Basic.Primitives.HordeRandomizer;
 export const HordeSpeedHandler = HordeResurrection.Basic.Primitives.HordeSpeedHandler;
 export type HordeSpeedHandler = HordeResurrection.Basic.Primitives.HordeSpeedHandler;
+export const MinMaxSpan = HordeResurrection.Basic.Primitives.MinMaxSpan;
+export type MinMaxSpan = HordeResurrection.Basic.Primitives.MinMaxSpan;
 export const PreciseFraction = HordeResurrection.Basic.Primitives.PreciseFraction;
 export type PreciseFraction = HordeResurrection.Basic.Primitives.PreciseFraction;
 export const SpiralOut = HordeResurrection.Basic.Primitives.SpiralOut;

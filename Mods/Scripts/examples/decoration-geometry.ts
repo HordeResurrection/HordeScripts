@@ -9,15 +9,12 @@ import { GeometryCanvas, GeometryVisualEffect, Stride_Color, Stride_Vector2, Uni
 export class Example_GeometryDecoration extends HordeExampleBase {
     private geometryDecoration: GeometryVisualEffect | undefined;
     private center: Point2D;
-    private startTick: number;
 
     /**
      * Конструктор.
      */
     public constructor() {
         super("Geometry decoration");
-        this.startTick = DataStorage.gameTickNum;
-
         this.center = createPoint(500, 500);
     }
 

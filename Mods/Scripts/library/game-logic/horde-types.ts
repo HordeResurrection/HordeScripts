@@ -11,6 +11,13 @@ export type WorldConstants = HordeClassLibrary.World.Const.WorldConstants;
 
 
 // ===================================================
+// --- Утилиты
+
+export const GeometryPresets = HordeClassLibrary.World.Geometry.GeometryPresets;
+export type GeometryPresets = HordeClassLibrary.World.Geometry.GeometryPresets;
+
+
+// ===================================================
 // --- Сцена
 
 export const Scena = HordeClassLibrary.World.ScenaComponents.Scena;
@@ -215,6 +222,8 @@ export const OrderBuildingAttackUnit = HordeClassLibrary.UnitComponents.OrdersSy
 export type OrderBuildingAttackUnit = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderBuildingAttackUnit;
 export const OrderCapture = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderCapture;
 export type OrderCapture = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderCapture;
+export const OrderCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderCustom;
+export type OrderCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderCustom;
 export const OrderDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderDeath;
 export type OrderDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderDeath;
 export const OrderDestroySelf = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderDestroySelf;
@@ -274,11 +283,15 @@ export const AActBase = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.AActB
 export type AActBase = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.AActBase;
 export const ActProduce = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.Producing.ActProduce;
 export type ActProduce = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.Producing.ActProduce;
+export const ActCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActCustom;
+export type ActCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActCustom;
 
 export const AMotionBase = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.AMotionBase;
 export type AMotionBase = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.AMotionBase;
 export const MotionHit = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionHit;
 export type MotionHit = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionHit;
+export const MotionCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionCustom;
+export type MotionCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionCustom;
 
 // Обработчики
 export const ScriptUnitWorkerState = HordeClassLibrary.UnitComponents.Workers.Script.ScriptUnitWorkerState;

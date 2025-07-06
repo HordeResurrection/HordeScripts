@@ -11,12 +11,20 @@ declare namespace HordeClassLibrary.Basic.GameVersion {
 			postfix: string | null
 		);
 
+		// Fields:
+		static readonly Zero: HordeClassLibrary.Basic.GameVersion.HordeVersion;
+		static readonly /* const */ ZeroVersion: string; // = "v0.00"
+
 		// Properties:
 		readonly Version: System.Version;
 		readonly Postfix: string;
 
 		// Methods:
 		static Parse(
+			rawVersion: string | null
+		): HordeClassLibrary.Basic.GameVersion.HordeVersion;
+
+		static SafeParse(
 			rawVersion: string | null
 		): HordeClassLibrary.Basic.GameVersion.HordeVersion;
 
@@ -3053,6 +3061,8 @@ declare namespace HordeClassLibrary.HordeContent.ContentPacks {
 		readonly GameVersion: HordeClassLibrary.Basic.GameVersion.HordeVersion;
 		readonly ModVersion: HordeClassLibrary.Basic.GameVersion.HordeVersion;
 		readonly RootDir: string;
+		readonly RootDirRelative: string;
+		readonly VirtualScriptsDir: string;
 		readonly DisplayDescription: string;
 
 		// Methods:
@@ -3062,6 +3072,7 @@ declare namespace HordeClassLibrary.HordeContent.ContentPacks {
 
 		static TryMakeContentPackInfo(
 			rootDir: string | null,
+			contentPackDir: string | null,
 			/*out*/ contentPackInfo: HordeClassLibrary.HordeContent.ContentPacks.ContentPackInfo | null
 		): boolean;
 	}
@@ -4725,10 +4736,6 @@ declare namespace HordeClassLibrary.PathFinders.ContourPathFinder {
 			newPoint: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			newDist: number
 		): void;
-
-		UpdateBy(
-			other: HordeClassLibrary.PathFinders.ContourPathFinder.CpfNearestPointsSet | null
-		): void;
 	}
 }
 //#endregion
@@ -5742,7 +5749,8 @@ declare namespace HordeClassLibrary.UnitComponents.Enumerations {
 		/** UnitState.Death = 23 */ static readonly Death: UnitState;
 		/** UnitState.DestroySelf = 24 */ static readonly DestroySelf: UnitState;
 		/** UnitState.Deleted = 25 */ static readonly Deleted: UnitState;
-		/** UnitState.Unknown = 26 */ static readonly Unknown: UnitState;
+		/** UnitState.Custom = 26 */ static readonly Custom: UnitState;
+		/** UnitState.Unknown = 27 */ static readonly Unknown: UnitState;
 	}
 }
 //#endregion
@@ -6167,15 +6175,20 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 			immediateDeathProcessing?: boolean /* = false */
 		): number;
 
-		CanBeCapturedNow(
-			ignoreAliveState?: boolean /* = false */
-		): boolean;
+		CanBeCapturedNow(): boolean;
 
 		CanBeCapturedNowAndHarmless(): boolean;
 
 		CanCaptureNow(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null,
-			ignoreTargetAliveState?: boolean /* = false */
+			target: HordeClassLibrary.World.Objects.Units.Unit | null
+		): boolean;
+
+		CanCaptureNow(
+			target: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+		): boolean;
+
+		CanCaptureNow(
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
 		): boolean;
 
 		CanCapture(
@@ -6873,6 +6886,8 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): void;
 
 		ReviewQueuedInstinctOrder(): void;
+
+		SkipFollowingAggressiveCapture(): void;
 
 		TryAddAutoHoldPosition(
 			assignOrderMode: HordeClassLibrary.UnitComponents.OrdersSystem.AssignOrderMode
@@ -7737,14 +7752,24 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 		// Constructors:
 		constructor(
 			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			chopsLeft: number
+			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
 		// Properties:
 		readonly TargetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
-		readonly ChopsLeft: number;
-		readonly IsTreeChoppedDown: boolean;
+	}
+}
+//#endregion
+
+//#region ActCustom
+declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
+	class ActCustom
+		extends HordeClassLibrary.UnitComponents.OrdersSystem.Acts.AActBase
+	{
+		// Constructors:
+		constructor(
+			u: HordeClassLibrary.World.Objects.Units.Unit | null
+		);
 	}
 }
 //#endregion
@@ -8359,13 +8384,24 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 		// Constructors:
 		constructor(
 			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			lastChop: boolean
+			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
 		// Properties:
 		readonly TargetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
-		readonly LastChop: boolean;
+	}
+}
+//#endregion
+
+//#region MotionCustom
+declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
+	class MotionCustom
+		extends HordeClassLibrary.UnitComponents.OrdersSystem.Motions.AMotionBase
+	{
+		// Constructors:
+		constructor(
+			u: HordeClassLibrary.World.Objects.Units.Unit | null
+		);
 	}
 }
 //#endregion
@@ -8829,6 +8865,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem {
 
 		GetNextExpectedOrder(): HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase;
 
+		SkipNextOrder(): void;
+
 		IsIdle(): boolean;
 
 		Count(): number;
@@ -8853,6 +8891,9 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 		readonly SpecialUnitBehavior: HordeClassLibrary.UnitComponents.Enumerations.UnitBehaviorByOrderFlag;
 		readonly NextSuggestedOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase;
 		readonly NextOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase;
+		readonly IsSimpleMoveOrder: boolean;
+		readonly IsBuildOrder: boolean;
+		readonly IsHarvestRelatedOrder: boolean;
 
 		// Methods:
 		ToInstinct(
@@ -8901,7 +8942,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 			commands: System.Collections.Generic.IEnumerable<HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand> | null
 		): void;
 
-		AllowDissallowedCommands(): void;
+		AllowDisallowedCommands(): void;
 
 		SuggestComebackOrder(
 			/*out*/ comebackBeforeHoldPosition: boolean
@@ -9054,6 +9095,24 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 }
 //#endregion
 
+//#region OrderCustom
+declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
+	class OrderCustom
+		extends HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase
+	{
+		// Constructors:
+		constructor(
+			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs | null
+		);
+
+		// Properties:
+		readonly CommandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs;
+	}
+}
+//#endregion
+
 //#region OrderDeath
 declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	class OrderDeath
@@ -9109,6 +9168,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 
 		// Properties:
 		readonly Target: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly ChoppingNow: boolean;
 	}
 }
 //#endregion
@@ -9899,6 +9959,10 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 
 		CanBeCapturedNow(): boolean;
 
+		CanBeCapturedNow(
+			knownUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+		): boolean;
+
 		DisallowDestroyOrderFor(
 			disableDestroyOrderTicks: number
 		): void;
@@ -9939,8 +10003,9 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 		// Properties:
 		readonly ItemInInventory: HordeClassLibrary.UnitComponents.Enumerations.ResourceItemType;
 		readonly ItemsCount: number;
-		readonly TakeFrame: number;
 		readonly HasItems: boolean;
+		readonly TakeFrame: number;
+		readonly Chops: HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData.ChopsCounter;
 
 		// Methods:
 		GiveItem(
@@ -9972,6 +10037,24 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 		IsEmptyFor(
 			itemType: HordeClassLibrary.UnitComponents.Enumerations.ResourceItemType
 		): boolean;
+	}
+}
+//#endregion
+
+//#region HarvesterProfessionData.ChopsCounter
+declare namespace HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData {
+	class ChopsCounter extends System.Object {
+
+		// Constructors:
+		constructor();
+
+		// Properties:
+		readonly Count: number;
+
+		// Methods:
+		OneChop(): void;
+
+		Reset(): void;
 	}
 }
 //#endregion
@@ -11669,7 +11752,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Units.Builder {
 
 		// Fields:
 		static readonly /* const */ DisbandPeriod: number; // = 17
-		static readonly /* const */ DisbandRetriesMaxCount: number; // = 10
+		static readonly /* const */ DisbandRetriesMaxCount: number; // = 32
 	}
 }
 //#endregion
@@ -12151,6 +12234,9 @@ declare namespace HordeClassLibrary.World.Const {
 		static readonly /* const */ ReplaysPathMaskExt: string; // = "Content/UserData/Replays/{0:yyyy-MM-dd_HH-mm-ss}_{1}.json"
 		static readonly /* const */ LogsDir: string; // = "Content/UserData/Logs/"
 		static readonly /* const */ LogPathMask: string; // = "Content/UserData/Logs/{0}.log"
+		static readonly /* const */ ReportsDir: string; // = "Content/UserData/Reports/"
+		static readonly /* const */ DesyncReportsDir: string; // = "Content/UserData/Reports/Desync/"
+		static readonly /* const */ DesyncReportMask: string; // = "Content/UserData/Reports/Desync/{0:yyyy-MM-dd_HH-mm-ss}.zip"
 		static readonly /* const */ CrashLogsDir: string; // = "Reports/CrashLogs/"
 		static readonly /* const */ MinidumpsDir: string; // = "Reports/CrashLogs/"
 		static readonly /* const */ TmpDir: string; // = "Content/UserData/Tmp/"
@@ -12299,6 +12385,7 @@ declare namespace HordeClassLibrary.World.Context {
 
 		// Properties:
 		readonly World: HordeClassLibrary.World.Context.Parameters.WorldParameters;
+		readonly Wind: HordeClassLibrary.World.Context.Parameters.WindParameters;
 		readonly Units: HordeClassLibrary.World.Context.Parameters.UnitParameters;
 	}
 }
@@ -12374,6 +12461,29 @@ declare namespace HordeClassLibrary.World.Context.Parameters {
 }
 //#endregion
 
+//#region WindParameters
+declare namespace HordeClassLibrary.World.Context.Parameters {
+	class WindParameters extends System.Object {
+
+		// Constructors:
+		constructor();
+
+		// Fields:
+		static readonly MaxSpeedDefault: HordeResurrection.Basic.Primitives.PreciseFraction;
+		static readonly MaxDeltaDefault: HordeResurrection.Basic.Primitives.PreciseFraction;
+		static readonly ChangingPhasePeriodDefault: HordeResurrection.Basic.Primitives.MinMaxSpan;
+		static readonly StaticPhasePeriodDefault: HordeResurrection.Basic.Primitives.MinMaxSpan;
+
+		// Properties:
+		EnableWindUpdating: boolean;
+		MaxSpeed: HordeResurrection.Basic.Primitives.PreciseFraction;
+		MaxDelta: HordeResurrection.Basic.Primitives.PreciseFraction;
+		ChangingPhasePeriod: HordeResurrection.Basic.Primitives.MinMaxSpan;
+		StaticPhasePeriod: HordeResurrection.Basic.Primitives.MinMaxSpan;
+	}
+}
+//#endregion
+
 //#region WorldParameters
 declare namespace HordeClassLibrary.World.Context.Parameters {
 	class WorldParameters extends System.Object {
@@ -12382,12 +12492,8 @@ declare namespace HordeClassLibrary.World.Context.Parameters {
 		constructor();
 
 		// Fields:
-		static readonly WindSpeedMaxDefault: HordeResurrection.Basic.Primitives.PreciseFraction;
-		static readonly WindDeltaMaxDefault: HordeResurrection.Basic.Primitives.PreciseFraction;
 		static readonly /* const */ GravityAccelerationDefault: number; // = 0,72
 		static readonly /* const */ AirAccelerationDefault: number; // = 0,1875
-		static readonly /* const */ WindSpeedUpdatePeriodDefault: number; // = 24
-		static readonly /* const */ WindDeltaUpdatePeriodDefault: number; // = 256
 		static readonly /* const */ FireFadingPeriodOnRepairingDefault: number; // = 100
 		static readonly /* const */ RepairHelperExtinguishingFactorDefault: number; // = 10
 		static readonly /* const */ PopulationTerritoryAroundActiveBuildingDefault: number; // = 6
@@ -12396,11 +12502,6 @@ declare namespace HordeClassLibrary.World.Context.Parameters {
 		// Properties:
 		GravityAcceleration: number;
 		AirAcceleration: number;
-		EnableWindUpdating: boolean;
-		WindSpeedMax: HordeResurrection.Basic.Primitives.PreciseFraction;
-		WindDeltaMax: HordeResurrection.Basic.Primitives.PreciseFraction;
-		WindSpeedUpdatePeriod: number;
-		WindDeltaUpdatePeriod: number;
 		FireFadingPeriodOnRepairing: number;
 		RepairHelperExtinguishingFactor: number;
 		PopulationTerritoryAroundActiveBuilding: number;
@@ -13676,6 +13777,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		readonly Rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D;
 		readonly Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
 		readonly Position: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly MapLayer: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer;
 		readonly DrawLayer: HordeClassLibrary.World.Simple.DrawLayer;
 		readonly RealUnit: HordeClassLibrary.World.Objects.Units.Unit;
 		readonly IsExistent: boolean;
@@ -13712,6 +13814,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		readonly Region: HordeClassLibrary.World.Objects.Units.KnownUnitRegion;
 		readonly Rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D;
 		readonly Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly MapLayer: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer;
 		readonly IsExistent: boolean;
 		readonly Cfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
 		readonly Owner: HordeClassLibrary.World.Settlements.Settlement;
@@ -13731,6 +13834,8 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 			effect: HordeClassLibrary.UnitComponents.Enumerations.UnitEffectFlag
 		): boolean;
 
+		CanBeCapturedNow(): boolean;
+
 		Initialize(
 			realUnit: HordeClassLibrary.World.Objects.Units.Unit | null
 		): void;
@@ -13746,8 +13851,6 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		GetAccess(): boolean;
 
 		GetRenderAccess(): boolean;
-
-		GetPoolAccess(): boolean;
 
 		RestoreAccess(): void;
 	}
@@ -14022,7 +14125,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 			repairTarget: HordeClassLibrary.World.Objects.Units.Unit | null
 		): boolean;
 
-		CanBeBuildedNow(): boolean;
+		CanBeBuiltNow(): boolean;
 
 		IsAbandonedUnfinishedBuilding(): boolean;
 
@@ -14637,7 +14740,9 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 		// Properties:
 		readonly FileInfo: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaFileInfo;
 		readonly HashInfo: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaHashInfo;
-		readonly Version: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaVersion;
+		readonly Format: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaFormat;
+		readonly GameVersion: HordeClassLibrary.Basic.GameVersion.HordeVersion;
+		readonly ScenaVersion: HordeClassLibrary.Basic.GameVersion.HordeVersion;
 		readonly Name: string;
 		readonly Description: string;
 		readonly Size: HordeResurrection.Basic.Primitives.Geometry.Size2D;
@@ -14728,9 +14833,9 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 
 		// Properties:
 		readonly ScenaFileInfo: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaFileInfo;
-		readonly Hash: number[];
+		readonly HashBytes: number[];
 		readonly ShortHash: number;
-		readonly HashHex: string;
+		readonly Hash: string;
 		readonly IsHashCalculated: boolean;
 
 		// Methods:
@@ -14756,7 +14861,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 		);
 
 		// Properties:
-		readonly Version: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaVersion;
+		readonly Format: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaFormat;
 		readonly ScenaName: string;
 		readonly Size: HordeResurrection.Basic.Primitives.Geometry.Size2D;
 		readonly Rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D;
@@ -14816,13 +14921,8 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 		constructor(
 			fileName: string | null,
 			fileLength: number,
-			hashHex: string | null
-		);
-
-		constructor(
-			fileName: string | null,
-			fileLength: number,
-			hash: number[] | null
+			hash: number[] | null,
+			version: string | null
 		);
 
 		constructor();
@@ -14830,8 +14930,9 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 		// Properties:
 		readonly FileName: string;
 		readonly FileLength: number;
-		readonly HashHex: string;
-		readonly Hash: number[];
+		readonly Hash: string;
+		readonly Version: string;
+		readonly HashBytes: number[];
 		readonly ShortHash: number;
 	}
 }
@@ -14873,6 +14974,17 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		// Default parameterless constructor for value types
 		constructor();
+	}
+}
+//#endregion
+
+//#region ScenaFormat
+declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
+	abstract class ScenaFormat extends System.Enum {
+		/** ScenaFormat.None = 0 */ static readonly None: ScenaFormat;
+		/** ScenaFormat.NorthWind = 1 */ static readonly NorthWind: ScenaFormat;
+		/** ScenaFormat.Citadel = 2 */ static readonly Citadel: ScenaFormat;
+		/** ScenaFormat.Resurrection = 3 */ static readonly Resurrection: ScenaFormat;
 	}
 }
 //#endregion
@@ -15217,17 +15329,6 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 }
 //#endregion
 
-//#region ScenaVersion
-declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
-	abstract class ScenaVersion extends System.Enum {
-		/** ScenaVersion.None = 0 */ static readonly None: ScenaVersion;
-		/** ScenaVersion.NorthWind = 1 */ static readonly NorthWind: ScenaVersion;
-		/** ScenaVersion.Citadel = 2 */ static readonly Citadel: ScenaVersion;
-		/** ScenaVersion.Resurrection = 3 */ static readonly Resurrection: ScenaVersion;
-	}
-}
-//#endregion
-
 //#region ScenaWind
 declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 	class ScenaWind extends System.Object {
@@ -15245,6 +15346,8 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		readonly MaxSpeedComponent: HordeResurrection.Basic.Primitives.PreciseFraction;
 
 		// Methods:
+		ReinitializeStates(): void;
+
 		UpdateOnGameTick(): void;
 
 		ApplyDelta(
@@ -15503,10 +15606,6 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		Recreate(): void;
 
 		GetUnitsInBox(
-			/*in*/ box: HordeResurrection.Basic.Primitives.Geometry.Box3D
-		): HordeClassLibrary.World.ScenaComponents.Intrinsics.UnitsQueryResult;
-
-		GetUnitsInBox(
 			box: HordeResurrection.Basic.Primitives.Geometry.Box3D
 		): HordeClassLibrary.World.ScenaComponents.Intrinsics.UnitsQueryResult;
 	}
@@ -15588,7 +15687,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents {
 
 		// Properties:
 		readonly FileStamp: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaStamp;
-		readonly Version: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaVersion;
+		readonly Format: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaFormat;
 		readonly ScenaName: string;
 		readonly Size: HordeResurrection.Basic.Primitives.Geometry.Size2D;
 		readonly SizePixels: HordeResurrection.Basic.Primitives.Geometry.Size2D;
@@ -17443,7 +17542,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 		UnitOrderChanged: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.UnitOrderChangedEventArgs>>;
 		UnitLifeStateChanged: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.UnitLifeStateChangedEventArgs>>;
 		UnitBuildingComplete: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.UnitBuildingCompleteEventArgs>>;
-		UnitUnitMovedToCell: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.UnitMovedToCellEventArgs>>;
+		UnitMovedToCell: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.UnitMovedToCellEventArgs>>;
 		UnitCauseDamage: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.CauseDamageEventArgs>>;
 		UnitTakeDamage: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.TakeDamageEventArgs>>;
 		UnitTakeDamageByUnknownSource: EventSource<System.EventHandler<HordeClassLibrary.UnitComponents.EventArgs.TakeDamageByUnknownSourceEventArgs>>;
@@ -19070,6 +19169,8 @@ export const ActCapture = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.Act
 export type ActCapture = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActCapture;
 export const ActChopDownTree = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActChopDownTree;
 export type ActChopDownTree = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActChopDownTree;
+export const ActCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActCustom;
+export type ActCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActCustom;
 export const ActDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActDeath;
 export type ActDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActDeath;
 export const ActDestroySelf = HordeClassLibrary.UnitComponents.OrdersSystem.Acts.ActDestroySelf;
@@ -19138,6 +19239,8 @@ export const CaptureStage = HordeClassLibrary.UnitComponents.OrdersSystem.Motion
 export type CaptureStage = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionCaptureMachine.CaptureStage;
 export const MotionChopDown = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionChopDown;
 export type MotionChopDown = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionChopDown;
+export const MotionCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionCustom;
+export type MotionCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionCustom;
 export const MotionDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionDeath;
 export type MotionDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionDeath;
 export const MotionDestroySelf = HordeClassLibrary.UnitComponents.OrdersSystem.Motions.MotionDestroySelf;
@@ -19198,6 +19301,8 @@ export const OrderBuildingAttackUnit = HordeClassLibrary.UnitComponents.OrdersSy
 export type OrderBuildingAttackUnit = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderBuildingAttackUnit;
 export const OrderCapture = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderCapture;
 export type OrderCapture = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderCapture;
+export const OrderCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderCustom;
+export type OrderCustom = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderCustom;
 export const OrderDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderDeath;
 export type OrderDeath = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderDeath;
 export const OrderDestroySelf = HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderDestroySelf;
@@ -19278,6 +19383,8 @@ export const CompoundProfessionData = HordeClassLibrary.UnitComponents.Professio
 export type CompoundProfessionData = HordeClassLibrary.UnitComponents.ProfessionData.CompoundProfessionData;
 export const HarvesterProfessionData = HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData;
 export type HarvesterProfessionData = HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData;
+export const ChopsCounter = HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData.ChopsCounter;
+export type ChopsCounter = HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData.ChopsCounter;
 export const IUnitContainerProfession = HordeClassLibrary.UnitComponents.ProfessionData.Interfaces.IUnitContainerProfession;
 export type IUnitContainerProfession = HordeClassLibrary.UnitComponents.ProfessionData.Interfaces.IUnitContainerProfession;
 export const MetalStockProfessionData = HordeClassLibrary.UnitComponents.ProfessionData.MetalStockProfessionData;
@@ -19532,6 +19639,8 @@ export const BattleSettings = HordeClassLibrary.World.Context.BattleSettings;
 export type BattleSettings = HordeClassLibrary.World.Context.BattleSettings;
 export const UnitParameters = HordeClassLibrary.World.Context.Parameters.UnitParameters;
 export type UnitParameters = HordeClassLibrary.World.Context.Parameters.UnitParameters;
+export const WindParameters = HordeClassLibrary.World.Context.Parameters.WindParameters;
+export type WindParameters = HordeClassLibrary.World.Context.Parameters.WindParameters;
 export const WorldParameters = HordeClassLibrary.World.Context.Parameters.WorldParameters;
 export type WorldParameters = HordeClassLibrary.World.Context.Parameters.WorldParameters;
 export const Episode = HordeClassLibrary.World.Episode;
@@ -19774,6 +19883,8 @@ export const LandscapeMapModification = HordeClassLibrary.World.ScenaComponents.
 export type LandscapeMapModification = HordeClassLibrary.World.ScenaComponents.Intrinsics.LandscapeMapModification;
 export const ResourcesMapModification = HordeClassLibrary.World.ScenaComponents.Intrinsics.ResourcesMapModification;
 export type ResourcesMapModification = HordeClassLibrary.World.ScenaComponents.Intrinsics.ResourcesMapModification;
+export const ScenaFormat = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaFormat;
+export type ScenaFormat = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaFormat;
 export const ScenaGlobalObjects = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaGlobalObjects;
 export type ScenaGlobalObjects = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaGlobalObjects;
 export const ScenaObjectsCollection = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaObjectsCollection;
@@ -19810,8 +19921,6 @@ export const ScenaSettlements = HordeClassLibrary.World.ScenaComponents.Intrinsi
 export type ScenaSettlements = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaSettlements;
 export const ScenaTileset = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaTileset;
 export type ScenaTileset = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaTileset;
-export const ScenaVersion = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaVersion;
-export type ScenaVersion = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaVersion;
 export const ScenaWind = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaWind;
 export type ScenaWind = HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaWind;
 export const UnitsMap = HordeClassLibrary.World.ScenaComponents.Intrinsics.UnitsMap;

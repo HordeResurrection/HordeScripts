@@ -68,6 +68,7 @@ export function allExamples() {
 
     // - Примеры работы с сообщениями
     addExample(new Example_SendMessageToAll());
+    addExample(new Example_SendBotMessage());
     addExample(new Example_HookSentChatMessages());
     addExample(new Example_HookReceivedChatMessages());
 
@@ -79,6 +80,7 @@ export function allExamples() {
     addExample(new Example_CustomBullet());
     addExample(new Example_CustomUnit());
     addExample(new Example_CustomUnitCommand());
+    addExample(new Example_CustomUnitOrder());
     addExample(new Example_CustomUnitCanBePlaced());
 }
 
@@ -99,7 +101,7 @@ import { Example_ConfigCreation, Example_ConfigRemoving, Example_ConfigWorks } f
 import { Example_InputHiLevel } from "./examples/mastermind-input-hi-level";
 import { Example_InputLowLevel } from "./examples/mastermind-input-low-level";
 import { Example_MasterMindRequest } from "./examples/mastermind-request";
-import { Example_HookReceivedChatMessages, Example_HookSentChatMessages, Example_SendMessageToAll } from "./examples/message-examples";
+import { Example_HookReceivedChatMessages, Example_HookSentChatMessages, Example_SendBotMessage, Example_SendMessageToAll } from "./examples/message-examples";
 import { Example_GameWorks, Example_Introspection } from "./examples/other-examples";
 import { Example_PlayerWorks } from "./examples/player-examples";
 import { Example_ScenaWorks } from "./examples/scena-examples";
@@ -123,4 +125,4 @@ import { Example_SettlementResourcesBonus } from "examples/settlement-resources-
 import { Example_UnitEnumerateEvents, Example_UnitHandleEvents } from "examples/unit-event-examples";
 import { Example_StringDecoration } from "examples/decoration-string";
 import { Example_GeometryDecoration } from "examples/decoration-geometry";
-
+import { Example_CustomUnitOrder } from "examples/custom-unit-order";

@@ -1,12 +1,21 @@
 import HordePluginBase from "plugins/base-plugin";
 import { ScriptUnitWorkerGetOrder, ScriptUnitWorkerCanBePlaced, ScriptUnitWorkerState, BulletConfig, BaseBullet, BulletEmittingArgs, UnitConfig, UnitState, Unit, ACommandArgs, Settlement, Scena } from "./horde-types";
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!! ВНИМАНИЕ !!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+// Эти функции будут удалены в одном из следующих релизов.
+// Вместо них следует использовать аналоги из "/library/game-logic/workers.ts"
+
 
 // ===================================================
 // --- Bullets
 
 /**
  * Установить инициализирующий обработчик для снаряда на основе метода из плагина.
+ * 
+ * @deprecated Функция устарела. Следует использовать функцию-аналог из "/library/game-logic/workers.ts".
  */
 export function setBulletInitializeWorker(
     plugin: HordePluginBase,
@@ -21,6 +30,8 @@ export function setBulletInitializeWorker(
 
 /**
  * Установить обработчик снаряда на каждый такт на основе метода из плагина.
+ * 
+ * @deprecated Функция устарела. Следует использовать функцию-аналог из "/library/game-logic/workers.ts".
  */
 export function setBulletProcessWorker(
     plugin: HordePluginBase,
@@ -36,7 +47,7 @@ export function setBulletProcessWorker(
 /**
  * Вспомогательный метод для установки обработчика на основе произвольной функции.
  * 
- * Примечание: эту функцию можно использовать для задания обработчика без привязки к плагину.
+ * @deprecated Функция устарела. Следует использовать функцию-аналог из "/library/game-logic/workers.ts".
  */
 export function setBulletWorker(
     bulletCfg: BulletConfig,
@@ -57,6 +68,8 @@ export function setBulletWorker(
 
 /**
  * Установить обработчик состояния юнита на основе метода из плагина.
+ * 
+ * @deprecated Функция устарела. Следует использовать функцию-аналог из "/library/game-logic/workers.ts".
  */
 export function setUnitStateWorker(
     plugin: HordePluginBase,
@@ -85,6 +98,8 @@ export function setUnitStateWorker(
 
 /**
  * Установить обработчик получения приказа для юнита на основе метода из плагина.
+ * 
+ * @deprecated Функция устарела. Следует использовать функцию-аналог из "/library/game-logic/workers.ts".
  */
 export function setUnitGetOrderWorker(
     plugin: HordePluginBase,
@@ -111,6 +126,8 @@ export function setUnitGetOrderWorker(
 
 /**
  * Установить CanBePlaced-обработчик для юнита на основе метода из плагина.
+ * 
+ * @deprecated Функция устарела. Следует использовать функцию-аналог из "/library/game-logic/workers.ts".
  */
 export function setUnitCanBePlacedWorker(
     plugin: HordePluginBase,

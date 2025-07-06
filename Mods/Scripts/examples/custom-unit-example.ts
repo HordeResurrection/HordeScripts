@@ -3,7 +3,7 @@ import { DictionaryT } from "library/dotnet/dotnet-types";
 import { mergeFlags } from "library/dotnet/dotnet-utils";
 import { Unit, UnitArmament, UnitConfig, UnitDirection, UnitQueryFlag, UnitState } from "library/game-logic/horde-types";
 import { UnitProducerProfessionParams, UnitProfession } from "library/game-logic/unit-professions";
-import { setUnitStateWorker } from "library/game-logic/workers-tools";
+import { setUnitStateWorker } from "library/game-logic/workers";
 import HordeExampleBase from "./base-example";
 
 
@@ -21,7 +21,7 @@ export class Example_CustomUnit extends HordeExampleBase {
     public constructor() {
         super("Custom unit (арбалетчик)");
 
-        this.armament = createArmamament();
+        this.armament = createArmament();
         this.baseMoveWorker = createBaseMoveWorker();
     }
 
@@ -36,7 +36,8 @@ export class Example_CustomUnit extends HordeExampleBase {
         let unitCfg = this.getOrCreateUnitConfig();
 
         // Создание и установка обработчика удара
-        setUnitStateWorker(this, unitCfg, UnitState.Move, this.moveWorker);
+        let pluginWrappedWorker = (u: Unit) => this.moveWorker(u);
+        setUnitStateWorker("CrossbowRider", unitCfg, UnitState.Move, pluginWrappedWorker);
 
         this.log.info('Настройка воина завершена!');
     }
@@ -142,7 +143,7 @@ function createBaseMoveWorker() {
 /**
  * Создание дополнительного вооружения для юнита.
  */
-function createArmamament() {
+function createArmament() {
 
     // Смещение арбалета по направлениям
     let gunCoord = new DictionaryT<UnitDirection, Point2D>(UnitDirection, Point2D);
