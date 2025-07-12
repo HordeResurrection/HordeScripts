@@ -18,7 +18,8 @@ export class Spell_Power_Attack extends IPassiveSpell {
 
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Усиленная атака";
-    protected static _DescriptionTemplate           : string = "Пассивка. Каждая атака отнимает заряд и наносит дополнительно " + Spell_Power_Attack._AddDamage + " урона.";
+    protected static _DescriptionTemplate           : string = "Пассивка. Каждая атака ближнего боя отнимает заряд и наносит дополнительно "
+        + Spell_Power_Attack._AddDamage + " осадного урона.";
 
     public OnCauseDamage(VictimUnit: Unit, Damage: number, EffectiveDamage: number, HurtType: UnitHurtType) {
         super.OnCauseDamage(VictimUnit, Damage, EffectiveDamage, HurtType);
@@ -26,18 +27,10 @@ export class Spell_Power_Attack extends IPassiveSpell {
             return;
         }
 
-        if (HurtType == UnitHurtType.Mele) {
+        if (HurtType == UnitHurtType.Mele || HurtType == UnitHurtType.Arrow) {
             this._caster.unit.BattleMind.CauseDamage(VictimUnit,
                 Spell_Power_Attack._AddDamage,
                 UnitHurtType.Heavy);
-            // VictimUnit.BattleMind.TakeDamage(Spell_Power_Attack._AddDamage, UnitHurtType.Mele);
-            // this._caster.OnCauseDamage(this,
-            //     {
-            //         VictimUnit: VictimUnit,
-            //         Damage: Spell_Power_Attack._AddDamage,
-            //         EffectiveDamage: Math.max(0, Spell_Power_Attack._AddDamage - VictimUnit.Cfg.Shield),
-            //         HurtType : UnitHurtType.Heavy
-            //     });
 
             var decorCell = Cell.ConvertHordePoint(VictimUnit.Cell).Scale(32);
             for (var x = 0; x <= 32; x += 32) {
@@ -49,16 +42,8 @@ export class Spell_Power_Attack extends IPassiveSpell {
                 }
             }
 
-            var chargeReloadTick = BattleController.GameTimer.GameFramesCounter
-                - GlobalVars.startGameTickNum
-                + this.constructor['_ChargesReloadTime'];
-            this._charges--;
-            this._chargesReloadTicks.push(chargeReloadTick);
-
-            if (this._charges == 0) {
-                this._caster.unit.CommandsMind.RemoveAddedCommand(this.GetUnitCommand());
-                this._state = SpellState.WAIT_CHARGE;
-            }
+            
+            this._SpendCharge();
         }
     }
 }

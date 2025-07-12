@@ -85,6 +85,24 @@
       "LoopAnimation": false,
       "StartFrameNumber": null,
       "InstanceFactory": "SingleAnimEffectFactory"
+    },
+    {
+      "Archetype": "#VisualEffectConfig_MagicCircle_red",
+      "Uid": "#VisualEffectConfig_MagicFireLittle",
+      "Description": "магический огонь (маленький)",
+      "SpecialParams": {
+        "$type": "HordeClassLibrary::SingleAnimEffectSpecialParams",
+        "AnimationsCatalog": "#AnimCatalog_Effects_MagicFireLittle"
+      }
+    },
+    {
+      "Archetype": "#VisualEffectConfig_MagicCircle_red",
+      "Uid": "#VisualEffectConfig_MagicFireBig",
+      "Description": "магический огонь (большой)",
+      "SpecialParams": {
+        "$type": "HordeClassLibrary::SingleAnimEffectSpecialParams",
+        "AnimationsCatalog": "#AnimCatalog_Effects_MagicFireBig"
+      }
     }
   ]
 }

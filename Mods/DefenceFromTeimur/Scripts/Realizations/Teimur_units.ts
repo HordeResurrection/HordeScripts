@@ -1,9 +1,9 @@
 import { createHordeColor, createPF, createPoint, createResourcesAmount } from "library/common/primitives";
-import { UnitFlags, UnitCommand, UnitDirection, UnitHurtType, UnitSpecification, BattleController, BulletState, UnitMapLayer, UnitEffectFlag, TileType } from "library/game-logic/horde-types";
+import { UnitFlags, UnitCommand, UnitDirection, UnitHurtType, UnitSpecification, BattleController, BulletState, UnitMapLayer, UnitEffectFlag, TileType, UnitConfig, DiplomacyStatus } from "library/game-logic/horde-types";
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 import { ChebyshevDistance, CreateBulletConfig, CreateUnitConfig, EuclidDistance, spawnUnit, spawnUnits, unitCanBePlacedByRealMap } from "../Utils";
 import { ILegendaryUnit } from "../Types/ILegendaryUnit";
-import { ITeimurUnit } from "../Types/ITeimurUnit";
+import { ITeimurUnit, TeimurUnitsModificators } from "../Types/ITeimurUnit";
 import { generateCellInSpiral, generateRandomCellInRect } from "library/common/position-tools";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
 import { GlobalVars } from "../GlobalData";
@@ -15,6 +15,31 @@ import { setBulletInitializeWorker, setBulletProcessWorker } from "library/game-
 import { createGameMessageWithSound } from "library/common/messages";
 import { Hero_Crusader } from "./Player_units";
 import { Cell } from "../Types/Geometry";
+import { IUnitCaster } from "../Spells/IUnitCaster";
+import { ISpell, SpellState } from "../Spells/ISpell";
+import { IPassiveSpell } from "../Spells/IPassiveSpell";
+import { ITargetPointSpell } from "../Spells/ITargetPointSpell";
+import { Spell_fear_attack } from "../Spells/Magic/Spell_fear_attack";
+import { Spell_fiery_dash } from "../Spells/Fire/Spell_fiery_dash";
+import { Spell_fiery_trail } from "../Spells/Fire/Spell_fiery_trail";
+import { Spell_FireArrowsRain } from "../Spells/Fire/Spell_FireArrowsRain";
+import { Spell_Fireball } from "../Spells/Fire/Spell_Fireball";
+import { Spell_fortress } from "../Spells/Utillity/Spell_fortress";
+import { Spell_healing_aura } from "../Spells/Utillity/Spell_healing_aura";
+import { Spell_PoisonBomb } from "../Spells/Magic/Spell_PoisonBomb";
+import { Spell_Teleportation } from "../Spells/Magic/Spell_Teleportation";
+import { Spell_Vampirism } from "../Spells/Melle/Spell_Vampirism";
+import { Spell_Blocking } from "../Spells/Melle/Spell_Blocking";
+import { Spell_Agr_attack } from "../Spells/Melle/Spell_Agr_attack";
+import { Spell_Power_Attack } from "../Spells/Melle/Spell_Power_Attack";
+import { Spell_Magic_shield } from "../Spells/Utillity/Spell_Magic_shield";
+import { Spell_Reflection } from "../Spells/Melle/Spell_Reflection";
+import { Spell_Summon_Guardians } from "../Spells/Utillity/Spell_Summon_Guardians";
+import { Spell_Ricochet } from "../Spells/Melle/Spell_Ricochet";
+import { Spell_Magic_fire } from "../Spells/Magic/Spell_Magic_fire";
+import { ACommandArgs } from "library/game-logic/horde-types";
+import { Unit } from "library/game-logic/horde-types";
+import { Spell_WorkerSaleList } from "../Spells/Worker/Spell_WorkerSaleList";
 
 export class Teimur_Swordmen extends ITeimurUnit {
     static CfgUid      : string = "#DefenceTeimur_Swordmen";
@@ -317,6 +342,7 @@ export class Teimur_Legendary_RAIDER extends ILegendaryUnit {
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 255, 100, 100));
         // задаем количество здоровья от числа игроков
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(200 * Math.sqrt(GlobalVars.difficult)));
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", this.Description);
         // делаем урон = 0
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid].MainArmament.ShotParams, "Damage", 0);
         // устанавливаем скорость
@@ -1155,6 +1181,144 @@ export class Teimur_Legendary_GREED_HORSE extends ILegendaryUnit {
     }
 }
 
+export class Teimur_Legendary_Melle_CASTER extends IUnitCaster {
+    public static canAttackBuilding : boolean = true;
+
+    static CfgUid      : string = "#DefenceTeimur_legendary_caster";
+    static BaseCfgUid  : string = "#DefenceTeimur_Swordmen";
+    static Description : string = "Легендарный кастер. Получает случайные способности максимального уровня";
+
+    protected static AllSpells : Array<typeof ISpell> = Spell_WorkerSaleList.SpellsList
+        .filter(spell => spell.constructor['_IsConsumables'] == false);
+
+    protected static _SpellsCount: number = 1;
+
+    lastCastTick: number;
+
+    constructor (unit: any, teamNum: number) {
+        super(unit, teamNum);
+
+        // Randomly select SpellsCount spells and set to max level
+        const selectedSpells = Teimur_Legendary_Melle_CASTER.AllSpells
+            .sort(() => GlobalVars.rnd.RandomDouble() - 0.5).slice(0, Teimur_Legendary_Melle_CASTER._SpellsCount);
+        for (let SpellClass of selectedSpells) {
+            this.AddSpell(SpellClass);
+            this.AddSpell(SpellClass);
+            this.AddSpell(SpellClass);
+            this.AddSpell(SpellClass);
+            this.AddSpell(SpellClass);
+        }
+        this.lastCastTick = 0;
+
+        for (var settlement of GlobalVars.teams[this.teamNum].settlements) {
+            let msg1 = createGameMessageWithSound("Способности: "
+                + this._spells.map(spell => spell.GetCommandConfig().Name).join(", "),
+                createHordeColor(255, 255, 165, 10));
+            settlement.Messages.AddMessage(msg1);
+        }
+    }
+
+    public static InitConfig() {
+        super.InitConfig.call(this);
+
+        // Set name
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный кастер");
+        // Change color
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 0, 255, 255));
+        // Set health based on difficulty
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(150 * Math.sqrt(GlobalVars.difficult)));
+        // Additional configurations as needed
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Description", this.Description);
+    }
+
+    public OnEveryTick(gameTickNum: number): boolean {
+        if (!super.OnEveryTick(gameTickNum)) return false;
+
+        if (gameTickNum - this.lastCastTick > 250) {
+            let nearestEnemy: any = null;
+            let minDist = Infinity;
+            let unitsIter = iterateOverUnitsInBox(createPoint(this.unit.Cell.X, this.unit.Cell.Y), 8);
+            for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
+                let _unit = u.value;
+                if (_unit.IsDead) continue;
+                if (GlobalVars.diplomacyTable[this.unit.Owner.Uid][_unit.Owner.Uid] != DiplomacyStatus.War) continue;
+                let dist = ChebyshevDistance(this.unit.Cell.X, this.unit.Cell.Y, _unit.Cell.X, _unit.Cell.Y);
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearestEnemy = _unit;
+                }
+            }
+            if (nearestEnemy) {
+                for (let spell of this._spells) {
+                    if ((spell as any)._state === SpellState.READY && !(spell instanceof IPassiveSpell)) {
+                        let activateArgs: any = {};
+                        if (spell instanceof ITargetPointSpell) {
+                            activateArgs.TargetCell = nearestEnemy.Cell;
+                        }
+                        if (spell.Activate(activateArgs)) {
+                            this.lastCastTick = gameTickNum;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (this.unit_ordersMind.IsIdle()) {
+            var goalPosition;
+            {
+                var generator = generateCellInSpiral(GlobalVars.teams[this.teamNum].castleCell.X, GlobalVars.teams[this.teamNum].castleCell.Y);
+                for (goalPosition = generator.next(); !goalPosition.done; goalPosition = generator.next()) {
+                    if (unitCanBePlacedByRealMap(this.unit.Cfg, goalPosition.value.X, goalPosition.value.Y)) {
+                        break;
+                    }
+                }
+            }
+            this.GivePointCommand(goalPosition.value, UnitCommand.Attack, AssignOrderMode.Queue);
+        }
+
+        return true;
+    }
+
+    public OnDead(gameTickNum: number): void {
+        // Optional dead logic
+    }
+
+    public static GetSpawnCount(spawnCount: number) {
+        this._SpellsCount = Math.min(spawnCount, this._SpellsMaxCount);
+
+        return 1;
+    }
+
+    public static GetConfigWithModificator(modificator : TeimurUnitsModificators.Type) : UnitConfig {
+        return GlobalVars.configs[this.CfgUid];
+    }
+
+    public static IsLegendaryUnit() : boolean {
+        return true;
+    }
+}
+
+export class Teimur_Legendary_Range_CASTER extends Teimur_Legendary_Melle_CASTER {
+    static CfgUid: string = "#DefenceFromTeimurPlugin_Teimur_Legendary_Range_CASTER";
+    static BaseCfgUid: string = "#UnitConfig_Slavyane_Archer";
+
+    constructor(unit: any, teamNum: number) {
+        super(unit, teamNum);
+    }
+
+    static InitConfig() {
+        super.InitConfig.call(this);
+
+        // Set name
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный дальнобойный кастер");
+        // Change color
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 0, 255, 255));
+        // Set health based on difficulty
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(100 * Math.sqrt(GlobalVars.difficult)));
+    }
+}
+
 
 export const TeimurLegendaryUnitsClass : Array<typeof IUnit> = [
     Teimur_Legendary_SWORDMEN,
@@ -1166,7 +1330,9 @@ export const TeimurLegendaryUnitsClass : Array<typeof IUnit> = [
     Teimur_Legendary_HORSE,
     Teimur_Legendary_DARK_DRAIDER,
     Teimur_Legendary_FIRE_MAGE,
-    Teimur_Legendary_GREED_HORSE
+    Teimur_Legendary_GREED_HORSE,
+    Teimur_Legendary_Melle_CASTER,
+    Teimur_Legendary_Range_CASTER
 ];
 
 export const TeimurUnitsClass : Array<typeof IUnit> = [

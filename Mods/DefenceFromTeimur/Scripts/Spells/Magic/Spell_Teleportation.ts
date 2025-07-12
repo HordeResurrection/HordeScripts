@@ -6,6 +6,7 @@ import { DiplomacyStatus, Stride_Color, UnitFlags, UnitHurtType, VisualEffectCon
 import { ITargetPointSpell } from "../ITargetPointSpell";
 import { Cell } from "../../Types/Geometry";
 import { SpellState } from "../ISpell";
+import { GlobalVars } from "../../GlobalData";
 
 export class Spell_Teleportation extends ITargetPointSpell {
     protected static _ButtonUid                     : string = "Spell_Teleportation";
@@ -63,7 +64,8 @@ export class Spell_Teleportation extends ITargetPointSpell {
                 if (Spell_Teleportation._TeleportAddDamagePerLevel[this.level] > 0) {
                     let unitsIter = iterateOverUnitsInBox(this._caster.unit.Cell, 5);
                     for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
-                        if (this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(u.value.Owner) == DiplomacyStatus.War
+                        if (//this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(u.value.Owner) == DiplomacyStatus.War
+                            GlobalVars.diplomacyTable[this._caster.unit.Owner.Uid][u.value.Owner.Uid] == DiplomacyStatus.War
                             && !u.value.Cfg.Flags.HasFlag(UnitFlags.MagicResistant)) {
                             // u.value.BattleMind.TakeDamage(Spell_Teleportation._TeleportAddDamagePerLevel[this.level]
                             //     + u.value.Cfg.Shield,

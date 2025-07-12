@@ -7,6 +7,7 @@ import { AssignOrderMode } from "library/mastermind/virtual-input";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
 import { IUnit } from "../../Types/IUnit";
 import { Cell } from "../../Types/Geometry";
+import { GlobalVars } from "../../GlobalData";
 
 export class Spell_fear_attack extends ISpell {
     protected static _ButtonUid                     : string = "Spell_fear_attack";
@@ -50,7 +51,8 @@ export class Spell_fear_attack extends ISpell {
             
             let unitsIter = iterateOverUnitsInBox(this._caster.unit.Cell, Spell_fear_attack._FearRadiusPerLevel[this.level]);
             for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
-                if (this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(u.value.Owner) == DiplomacyStatus.War
+                if (//this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(u.value.Owner) == DiplomacyStatus.War
+                    GlobalVars.diplomacyTable[this._caster.unit.Owner.Uid][u.value.Owner.Uid] == DiplomacyStatus.War
                     && !u.value.Cfg.Flags.HasFlag(UnitFlags.MagicResistant)
                     && u.value.Cfg.IsBuilding == false) {
                     if (u.value.ScriptData.IUnit) {

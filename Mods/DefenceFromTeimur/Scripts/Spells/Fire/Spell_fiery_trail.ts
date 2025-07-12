@@ -4,6 +4,7 @@ import { Stride_Color, BulletConfig, VisualEffectConfig, UnitFlags, DiplomacySta
 import { Cell } from "../../Types/Geometry";
 import { ISpell } from "../ISpell";
 import { IUnitCaster } from "../IUnitCaster";
+import { GlobalVars } from "../../GlobalData";
 
 export class Spell_fiery_trail extends ISpell {
     protected static _ButtonUid                     : string = "Spell_fiery_trail";
@@ -66,7 +67,8 @@ export class Spell_fiery_trail extends ISpell {
             var upperHordeUnit = ActiveScena.UnitsMap.GetUpperUnit(cell.ToHordePoint());
             if (upperHordeUnit
                 && !upperHordeUnit.Cfg.Flags.HasFlag(UnitFlags.FireResistant)
-                && this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(upperHordeUnit.Owner) == DiplomacyStatus.War) {
+                && GlobalVars.diplomacyTable[this._caster.unit.Owner.Uid][upperHordeUnit.Owner.Uid] == DiplomacyStatus.War) {
+                //&& this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(upperHordeUnit.Owner) == DiplomacyStatus.War) {
                 HordeClassLibrary.World.Objects.Bullets.Implementations.Fire.BaseFireBullet.MakeFire(
                     this._caster.unit, trailPoint, UnitMapLayer.Main, Spell_fiery_trail._FireConfig);
                 this._caster.unit.BattleMind.CauseDamage(upperHordeUnit,

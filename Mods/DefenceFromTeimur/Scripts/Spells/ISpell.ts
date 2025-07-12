@@ -325,12 +325,25 @@ export class ISpell {
     public OnTakeDamage(AttackerUnit: Unit, EffectiveDamage: number, HurtType: UnitHurtType) {
     }
 
+    protected _SpendCharge() {
+        var chargeReloadTick = BattleController.GameTimer.GameFramesCounter
+            - GlobalVars.startGameTickNum
+            + this.constructor['_ChargesReloadTime'];
+        this._charges--;
+        this._chargesReloadTicks.push(chargeReloadTick);
+
+        if (this._charges == 0) {
+            this._caster.unit.CommandsMind.RemoveAddedCommand(this.GetUnitCommand());
+            this._state = SpellState.WAIT_CHARGE;
+        }
+    }
+
     protected _OnEveryTickReady(gameTickNum: number) : boolean {
         return true;
     }
 
     protected _OnEveryTickActivated(gameTickNum: number) : boolean {
-        return true;
+        return false;
     }
 
     protected _OnEveryTickActivatedDelay(gameTickNum: number) : boolean {

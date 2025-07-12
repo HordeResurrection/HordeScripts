@@ -20,7 +20,12 @@ import { Spell_Magic_shield } from "../Utillity/Spell_Magic_shield";
 import { createGameMessageWithNoSound } from "library/common/messages";
 import { createHordeColor } from "library/common/primitives";
 import { log } from "library/common/logging";
-import { printObjectItems } from "library/common/introspection";
+import { Spell_Reflection } from "../Melle/Spell_Reflection";
+import { Spell_Summon_Guardians } from "../Utillity/Spell_Summon_Guardians";
+import { Spell_Ricochet } from "../Melle/Spell_Ricochet";
+import { Spell_Magic_fire } from "../Magic/Spell_Magic_fire";
+import { Spell_ranged_transform } from "../Utillity/Spell_ranged_transform";
+import { Spell_Melle_transform } from "../Utillity/Spell_Melle_transform";
 
 export class Spell_WorkerSaleList extends IProduceSpell {
     protected static _ChargesReloadTime             : number = 1;
@@ -33,7 +38,7 @@ export class Spell_WorkerSaleList extends IProduceSpell {
         100
     ];
 
-    protected static SpellsList : Array<typeof ISpell> = 
+    public static SpellsList : Array<typeof ISpell> = 
     [
         Spell_fear_attack,
         Spell_fiery_dash,
@@ -48,7 +53,13 @@ export class Spell_WorkerSaleList extends IProduceSpell {
         Spell_Blocking,
         Spell_Agr_attack,
         Spell_Power_Attack,
-        Spell_Magic_shield
+        Spell_Magic_shield,
+        Spell_Reflection,
+        Spell_Summon_Guardians,
+        Spell_Ricochet,
+        Spell_Magic_fire,
+        Spell_Melle_transform,
+        Spell_ranged_transform
     ];
 
     private _targetHero : IUnitCaster;

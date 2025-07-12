@@ -1,5 +1,5 @@
 import { GlobalVars } from "../GlobalData";
-import { TeimurLegendaryUnitsClass, Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER, Teimur_Legendary_HORSE, Teimur_Legendary_DARK_DRAIDER, Teimur_Legendary_FIRE_MAGE, Teimur_Legendary_GREED_HORSE, Teimur_Scorpion } from "./Teimur_units";
+import { TeimurLegendaryUnitsClass, Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER, Teimur_Legendary_HORSE, Teimur_Legendary_DARK_DRAIDER, Teimur_Legendary_FIRE_MAGE, Teimur_Legendary_GREED_HORSE, Teimur_Scorpion, Teimur_Legendary_Melle_CASTER, Teimur_Legendary_Range_CASTER } from "./Teimur_units";
 import { IAttackPlan, WaveUnit, Wave } from "../Types/IAttackPlan";
 import { RandomUnit } from "../Types/IUnit";
 import { IIncomePlan } from "../Types/IIncomePlan";
@@ -723,19 +723,31 @@ export class AttackPlan_7 extends IAttackPlan {
             [
                 new WaveUnit(Teimur_Legendary_ARCHER,      1),
                 new WaveUnit(Teimur_Legendary_WORKER,      1),
-                new WaveUnit(Teimur_Legendary_GREED_HORSE, 1)
+                new WaveUnit(Teimur_Legendary_GREED_HORSE, 1),
+                // @ts-expect-error
+                new WaveUnit(Teimur_Legendary_Melle_CASTER,      1),
+                // @ts-expect-error
+                new WaveUnit(Teimur_Legendary_Range_CASTER,      1)
             ],
             // normal
             [
                 new WaveUnit(Teimur_Legendary_HEAVYMAN,     1),
                 new WaveUnit(Teimur_Legendary_ARCHER_2,     1),
-                new WaveUnit(Teimur_Legendary_DARK_DRAIDER, 1)
+                new WaveUnit(Teimur_Legendary_DARK_DRAIDER, 1),
+                // @ts-expect-error
+                new WaveUnit(Teimur_Legendary_Melle_CASTER,       2),
+                // @ts-expect-error
+                new WaveUnit(Teimur_Legendary_Range_CASTER,       2)
             ],
             // hard
             [
                 new WaveUnit(Teimur_Legendary_SWORDMEN,  1),
                 new WaveUnit(Teimur_Legendary_RAIDER,    1),
-                new WaveUnit(Teimur_Legendary_FIRE_MAGE, 1)
+                new WaveUnit(Teimur_Legendary_FIRE_MAGE, 1),
+                // @ts-expect-error
+                new WaveUnit(Teimur_Legendary_Melle_CASTER,    3),
+                // @ts-expect-error
+                new WaveUnit(Teimur_Legendary_Range_CASTER,    3)
             ]
         ];
 
@@ -903,6 +915,262 @@ export class AttackPlan_7 extends IAttackPlan {
     }
 }
 
+export class AttackPlan_8 extends IAttackPlan {
+    protected static _UnitBaseCfgUid : string = "#UnitConfig_Nature_Bear";
+    protected static _UnitCfgUid : string = "#DefenceFromTeimurPlugin_AttackPlan_8";
+    protected static _UnitName : string = "Тест для кожанных";
+    protected static _UnitDescription : string = "Кармические волны с модификаторами и неожиданными элементами для режима героев. Реграбельно за счет повышенной случайности.";
+
+    static IncomePlanClass : typeof IIncomePlan = IncomePlan_1;
+
+    constructor (endTick?: number) {
+        super();
+        this.waves = [];
+        if (!endTick) {
+            endTick = 50 * (50*60);
+        }
+
+        // Increased variety in units for more interesting waves
+        var waveUnits = [
+            // easy
+            [
+                new WaveUnit(Teimur_Swordmen, 10),
+                new WaveUnit(Teimur_Archer,   10),
+                new WaveUnit(Teimur_Raider,   4),
+                new WaveUnit(Teimur_Scorpion, 7)
+            ],
+            // normal
+            [
+                new WaveUnit(Teimur_Heavymen, 7),
+                new WaveUnit(Teimur_Catapult, 3),
+                new WaveUnit(Teimur_Mag_2,    2),
+                new WaveUnit(Teimur_Archer_2, 7)
+            ],
+            // hard
+            [
+                new WaveUnit(Teimur_Raider,   12),
+                new WaveUnit(Teimur_Balista,  3),
+                new WaveUnit(Teimur_Villur,   2),
+                new WaveUnit(Teimur_Olga,     2)
+            ]  
+        ];
+
+        var modificators_Probability = new Array<number>(TeimurUnitsModificators.Type.NULL);
+        modificators_Probability.fill(1 / modificators_Probability.length);
+
+        var waveUnits_ProbabilityPerDifficult = new Array<number>(waveUnits.length);
+        var waveUnits_ProbabilityPerUnit      = new Array<Array<number>>(waveUnits.length);
+        for (var difficultNum = 0; difficultNum < waveUnits.length; difficultNum++) {
+            if (difficultNum == 0) {
+                waveUnits_ProbabilityPerDifficult[difficultNum] = 1.0;
+            } else {
+                waveUnits_ProbabilityPerDifficult[difficultNum] = 0.0;
+            }
+
+            waveUnits_ProbabilityPerUnit[difficultNum] = new Array<number>(waveUnits[difficultNum].length);
+            for (var unitNum = 0; unitNum < waveUnits[difficultNum].length; unitNum++) {
+                waveUnits_ProbabilityPerUnit[difficultNum][unitNum] = 1.0 / waveUnits[difficultNum].length;
+            }
+        }
+
+        var waveLegendaryUnits = [
+            // easy
+            [
+                new WaveUnit(Teimur_Legendary_ARCHER,      1),
+                new WaveUnit(Teimur_Legendary_WORKER,      1),
+                new WaveUnit(Teimur_Legendary_GREED_HORSE, 1),
+                // @ts-expect-error
+                new WaveUnit(Teimur_Legendary_Melle_CASTER,      1),
+                // @ts-expect-error
+                new WaveUnit(Teimur_Legendary_Range_CASTER,      1)
+            ],
+            // normal
+            [
+                new WaveUnit(Teimur_Legendary_HEAVYMAN,     1),
+                new WaveUnit(Teimur_Legendary_ARCHER_2,     1),
+                new WaveUnit(Teimur_Legendary_DARK_DRAIDER, 1),
+                // @ts-expect-error
+                new WaveUnit(Teimur_Legendary_Melle_CASTER,       2),
+                // @ts-expect-error
+                new WaveUnit(Teimur_Legendary_Range_CASTER,       2)
+            ],
+            // hard
+            [
+                new WaveUnit(Teimur_Legendary_SWORDMEN,  1),
+                new WaveUnit(Teimur_Legendary_RAIDER,    1),
+                new WaveUnit(Teimur_Legendary_FIRE_MAGE, 1),
+                // @ts-expect-error
+                new WaveUnit(Teimur_Legendary_Melle_CASTER,    3),
+                // @ts-expect-error
+                new WaveUnit(Teimur_Legendary_Range_CASTER,    3)
+            ]
+        ];
+
+        var waveLegendaryUnits_ProbabilityPerDifficult = new Array<number>(waveLegendaryUnits.length);
+        var waveLegendaryUnits_ProbabilityPerUnit      = new Array<Array<number>>(waveLegendaryUnits.length);
+        for (var difficultNum = 0; difficultNum < waveLegendaryUnits.length; difficultNum++) {
+            if (difficultNum == 0) {
+                waveLegendaryUnits_ProbabilityPerDifficult[difficultNum] = 1.0;
+            } else {
+                waveLegendaryUnits_ProbabilityPerDifficult[difficultNum] = 0.0;
+            }
+
+            waveLegendaryUnits_ProbabilityPerUnit[difficultNum] = new Array<number>(waveLegendaryUnits[difficultNum].length);
+            for (var unitNum = 0; unitNum < waveLegendaryUnits[difficultNum].length; unitNum++) {
+                waveLegendaryUnits_ProbabilityPerUnit[difficultNum][unitNum] = 1.0 / waveLegendaryUnits[difficultNum].length;
+            }
+        }
+
+        var difficult_waveTime = new Array<number>(3);
+        difficult_waveTime[0] = 1.5*50*60;
+        difficult_waveTime[1] = 2.0*50*60;
+        difficult_waveTime[2] = 2.2*50*60;
+
+        var difficult_unitsCountCoeffFunc = [
+            (waveNum) => { return 1.0 + 0.25*(waveNum); },
+            (waveNum) => { return 1.0 + 0.20*(waveNum); },
+            (waveNum) => { return 1.0 + 0.15*(waveNum); }
+        ];
+        var difficult_legendaryUnitsCountCoeffFunc = [
+            (waveNum) => { return 1.0 + 0.14*(waveNum); },
+            (waveNum) => { return 1.0 + 0.14*(waveNum); },
+            (waveNum) => { return 1.0 + 0.14*(waveNum); }
+        ];
+
+        var waveNum  = 0;
+        var waveTime = 0.1*50*60;
+        while (waveTime <= endTick) {
+            // Legendary waves more frequent for surprise
+            var isLegendaryWave = (waveNum > 0 && waveNum % 3 == 0) || (waveTime >= 30.0*50*60) || (GlobalVars.rnd.RandomNumber(0, 10) < 2); // Added random chance for surprise
+
+            // Determine random difficulty with some bias towards variety
+            var wave_ProbabilityPerDifficult = isLegendaryWave ? waveLegendaryUnits_ProbabilityPerDifficult : waveUnits_ProbabilityPerDifficult;
+
+            var randomNumber : number = GlobalVars.rnd.RandomNumber(0, 32766) * 0.00003051850947599719;
+            var index        : number = 0;
+            var accProb      : number = wave_ProbabilityPerDifficult[0];
+            while (randomNumber > accProb && index < wave_ProbabilityPerDifficult.length) {
+                index++;
+                accProb += wave_ProbabilityPerDifficult[index];
+            }
+
+            var difficultNum : number =  Math.min(index, waveNum <= 2 ? 1 : index);
+
+            // Redistribute probabilities
+            for (var i = 0; i < wave_ProbabilityPerDifficult.length; i++) {
+                if (i == difficultNum) {
+                    continue;
+                }
+                wave_ProbabilityPerDifficult[i] += wave_ProbabilityPerDifficult[difficultNum] / (wave_ProbabilityPerDifficult.length - 1);
+            }
+            wave_ProbabilityPerDifficult[difficultNum] = 0.0;
+
+            // Determine random unit
+            var wave_ProbabilityPerUnit = isLegendaryWave ? waveLegendaryUnits_ProbabilityPerUnit[difficultNum] : waveUnits_ProbabilityPerUnit[difficultNum];
+
+            randomNumber = GlobalVars.rnd.RandomNumber(0, 32766) * 0.00003051850947599719;
+            index        = 0;
+            accProb      = wave_ProbabilityPerUnit[0];
+            while (randomNumber > accProb && index < wave_ProbabilityPerUnit.length) {
+                index++;
+                accProb += wave_ProbabilityPerUnit[index];
+            }
+
+            var unitNum = index;
+
+            // Redistribute unit probabilities
+            for (var i = 0; i < wave_ProbabilityPerUnit.length; i++) {
+                if (i == unitNum) {
+                    continue;
+                }
+                wave_ProbabilityPerUnit[i] += wave_ProbabilityPerUnit[unitNum] / (wave_ProbabilityPerUnit.length - 1);
+            }
+            wave_ProbabilityPerUnit[unitNum] = 0.0;
+
+            // Random modifier
+            var modificator = TeimurUnitsModificators.Type.NULL;
+
+            if (!isLegendaryWave || GlobalVars.rnd.RandomNumber(0, 10) < 5) { // Modifiers on legendary sometimes for variety
+                randomNumber = GlobalVars.rnd.RandomNumber(0, 32766) * 0.00003051850947599719;
+                index        = 0;
+                accProb      = modificators_Probability[0];
+                while (randomNumber > accProb && index < modificators_Probability.length) {
+                    index++;
+                    accProb += modificators_Probability[index];
+                }
+
+                var modificatorNum : number = index;
+
+                for (var i = 0; i < modificators_Probability.length; i++) {
+                    if (i == modificatorNum) {
+                        continue;
+                    }
+                    modificators_Probability[i] +=
+                        modificators_Probability[modificatorNum] / (modificators_Probability.length - 1);
+                }
+                modificators_Probability[modificatorNum] = 0.0;
+                modificator = modificatorNum as TeimurUnitsModificators.Type;
+            }
+
+            // Generate wave with potential for combined units for interest
+            var waveUnitsCountCoeff = isLegendaryWave ? difficult_legendaryUnitsCountCoeffFunc[difficultNum](waveNum) : difficult_unitsCountCoeffFunc[difficultNum](waveNum);
+
+            var difficultName : string = "";
+            switch (difficultNum) {
+                case 0:
+                    difficultName = "Легкая";
+                    break;
+                case 1:
+                    difficultName = "Средняя";
+                    break;
+                case 2:
+                    difficultName = "Сложная";
+                    break;
+            }
+
+            var mainWaveUnit = new WaveUnit(
+                isLegendaryWave
+                    ? waveLegendaryUnits[difficultNum][unitNum].unitClass
+                    : waveUnits[difficultNum][unitNum].unitClass,
+                Math.max(Math.floor(isLegendaryWave
+                        ? waveUnitsCountCoeff * waveLegendaryUnits[difficultNum][unitNum].count * (GlobalVars.difficult + 1) / 2
+                        : waveUnitsCountCoeff * waveUnits[difficultNum][unitNum].count * GlobalVars.difficult)
+                    , 1),
+                modificator
+            );
+
+            var waveUnitsArray = [mainWaveUnit];
+
+            // Add surprise element: sometimes add extra unit type
+            if (GlobalVars.rnd.RandomNumber(0, 10) < 4) { // 40% chance
+                var extraDifficult = GlobalVars.rnd.RandomNumber(0, 2);
+                var extraUnitNum = GlobalVars.rnd.RandomNumber(0, waveUnits[extraDifficult].length - 1);
+                var extraCount = Math.floor(mainWaveUnit.count * 0.5); // Half of main
+                waveUnitsArray.push(new WaveUnit(waveUnits[extraDifficult][extraUnitNum].unitClass, extraCount, modificator));
+            }
+
+            this.waves.push(
+                new Wave(difficultName + (isLegendaryWave ? " легендарная" : "") + " волна " + (waveNum + 1) + " - ", waveTime + GlobalVars.rnd.RandomNumber(-10*50, 10*50), waveUnitsArray) // Slight timing variation for unpredictability
+            );
+
+            log.info("waveNum = ", waveNum,
+                " difficultNum = ", difficultNum,
+                " unitNum = ", unitNum,
+                " unitName = ", this.waves[waveNum].waveUnits[0].unitClass.CfgUid, " count = ", this.waves[waveNum].waveUnits[0].count, " modificator = ", modificator);
+
+            waveTime += difficult_waveTime[difficultNum] + GlobalVars.rnd.RandomNumber(-5*50, 5*50); // Vary wave timing
+            waveNum++;
+        }
+
+        // генерируем имена волнам
+        this.AutoGenerateWaveNames();
+
+        this.waves.push(
+            new Wave("Конец", waveTime, [ ])
+        );
+    }
+}
+
 export class AttackPlan_test extends IAttackPlan {
     protected static _UnitBaseCfgUid : string = "#UnitConfig_Nature_Bird";
     protected static _UnitCfgUid : string = "#DefenceFromTeimurPlugin_AttackPlan_test";
@@ -914,7 +1182,8 @@ export class AttackPlan_test extends IAttackPlan {
 
         this.waves = [];
         this.waves.push(
-            new Wave("ТЕСТ", 0, [new WaveUnit(Teimur_Villur, 1)]),
+            // @ts-expect-error
+            new Wave("ТЕСТ", 0, [new WaveUnit(Teimur_Legendary_Range_CASTER, 1)]),
             new Wave("END", 20*60*50, [])
         );
     }
@@ -924,6 +1193,7 @@ export const AttackPlansClass = [
     AttackPlan_1,
     AttackPlan_2,
     AttackPlan_7,
+    AttackPlan_8,  // Added new plan
     // AttackPlan_3,
     // AttackPlan_4,
     // AttackPlan_5,

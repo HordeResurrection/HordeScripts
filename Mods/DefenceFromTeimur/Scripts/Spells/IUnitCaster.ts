@@ -11,7 +11,7 @@ var pluginWrappedWorker     : any = null;
 var cfgUidWithWrappedWorker : Map<string, boolean> = new Map<string, boolean>();
 
 export class IUnitCaster extends IReviveUnit {
-    private static _SpellsMaxCount : number = 5;
+    protected static _SpellsMaxCount : number = 5;
 
     public static InitConfig() {
         // удаляем конфиг, чтобы был скопирован обработчик из базового конфига

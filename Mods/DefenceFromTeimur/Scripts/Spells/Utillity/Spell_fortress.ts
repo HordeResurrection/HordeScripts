@@ -1,11 +1,13 @@
 import { ISpell, SpellState } from "../ISpell";
 import { HordeColor } from "library/common/primitives";
-import { ACommandArgs, Stride_Color, Unit, UnitDirection } from "library/game-logic/horde-types";
+import { ACommandArgs, DiplomacyStatus, Stride_Color, Unit, UnitDirection, UnitFlags } from "library/game-logic/horde-types";
 import { IUnitCaster } from "../IUnitCaster";
 import { spawnUnit } from "library/game-logic/unit-spawn";
-import { unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
+import { iterateOverUnitsInBox, unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
 import { Cell } from "../../Types/Geometry";
+import { IUnit } from "../../Types/IUnit";
+import { GlobalVars } from "../../GlobalData";
 
 export class Spell_fortress extends ISpell {
     //protected static _Duration : number = 10 * 50;
@@ -29,9 +31,9 @@ export class Spell_fortress extends ISpell {
 
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Крепость";
-    protected static _DescriptionTemplate           : string = "Призывает клетку забора вокруг героя на расстоянии {0} клеток в течении {1} сек.";
+    protected static _DescriptionTemplate           : string = "Воздвигает вокруг врагов забор в радиусе {0}x{0} вокруг героя в течении {1} секунд.";
     protected static _DescriptionParamsPerLevel     : Array<Array<any>> = 
-        [this._FortressRadiusPerLevel, this._FortressDurationPerLevel.map(ticks => ticks / 50)];
+        [this._FortressRadiusPerLevel.map(num => 2*num + 1), this._FortressDurationPerLevel.map(ticks => ticks / 50)];
 
     ////////////////////////////////////
 
@@ -44,50 +46,27 @@ export class Spell_fortress extends ISpell {
 
     public Activate(activateArgs: ACommandArgs): boolean {
         if (super.Activate(activateArgs)) {
-            var heroCell = Cell.ConvertHordePoint(this._caster.unit.Cell);
             var spawnedConfig = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Fence");
-
-            var rectX = heroCell.X - Spell_fortress._FortressRadiusPerLevel[this.level];
-            var rectY = heroCell.Y - Spell_fortress._FortressRadiusPerLevel[this.level];
-            var rectW = 2 * Spell_fortress._FortressRadiusPerLevel[this.level];
-            var rectH = 2 * Spell_fortress._FortressRadiusPerLevel[this.level];
-
-            let scenaWidth = ActiveScena.GetRealScena().Size.Width;
-            let scenaHeight = ActiveScena.GetRealScena().Size.Height;
-
-            rectX = Math.max(0, rectX);
-            rectY = Math.max(0, rectY);
-            rectW = Math.min(scenaWidth - rectX, rectW);
-            rectH = Math.min(scenaHeight - rectY, rectH);
-
-            for (var x = rectX; x <= rectX + rectW; x++) {
-                for (var y = rectY; y <= rectY + rectH; y += rectH) {
-                    var cell = new Cell(x, y);
-                    if (unitCanBePlacedByRealMap(spawnedConfig, cell.X, cell.Y)) {
-                        var unit = spawnUnit(
-                            this._caster.unit.Owner, spawnedConfig, cell.ToHordePoint(), UnitDirection.Down);
-                        if (unit) {
-                            this._spawnedUnits.push(unit);
-                            spawnDecoration(
-                                ActiveScena.GetRealScena(),
-                                HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"),
-                                Cell.ConvertHordePoint(unit.Cell).Scale(32).Add(new Cell(16, 16)).ToHordePoint());
-                        }
-                    }
-                }
-            }
-            for (var y = rectY + 1; y < rectY + rectH; y++) {
-                for (var x = rectX; x <= rectX + rectW; x += rectW) {
-                    var cell = new Cell(x, y);
-                    if (unitCanBePlacedByRealMap(spawnedConfig, cell.X, cell.Y)) {
-                        var unit = spawnUnit(
-                            this._caster.unit.Owner, spawnedConfig, cell.ToHordePoint(), UnitDirection.Down);
-                        if (unit) {
-                            this._spawnedUnits.push(unit);
-                            spawnDecoration(
-                                ActiveScena.GetRealScena(),
-                                HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"),
-                                Cell.ConvertHordePoint(unit.Cell).Scale(32).Add(new Cell(16, 16)).ToHordePoint());
+            let unitsIter = iterateOverUnitsInBox(this._caster.unit.Cell, Spell_fortress._FortressRadiusPerLevel[this.level]);
+            for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
+                //if (this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(u.value.Owner) == DiplomacyStatus.War) {
+                if (GlobalVars.diplomacyTable[this._caster.unit.Owner.Uid][u.value.Owner.Uid] == DiplomacyStatus.War) {
+                    var unitCell = Cell.ConvertHordePoint(u.value.Cell);
+                    
+                    for (var x = Math.max(0, unitCell.X - 1); x <= Math.min(GlobalVars.scenaWidth, unitCell.X + 1); x++) {
+                        for (var y = Math.max(0, unitCell.Y - 1); y <= Math.min(GlobalVars.scenaHeight, unitCell.Y + 1); y++) {
+                            var cell = new Cell(x, y);
+                            if (unitCanBePlacedByRealMap(spawnedConfig, cell.X, cell.Y)) {
+                                var unit = spawnUnit(
+                                    this._caster.unit.Owner, spawnedConfig, cell.ToHordePoint(), UnitDirection.Down);
+                                if (unit) {
+                                    this._spawnedUnits.push(unit);
+                                    spawnDecoration(
+                                        ActiveScena.GetRealScena(),
+                                        HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"),
+                                        Cell.ConvertHordePoint(unit.Cell).Scale(32).Add(new Cell(16, 16)).ToHordePoint());
+                                }
+                            }
                         }
                     }
                 }

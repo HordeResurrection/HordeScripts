@@ -5,10 +5,6 @@ import { ITargetPointSpell } from "../ITargetPointSpell";
 import { IUnitCaster } from "../IUnitCaster";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
 import { Cell } from "../../Types/Geometry";
-import { IUnit } from "../../Types/IUnit";
-import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
-import { log } from "library/common/logging";
-import { GlobalVars } from "../../GlobalData";
 
 export class Spell_PoisonBomb extends ITargetPointSpell {
     protected static _ButtonUid                     : string = "Spell_PoisonBomb";
@@ -22,41 +18,43 @@ export class Spell_PoisonBomb extends ITargetPointSpell {
     private static _BombShotParams : ShotParams;
 
     private static _MaxDistance : number = 10;
+    private static _CloudIncreasePeriod : number = 1.2*50;
     private static _CloudEffect : VisualEffectConfig = HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_BloodGreenPool");
     private static _CloudDurationPerLevel : Array<number> = [
-        4, 6, 8, 10, 12
+        8, 10, 12, 14, 16
     ].map(sec => sec * 50);
     private static _CloudDamagePerLevel : Array<number> = [
-        1, 1.5, 2, 2.5, 3
+        1, 1, 2, 2, 3
     ];
     protected static _ChargesCountPerLevel   : Array<number> = [
-        1, 2, 3, 4, 5
+        1, 1, 2, 2, 3
     ];
-    private static _CloudRadius : number = 4;
-    private static _CloudApplyPeriod : number = 1.2*50;
 
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Ядовитая бомба";
     protected static _DescriptionTemplate           : string =
         "Запускает ядовитую бомбу в выбранном направлении до " + Spell_PoisonBomb._MaxDistance
-        + " клеток, которая распространяет яд вокруг попавшей клетки в области "
-        + (2*Spell_PoisonBomb._CloudRadius + 1) + "x" + (2*Spell_PoisonBomb._CloudRadius + 1)
-        + ". Яд наносит врагам суммарно {0} магического урона в течении {1}."
+        + " клеток, которая распространяет яд вокруг попавшей клетки в течении "
+        + " {0} секунд до 9х9 клеток. Яд наносит врагам {1} магического урона в секунду."
     protected static _DescriptionParamsPerLevel     : Array<Array<any>> = 
-        [this._CloudDurationPerLevel.map((duration, level) => {
-            return Math.round(duration / this._CloudApplyPeriod * this._CloudDamagePerLevel[level]);
-        }), this._CloudDurationPerLevel.map(ticks => ticks / 50)];
+        [this._CloudDurationPerLevel.map(ticks => ticks / 50), this._CloudDamagePerLevel.map(damage => damage * 50 / this._ProcessingModule)];
 
     ///////////////////////////////////
 
-    private _cloudApplyTick : number;
-    private _cloudDeltaDamage : number;
-    private _targetUnits : Array<IUnit>;
+    private _cloudCells : Array<Cell>;
+    private _cloudIncreaseTick : number;
+    private _cloudCellsHash : Map<number, number>;
+    private _scenaWidth : number;
+    private _scenaHeight : number;
 
     constructor(caster: IUnitCaster) {
         super(caster);
 
-        this._targetUnits = new Array<IUnit>();
+        this._cloudCells = new Array<Cell>();
+        this._cloudIncreaseTick = -1;
+        this._cloudCellsHash = new Map<number, number>();
+        this._scenaWidth  = ActiveScena.GetRealScena().Size.Width;
+        this._scenaHeight = ActiveScena.GetRealScena().Size.Height;
     }
 
     public static GetCommandConfig(slotNum: number, level: number) : UnitCommandConfig {
@@ -94,23 +92,9 @@ export class Spell_PoisonBomb extends ITargetPointSpell {
                 targetCell.Scale(32).Add(new Cell(16, 16)).ToHordePoint(),
                 UnitMapLayer.Main
             );
-
-            let unitsIter = iterateOverUnitsInBox(this._targetCell.ToHordePoint(), Spell_PoisonBomb._CloudRadius);
-            for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
-                if (GlobalVars.diplomacyTable[this._caster.unit.Owner.Uid][u.value.Owner.Uid] == DiplomacyStatus.War
-                    && !u.value.Cfg.Flags.HasFlag(UnitFlags.MagicResistant)
-                    && u.value.Cfg.IsBuilding == false) {
-                    if (u.value.ScriptData.IUnit) {
-                        this._targetUnits.push(u.value.ScriptData.IUnit);
-                    } else {
-                        this._targetUnits.push(new IUnit(u.value, 0));
-                    }
-                    log.info("targetUnits = ", u.value.Cfg.Name);
-                }
-            }
-
-            this._cloudApplyTick = this._activatedTick;
-            this._cloudDeltaDamage = 0;
+            this._cloudCells.push(targetCell);
+            this._cloudCellsHash.set(targetCell.Hash(), 1);
+            this._cloudIncreaseTick = this._activatedTick + Spell_PoisonBomb._CloudIncreasePeriod;
 
             return true;
         } else {
@@ -121,41 +105,56 @@ export class Spell_PoisonBomb extends ITargetPointSpell {
     protected _OnEveryTickActivated(gameTickNum: number): boolean {
         super._OnEveryTickActivated(gameTickNum);
 
-        var isApply = this._cloudApplyTick <= gameTickNum;
-        var isEnd   = this._activatedTick + Spell_PoisonBomb._CloudDurationPerLevel[this.level] < gameTickNum;
- 
-        if (isApply || isEnd) {
-            this._cloudApplyTick +=  Spell_PoisonBomb._CloudApplyPeriod;
-
-            var cloudDamage = Spell_PoisonBomb._CloudDamagePerLevel[this.level] + this._cloudDeltaDamage;
-            this._cloudDeltaDamage = cloudDamage - Math.floor(cloudDamage);
-            cloudDamage = Math.floor(cloudDamage);
-
-            if (cloudDamage > 0) {
-                for (var unitNum = 0; unitNum < this._targetUnits.length; unitNum++) {
-                    if (this._targetUnits[unitNum].unit.IsDead) {
-                        this._targetUnits.splice(unitNum--, 1);
-                        continue;
-                    }
-
-                    var targetUnit = this._targetUnits[unitNum].unit;
-                    this._caster.unit.BattleMind.CauseDamage(targetUnit,
-                        cloudDamage + targetUnit.Cfg.Shield,
-                        UnitHurtType.Any);
-
-                    spawnDecoration(
-                        ActiveScena.GetRealScena(),
-                        Spell_PoisonBomb._CloudEffect,
-                        Cell.ConvertHordePoint(targetUnit.Cell).Scale(32).Add(new Cell(16, 16)).ToHordePoint());
-                }
-            }
-        }
-
-        if (isEnd) {
-            this._targetUnits.splice(0);
+        if (this._activatedTick + Spell_PoisonBomb._CloudDurationPerLevel[this.level] < gameTickNum) {
+            this._cloudCells.splice(0);
+            this._cloudCellsHash.clear();
 
             return false;
         }
+
+        if (this._cloudIncreaseTick < gameTickNum) {
+            this._cloudIncreaseTick += Spell_PoisonBomb._CloudIncreasePeriod;
+            
+            // распространяем лужу
+            if (this._activatedTick + 4 * Spell_PoisonBomb._CloudIncreasePeriod >= gameTickNum) {
+                this._cloudCells.forEach(cell => {
+                    for (var x = Math.max(0, cell.X - 1); x <= Math.min(this._scenaWidth, cell.X + 1); x++) {
+                        for (var y = Math.max(0, cell.Y - 1); y <= Math.min(this._scenaHeight, cell.Y + 1); y++) {
+                            var cloudCell     = new Cell(x, y);
+                            var cloudCellHash = cloudCell.Hash();
+                            if (this._cloudCellsHash.has(cloudCellHash)) {
+                                continue;
+                            }
+
+                            this._cloudCellsHash.set(cloudCellHash, 1);
+                            this._cloudCells.push(cloudCell);
+                        }
+                    }
+                });
+            }
+
+            // декорации
+            this._cloudCells.forEach(cell => {
+                spawnDecoration(
+                    ActiveScena.GetRealScena(),
+                    Spell_PoisonBomb._CloudEffect,
+                    cell.Scale(32).Add(new Cell(16, 16)).ToHordePoint());
+            });
+        }
+
+        // урон
+        this._cloudCells.forEach(cell => {
+            var upperHordeUnit = ActiveScena.UnitsMap.GetUpperUnit(cell.ToHordePoint());
+            if (upperHordeUnit
+                && !upperHordeUnit.Cfg.Flags.HasFlag(UnitFlags.MagicResistant)
+                && this._caster.unit.Owner.Diplomacy.GetDiplomacyStatus(upperHordeUnit.Owner) == DiplomacyStatus.War) {
+                // upperHordeUnit.BattleMind.TakeDamage(Spell_PoisonBomb._CloudDamagePerLevel[this.level] + upperHordeUnit.Cfg.Shield,
+                //     UnitHurtType.Any);
+                this._caster.unit.BattleMind.CauseDamage(upperHordeUnit,
+                    Spell_PoisonBomb._CloudDamagePerLevel[this.level] + upperHordeUnit.Cfg.Shield,
+                    UnitHurtType.Any);
+            }
+        });
 
         return true;
     }

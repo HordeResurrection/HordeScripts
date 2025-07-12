@@ -29,7 +29,7 @@ export class GlobalVars {
     /** время старта игры */
     public static startGameTickNum: number;
     /** рандомайзер */
-    public static rnd: any;
+    public static rnd: HordeResurrection.Basic.Primitives.HordeRandomizer;
     /** Players */
     public static Players: Player[];
     public static scenaWidth : number;

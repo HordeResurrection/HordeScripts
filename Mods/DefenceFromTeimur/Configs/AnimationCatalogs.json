@@ -282,6 +282,62 @@
       }
     },
     {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_Command_Summon_Guardians",
+      "Description": "Command button \"Spell_Summon_Guardians\"",
+      "InternalEditorPath": "Units\\Commands\\Capture\\Spell_Summon_Guardians",
+      "RootSection": {
+        "States": {
+          "Focused": "Spell_Summon_Guardians_focused",
+          "Pressed": "Spell_Summon_Guardians_pressed",
+          "Regular": "Spell_Summon_Guardians_regular",
+          "Disabled": "Spell_Summon_Guardians_disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_Command_Ricochet",
+      "Description": "Command button \"Spell_Ricochet\"",
+      "InternalEditorPath": "Units\\Commands\\Capture\\Spell_Ricochet",
+      "RootSection": {
+        "States": {
+          "Focused": "Spell_Ricochet_focused",
+          "Pressed": "Spell_Ricochet_pressed",
+          "Regular": "Spell_Ricochet_regular",
+          "Disabled": "Spell_Ricochet_disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_Command_Reflection",
+      "Description": "Command button \"Spell_Reflection\"",
+      "InternalEditorPath": "Units\\Commands\\Capture\\Spell_Reflection",
+      "RootSection": {
+        "States": {
+          "Focused": "Spell_Reflection_focused",
+          "Pressed": "Spell_Reflection_pressed",
+          "Regular": "Spell_Reflection_regular",
+          "Disabled": "Spell_Reflection_disabled"
+        }
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::ButtonAnimationsCatalog",
+      "Uid": "#AnimCatalog_Command_Magic_fire",
+      "Description": "Command button \"Spell_Magic_fire\"",
+      "InternalEditorPath": "Units\\Commands\\Capture\\Spell_Magic_fire",
+      "RootSection": {
+        "States": {
+          "Focused": "Spell_Magic_fire_focused",
+          "Pressed": "Spell_Magic_fire_pressed",
+          "Regular": "Spell_Magic_fire_regular",
+          "Disabled": "Spell_Magic_fire_disabled"
+        }
+      }
+    },
+    {
       "$type": "HordeClassLibrary::UnitAnimationsCatalog",
       "Uid": "#AnimCatalog_Nature_Invisibility_Horse",
       "Description": "invisibility_horse",
@@ -484,6 +540,28 @@
       "RootSection": {
         "Variations": [
           "ad059387086f497dba3d5f10225c562f_babble"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_Effects_MagicFireLittle",
+      "Description": "fire_lit",
+      "InternalEditorPath": "Bullets\\magicfire_lit",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_Bullets_MagicFireLittle_Burning"
+        ]
+      }
+    },
+    {
+      "$type": "HordeClassLibrary::SimpleAnimationsCatalog",
+      "Uid": "#AnimCatalog_Effects_MagicFireBig",
+      "Description": "fire_big",
+      "InternalEditorPath": "Bullets\\magicfire_big",
+      "RootSection": {
+        "Variations": [
+          "#AnimAtlas_Bullets_MagicFireBig_Burning"
         ]
       }
     }

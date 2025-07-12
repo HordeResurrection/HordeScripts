@@ -403,52 +403,6 @@ export class Player_worker_gamemode2 extends IUnitCaster {
 
         ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Specification", UnitSpecification.None);
     }
-
-    // public OnOrder(commandArgs: ACommandArgs): boolean {
-    //     if (commandArgs.CommandType == UnitCommand.Produce) {
-    //         for (var spell of Player_worker_gamemode2.Spells) {
-    //             // @ts-expect-error
-    //             if (spell.GetUnitConfig().Uid != commandArgs.ProductCfg.Uid) {
-    //                 continue;
-    //             }
-
-    //             // @ts-expect-error
-    //             if (!this.unit.Owner.Resources.IsEnoughResources(commandArgs.ProductCfg.CostResources)) {
-    //                 let msg = createGameMessageWithNoSound("Не хватает ресурсов!", createHordeColor(255, 255, 100, 100));
-    //                 this.unit.Owner.Messages.AddMessage(msg);
-    //                 return false;
-    //             }
-
-    //             if (!this.hero.AddSpell(spell)) {
-    //                 return false;
-    //             }
-
-    //             // @ts-expect-error
-    //             this.unit.Owner.Resources.TakeResources(commandArgs.ProductCfg.CostResources);
-
-    //             return false;
-    //         }
-
-    //         // @ts-expect-error
-    //         if ("#DefenceTeimur_Set_spawn_point" == commandArgs.ProductCfg.Uid) {
-    //             // @ts-expect-error
-    //             if (!this.unit.Owner.Resources.TakeResourcesIfEnough(commandArgs.ProductCfg.CostResources)) {
-    //                 let msg = createGameMessageWithNoSound("Не хватает ресурсов!", createHordeColor(255, 255, 100, 100));
-    //                 this.unit.Owner.Messages.AddMessage(msg);
-    //             }
-
-    //             for (var settlementNum = 0; settlementNum < GlobalVars.teams[this.teamNum].settlements.length; settlementNum++) {
-    //                 if (GlobalVars.teams[this.teamNum].settlements[settlementNum].Uid == this.unit.Owner.Uid) {
-    //                     GlobalVars.teams[this.teamNum].spawnCell[settlementNum] = this.unit.Cell;
-    //                 }
-    //             }
-
-    //             return false;
-    //         }
-    //     }
-
-    //     return true;
-    // }
 }
 
 export class Hero_Crusader extends IUnitCaster {
@@ -559,10 +513,36 @@ export class Hero_Crusader extends IUnitCaster {
     }
 }
 
+export class Hero_Archer extends Hero_Crusader {
+    public static CfgUid      : string = "#DefenceTeimur_Hero_Archer";
+    public static BaseCfgUid  : string = "#UnitConfig_Slavyane_Archer";
+
+    public static InitConfig() {
+        super.InitConfig();
+
+        var cfg = GlobalVars.configs[this.CfgUid];
+        
+        ScriptUtils.SetValue(cfg, "Name", "Герой {лучник}");
+        ScriptUtils.SetValue(cfg, "MaxHealth", 40);
+        ScriptUtils.SetValue(cfg, "Shield", 0);
+        ScriptUtils.SetValue(cfg.MainArmament.ShotParams, "Damage", 5);
+        ScriptUtils.SetValue(cfg, "Sight", 10);
+        // скорость как у рыцаря
+        cfg.Speeds.Item.set(TileType.Grass, 12);
+        cfg.Speeds.Item.set(TileType.Forest, 8);
+        cfg.Speeds.Item.set(TileType.Marsh, 9);
+        cfg.Speeds.Item.set(TileType.Sand, 10);
+        cfg.Speeds.Item.set(TileType.Road, 15);
+        cfg.Speeds.Item.set(TileType.Ice, 12);
+    }
+}
+
 export const PlayerUnitsClass : Array<typeof IUnit> = [
     Player_GOALCASTLE,
     Player_Teimur_Dovehouse,
     Player_worker_gamemode1,
+    // @ts-expect-error
     Player_worker_gamemode2,
-    Hero_Crusader
+    Hero_Crusader,
+    Hero_Archer
 ];

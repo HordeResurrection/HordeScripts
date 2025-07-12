@@ -9,10 +9,7 @@ export class IReviveUnit extends IUnit {
     protected static _RevivePeriod : number = 60*50;
 
     public OnEveryTick(gameTickNum: number) : boolean {
-        if (!super.OnEveryTick(gameTickNum)) {
-            return false;
-        }
-        return false;
+        return super.OnEveryTick(gameTickNum);
     }
     public OnDead(gameTickNum: number) {
         super.OnDead(gameTickNum);

@@ -15,4 +15,8 @@ export class IPassiveSpell extends ISpell {
         // пассивки нельзя активировать
         return false;
     }
+
+    protected _OnEveryTickActivated(gameTickNum: number) : boolean {
+        return true;
+    }
 }
