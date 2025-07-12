@@ -1198,12 +1198,12 @@ export class Teimur_Legendary_Melle_CASTER extends IUnitCaster {
         super(unit, teamNum);
 
         // Randomly select SpellsCount spells and set to max level
-        const selectedSpells = this.constructor["_SpellsCount"].AllSpells
+        const selectedSpells = this.constructor["AllSpells"]
             .sort(() => GlobalVars.rnd.RandomDouble() - 0.5)
-            .slice(0, Math.min(this.constructor["_SpellsCount"]._SpellsCount, IUnitCaster._SpellsMaxCount));
-        for (var i = 0; i < selectedSpells.length && this.constructor["_SpellsCount"]._SpellsCount > 0; i++) {
+            .slice(0, Math.min(this.constructor["_SpellsCount"], IUnitCaster._SpellsMaxCount));
+        for (var i = 0; i < selectedSpells.length && this.constructor["_SpellsCount"] > 0; i++) {
             this.AddSpell(selectedSpells[i]);
-            this.constructor["_SpellsCount"]._SpellsCount--;
+            this.constructor["_SpellsCount"]--;
         }
         this.lastCastTick = 0;
 
