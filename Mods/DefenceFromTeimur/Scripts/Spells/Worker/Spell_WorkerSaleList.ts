@@ -57,9 +57,7 @@ export class Spell_WorkerSaleList extends IProduceSpell {
         Spell_Reflection,
         Spell_Summon_Guardians,
         Spell_Ricochet,
-        Spell_Magic_fire,
-        Spell_Melle_transform,
-        Spell_ranged_transform
+        Spell_Magic_fire
     ];
 
     private _targetHero : IUnitCaster;

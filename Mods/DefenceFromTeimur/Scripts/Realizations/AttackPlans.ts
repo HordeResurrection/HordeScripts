@@ -1183,7 +1183,7 @@ export class AttackPlan_test extends IAttackPlan {
         this.waves = [];
         this.waves.push(
             // @ts-expect-error
-            new Wave("ТЕСТ", 0, [new WaveUnit(Teimur_Legendary_Range_CASTER, 1)]),
+            new Wave("ТЕСТ", 0, [new WaveUnit(Teimur_Legendary_Range_CASTER, 5)]),
             new Wave("END", 20*60*50, [])
         );
     }

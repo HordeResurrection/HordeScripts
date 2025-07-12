@@ -1188,8 +1188,7 @@ export class Teimur_Legendary_Melle_CASTER extends IUnitCaster {
     static BaseCfgUid  : string = "#DefenceTeimur_Swordmen";
     static Description : string = "Легендарный кастер. Получает случайные способности максимального уровня";
 
-    protected static AllSpells : Array<typeof ISpell> = Spell_WorkerSaleList.SpellsList
-        .filter(spell => spell.constructor['_IsConsumables'] == false);
+    protected static AllSpells : Array<typeof ISpell> = Spell_WorkerSaleList.SpellsList;
 
     protected static _SpellsCount: number = 1;
 
@@ -1199,14 +1198,12 @@ export class Teimur_Legendary_Melle_CASTER extends IUnitCaster {
         super(unit, teamNum);
 
         // Randomly select SpellsCount spells and set to max level
-        const selectedSpells = Teimur_Legendary_Melle_CASTER.AllSpells
-            .sort(() => GlobalVars.rnd.RandomDouble() - 0.5).slice(0, Teimur_Legendary_Melle_CASTER._SpellsCount);
-        for (let SpellClass of selectedSpells) {
-            this.AddSpell(SpellClass);
-            this.AddSpell(SpellClass);
-            this.AddSpell(SpellClass);
-            this.AddSpell(SpellClass);
-            this.AddSpell(SpellClass);
+        const selectedSpells = this.constructor["_SpellsCount"].AllSpells
+            .sort(() => GlobalVars.rnd.RandomDouble() - 0.5)
+            .slice(0, Math.min(this.constructor["_SpellsCount"]._SpellsCount, IUnitCaster._SpellsMaxCount));
+        for (var i = 0; i < selectedSpells.length && this.constructor["_SpellsCount"]._SpellsCount > 0; i++) {
+            this.AddSpell(selectedSpells[i]);
+            this.constructor["_SpellsCount"]._SpellsCount--;
         }
         this.lastCastTick = 0;
 
@@ -1285,7 +1282,7 @@ export class Teimur_Legendary_Melle_CASTER extends IUnitCaster {
     }
 
     public static GetSpawnCount(spawnCount: number) {
-        this._SpellsCount = Math.min(spawnCount, this._SpellsMaxCount);
+        this._SpellsCount = spawnCount;
 
         return 1;
     }

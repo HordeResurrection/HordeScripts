@@ -32,7 +32,7 @@ export class Spell_Ricochet extends IPassiveSpell {
             return;
         }
 
-        let unitsIter = iterateOverUnitsInBox(VictimUnit.Cell, this._caster.unit.Cfg.MainArmament.Range + 1);
+        let unitsIter = iterateOverUnitsInBox(VictimUnit.Cell, this._caster.unit.Cfg.MainArmament.Range);
         for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
             if (u.value.Id != VictimUnit.Id
                 && GlobalVars.diplomacyTable[this._caster.unit.Owner.Uid][u.value.Owner.Uid] == DiplomacyStatus.War

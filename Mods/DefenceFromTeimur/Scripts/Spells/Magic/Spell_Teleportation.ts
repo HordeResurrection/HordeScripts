@@ -53,7 +53,7 @@ export class Spell_Teleportation extends ITargetPointSpell {
         for (let position = generator.next(); !position.done; position = generator.next()) {
             var tpCell = createPoint(position.value.X, position.value.Y);
 
-            if (unitCanBePlacedByRealMap(this._caster.unit.Cfg, tpCell.X, tpCell.Y) && this._caster.unit.MapMind.CheckPathTo(tpCell, false).Found) {
+            if (unitCanBePlacedByRealMap(this._caster.unit.Cfg, tpCell.X, tpCell.Y)) {
                 this._caster.unit.MapMind.TeleportToCell(tpCell);
                 spawnDecoration(
                     ActiveScena.GetRealScena(),
