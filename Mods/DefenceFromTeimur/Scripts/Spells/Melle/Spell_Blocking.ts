@@ -17,7 +17,8 @@ export class Spell_Blocking extends IPassiveSpell {
 
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Блокирование";
-    protected static _DescriptionTemplate           : string = "Пассивка. Каждый {0} удар ближнего боя, стрела, осадный выстрел не наносит урон.";
+    protected static _DescriptionTemplate           : string = "Пассивка. Каждый {0} урон ближнего, дальнего, осадного"
+        + " типа блокируется";
     protected static _DescriptionParamsPerLevel     : Array<Array<any>> = 
         [this._BlockPeriodPerLevel];
 

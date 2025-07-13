@@ -17,7 +17,7 @@ export class Spell_fiery_trail extends ISpell {
         10, 12, 15, 18, 20
     ].map(sec => sec*50);
     private static _TrailAddDamagePerLevel : Array<number> = [
-        2, 3, 4, 5, 6
+        3, 4, 5, 6, 7
     ];
     protected static _ChargesCountPerLevel   : Array<number> = [
         1, 1, 2, 2, 3
@@ -28,7 +28,8 @@ export class Spell_fiery_trail extends ISpell {
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Огненный след";
     protected static _DescriptionTemplate           : string =
-        "В течении {0} секунд оставляет огненный след, который поджигает врагов и дополнительно наносит {1} огненного урона/сек.";
+        "В течении {0} секунд оставляет огненный след, который поджигает врагов"
+        + " и дополнительно наносит {1} огненного урона/сек (игнорирует броню)";
     protected static _DescriptionParamsPerLevel     : Array<Array<any>> = 
         [this._TrailDurationPerLevel.map(ticks => ticks / 50), this._TrailAddDamagePerLevel.map(damage => damage * 50 / this._ProcessingModule)];
 

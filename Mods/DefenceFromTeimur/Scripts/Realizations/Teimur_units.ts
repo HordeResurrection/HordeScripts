@@ -1231,7 +1231,7 @@ export class Teimur_Legendary_Melle_CASTER extends IUnitCaster {
     public OnEveryTick(gameTickNum: number): boolean {
         if (!super.OnEveryTick(gameTickNum)) return false;
 
-        if (gameTickNum - this.lastCastTick > 250) {
+        if (gameTickNum - this.lastCastTick > 100) {
             let nearestEnemy: any = null;
             let minDist = Infinity;
             let unitsIter = iterateOverUnitsInBox(createPoint(this.unit.Cell.X, this.unit.Cell.Y), 8);

@@ -41,7 +41,7 @@ export class Spell_PoisonBomb extends ITargetPointSpell {
         "Запускает ядовитую бомбу в выбранном направлении до " + Spell_PoisonBomb._MaxDistance
         + " клеток, которая распространяет яд вокруг попавшей клетки в области "
         + (2*Spell_PoisonBomb._CloudRadius + 1) + "x" + (2*Spell_PoisonBomb._CloudRadius + 1)
-        + ". Яд наносит врагам суммарно {0} магического урона в течении {1}."
+        + ". Яд наносит врагам суммарно {0} магического урона (игнорирует броню) в течении {1}."
     protected static _DescriptionParamsPerLevel     : Array<Array<any>> = 
         [this._CloudDurationPerLevel.map((duration, level) => {
             return Math.round(duration / this._CloudApplyPeriod * this._CloudDamagePerLevel[level]);

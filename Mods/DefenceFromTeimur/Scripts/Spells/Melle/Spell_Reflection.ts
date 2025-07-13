@@ -17,7 +17,8 @@ export class Spell_Reflection extends IPassiveSpell {
 
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Отражение";
-    protected static _DescriptionTemplate           : string = "Пассивка. Ближние, дальние и осадные атаки отражаются, атакующему наносится {0} осадного урона.";
+    protected static _DescriptionTemplate           : string = "Пассивка. Враги, которые нанесли по вам урон ближнего,"
+        + " дальнего, осадного типа получают в ответ {0} урона";
     protected static _DescriptionParamsPerLevel     : Array<Array<any>> = 
         [this._ReflectionDamagePerLevel];
 
@@ -30,7 +31,7 @@ export class Spell_Reflection extends IPassiveSpell {
 
         this._caster.unit.BattleMind.CauseDamage(AttackerUnit,
             Spell_Reflection._ReflectionDamagePerLevel[this.level],
-            UnitHurtType.Heavy);
+            UnitHurtType.Any);
 
         spawnDecoration(
             ActiveScena.GetRealScena(),

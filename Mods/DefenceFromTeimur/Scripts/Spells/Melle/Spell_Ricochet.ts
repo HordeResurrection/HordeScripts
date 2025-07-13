@@ -20,7 +20,10 @@ export class Spell_Ricochet extends IPassiveSpell {
 
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Рикошет";
-    protected static _DescriptionTemplate           : string = "Пассивка. Каждая ближняя, дальняя атака отнимает заряд и рикошетит во врага.";
+    protected static _DescriptionTemplate           : string = "Пассивка. Если ваша атака ближнего, дальнего боя из любого"
+        + " источника настигла врага. И рядом (в радиусе вашей атаки) с настигнутым врагом есть еще враги."
+        + " То расходуется заряд способности и ваша атака активируется еще раз из положения"
+        + " настигнутого врага в ближайшего.";
 
     public OnCauseDamage(VictimUnit: Unit, Damage: number, EffectiveDamage: number, HurtType: UnitHurtType) {
         super.OnCauseDamage(VictimUnit, Damage, EffectiveDamage, HurtType);

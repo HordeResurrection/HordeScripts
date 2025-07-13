@@ -28,7 +28,8 @@ export class Spell_Fireball extends ITargetPointSpell {
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Огненный шар";
     protected static _DescriptionTemplate           : string =
-        "Запускает огненный шар в выбранном направлении до {0} клеток, который наносит {1} магического урона и поджигает врагов.";
+        "Запускает огненный шар в выбранном направлении до {0} клеток, который наносит {1} магического урона (игнорирует броню)"
+        + " и поджигает врагов.";
     protected static _DescriptionParamsPerLevel     : Array<Array<any>> = 
         [this._FireballMaxDistancePerLevel, this._FireballDamagePerLevel];
 

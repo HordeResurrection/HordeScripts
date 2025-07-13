@@ -30,7 +30,7 @@ export class Spell_Agr_attack extends ISpell {
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Приступ ярости";
     protected static _DescriptionTemplate           : string
-        = "Вселяет ярость к вам во вражеских юнитов в радиусе {0} клеток на {1} секунд.";
+        = "Враги в радиусе {0} клеток на {1} секунд стремятся подойти к вам вплотную игнорируя опасности";
     protected static _DescriptionParamsPerLevel     : Array<Array<any>>
         = [this._AgrRadiusPerLevel, this._AgrTimePerLevel.map(ticks => ticks / 50)];
 

@@ -30,7 +30,7 @@ export class Spell_fear_attack extends ISpell {
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Приступ страха";
     protected static _DescriptionTemplate           : string
-        = "Вселяет страх во вражеских юнитов (без иммуна к магии) в радиусе {0} клеток на {1} секунд.";
+        = "Вселяет страх во вражеских юнитов (без иммуна к магии) в радиусе {0} клеток на {1} секунд";
     protected static _DescriptionParamsPerLevel     : Array<Array<any>>
         = [this._FearRadiusPerLevel, this._FearTimePerLevel.map(ticks => ticks / 50)];
 

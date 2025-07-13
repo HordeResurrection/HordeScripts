@@ -29,7 +29,8 @@ export class Spell_Teleportation extends ITargetPointSpell {
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Телепортация";
     protected static _DescriptionTemplate           : string = 
-        "Телепортация героя в достижимую клетку, максимальное расстояние {0} клеток. В 5х5 клеток вокруг назначения телепорта наносит {1} магического урона.";
+        "Телепортация героя в достижимую клетку, максимальное расстояние {0} клеток. В 5х5"
+        + " клеток вокруг назначения телепорта наносит {1} магического урона (игнорирует броню)";
     protected static _DescriptionParamsPerLevel     : Array<Array<any>> = [
         this._TeleportMaxDistancePerLevel, this._TeleportAddDamagePerLevel
     ];

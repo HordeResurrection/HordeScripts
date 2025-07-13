@@ -19,14 +19,15 @@ export class Spell_Magic_fire extends ITargetPointSpell {
 
     private static _DurationTicks: number = 500;
     private static _ApplyPeriod: number = 50;
-    private static _TotalDamagePerLevel: Array<number> = [100, 150, 200, 250, 300];
-    private static _DamagePerApplyPerLevel: Array<number> = Spell_Magic_fire._TotalDamagePerLevel.map(dmg => dmg / (Spell_Magic_fire._DurationTicks / Spell_Magic_fire._ApplyPeriod));
+    private static _TotalDamagePerLevel: Array<number> = [40, 45, 50, 55, 60];
+    private static _DamagePerApplyPerLevel: Array<number> = Spell_Magic_fire._TotalDamagePerLevel.map(dmg => 0.01 * dmg / (Spell_Magic_fire._DurationTicks / Spell_Magic_fire._ApplyPeriod));
 
     protected static _MaxLevel: number = 4;
     protected static _NamePrefix: string = "Магический огонь";
-    protected static _DescriptionTemplate: string = "Поджигает цель, нанося суммарно {0} магического урона.";
+    protected static _DescriptionTemplate: string = "Поджигает цель, нанося суммарно {0} % от максимального хп "
+        + " в виде магического урона (игнорирует броню)";
     protected static _DescriptionParamsPerLevel: Array<Array<any>> = [Spell_Magic_fire._TotalDamagePerLevel];
-    protected static _ChargesCountPerLevel: Array<number> = [1, 1, 1, 1, 1];
+    protected static _ChargesCountPerLevel: Array<number> = [1, 1, 2, 2, 3];
 
     private _applyTick: number;
     private _deltaDamage: number;
@@ -80,7 +81,7 @@ export class Spell_Magic_fire extends ITargetPointSpell {
         if (isApply || isEnd) {
             this._applyTick += Spell_Magic_fire._ApplyPeriod;
 
-            let damage = Spell_Magic_fire._DamagePerApplyPerLevel[this.level] + this._deltaDamage;
+            let damage = Spell_Magic_fire._DamagePerApplyPerLevel[this.level] * this._targetUnit.Cfg.MaxHealth + this._deltaDamage;
             this._deltaDamage = damage - Math.floor(damage);
             damage = Math.floor(damage);
 

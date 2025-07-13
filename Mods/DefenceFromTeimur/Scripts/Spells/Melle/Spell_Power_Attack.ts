@@ -18,8 +18,8 @@ export class Spell_Power_Attack extends IPassiveSpell {
 
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Усиленная атака";
-    protected static _DescriptionTemplate           : string = "Пассивка. Каждая атака ближнего боя отнимает заряд и наносит дополнительно "
-        + Spell_Power_Attack._AddDamage + " осадного урона.";
+    protected static _DescriptionTemplate           : string = "Пассивка. Урон ближнего, дального типа отнимает заряд способности"
+        + " и наносит дополнительно " + Spell_Power_Attack._AddDamage + " осадного урона";
 
     public OnCauseDamage(VictimUnit: Unit, Damage: number, EffectiveDamage: number, HurtType: UnitHurtType) {
         super.OnCauseDamage(VictimUnit, Damage, EffectiveDamage, HurtType);

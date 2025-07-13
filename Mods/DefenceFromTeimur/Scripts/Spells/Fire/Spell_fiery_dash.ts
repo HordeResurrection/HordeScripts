@@ -31,7 +31,8 @@ export class Spell_fiery_dash extends ISpell {
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Огненный рывок";
     protected static _DescriptionTemplate           : string = 
-        "Делает рывок в сторону взгляда, максимум на {0} клеток, поджигая все на своем пути, дополнительно наносит {1} огненного урона, ширина воздействия {2}.";
+        "Делает рывок в сторону взгляда, максимум на {0} клеток, поджигая все на своем пути,"
+        + " дополнительно наносит {1} огненного урона (игнорирует броню), ширина воздействия {2}.";
     protected static _DescriptionParamsPerLevel     : Array<Array<any>> = [
         this._FireDashMaxDistancePerLevel, this._FireDashAddDamagePerLevel, this._FireDashWidthPerLevel
     ];
