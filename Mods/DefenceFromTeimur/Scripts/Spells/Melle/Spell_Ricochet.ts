@@ -1,12 +1,9 @@
-import { BattleController, DiplomacyStatus, Unit, UnitConfig, UnitFlags, UnitHurtType, UnitMapLayer, VisualEffectConfig } from "library/game-logic/horde-types";
+import { DiplomacyStatus, Unit, UnitHurtType, UnitMapLayer } from "library/game-logic/horde-types";
 import { IPassiveSpell } from "../IPassiveSpell";
 import { SpellState } from "../ISpell";
 import { GlobalVars } from "../../GlobalData";
-import { spawnDecoration } from "library/game-logic/decoration-spawn";
 import { Cell } from "../../Types/Geometry";
-import { log } from "library/common/logging";
 import { iterateOverUnitsInBox } from "library/game-logic/unit-and-map";
-import { Spell_fear_attack } from "../Magic/Spell_fear_attack";
 import { spawnBullet } from "library/game-logic/bullet-spawn";
 
 export class Spell_Ricochet extends IPassiveSpell {
@@ -25,6 +22,9 @@ export class Spell_Ricochet extends IPassiveSpell {
         + " То расходуется заряд способности и ваша атака активируется еще раз из положения"
         + " настигнутого врага в ближайшего.";
 
+    private _currentTargets : Map<number, Unit> = new Map<number, Unit>();
+    private _deletePeriod : number = 10;
+
     public OnCauseDamage(VictimUnit: Unit, Damage: number, EffectiveDamage: number, HurtType: UnitHurtType) {
         super.OnCauseDamage(VictimUnit, Damage, EffectiveDamage, HurtType);
         if (!(this._state == SpellState.READY || this._state == SpellState.ACTIVATED)) {
@@ -35,18 +35,37 @@ export class Spell_Ricochet extends IPassiveSpell {
             return;
         }
 
+        if (this._currentTargets.has(VictimUnit.Id)) {
+            this._currentTargets.delete(VictimUnit.Id);
+        }
+
+        // удаляем мертвых
+        if (this._deletePeriod-- == 0) {
+            this._deletePeriod = 10;
+            for (var target of this._currentTargets) {
+                if (target[1].IsDead) {
+                    this._currentTargets.delete(target[0]);
+                }
+            }
+        }
+
         let unitsIter = iterateOverUnitsInBox(VictimUnit.Cell, this._caster.unit.Cfg.MainArmament.Range);
         for (let u = unitsIter.next(); !u.done; u = unitsIter.next()) {
             if (u.value.Id != VictimUnit.Id
+                && !u.value.IsDead
                 && GlobalVars.diplomacyTable[this._caster.unit.Owner.Uid][u.value.Owner.Uid] == DiplomacyStatus.War
-                && u.value.Cfg.IsBuilding == false) {
+                && u.value.Cfg.IsBuilding == false
+                && !this._currentTargets.has(u.value.Id)) {
+
+                this._currentTargets.set(u.value.Id, u.value);
+
                 spawnBullet(
                     this._caster.unit,  // Игра будет считать, что именно этот юнит запустил снаряд
                     null,
                     null,
                     this._caster.unit.Cfg.MainArmament.BulletConfig,
                     this._caster.unit.Cfg.MainArmament.ShotParams,
-                    this._caster.unit.Position,
+                    VictimUnit.Position,
                     u.value.Position,
                     UnitMapLayer.Main
                 );

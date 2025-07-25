@@ -39,6 +39,8 @@ export class Spell_Fireball extends ITargetPointSpell {
         var config = super.GetCommandConfig(slotNum, level);
 
         if (!this._Init) {
+            this._Init = true;
+            
             this._BulletConfig = HordeContentApi.GetBulletConfig("#BulletConfig_DragonFire");
             // убираем дружественный огонь у огня
             ScriptUtils.SetValue(this._BulletConfig, "CanDamageAllied", false);

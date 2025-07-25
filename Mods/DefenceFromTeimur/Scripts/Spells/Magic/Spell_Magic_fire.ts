@@ -1,6 +1,6 @@
 import { generateCellInSpiral } from "library/common/position-tools";
 import { iterateOverUnitsInBox, unitCanBePlacedByRealMap } from "library/game-logic/unit-and-map";
-import { createPoint, HordeColor } from "library/common/primitives";
+import { createPoint, HordeColor, Point2D } from "library/common/primitives";
 import { spawnDecoration } from "library/game-logic/decoration-spawn";
 import { DiplomacyStatus, Stride_Color, UnitFlags, UnitHurtType, VisualEffectConfig, ACommandArgs, Unit } from "library/game-logic/horde-types";
 import { IUnitCaster } from "../IUnitCaster";
@@ -8,6 +8,7 @@ import { ITargetPointSpell } from "../ITargetPointSpell";
 import { Cell } from "../../Types/Geometry";
 import { SpellState } from "../ISpell";
 import { GlobalVars } from "../../GlobalData";
+import { IUnit } from "../../Types/IUnit";
 
 
 export class Spell_Magic_fire extends ITargetPointSpell {
@@ -42,26 +43,11 @@ export class Spell_Magic_fire extends ITargetPointSpell {
 
     public Activate(activateArgs: ACommandArgs): boolean {
         if (super.Activate(activateArgs)) {
-            let nearestDist = Infinity;
-            let nearestUnit: Unit | null = null;
-            let center = this._targetCell.ToHordePoint();
-            let iter = iterateOverUnitsInBox(center, 2);
-            for (let u = iter.next(); !u.done; u = iter.next()) {
-                if (GlobalVars.diplomacyTable[this._caster.unit.Owner.Uid][u.value.Owner.Uid] === DiplomacyStatus.War &&
-                    !u.value.Cfg.Flags.HasFlag(UnitFlags.MagicResistant)) {
-                    let unitCell = Cell.ConvertHordePoint(u.value.Cell);
-                    let dist = unitCell.Minus(this._targetCell).Length_Chebyshev();
-                    if (dist < nearestDist) {
-                        nearestDist = dist;
-                        nearestUnit = u.value;
-                    }
-                }
-            }
-            if (nearestUnit === null) {
+            this._targetUnit = this._GetNearestUnit(this._targetCell.ToHordePoint(), 2);
+            if (this._targetUnit == null) {
                 this._state = SpellState.READY;
                 return false;
             }
-            this._targetUnit = nearestUnit;
             this._applyTick = this._activatedTick;
             this._deltaDamage = 0;
             return true;
@@ -70,13 +56,28 @@ export class Spell_Magic_fire extends ITargetPointSpell {
     }
 
     protected _OnEveryTickActivated(gameTickNum: number): boolean {
-        if (this._targetUnit === null || this._targetUnit.IsDead) {
+        if (this._targetUnit == null) {
             this._targetUnit = null;
             return false;
         }
 
         const isApply = this._applyTick <= gameTickNum;
         const isEnd = this._activatedTick + Spell_Magic_fire._DurationTicks < gameTickNum;
+
+        // магический огонь перебирается на соседа
+        if (this._targetUnit.IsDead) {
+            if (isEnd) {
+                this._targetUnit = null;
+                return false;
+            } else {
+                this._targetUnit = this._GetNearestUnit(this._targetCell.ToHordePoint(), 2);
+                if (this._targetUnit != null) {
+                    this._activatedTick += Spell_Magic_fire._DurationTicks;
+                } else {
+                    return false;
+                }
+            }
+        }
 
         if (isApply || isEnd) {
             this._applyTick += Spell_Magic_fire._ApplyPeriod;
@@ -106,6 +107,25 @@ export class Spell_Magic_fire extends ITargetPointSpell {
         }
 
         return true;
+    }
+
+    private _GetNearestUnit(cell: Point2D, radius: number) : Unit | null {
+        let nearestDist = Infinity;
+        let nearestUnit: Unit | null = null;
+        let center = this._targetCell.ToHordePoint();
+        let iter = iterateOverUnitsInBox(center, 2);
+        for (let u = iter.next(); !u.done; u = iter.next()) {
+            if (GlobalVars.diplomacyTable[this._caster.unit.Owner.Uid][u.value.Owner.Uid] === DiplomacyStatus.War &&
+                !u.value.Cfg.Flags.HasFlag(UnitFlags.MagicResistant)) {
+                let unitCell = Cell.ConvertHordePoint(u.value.Cell);
+                let dist = unitCell.Minus(this._targetCell).Length_Chebyshev();
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearestUnit = u.value;
+                }
+            }
+        }
+        return nearestUnit;
     }
 }
 

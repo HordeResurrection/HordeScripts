@@ -19,35 +19,38 @@ export class Spell_Magic_shield extends IPassiveSpell {
     protected static _NamePrefix                    : string = "Магический щит";
     protected static _DescriptionTemplate           : string = "Пассивка. Каждое получение урона отнимает заряд и невелирует урон.";
 
+    private _shieldActiveUntil: number = 0;
+    private static readonly SHIELD_DURATION_TICKS = 50;
+
     public OnTakeDamage(AttackerUnit: Unit, EffectiveDamage: number, HurtType: UnitHurtType): void {
         super.OnTakeDamage(AttackerUnit, EffectiveDamage, HurtType);
 
-        if (!(this._state == SpellState.READY || this._state == SpellState.ACTIVATED)) {
-            return;
+        const isBuffActive = BattleController.GameTimer.GameFramesCounter < this._shieldActiveUntil;
+        const canActivateBuff = (this._state == SpellState.READY || this._state == SpellState.ACTIVATED);
+
+        if (!isBuffActive && !canActivateBuff) {
+            return; // Nothing to do
         }
 
-        this._caster.unit.Health += EffectiveDamage;
+        // Negate damage & show effect
+        if (EffectiveDamage > 0) {
+            this._caster.unit.Health += EffectiveDamage;
+        }
+
         // тушим огонь
         if (HurtType == UnitHurtType.Fire) {
-
+            this._caster.unit.EffectsMind.RemoveEffect(HordeClassLibrary.UnitComponents.Enumerations.UnitEffectFlag.Burning);
         }
 
-        spawnDecoration(
-            ActiveScena.GetRealScena(),
-            Spell_Magic_shield._ShieldEffect,
-            this._caster.unit.Position);
-
-        // отнимаем заряд
-        var chargeReloadTick = BattleController.GameTimer.GameFramesCounter
-            - GlobalVars.startGameTickNum
-            + this.constructor['_ChargesReloadTime'];
-        this._charges--;
-        this._chargesReloadTicks.push(chargeReloadTick);
-
-        // заряды кончились
-        if (this._charges == 0) {
-            this._caster.unit.CommandsMind.RemoveAddedCommand(this.GetUnitCommand());
-            this._state = SpellState.WAIT_CHARGE;
+        // If buff wasn't active, activate it and consume a charge
+        if (!isBuffActive && canActivateBuff) {
+            this._shieldActiveUntil = BattleController.GameTimer.GameFramesCounter + Spell_Magic_shield.SHIELD_DURATION_TICKS;
+            this._SpendCharge();
+            spawnDecoration(
+                ActiveScena.GetRealScena(),
+                Spell_Magic_shield._ShieldEffect,
+                this._caster.unit.Position
+            );
         }
     }
 }

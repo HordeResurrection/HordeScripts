@@ -2,16 +2,16 @@ import { ISpell } from "../ISpell";
 import { HordeColor, ResourcesAmount } from "library/common/primitives";
 import { ACommandArgs, ReplaceUnitParameters, Stride_Color, UnitConfig } from "library/game-logic/horde-types";
 import { GlobalVars } from "../../GlobalData";
-import { Hero_Archer } from "../../Realizations/Player_units";
+import { Hero_Archer, Hero_Mage, Hero_Phantom, Hero_Raider } from "../../Realizations/Player_units";
 import { log } from "library/common/logging";
 
-export class Spell_ranged_transform extends ISpell {
-    protected static _ButtonUid                     : string = "Spell_ranged_transform";
+export class Spell_Raider_transform extends ISpell {
+    protected static _ButtonUid                     : string = "Spell_Raider_transform";
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_View"; // Assume an animation catalog
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(255, 0, 255, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 0, 255, 255);
-    protected static _NamePrefix                    : string = "Превращение в лучника";
-    protected static _DescriptionTemplate           : string = "Превращает юнита в лучника";
+    protected static _NamePrefix                    : string = "Превращение во всадника";
+    protected static _DescriptionTemplate           : string = "Превращает юнита во всадника";
     protected static _SpellCost                     : ResourcesAmount = new ResourcesAmount(0, 0, 500, 0);
     protected static _IsConsumables                 : boolean = true;
 
@@ -20,7 +20,7 @@ export class Spell_ranged_transform extends ISpell {
             // Параметры замены
             let replaceParams           = new ReplaceUnitParameters();
             replaceParams.OldUnit       = this._caster.unit;
-            replaceParams.NewUnitConfig = GlobalVars.configs[Hero_Archer.CfgUid];
+            replaceParams.NewUnitConfig = GlobalVars.configs[Hero_Raider.CfgUid];
             replaceParams.Cell = this._caster.unit.Cell;
             replaceParams.PreserveHealthLevel = true;
             replaceParams.PreserveExperience = true;

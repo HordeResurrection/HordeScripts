@@ -1,6 +1,6 @@
 import { UnitProfession, UnitProducerProfessionParams } from "library/game-logic/unit-professions";
 import { IUnit } from "../Types/IUnit";
-import { CreateUnitConfig } from "../Utils";
+import { CreateBulletConfig, CreateUnitConfig, removeFlags } from "../Utils";
 import { AttackPlansClass } from "./AttackPlans";
 import { GlobalVars } from "../GlobalData";
 import { ACommandArgs, GeometryCanvas, GeometryVisualEffect, Stride_Color, Stride_Vector2, TileType, Unit, UnitCommand, UnitConfig, UnitFlags, UnitHurtType, UnitSpecification } from "library/game-logic/horde-types";
@@ -525,15 +525,77 @@ export class Hero_Archer extends Hero_Crusader {
         ScriptUtils.SetValue(cfg, "Name", "Герой {лучник}");
         ScriptUtils.SetValue(cfg, "MaxHealth", 40);
         ScriptUtils.SetValue(cfg, "Shield", 0);
-        ScriptUtils.SetValue(cfg.MainArmament.ShotParams, "Damage", 5);
+        ScriptUtils.SetValue(cfg.MainArmament.ShotParams, "Damage", 7);
+        // дальность 10
         ScriptUtils.SetValue(cfg, "Sight", 10);
-        // скорость как у рыцаря
+        ScriptUtils.SetValue(cfg.MainArmament, "Range", 10);
+        ScriptUtils.SetValue(cfg, "RaOrderDistancenge", 10);
+        // абсолютная точность
+        ScriptUtils.SetValue(cfg.MainArmament, "DisableDispersion", true);
+        // скорость как у рыцаря + 2
         cfg.Speeds.Item.set(TileType.Grass, 12);
         cfg.Speeds.Item.set(TileType.Forest, 8);
         cfg.Speeds.Item.set(TileType.Marsh, 9);
         cfg.Speeds.Item.set(TileType.Sand, 10);
         cfg.Speeds.Item.set(TileType.Road, 15);
         cfg.Speeds.Item.set(TileType.Ice, 12);
+    }
+}
+
+export class Hero_Mage extends Hero_Crusader {
+    public static CfgUid      : string = "#DefenceTeimur_Hero_Mage";
+    public static BaseCfgUid  : string = "#UnitConfig_Mage_Villur";
+
+    public static InitConfig() {
+        super.InitConfig();
+
+        var cfg = GlobalVars.configs[this.CfgUid] as UnitConfig;
+        
+        ScriptUtils.SetValue(cfg, "Name", "Герой {маг}");
+        ScriptUtils.SetValue(cfg, "MaxHealth", 10);
+        ScriptUtils.SetValue(cfg, "Shield", 0);
+        ScriptUtils.SetValue(cfg.MainArmament.ShotParams, "Damage", 1);
+        ScriptUtils.SetValue(cfg, "Sight", 10);
+        // скорость как у рыцаря + 3
+        cfg.Speeds.Item.set(TileType.Grass, 13);
+        cfg.Speeds.Item.set(TileType.Forest, 9);
+        cfg.Speeds.Item.set(TileType.Marsh, 10);
+        cfg.Speeds.Item.set(TileType.Sand, 11);
+        cfg.Speeds.Item.set(TileType.Road, 16);
+        cfg.Speeds.Item.set(TileType.Ice, 13);
+        // возвращаем иммун к огню
+        ScriptUtils.SetValue(cfg, "Flags", removeFlags(UnitFlags, cfg.Flags, UnitFlags.FireResistant))
+        // снаряд это стрела!
+        var bulletConfig = CreateBulletConfig(cfg.MainArmament.BulletConfig.Uid, "#BulletConfig_Hero_Mage");
+        ScriptUtils.SetValue(bulletConfig, "UnitHurtType", UnitHurtType.Arrow);
+        ScriptUtils.GetValue(GlobalVars.configs[this.CfgUid].MainArmament, "BulletConfigRef")
+            .SetConfig(bulletConfig);
+    }
+}
+
+export class Hero_Raider extends Hero_Crusader {
+    public static CfgUid      : string = "#DefenceTeimur_Hero_Raider";
+    public static BaseCfgUid  : string = "#UnitConfig_Slavyane_Raider";
+
+    public static InitConfig() {
+        super.InitConfig();
+
+        var cfg = GlobalVars.configs[this.CfgUid] as UnitConfig;
+        
+        ScriptUtils.SetValue(cfg, "Name", "Герой {всадник}");
+        ScriptUtils.SetValue(cfg, "MaxHealth", 60);
+        ScriptUtils.SetValue(cfg, "Shield", 0);
+        ScriptUtils.SetValue(cfg, "Sight", 6);
+        // скорость как у рыцаря + 3
+        cfg.Speeds.Item.set(TileType.Grass, 20);
+        cfg.Speeds.Item.set(TileType.Forest, 0);
+        cfg.Speeds.Item.set(TileType.Marsh, 17);
+        cfg.Speeds.Item.set(TileType.Sand, 17);
+        cfg.Speeds.Item.set(TileType.Road, 21);
+        cfg.Speeds.Item.set(TileType.Ice, 15);
+
+        // снаряд это стрела!
+        //ScriptUtils.SetValue(cfg.MainArmament.BulletConfig, "UnitHurtType", UnitHurtType.Arrow);
     }
 }
 
@@ -544,5 +606,7 @@ export const PlayerUnitsClass : Array<typeof IUnit> = [
     // @ts-expect-error
     Player_worker_gamemode2,
     Hero_Crusader,
-    Hero_Archer
+    Hero_Archer,
+    Hero_Mage,
+    Hero_Raider
 ];

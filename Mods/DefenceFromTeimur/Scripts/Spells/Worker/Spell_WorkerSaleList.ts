@@ -26,6 +26,9 @@ import { Spell_Ricochet } from "../Melle/Spell_Ricochet";
 import { Spell_Magic_fire } from "../Magic/Spell_Magic_fire";
 import { Spell_ranged_transform } from "../Utillity/Spell_ranged_transform";
 import { Spell_Melle_transform } from "../Utillity/Spell_Melle_transform";
+import { Spell_Mage_transform } from "../Utillity/Spell_Mage_transform";
+import { Spell_Raider_transform } from "../Utillity/Spell_Raider_transform";
+import { Spell_Homing_Fireball } from "../Magic/Spell_Homing_Fireball";
 
 export class Spell_WorkerSaleList extends IProduceSpell {
     protected static _ChargesReloadTime             : number = 1;
@@ -57,7 +60,12 @@ export class Spell_WorkerSaleList extends IProduceSpell {
         Spell_Reflection,
         Spell_Summon_Guardians,
         Spell_Ricochet,
-        Spell_Magic_fire
+        Spell_Magic_fire,
+
+        Spell_ranged_transform,
+        Spell_Melle_transform,
+        Spell_Mage_transform,
+        Spell_Raider_transform
     ];
 
     private _targetHero : IUnitCaster;

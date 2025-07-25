@@ -54,6 +54,10 @@ export class ISpell {
         }
     }
 
+    public static IsConsumables() {
+        return this._IsConsumables;
+    }
+
     private static _IsDescriptionInit = false;
     public static GetDescription(in_level: number) : string {
         if (!this._IsDescriptionInit) {
@@ -195,7 +199,11 @@ export class ISpell {
     public OnReplacedCaster(caster: IUnitCaster) {
         this._caster = caster;
 
-        if (this._state != SpellState.WAIT_CHARGE) {
+        // if (this._state != SpellState.WAIT_CHARGE
+        //     && this._state != SpellState.WAIT_DELETE
+        //     && !this.constructor["_IsConsumables"]) {
+        if (this._charges > 0 || (this.constructor["_ChargesCountPerLevel"].length == 0)) {
+            log.info("добавляем команду ", this.GetCommandConfig().Uid, " для юнита ", caster.unit.Name);
             this._caster.unit.CommandsMind.AddCommand(this.GetUnitCommand(), this.GetCommandConfig());
         }
     }
@@ -230,8 +238,8 @@ export class ISpell {
             this._activatedEffect.DrawLayer = DrawLayer.Birds;
 
             // запускаем перезарядку заряда если не расходник
+            this._charges--;
             if (!this.constructor["_IsConsumables"]) {
-                this._charges--;
                 this._chargesReloadTicks.push(this._activatedTick + this.constructor['_ChargesReloadTime']);
             }
 

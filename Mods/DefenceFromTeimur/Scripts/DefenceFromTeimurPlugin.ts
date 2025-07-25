@@ -150,9 +150,9 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         // настройка конфига огня
 
         var fireCfg = HordeContentApi.GetBulletConfig("#BulletConfig_Fire");
-        fireCfg.SpecialParams.DamagePeriod[0] = 16;
-        fireCfg.SpecialParams.DamagePeriod[1] = 16;
-        fireCfg.SpecialParams.DamagePeriod[2] = 16;
+        // fireCfg.SpecialParams.DamagePeriod[0] = 16;
+        // fireCfg.SpecialParams.DamagePeriod[1] = 16;
+        // fireCfg.SpecialParams.DamagePeriod[2] = 16;
         //ScriptUtils.SetValue(fireCfg.SpecialParams, "BurningPhaseChangePeriod", 64);
         //ScriptUtils.SetValue(fireCfg.SpecialParams, "MaxNoDamageTicks", 2);
         ScriptUtils.SetValue(fireCfg.SpecialParams, "MinDamageToFade", 1);
@@ -532,32 +532,32 @@ export class DefenceFromTeimurPlugin extends HordePluginBase {
         // подписываемся на событие о замене юнита (поддержка LevelSystem)
 
         let scenaSettlements = ActiveScena.GetRealScena().Settlements;
-        for (var settlementNum = 0; settlementNum < scenaSettlements.Count; settlementNum++) {
-            var settlementUnits = scenaSettlements.Item.get(settlementNum + '').Units;
+        // for (var settlementNum = 0; settlementNum < scenaSettlements.Count; settlementNum++) {
+        //     var settlementUnits = scenaSettlements.Item.get(settlementNum + '').Units;
 
-            settlementUnits.UnitReplaced.connect(
-                function (sender, args) {
-                    // если производится заменя юнита, который в списке юнитов, то нужно переинициализировать его
-                    for (var unitNum = 0; unitNum < GlobalVars.units.length; unitNum++) {
-                        if (args.OldUnit.Id == GlobalVars.units[unitNum].unit.Id) {
-                            GlobalVars.units[unitNum].needDeleted = true;
-                            GlobalVars.units.push(GlobalVars.units[unitNum].constructor(args.NewUnit, GlobalVars.units[unitNum].teamNum));
+        //     settlementUnits.UnitReplaced.connect(
+        //         function (sender, args) {
+        //             // если производится заменя юнита, который в списке юнитов, то нужно переинициализировать его
+        //             for (var unitNum = 0; unitNum < GlobalVars.units.length; unitNum++) {
+        //                 if (args.OldUnit.Id == GlobalVars.units[unitNum].unit.Id) {
+        //                     GlobalVars.units[unitNum].needDeleted = true;
+        //                     GlobalVars.units.push(GlobalVars.units[unitNum].constructor(args.NewUnit, GlobalVars.units[unitNum].teamNum));
 
-                            // если конфига нету в системе, то инициализируем его
-                            if (!GlobalVars.configs[args.NewUnit.Cfg.Uid]) {
-                                var prev_BaseCfgUid     = ITeimurUnit.BaseCfgUid;
-                                var prev_CfgUid         = ITeimurUnit.CfgUid;
-                                ITeimurUnit.BaseCfgUid  = args.NewUnit.Cfg.Uid;
-                                ITeimurUnit.CfgUid      = args.NewUnit.Cfg.Uid;
-                                ITeimurUnit.InitConfig();
-                                ITeimurUnit.BaseCfgUid  = prev_BaseCfgUid;
-                                ITeimurUnit.CfgUid      = prev_CfgUid;
-                            }
-                            break;
-                        }
-                    }
-            });
-        }
+        //                     // если конфига нету в системе, то инициализируем его
+        //                     if (!GlobalVars.configs[args.NewUnit.Cfg.Uid]) {
+        //                         var prev_BaseCfgUid     = ITeimurUnit.BaseCfgUid;
+        //                         var prev_CfgUid         = ITeimurUnit.CfgUid;
+        //                         ITeimurUnit.BaseCfgUid  = args.NewUnit.Cfg.Uid;
+        //                         ITeimurUnit.CfgUid      = args.NewUnit.Cfg.Uid;
+        //                         ITeimurUnit.InitConfig();
+        //                         ITeimurUnit.BaseCfgUid  = prev_BaseCfgUid;
+        //                         ITeimurUnit.CfgUid      = prev_CfgUid;
+        //                     }
+        //                     break;
+        //                 }
+        //             }
+        //     });
+        // }
 
         GlobalVars.diplomacyTable = new Array<Array<DiplomacyStatus>>(scenaSettlements.Count);
         for (var settlementNum = 0; settlementNum < scenaSettlements.Count; settlementNum++) {

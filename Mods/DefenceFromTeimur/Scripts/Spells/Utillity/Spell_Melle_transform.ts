@@ -1,5 +1,5 @@
 import { ISpell } from "../ISpell";
-import { HordeColor } from "library/common/primitives";
+import { HordeColor, ResourcesAmount } from "library/common/primitives";
 import { ACommandArgs, ReplaceUnitParameters, Stride_Color, UnitConfig } from "library/game-logic/horde-types";
 import { GlobalVars } from "../../GlobalData";
 import { Hero_Archer, Hero_Crusader } from "../../Realizations/Player_units";
@@ -9,8 +9,9 @@ export class Spell_Melle_transform extends ISpell {
     protected static _ButtonAnimationsCatalogUid    : string = "#AnimCatalog_Command_View"; // Assume an animation catalog
     protected static _EffectStrideColor             : Stride_Color = new Stride_Color(255, 0, 255, 255);
     protected static _EffectHordeColor              : HordeColor = new HordeColor(255, 0, 255, 255);
-    protected static _Name                          : string = "Превращение в ближника";
-    protected static _Description                   : string = "Превращает юнита в юнита ближнего боя.";
+    protected static _NamePrefix                    : string = "Превращение в паладина";
+    protected static _DescriptionTemplate           : string = "Превращает юнита в паладина";
+    protected static _SpellCost                     : ResourcesAmount = new ResourcesAmount(0, 0, 500, 0);
     protected static _IsConsumables                 : boolean = true;
 
     public Activate(activateArgs: ACommandArgs): boolean {
@@ -22,7 +23,7 @@ export class Spell_Melle_transform extends ISpell {
             replaceParams.Cell = this._caster.unit.Cell;
             replaceParams.PreserveHealthLevel = true;
             replaceParams.PreserveExperience = true;
-            replaceParams.PreserveOrders = true;
+            replaceParams.PreserveOrders = false;
             replaceParams.PreserveKillsCounter = true;
             replaceParams.Silent = true;
     

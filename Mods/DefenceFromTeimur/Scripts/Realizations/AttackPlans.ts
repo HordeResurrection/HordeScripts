@@ -1,9 +1,9 @@
 import { GlobalVars } from "../GlobalData";
-import { TeimurLegendaryUnitsClass, Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER, Teimur_Legendary_HORSE, Teimur_Legendary_DARK_DRAIDER, Teimur_Legendary_FIRE_MAGE, Teimur_Legendary_GREED_HORSE, Teimur_Scorpion, Teimur_Legendary_Melle_CASTER, Teimur_Legendary_Range_CASTER } from "./Teimur_units";
+import { TeimurLegendaryUnitsClass, Teimur_Swordmen, Teimur_Archer, Teimur_Heavymen, Teimur_Archer_2, Teimur_Raider, Teimur_Catapult, Teimur_Balista, Teimur_Mag_2, Teimur_Villur, Teimur_Olga, Teimur_Legendary_SWORDMEN, Teimur_Legendary_HEAVYMAN, Teimur_Legendary_ARCHER, Teimur_Legendary_ARCHER_2, Teimur_Legendary_RAIDER, Teimur_Legendary_WORKER, Teimur_Legendary_HORSE, Teimur_Legendary_DARK_DRAIDER, Teimur_Legendary_FIRE_MAGE, Teimur_Legendary_GREED_HORSE, Teimur_Scorpion, Teimur_Legendary_Melle_CASTER, Teimur_Legendary_Range_CASTER, Teimur_Legendary_Raider_CASTER } from "./Teimur_units";
 import { IAttackPlan, WaveUnit, Wave } from "../Types/IAttackPlan";
 import { RandomUnit } from "../Types/IUnit";
 import { IIncomePlan } from "../Types/IIncomePlan";
-import { IncomePlan_1 } from "./IncomePlans";
+import { IncomePlan_0, IncomePlan_1 } from "./IncomePlans";
 import { ITeimurUnit, TeimurUnitsModificators } from "../Types/ITeimurUnit";
 import { log } from "library/common/logging";
 
@@ -724,30 +724,27 @@ export class AttackPlan_7 extends IAttackPlan {
                 new WaveUnit(Teimur_Legendary_ARCHER,      1),
                 new WaveUnit(Teimur_Legendary_WORKER,      1),
                 new WaveUnit(Teimur_Legendary_GREED_HORSE, 1),
-                // @ts-expect-error
                 new WaveUnit(Teimur_Legendary_Melle_CASTER,      1),
-                // @ts-expect-error
-                new WaveUnit(Teimur_Legendary_Range_CASTER,      1)
+                new WaveUnit(Teimur_Legendary_Range_CASTER,      1),
+                new WaveUnit(Teimur_Legendary_Raider_CASTER,     1)
             ],
             // normal
             [
                 new WaveUnit(Teimur_Legendary_HEAVYMAN,     1),
                 new WaveUnit(Teimur_Legendary_ARCHER_2,     1),
                 new WaveUnit(Teimur_Legendary_DARK_DRAIDER, 1),
-                // @ts-expect-error
                 new WaveUnit(Teimur_Legendary_Melle_CASTER,       2),
-                // @ts-expect-error
-                new WaveUnit(Teimur_Legendary_Range_CASTER,       2)
+                new WaveUnit(Teimur_Legendary_Range_CASTER,       2),
+                new WaveUnit(Teimur_Legendary_Raider_CASTER,      2)
             ],
             // hard
             [
                 new WaveUnit(Teimur_Legendary_SWORDMEN,  1),
                 new WaveUnit(Teimur_Legendary_RAIDER,    1),
                 new WaveUnit(Teimur_Legendary_FIRE_MAGE, 1),
-                // @ts-expect-error
                 new WaveUnit(Teimur_Legendary_Melle_CASTER,    3),
-                // @ts-expect-error
-                new WaveUnit(Teimur_Legendary_Range_CASTER,    3)
+                new WaveUnit(Teimur_Legendary_Range_CASTER,    3),
+                new WaveUnit(Teimur_Legendary_Raider_CASTER,   3)
             ]
         ];
 
@@ -979,9 +976,7 @@ export class AttackPlan_8 extends IAttackPlan {
                 new WaveUnit(Teimur_Legendary_ARCHER,      1),
                 new WaveUnit(Teimur_Legendary_WORKER,      1),
                 new WaveUnit(Teimur_Legendary_GREED_HORSE, 1),
-                // @ts-expect-error
                 new WaveUnit(Teimur_Legendary_Melle_CASTER,      1),
-                // @ts-expect-error
                 new WaveUnit(Teimur_Legendary_Range_CASTER,      1)
             ],
             // normal
@@ -989,9 +984,7 @@ export class AttackPlan_8 extends IAttackPlan {
                 new WaveUnit(Teimur_Legendary_HEAVYMAN,     1),
                 new WaveUnit(Teimur_Legendary_ARCHER_2,     1),
                 new WaveUnit(Teimur_Legendary_DARK_DRAIDER, 1),
-                // @ts-expect-error
                 new WaveUnit(Teimur_Legendary_Melle_CASTER,       2),
-                // @ts-expect-error
                 new WaveUnit(Teimur_Legendary_Range_CASTER,       2)
             ],
             // hard
@@ -999,9 +992,7 @@ export class AttackPlan_8 extends IAttackPlan {
                 new WaveUnit(Teimur_Legendary_SWORDMEN,  1),
                 new WaveUnit(Teimur_Legendary_RAIDER,    1),
                 new WaveUnit(Teimur_Legendary_FIRE_MAGE, 1),
-                // @ts-expect-error
                 new WaveUnit(Teimur_Legendary_Melle_CASTER,    3),
-                // @ts-expect-error
                 new WaveUnit(Teimur_Legendary_Range_CASTER,    3)
             ]
         ];
@@ -1102,7 +1093,7 @@ export class AttackPlan_8 extends IAttackPlan {
                 var modificatorNum : number = index;
 
                 for (var i = 0; i < modificators_Probability.length; i++) {
-                    if (i == modificatorNum) {
+                    if (i === modificatorNum) {
                         continue;
                     }
                     modificators_Probability[i] +=
@@ -1182,8 +1173,7 @@ export class AttackPlan_test extends IAttackPlan {
 
         this.waves = [];
         this.waves.push(
-            // @ts-expect-error
-            new Wave("ТЕСТ", 0, [new WaveUnit(Teimur_Legendary_Range_CASTER, 1)]),
+            new Wave("ТЕСТ", 0, [new WaveUnit(Teimur_Villur, 5)]),
             new Wave("END", 20*60*50, [])
         );
     }
@@ -1193,7 +1183,7 @@ export const AttackPlansClass = [
     AttackPlan_1,
     AttackPlan_2,
     AttackPlan_7,
-    AttackPlan_8,  // Added new plan
+    AttackPlan_8,
     // AttackPlan_3,
     // AttackPlan_4,
     // AttackPlan_5,

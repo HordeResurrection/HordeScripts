@@ -13,7 +13,7 @@ import { log } from "library/common/logging";
 import { iterateOverUnitsInBox, unitCheckPathTo } from "library/game-logic/unit-and-map";
 import { setBulletInitializeWorker, setBulletProcessWorker } from "library/game-logic/workers-tools";
 import { createGameMessageWithSound } from "library/common/messages";
-import { Hero_Crusader } from "./Player_units";
+import { Hero_Crusader, PlayerUnitsClass } from "./Player_units";
 import { Cell } from "../Types/Geometry";
 import { IUnitCaster } from "../Spells/IUnitCaster";
 import { ISpell, SpellState } from "../Spells/ISpell";
@@ -670,11 +670,11 @@ export class Teimur_Legendary_HORSE extends ILegendaryUnit {
                     continue;
                 }
                 // пропускаем героев
-                if (Hero_Crusader.CfgUid == _unit.Cfg.Uid) {
+                else if (PlayerUnitsClass.findIndex(playerUnitClass => playerUnitClass.CfgUid == _unit.Cfg.Uid) != -1) {
                     continue;
                 }
                 // достигнут предел захвата за раз
-                if (captureUnitsLimit <= 0) {
+                else if (captureUnitsLimit <= 0) {
                     break;
                 }
 
@@ -1188,7 +1188,8 @@ export class Teimur_Legendary_Melle_CASTER extends IUnitCaster {
     static BaseCfgUid  : string = "#DefenceTeimur_Swordmen";
     static Description : string = "Легендарный кастер. Получает случайные способности максимального уровня";
 
-    protected static AllSpells : Array<typeof ISpell> = Spell_WorkerSaleList.SpellsList;
+    protected static AllSpells : Array<typeof ISpell> = Spell_WorkerSaleList.SpellsList
+        .filter(spell => !spell.IsConsumables());
 
     protected static _SpellsCount: number = 1;
 
@@ -1282,9 +1283,10 @@ export class Teimur_Legendary_Melle_CASTER extends IUnitCaster {
     }
 
     public static GetSpawnCount(spawnCount: number) {
-        this._SpellsCount = spawnCount;
+        var count = Math.max(1, spawnCount / 5);
+        this._SpellsCount = Math.ceil(spawnCount / count);
 
-        return 1;
+        return count;
     }
 
     public static GetConfigWithModificator(modificator : TeimurUnitsModificators.Type) : UnitConfig {
@@ -1316,6 +1318,25 @@ export class Teimur_Legendary_Range_CASTER extends Teimur_Legendary_Melle_CASTER
     }
 }
 
+export class Teimur_Legendary_Raider_CASTER extends Teimur_Legendary_Melle_CASTER {
+    static CfgUid: string = "#DefenceFromTeimurPlugin_Teimur_Legendary_Raider_CASTER";
+    static BaseCfgUid: string = "#UnitConfig_Slavyane_Raider";
+
+    constructor(unit: any, teamNum: number) {
+        super(unit, teamNum);
+    }
+
+    static InitConfig() {
+        super.InitConfig.call(this);
+
+        // Set name
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "Name", "Легендарный всадник кастер");
+        // Change color
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "TintColor", createHordeColor(255, 0, 255, 255));
+        // Set health based on difficulty
+        ScriptUtils.SetValue(GlobalVars.configs[this.CfgUid], "MaxHealth", Math.floor(100 * Math.sqrt(GlobalVars.difficult)));
+    }
+}
 
 export const TeimurLegendaryUnitsClass : Array<typeof IUnit> = [
     Teimur_Legendary_SWORDMEN,
@@ -1329,7 +1350,8 @@ export const TeimurLegendaryUnitsClass : Array<typeof IUnit> = [
     Teimur_Legendary_FIRE_MAGE,
     Teimur_Legendary_GREED_HORSE,
     Teimur_Legendary_Melle_CASTER,
-    Teimur_Legendary_Range_CASTER
+    Teimur_Legendary_Range_CASTER,
+    Teimur_Legendary_Raider_CASTER
 ];
 
 export const TeimurUnitsClass : Array<typeof IUnit> = [

@@ -14,7 +14,7 @@ export class Spell_Vampirism extends IPassiveSpell {
 
     protected static _MaxLevel                      : number = 4;
     protected static _NamePrefix                    : string = "Вампиризм";
-    protected static _DescriptionTemplate           : string = "Пассивка. Урон ближнего, осадного типа"
+    protected static _DescriptionTemplate           : string = "Пассивка. Урон ближнего, осадного, дальнего (лечение в 2 раза меньше) типа"
         + " восстанавливает хп в размере {0} % нанесенного урона (то есть с вычетом брони врага)";
     protected static _DescriptionParamsPerLevel     : Array<Array<any>> = 
         [this._VampirismCoeffPerLevel.map(value => value * 100)];
@@ -22,13 +22,15 @@ export class Spell_Vampirism extends IPassiveSpell {
     public OnCauseDamage(VictimUnit: Unit, Damage: number, EffectiveDamage: number, HurtType: UnitHurtType) {
         super.OnCauseDamage(VictimUnit, Damage, EffectiveDamage, HurtType);
 
-        if (HurtType == UnitHurtType.Mele || HurtType == UnitHurtType.Heavy) {
-            var heal = Math.round(EffectiveDamage * Spell_Vampirism._VampirismCoeffPerLevel[this.level]);
+        if (HurtType != UnitHurtType.Mele && HurtType != UnitHurtType.Heavy && HurtType != UnitHurtType.Arrow) {
+            return;
+        }
+
+        var heal = Math.round(EffectiveDamage * Spell_Vampirism._VampirismCoeffPerLevel[this.level] * (HurtType == UnitHurtType.Arrow ? 0.5 : 1.0));
+        if (heal > 0) {
+            heal = Math.min(this._caster.unit.Cfg.MaxHealth - this._caster.unit.Health, heal);
             if (heal > 0) {
-                heal = Math.min(this._caster.unit.Cfg.MaxHealth - this._caster.unit.Health, heal);
-                if (heal > 0) {
-                    this._caster.unit.Health = this._caster.unit.Health + heal;
-                }
+                this._caster.unit.Health = this._caster.unit.Health + heal;
             }
         }
     }
