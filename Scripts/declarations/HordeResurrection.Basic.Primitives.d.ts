@@ -120,7 +120,7 @@ declare namespace HordeResurrection.Basic.Primitives.Geometry {
 
 		FillNeighborPointsSet(
 			withCenter: boolean,
-			targetPointsSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			targetPointsSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		): void;
 
 		NormalizeChebushev(): HordeResurrection.Basic.Primitives.Geometry.Point2D;
@@ -292,11 +292,11 @@ declare namespace HordeResurrection.Basic.Primitives.Geometry {
 		GetEdgePoints(): System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>;
 
 		GetEdgePoints(
-			targetPointsSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			targetPointsSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		): void;
 
 		GetAllPoints(
-			pointSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			pointSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		): void;
 
 		Contains(
@@ -308,7 +308,7 @@ declare namespace HordeResurrection.Basic.Primitives.Geometry {
 		): boolean;
 
 		ForEachEdgePoint(
-			callback: System.Func_1<HordeResurrection.Basic.Primitives.Geometry.Point2D, boolean> | System.Func | null
+			callback: System.Func_1<HordeResurrection.Basic.Primitives.Geometry.Point2D, boolean> | System.Func
 		): void;
 
 		Equals(
@@ -385,7 +385,7 @@ declare namespace HordeResurrection.Basic.Primitives {
 		);
 
 		constructor(
-			other: HordeResurrection.Basic.Primitives.HordeColor | null
+			other: HordeResurrection.Basic.Primitives.HordeColor
 		);
 
 		// Fields:
@@ -412,11 +412,23 @@ declare namespace HordeResurrection.Basic.Primitives {
 		ToRgba(): number;
 
 		static FromBgra(
+			bgra: number
+		): HordeResurrection.Basic.Primitives.HordeColor;
+
+		static FromBgra(
+			bgra: number
+		): HordeResurrection.Basic.Primitives.HordeColor;
+
+		static FromRgba(
 			rgba: number
 		): HordeResurrection.Basic.Primitives.HordeColor;
 
 		static FromRgba(
-			array: number[] | null
+			rgba: number
+		): HordeResurrection.Basic.Primitives.HordeColor;
+
+		static FromHex(
+			argbHex: string
 		): HordeResurrection.Basic.Primitives.HordeColor;
 	}
 }
@@ -467,19 +479,19 @@ declare namespace HordeResurrection.Basic.Primitives {
 
 		GetRandomElement<T>(
 			$T: any,
-			list: System.Collections.Generic.IList<T> | null
-		): T;
+			list: System.Collections.Generic.IList<T>
+		): T | null;
 
 		GetRandomElement<T>(
 			$T: any,
-			collection: System.Collections.Generic.ICollection<T> | null
-		): T;
+			collection: System.Collections.Generic.ICollection<T>
+		): T | null;
 
 		GetRandomElement<T>(
 			$T: any,
-			enumerable: System.Collections.Generic.IEnumerable<T> | null,
+			enumerable: System.Collections.Generic.IEnumerable<T>,
 			count: number
-		): T;
+		): T | null;
 
 		RandomPreciseFraction(
 			min: HordeResurrection.Basic.Primitives.PreciseFraction,
@@ -519,8 +531,7 @@ declare namespace HordeResurrection.Basic.Primitives {
 		);
 
 		// Properties:
-		readonly SpeedX: HordeResurrection.Basic.Primitives.PreciseFraction;
-		readonly SpeedY: HordeResurrection.Basic.Primitives.PreciseFraction;
+		readonly Speed: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector;
 		readonly SpeedRestX: HordeResurrection.Basic.Primitives.PreciseFraction;
 		readonly SpeedRestY: HordeResurrection.Basic.Primitives.PreciseFraction;
 
@@ -529,6 +540,11 @@ declare namespace HordeResurrection.Basic.Primitives {
 			position: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			finishPoint: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D;
+
+		ApplyToPoint(
+			position: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector,
+			finishPoint: HordeResurrection.Basic.Primitives.Geometry.Point2D
+		): HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector;
 
 		ResetRest(): void;
 	}
@@ -628,7 +644,7 @@ declare namespace HordeResurrection.Basic.Primitives {
 
 		// Methods:
 		static GetRandomSpiral(
-			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer | null,
+			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer,
 			center?: HordeResurrection.Basic.Primitives.Geometry.Point2D | null /* = null */,
 			stepSize?: HordeResurrection.Basic.Primitives.Geometry.Size2D | null /* = null */
 		): HordeResurrection.Basic.Primitives.SpiralOut;

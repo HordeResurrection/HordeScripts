@@ -401,10 +401,6 @@ declare namespace Stride.Core.Mathematics {
 			source: Stride.Core.Mathematics.Vector2[]
 		): void;
 
-		ToString(
-			format: string | null
-		): string;
-
 		EqualsStrict(
 			other: Stride.Core.Mathematics.Vector2
 		): boolean;
@@ -417,8 +413,6 @@ declare namespace Stride.Core.Mathematics {
 			/*out*/ x: number,
 			/*out*/ y: number
 		): void;
-
-		ToString(): string;
 
 		// Default parameterless constructor for value types
 		constructor();

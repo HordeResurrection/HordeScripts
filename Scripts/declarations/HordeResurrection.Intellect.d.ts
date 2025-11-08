@@ -17,8 +17,8 @@ declare namespace HordeResurrection.Intellect.Actions {
 	{
 		// Constructors:
 		constructor(
-			producerUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			producerUnit: HordeClassLibrary.World.Objects.Units.Unit,
+			productConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			cellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			cellEnd: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		);
@@ -39,8 +39,8 @@ declare namespace HordeResurrection.Intellect.Actions {
 	{
 		// Constructors:
 		constructor(
-			producerUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			producerUnit: HordeClassLibrary.World.Objects.Units.Unit,
+			productConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			count: number
 		);
 
@@ -86,13 +86,13 @@ declare namespace HordeResurrection.Intellect.Collections {
 		GetEnumerator(): System.Collections.Generic.IEnumerator<HordeResurrection.Intellect.Departments.ADepartment>;
 
 		Add(
-			item: HordeResurrection.Intellect.Departments.ADepartment | null
+			item: HordeResurrection.Intellect.Departments.ADepartment
 		): void;
 
 		Clear(): void;
 
 		Contains(
-			item: HordeResurrection.Intellect.Departments.ADepartment | null
+			item: HordeResurrection.Intellect.Departments.ADepartment
 		): boolean;
 
 		CopyTo(
@@ -101,7 +101,7 @@ declare namespace HordeResurrection.Intellect.Collections {
 		): void;
 
 		Remove(
-			item: HordeResurrection.Intellect.Departments.ADepartment | null
+			item: HordeResurrection.Intellect.Departments.ADepartment
 		): boolean;
 
 		GetEnumerator(): System.Collections.IEnumerator;
@@ -132,13 +132,13 @@ declare namespace HordeResurrection.Intellect.Collections {
 		GetEnumerator(): System.Collections.Generic.IEnumerator<HordeResurrection.Intellect.Intelligence.AIntelligenceModule>;
 
 		Add(
-			item: HordeResurrection.Intellect.Intelligence.AIntelligenceModule | null
+			item: HordeResurrection.Intellect.Intelligence.AIntelligenceModule
 		): void;
 
 		Clear(): void;
 
 		Contains(
-			item: HordeResurrection.Intellect.Intelligence.AIntelligenceModule | null
+			item: HordeResurrection.Intellect.Intelligence.AIntelligenceModule
 		): boolean;
 
 		CopyTo(
@@ -147,7 +147,7 @@ declare namespace HordeResurrection.Intellect.Collections {
 		): void;
 
 		Remove(
-			item: HordeResurrection.Intellect.Intelligence.AIntelligenceModule | null
+			item: HordeResurrection.Intellect.Intelligence.AIntelligenceModule
 		): boolean;
 
 		GetEnumerator(): System.Collections.IEnumerator;
@@ -178,13 +178,13 @@ declare namespace HordeResurrection.Intellect.Collections {
 		GetEnumerator(): System.Collections.Generic.IEnumerator<HordeResurrection.Intellect.Operators.AOperator>;
 
 		Add(
-			item: HordeResurrection.Intellect.Operators.AOperator | null
+			item: HordeResurrection.Intellect.Operators.AOperator
 		): void;
 
 		Clear(): void;
 
 		Contains(
-			item: HordeResurrection.Intellect.Operators.AOperator | null
+			item: HordeResurrection.Intellect.Operators.AOperator
 		): boolean;
 
 		CopyTo(
@@ -193,7 +193,7 @@ declare namespace HordeResurrection.Intellect.Collections {
 		): void;
 
 		Remove(
-			item: HordeResurrection.Intellect.Operators.AOperator | null
+			item: HordeResurrection.Intellect.Operators.AOperator
 		): boolean;
 
 		GetEnumerator(): System.Collections.IEnumerator;
@@ -216,14 +216,14 @@ declare namespace HordeResurrection.Intellect.Collections {
 
 		// Methods:
 		EnqueueIfNotExists(
-			newRequest: HordeResurrection.Intellect.Requests.ARequest | null,
-			/*out*/ existsRequest: HordeResurrection.Intellect.Requests.ARequest | null
+			newRequest: HordeResurrection.Intellect.Requests.ARequest,
+			/*out*/ existsRequest: HordeResurrection.Intellect.Requests.ARequest
 		): boolean;
 
 		Dequeue(): HordeResurrection.Intellect.Requests.ARequest;
 
 		Enqueue(
-			request: HordeResurrection.Intellect.Requests.ARequest | null
+			request: HordeResurrection.Intellect.Requests.ARequest
 		): void;
 
 		Clear(): void;
@@ -249,7 +249,7 @@ declare namespace HordeResurrection.Intellect.Collections {
 		Dequeue(): HordeResurrection.Intellect.Requests.Trackers.ARequestTracker;
 
 		Enqueue(
-			tracker: HordeResurrection.Intellect.Requests.Trackers.ARequestTracker | null
+			tracker: HordeResurrection.Intellect.Requests.Trackers.ARequestTracker
 		): void;
 
 		Clear(): void;
@@ -269,7 +269,7 @@ declare namespace HordeResurrection.Intellect.Departments {
 		Deinitialize(): void;
 
 		InspectRequest(
-			request: HordeResurrection.Intellect.Requests.ARequest | null
+			request: HordeResurrection.Intellect.Requests.ARequest
 		): HordeResurrection.Intellect.Requests.Stuff.RequestPerformPossibility;
 
 		// Dummy constructor for some magic:
@@ -285,7 +285,7 @@ declare namespace HordeResurrection.Intellect.Departments {
 	{
 		// Constructors:
 		constructor(
-			masterMind: HordeResurrection.Intellect.MasterMind | null
+			masterMind: HordeResurrection.Intellect.MasterMind
 		);
 	}
 }
@@ -298,7 +298,7 @@ declare namespace HordeResurrection.Intellect.Departments {
 	{
 		// Constructors:
 		constructor(
-			masterMind: HordeResurrection.Intellect.MasterMind | null
+			masterMind: HordeResurrection.Intellect.MasterMind
 		);
 	}
 }
@@ -311,7 +311,7 @@ declare namespace HordeResurrection.Intellect.Departments {
 	{
 		// Constructors:
 		constructor(
-			masterMind: HordeResurrection.Intellect.MasterMind | null
+			masterMind: HordeResurrection.Intellect.MasterMind
 		);
 
 		// Fields:
@@ -319,22 +319,22 @@ declare namespace HordeResurrection.Intellect.Departments {
 
 		// Methods:
 		InspectPossibilityOfUnitCreation(
-			request: HordeResurrection.Intellect.Requests.ProduceRequest | null
+			request: HordeResurrection.Intellect.Requests.ProduceRequest
 		): HordeResurrection.Intellect.Requests.Stuff.RequestPerformPossibility;
 
 		AddRequestToProduce(
-			parameters: HordeResurrection.Intellect.Requests.CreationArgs.ProduceRequestParameters | null,
-			/*out*/ requestInQueue: HordeResurrection.Intellect.Requests.ProduceRequest | null
+			parameters: HordeResurrection.Intellect.Requests.CreationArgs.ProduceRequestParameters,
+			/*out*/ requestInQueue: HordeResurrection.Intellect.Requests.ProduceRequest
 		): boolean;
 
 		AddRequestToProduce(
-			parameters: HordeResurrection.Intellect.Requests.CreationArgs.ProduceRequestParameters | null
+			parameters: HordeResurrection.Intellect.Requests.CreationArgs.ProduceRequestParameters
 		): boolean;
 
 		AddRequestToProduce(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			count?: number /* = 1 */,
-			dependentRequest?: HordeResurrection.Intellect.Requests.ARequest | null /* = null */,
+			dependentRequest?: HordeResurrection.Intellect.Requests.ARequest /* = null */,
 			checkExists?: boolean /* = true */
 		): boolean;
 	}
@@ -348,7 +348,7 @@ declare namespace HordeResurrection.Intellect.Departments {
 	{
 		// Constructors:
 		constructor(
-			masterMind: HordeResurrection.Intellect.MasterMind | null
+			masterMind: HordeResurrection.Intellect.MasterMind
 		);
 	}
 }
@@ -361,7 +361,7 @@ declare namespace HordeResurrection.Intellect.Departments {
 	{
 		// Constructors:
 		constructor(
-			masterMind: HordeResurrection.Intellect.MasterMind | null
+			masterMind: HordeResurrection.Intellect.MasterMind
 		);
 	}
 }
@@ -396,7 +396,7 @@ declare namespace HordeResurrection.Intellect.Intelligence {
 	{
 		// Constructors:
 		constructor(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Properties:
@@ -412,7 +412,7 @@ declare namespace HordeResurrection.Intellect.Intelligence {
 	{
 		// Constructors:
 		constructor(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Properties:
@@ -469,7 +469,7 @@ declare namespace HordeResurrection.Intellect.Intelligence {
 
 		// Methods:
 		Initialize(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		): void;
 
 		Deinitialize(): void;
@@ -486,7 +486,7 @@ declare namespace HordeResurrection.Intellect.Intelligence {
 	{
 		// Constructors:
 		constructor(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Properties:
@@ -501,8 +501,8 @@ declare namespace HordeResurrection.Intellect {
 
 		// Constructors:
 		constructor(
-			name: string | null,
-			character: HordeClassLibrary.HordeContent.Configs.MasterMind.MindCharacterConfig | null
+			name: string,
+			character: HordeClassLibrary.HordeContent.Configs.MasterMind.MindCharacterConfig
 		);
 
 		// Properties:
@@ -531,11 +531,11 @@ declare namespace HordeResurrection.Intellect {
 
 		// Methods:
 		ChangeCharacter(
-			character: HordeClassLibrary.HordeContent.Configs.MasterMind.MindCharacterConfig | null
+			character: HordeClassLibrary.HordeContent.Configs.MasterMind.MindCharacterConfig
 		): void;
 
 		Initialize(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		): void;
 
 		Deinitialize(): void;
@@ -559,7 +559,7 @@ declare namespace HordeResurrection.Intellect.Operators {
 		Deinitialize(): void;
 
 		PerformRequest(
-			request: HordeResurrection.Intellect.Requests.ARequest | null,
+			request: HordeResurrection.Intellect.Requests.ARequest,
 			gameTick: number
 		): void;
 
@@ -576,7 +576,7 @@ declare namespace HordeResurrection.Intellect.Operators {
 	{
 		// Constructors:
 		constructor(
-			masterMind: HordeResurrection.Intellect.MasterMind | null
+			masterMind: HordeResurrection.Intellect.MasterMind
 		);
 	}
 }
@@ -589,7 +589,7 @@ declare namespace HordeResurrection.Intellect.Operators {
 	{
 		// Constructors:
 		constructor(
-			masterMind: HordeResurrection.Intellect.MasterMind | null
+			masterMind: HordeResurrection.Intellect.MasterMind
 		);
 	}
 }
@@ -602,7 +602,7 @@ declare namespace HordeResurrection.Intellect.Operators {
 	{
 		// Constructors:
 		constructor(
-			masterMind: HordeResurrection.Intellect.MasterMind | null
+			masterMind: HordeResurrection.Intellect.MasterMind
 		);
 	}
 }
@@ -615,7 +615,7 @@ declare namespace HordeResurrection.Intellect.Operators {
 	{
 		// Constructors:
 		constructor(
-			masterMind: HordeResurrection.Intellect.MasterMind | null
+			masterMind: HordeResurrection.Intellect.MasterMind
 		);
 	}
 }
@@ -640,7 +640,7 @@ declare namespace HordeResurrection.Intellect.Requests {
 		IsAttemptsIsOver(): boolean;
 
 		IsIdenticalTo(
-			other: HordeResurrection.Intellect.Requests.ARequest | null
+			other: HordeResurrection.Intellect.Requests.ARequest
 		): boolean;
 
 		// Events:
@@ -659,7 +659,7 @@ declare namespace HordeResurrection.Intellect.Requests.ARequest {
 	{
 		// Constructors:
 		constructor(
-			NewTracker: HordeResurrection.Intellect.Requests.Trackers.ARequestTracker | null
+			NewTracker: HordeResurrection.Intellect.Requests.Trackers.ARequestTracker
 		);
 
 		// Properties:
@@ -689,7 +689,7 @@ declare namespace HordeResurrection.Intellect.Requests.CreationArgs {
 	{
 		// Constructors:
 		constructor(
-			productConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			productConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			count?: number /* = 1 */
 		);
 
@@ -718,7 +718,7 @@ declare namespace HordeResurrection.Intellect.Requests {
 	{
 		// Constructors:
 		constructor(
-			parameters: HordeResurrection.Intellect.Requests.CreationArgs.ProduceRequestParameters | null
+			parameters: HordeResurrection.Intellect.Requests.CreationArgs.ProduceRequestParameters
 		);
 
 		// Fields:
@@ -837,7 +837,7 @@ declare namespace HordeResurrection.Intellect.Requests.Trackers.Manager {
 
 		// Methods:
 		RegisterTracker(
-			tracker: HordeResurrection.Intellect.Requests.Trackers.ARequestTracker | null
+			tracker: HordeResurrection.Intellect.Requests.Trackers.ARequestTracker
 		): void;
 	}
 }
@@ -855,7 +855,7 @@ declare namespace HordeResurrection.Intellect.Requests.Trackers {
 
 		// Methods:
 		HandleOrder(
-			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null
+			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase
 		): void;
 
 		// Dummy constructor for some magic:
@@ -871,8 +871,8 @@ declare namespace HordeResurrection.Intellect.Requests.Trackers.UnitProducing {
 	{
 		// Constructors:
 		constructor(
-			trackRequest: HordeResurrection.Intellect.Requests.ARequest | null,
-			trackOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null,
+			trackRequest: HordeResurrection.Intellect.Requests.ARequest,
+			trackOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase,
 			expirationTick: number,
 			fastExpirationTick: number
 		);
@@ -890,9 +890,9 @@ declare namespace HordeResurrection.Intellect.Requests.Trackers.UnitProducing {
 	{
 		// Constructors:
 		constructor(
-			trackRequest: HordeResurrection.Intellect.Requests.ARequest | null,
+			trackRequest: HordeResurrection.Intellect.Requests.ARequest,
 			expirationTick: number,
-			trackUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			trackUnit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -908,9 +908,9 @@ declare namespace HordeResurrection.Intellect.Requests.Trackers.UnitProducing {
 	{
 		// Constructors:
 		constructor(
-			trackRequest: HordeResurrection.Intellect.Requests.ARequest | null,
-			trackUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			requiredProductCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			trackRequest: HordeResurrection.Intellect.Requests.ARequest,
+			trackUnit: HordeClassLibrary.World.Objects.Units.Unit,
+			requiredProductCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			expirationTick: number,
 			fastExpirationTick: number
 		);
@@ -928,9 +928,9 @@ declare namespace HordeResurrection.Intellect.Requests.Trackers.UnitProducing {
 	{
 		// Constructors:
 		constructor(
-			trackRequest: HordeResurrection.Intellect.Requests.ARequest | null,
+			trackRequest: HordeResurrection.Intellect.Requests.ARequest,
 			expirationTick: number,
-			trackUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			trackUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			targetCount: number
 		);
 

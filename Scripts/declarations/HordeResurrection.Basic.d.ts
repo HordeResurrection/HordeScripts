@@ -35,7 +35,7 @@ declare namespace HordeResurrection.Basic.Collections {
 		): boolean;
 
 		GetKeys(
-			listToFill: System.Collections.Generic.List<T> | null
+			listToFill: System.Collections.Generic.List<T>
 		): void;
 
 		// Some generics magic for TypeScript:
@@ -87,7 +87,7 @@ declare namespace HordeResurrection.Basic.Collections {
 		): boolean;
 
 		CopyTo(
-			array: T[],
+			array: (T | null)[],
 			arrayIndex: number
 		): void;
 
@@ -144,14 +144,14 @@ declare namespace HordeResurrection.Basic.Pool {
 		// Constructors:
 		constructor(
 			$T: any,
-			objectGenerator: System.Func_0<T> | System.Func | null
+			objectGenerator: System.Func_0<T> | System.Func
 		);
 
 		// Methods:
 		Get(): HordeResurrection.Basic.Pool.PoolSlot<T>;
 
 		Return(
-			item: T | null
+			item: T
 		): void;
 
 		DebugFindDublicates(
@@ -176,8 +176,8 @@ declare namespace HordeResurrection.Basic.Pool {
 		// Constructors:
 		constructor(
 			$T: any,
-			pool: HordeResurrection.Basic.Pool.Pool<T> | null,
-			obj: T | null
+			pool: HordeResurrection.Basic.Pool.Pool<T>,
+			obj: T
 		);
 
 		// Properties:

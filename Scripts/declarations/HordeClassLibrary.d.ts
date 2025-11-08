@@ -7,8 +7,8 @@ declare namespace HordeClassLibrary.Basic.GameVersion {
 	{
 		// Constructors:
 		constructor(
-			version: System.Version | null,
-			postfix: string | null
+			version: System.Version,
+			postfix: string
 		);
 
 		// Fields:
@@ -21,15 +21,15 @@ declare namespace HordeClassLibrary.Basic.GameVersion {
 
 		// Methods:
 		static Parse(
-			rawVersion: string | null
+			rawVersion: string
 		): HordeClassLibrary.Basic.GameVersion.HordeVersion;
 
 		static SafeParse(
-			rawVersion: string | null
+			rawVersion: string
 		): HordeClassLibrary.Basic.GameVersion.HordeVersion;
 
 		Equals(
-			other: HordeClassLibrary.Basic.GameVersion.HordeVersion | null
+			other: HordeClassLibrary.Basic.GameVersion.HordeVersion
 		): boolean;
 	}
 }
@@ -70,6 +70,7 @@ declare namespace HordeClassLibrary.HordeContent {
 		static readonly MindCharacters: HordeClassLibrary.HordeContent.ConfigBooks.MindCharactersBook;
 		static readonly ContentStamps: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStampsCollection;
 		static readonly CoreContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack;
+		static readonly IsLoaded: boolean;
 
 		// Dummy constructor for some magic:
 		protected constructor(...dummy: any[]);
@@ -89,11 +90,11 @@ declare namespace HordeClassLibrary.HordeContent {
 		): T;
 
 		static GetWorker(
-			workerName: string | null
+			workerName: string
 		): HordeClassLibrary.World.Objects.Bullets.BaseBullet.BaseBulletFactory;
 
 		static GetWorkerFunc(
-			workerName: string | null
+			workerName: string
 		): HordeClassLibrary.World.Objects.Bullets.BaseBullet.BaseBulletFactory.CreateInstanceDelegate;
 
 		static GetAllWorkers(): System.Collections.Generic.IEnumerable<HordeClassLibrary.World.Objects.Bullets.BaseBullet.BaseBulletFactory>;
@@ -110,41 +111,41 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 
 		// Methods:
 		MergeWith(
-			otherBook: HordeClassLibrary.HordeContent.ConfigBooks.AConfigsBookAny | null
+			otherBook: HordeClassLibrary.HordeContent.ConfigBooks.AConfigsBookAny
 		): void;
 
 		SetupAllConfigs(
-			generalContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null
+			generalContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack
 		): void;
 
 		AfterSetup(
-			generalContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null
+			generalContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack
 		): void;
 
 		GetConfigUngeneric(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.AConfig;
 
 		GetBookHash(): string;
 
 		AddConfig(
-			cfg: HordeClassLibrary.HordeContent.Configs.AConfig | null
+			cfg: HordeClassLibrary.HordeContent.Configs.AConfig
 		): void;
 
 		RemoveConfig(
-			cfg: HordeClassLibrary.HordeContent.Configs.AConfig | null
+			cfg: HordeClassLibrary.HordeContent.Configs.AConfig
 		): void;
 
 		RemoveConfigByUid(
-			uid: string | null
+			uid: string
 		): void;
 
 		HasConfig(
-			uid: string | null
+			uid: string
 		): boolean;
 
 		MakeUniqueUid(
-			uid: string | null
+			uid: string
 		): string;
 
 		// Dummy constructor for some magic:
@@ -167,7 +168,7 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 
 		// Methods:
 		GetConfig(
-			uid: string | null
+			uid: string
 		): TConfig;
 
 		AddConfig(
@@ -189,7 +190,7 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	abstract class $Indexer_AConfigsBook<TConfig extends HordeClassLibrary.HordeContent.Configs.AConfig> {
 		/** [ uid: string ] -> TConfig */
 		public get(
-			uid: string | null
+			uid: string
 		): TConfig;
 	}
 }
@@ -202,8 +203,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 
 		// Properties:
@@ -221,8 +222,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 
 		// Methods:
@@ -240,8 +241,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			fontsDir: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			fontsDir: string
 		);
 	}
 }
@@ -254,13 +255,13 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 
 		// Methods:
 		GetUnitConfigByUid(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
 
 		GetForceByArmyType(
@@ -277,8 +278,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			dirPath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			dirPath: string
 		);
 
 		// Methods:
@@ -296,19 +297,19 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 
 		// Methods:
 		GetDefaultCharacter(): HordeClassLibrary.HordeContent.Configs.MasterMind.MindCharacterConfig;
 
 		GetCharacterByUidOrDefault(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.MasterMind.MindCharacterConfig;
 
 		GetCharacterByName(
-			name: string | null
+			name: string
 		): HordeClassLibrary.HordeContent.Configs.MasterMind.MindCharacterConfig;
 
 		GetAllSelectableCharacters(): System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.Configs.MasterMind.MindCharacterConfig>;
@@ -325,8 +326,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 	}
 }
@@ -339,8 +340,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 
 		// Properties:
@@ -364,8 +365,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 	}
 }
@@ -378,8 +379,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 
 		// Properties:
@@ -400,8 +401,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 	}
 }
@@ -413,15 +414,15 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks.ViewResources.Abstr
 
 		// Methods:
 		AddCatalog(
-			catalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Abstract.AViewResourcesCatalog | null
+			catalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Abstract.AViewResourcesCatalog
 		): boolean;
 
 		RemoveCatalog(
-			catalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Abstract.AViewResourcesCatalog | null
+			catalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Abstract.AViewResourcesCatalog
 		): boolean;
 
 		GetSourcePathForNewConfig(
-			suggestedPath: string | null
+			suggestedPath: string
 		): string;
 	}
 	/** TypeScript type stub for .Net interface */
@@ -437,30 +438,30 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks.ViewResources.Abstr
 	{
 		// Methods:
 		GetCatalog(
-			uid: string | null
+			uid: string
 		): TConfig;
 
 		GetCatalog<TCatalogType extends TConfig>(
 			$TCatalogType: typeof HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Abstract.AViewResourcesCatalog,
-			uid: string | null
+			uid: string
 		): TCatalogType;
 
 		GetAllCatalogs(): System.Collections.Generic.Dictionary<string, TConfig>;
 
 		GetCatalogByResourcePath(
-			resourcePath: string | null
+			resourcePath: string
 		): TConfig;
 
 		AddCatalog(
-			catalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Abstract.AViewResourcesCatalog | null
+			catalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Abstract.AViewResourcesCatalog
 		): boolean;
 
 		RemoveCatalog(
-			catalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Abstract.AViewResourcesCatalog | null
+			catalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Abstract.AViewResourcesCatalog
 		): boolean;
 
 		GetSourcePathForNewConfig(
-			suggestedPath: string | null
+			suggestedPath: string
 		): string;
 
 		// Dummy constructor for some magic:
@@ -493,8 +494,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks.ViewResources.Audio
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 	}
 }
@@ -507,8 +508,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks.ViewResources.Audio
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 
 		// Properties:
@@ -524,8 +525,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks.ViewResources.Graph
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 
 		// Properties:
@@ -533,7 +534,7 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks.ViewResources.Graph
 
 		// Methods:
 		DebugConvertAtlasToCanvas(
-			atlas: HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlas | null
+			atlas: HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlas
 		): void;
 	}
 }
@@ -546,8 +547,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks.ViewResources.Graph
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 	}
 }
@@ -560,8 +561,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBooks {
 	{
 		// Constructors:
 		constructor(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			filePath: string | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			filePath: string
 		);
 
 		// Properties:
@@ -587,8 +588,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBoxes {
 
 		// Constructors:
 		constructor(
-			sourcePath?: string | null /* = null */,
-			description?: string | null /* = null */
+			sourcePath?: string /* = null */,
+			description?: string /* = null */
 		);
 
 		// Properties:
@@ -606,8 +607,8 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBoxes.Implementation {
 	{
 		// Constructors:
 		constructor(
-			sourcePath?: string | null /* = null */,
-			description?: string | null /* = null */
+			sourcePath?: string /* = null */,
+			description?: string /* = null */
 		);
 
 		constructor();
@@ -622,9 +623,9 @@ declare namespace HordeClassLibrary.HordeContent.ConfigBoxes.Implementation {
 	{
 		// Constructors:
 		constructor(
-			forceUid: string | null,
-			sourcePath?: string | null /* = null */,
-			description?: string | null /* = null */
+			forceUid: string,
+			sourcePath?: string /* = null */,
+			description?: string /* = null */
 		);
 
 		// Properties:
@@ -659,15 +660,15 @@ declare namespace HordeClassLibrary.HordeContent.Configs {
 
 		// Methods:
 		Initialize(
-			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null,
-			containerData: HordeClassLibrary.HordeContent.ConfigBoxes.ConfigsContainerData | null,
-			contentPackRequirements: System.Collections.Generic.List<string> | null
+			holderContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack,
+			containerData: HordeClassLibrary.HordeContent.ConfigBoxes.ConfigsContainerData,
+			contentPackRequirements: System.Collections.Generic.List<string>
 		): void;
 
 		GetPatchVariant(): HordeClassLibrary.HordeContent.PatchSystem.ConfigPatchVariant;
 
 		Setup(
-			generalContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null
+			generalContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack
 		): void;
 
 		// Dummy constructor for some magic:
@@ -683,8 +684,8 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Army {
 	{
 		// Constructors:
 		constructor(
-			uid: string | null,
-			name: string | null
+			uid: string,
+			name: string
 		);
 
 		// Properties:
@@ -699,11 +700,11 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Army {
 		UpdateTechTree(): void;
 
 		AddUnitConfig(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): void;
 
 		RemoveUnitConfig(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): void;
 
 		FindUnitConfigByNumber(
@@ -722,15 +723,15 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Army {
 
 		// Methods:
 		GetDependentConfigs(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): System.Collections.Generic.HashSet<HordeClassLibrary.HordeContent.Configs.Units.UnitConfig>;
 
 		GetProducers(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): System.Collections.Generic.HashSet<HordeClassLibrary.HordeContent.Configs.Units.UnitConfig>;
 
 		AddConfig(
-			cfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			cfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): void;
 	}
 }
@@ -757,16 +758,16 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Bullets {
 
 		// Methods:
 		CanAttackTargetExt(
-			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): HordeClassLibrary.UnitComponents.Enumerations.CanNotAttackCause;
 
 		CanAttackTarget(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null
+			target: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		CanDiplomacyDamageUnit(
-			sourceUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			targetUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			sourceUnit: HordeClassLibrary.World.Objects.Units.Unit,
+			targetUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		CreateInstance(
@@ -774,8 +775,8 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Bullets {
 		): HordeClassLibrary.World.Objects.Bullets.BaseBullet;
 
 		static CreateConfigInstance(
-			uid: string | null,
-			name: string | null
+			uid: string,
+			name: string
 		): HordeClassLibrary.HordeContent.Configs.Bullets.BulletConfig;
 	}
 }
@@ -996,7 +997,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Citadel {
 		): HordeClassLibrary.HordeContent.Configs.Citadel.CitadelUnitConfig;
 
 		ReadFromBinArray(
-			armyBuff: number[] | null,
+			armyBuff: number[],
 			unitConfigsCount: number
 		): void;
 	}
@@ -1010,7 +1011,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Citadel {
 	{
 		// Constructors:
 		constructor(
-			army: HordeClassLibrary.HordeContent.Configs.Citadel.CitadelArmy | null,
+			army: HordeClassLibrary.HordeContent.Configs.Citadel.CitadelArmy,
 			id: number,
 			nameStringIndex: number
 		);
@@ -1095,7 +1096,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Citadel {
 
 		// Methods:
 		ReadFromOldArray(
-			cfgBuff: number[] | null
+			cfgBuff: number[]
 		): void;
 	}
 }
@@ -1114,9 +1115,9 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ConfigFactories {
 
 		// Methods:
 		CreateInstance(
-			name: string | null,
-			internalEditorDirectory: string | null,
-			containerPathProvider: System.Func_1<string, string> | System.Func | null
+			name: string,
+			internalEditorDirectory: string,
+			containerPathProvider: System.Func_1<string, string> | System.Func
 		): HordeClassLibrary.HordeContent.Configs.AConfig;
 
 		// Dummy constructor for some magic:
@@ -1249,11 +1250,11 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Rules.Instructions {
 
 		// Methods:
 		Setup(
-			generalContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null
+			generalContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack
 		): void;
 
 		MakeContextInstance(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		): HordeClassLibrary.World.Objects.Rules.ARuleContext;
 
 		// Dummy constructor for some magic:
@@ -1344,7 +1345,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.SoundEffects {
 
 		// Methods:
 		static CreateVisualEffectConfig(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.SoundEffects.SoundEffectConfig;
 	}
 }
@@ -1424,13 +1425,13 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Stuff.References {
 		IsValid(): boolean;
 
 		SetConfig(
-			config: HordeClassLibrary.HordeContent.Configs.AConfig | null
+			config: HordeClassLibrary.HordeContent.Configs.AConfig
 		): void;
 
 		GetConfig(): HordeClassLibrary.HordeContent.Configs.AConfig;
 
 		static CreateReference(
-			cfg: HordeClassLibrary.HordeContent.Configs.AConfig | null
+			cfg: HordeClassLibrary.HordeContent.Configs.AConfig
 		): HordeClassLibrary.HordeContent.Configs.Stuff.References.ConfigReferenceBase;
 
 		// Dummy constructor for some magic:
@@ -1452,7 +1453,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Stuff.References {
 
 		constructor(
 			$TConfig: typeof HordeClassLibrary.HordeContent.Configs.AConfig,
-			uid: string | null
+			uid: string
 		);
 
 		// Properties:
@@ -1473,13 +1474,13 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Stuff.References {
 
 		// Methods:
 		ResolveReferences(
-			targetObj: any | null,
-			generalContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null
+			targetObj: any,
+			generalContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack
 		): void;
 
 		RestoreReferences(
-			targetObj: any | null,
-			generalContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null
+			targetObj: any,
+			generalContentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack
 		): void;
 	}
 }
@@ -1496,13 +1497,13 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Stuff.References {
 		IsValid(): boolean;
 
 		SetResource(
-			resource: any | null
+			resource: any
 		): void;
 
 		GetResource(): any;
 
 		static CreateReference(
-			res: HordeClassLibrary.HordeContent.ViewResources.Abstract.AViewResource | null
+			res: HordeClassLibrary.HordeContent.ViewResources.Abstract.AViewResource
 		): HordeClassLibrary.HordeContent.Configs.Stuff.References.ViewResourceReferenceBase;
 
 		// Dummy constructor for some magic:
@@ -1524,7 +1525,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Stuff.References {
 
 		constructor(
 			$TViewResource: typeof HordeClassLibrary.HordeContent.ViewResources.Abstract.AViewResource,
-			uid: string | null
+			uid: string
 		);
 
 		// Properties:
@@ -1547,13 +1548,13 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Stuff.References {
 		IsValid(): boolean;
 
 		SetWorker(
-			worker: System.Delegate | null
+			worker: System.Delegate
 		): void;
 
 		GetWorker(): System.Delegate;
 
 		static CreateReference(
-			wrk: System.Delegate | null
+			wrk: System.Delegate
 		): HordeClassLibrary.HordeContent.Configs.Stuff.References.WorkerReferenceBase;
 
 		// Dummy constructor for some magic:
@@ -1575,7 +1576,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Stuff.References {
 
 		constructor(
 			$TWorker: typeof System.Delegate,
-			workerName: string | null
+			workerName: string
 		);
 
 		// Properties:
@@ -1672,12 +1673,11 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Tiles {
 
 		// Constructors:
 		constructor(
-			citadelSegmentsSequence: System.Collections.Generic.IList<HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles.CitadelSegmentData> | null
+			citadelSegmentsSequence: System.Collections.Generic.IList<HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles.CitadelSegmentData>
 		);
 
 		// Properties:
 		readonly Type: HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType;
-		readonly ChoppedType: HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType;
 		readonly Slowing: number;
 		readonly Payload: HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TilePayload;
 		readonly Sounds: HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileSound;
@@ -1691,7 +1691,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Tiles {
 
 		// Methods:
 		MaskIsEqualTo(
-			other: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig | null
+			other: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig
 		): boolean;
 	}
 }
@@ -1704,7 +1704,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs {
 	{
 		// Constructors:
 		constructor(
-			uid: string | null
+			uid: string
 		);
 
 		// Properties:
@@ -1743,17 +1743,17 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Units {
 
 		// Methods:
 		CheckLifeDistance(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
+			owner: HordeClassLibrary.World.Settlements.Settlement,
 			targetRect: HordeResurrection.Basic.Primitives.Geometry.Rect2D
 		): boolean;
 
 		CheckDistanceToCastle(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
+			owner: HordeClassLibrary.World.Settlements.Settlement,
 			targetRect: HordeResurrection.Basic.Primitives.Geometry.Rect2D
 		): boolean;
 
 		GetEntranceCellOf(
-			u: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			u: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 
 		GetEntranceCell(
@@ -1761,7 +1761,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Units {
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 
 		static InitFromCitadelCfg(
-			citadelCfg: HordeClassLibrary.HordeContent.Configs.Citadel.CitadelUnitConfig | null
+			citadelCfg: HordeClassLibrary.HordeContent.Configs.Citadel.CitadelUnitConfig
 		): HordeClassLibrary.HordeContent.Configs.Units.BuildingConfig;
 	}
 }
@@ -1872,9 +1872,6 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams 
 	{
 		// Constructors:
 		constructor();
-
-		// Properties:
-		readonly StepSize: HordeResurrection.Basic.Primitives.PreciseFraction;
 	}
 }
 //#endregion
@@ -1936,9 +1933,9 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Units {
 	{
 		// Constructors:
 		constructor(
-			uid: string | null,
-			description: string | null,
-			name: string | null
+			uid: string,
+			description: string,
+			name: string
 		);
 
 		// Properties:
@@ -2019,7 +2016,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Units {
 
 		// Methods:
 		BelongForce(
-			force: HordeClassLibrary.HordeContent.Configs.Army.Force | null
+			force: HordeClassLibrary.HordeContent.Configs.Army.Force
 		): boolean;
 
 		HasFlags(
@@ -2047,21 +2044,21 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Units {
 		): boolean;
 
 		IsEnoughResources(
-			settlementResources: HordeClassLibrary.World.Settlements.Modules.SettlementResources | null
+			settlementResources: HordeClassLibrary.World.Settlements.Modules.SettlementResources
 		): boolean;
 
 		IsDiscovered(
-			techTree: HordeClassLibrary.World.Settlements.Modules.SettlementTechTree | null
+			techTree: HordeClassLibrary.World.Settlements.Modules.SettlementTechTree
 		): boolean;
 
 		HasProductInList(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		IsProducingUnit(): boolean;
 
 		IsProducingUnit(
-			/*out*/ producerParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.UnitProducerProfessionParams | null
+			/*out*/ producerParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.UnitProducerProfessionParams
 		): boolean;
 
 		HasProfession(
@@ -2081,11 +2078,11 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Units {
 
 		AddProfession(
 			profession: HordeClassLibrary.UnitComponents.Enumerations.UnitProfession,
-			profParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.AUnitProfessionParams | null
+			profParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.AUnitProfessionParams
 		): void;
 
 		CanBePlacedByRealMap(
-			scn: HordeClassLibrary.World.ScenaComponents.Scena | null,
+			scn: HordeClassLibrary.World.ScenaComponents.Scena,
 			x: number,
 			y: number,
 			checkForTerritory?: boolean /* = false */,
@@ -2093,14 +2090,14 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Units {
 		): boolean;
 
 		CanBePlacedByRealMap(
-			scn: HordeClassLibrary.World.ScenaComponents.Scena | null,
+			scn: HordeClassLibrary.World.ScenaComponents.Scena,
 			x: number,
 			y: number,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		CanBePlacedByKnownMap(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
 			x: number,
 			y: number,
 			checkForTerritory?: boolean /* = false */,
@@ -2108,32 +2105,32 @@ declare namespace HordeClassLibrary.HordeContent.Configs.Units {
 		): boolean;
 
 		CanBePlacedByKnownMap(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
 			x: number,
 			y: number,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit
 		): boolean;
 
 		CanBeBuiltByRealMapAtExt(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
+			owner: HordeClassLibrary.World.Settlements.Settlement,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			checkDistances: boolean
 		): HordeClassLibrary.UnitComponents.Enumerations.CanNotBuildReason;
 
 		CanBeBuiltByRealMapAt(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
+			owner: HordeClassLibrary.World.Settlements.Settlement,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			checkDistances: boolean
 		): boolean;
 
 		CanBeBuiltByKnownMapAtExt(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
+			owner: HordeClassLibrary.World.Settlements.Settlement,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			checkDistances: boolean
 		): HordeClassLibrary.UnitComponents.Enumerations.CanNotBuildReason;
 
 		AddEveryTickWorker(
-			worker: HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerEveryTick | null
+			worker: HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerEveryTick
 		): void;
 
 		GetStateDelegate(
@@ -2262,6 +2259,16 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Au
 }
 //#endregion
 
+//#region ButtonSoundSections
+declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SectionEnums {
+	abstract class ButtonSoundSections extends System.Enum {
+		/** ButtonSoundSections.Click = 0 */ static readonly Click: ButtonSoundSections;
+		/** ButtonSoundSections.ClickLoud = 1 */ static readonly ClickLoud: ButtonSoundSections;
+		/** ButtonSoundSections.Hover = 2 */ static readonly Hover: ButtonSoundSections;
+	}
+}
+//#endregion
+
 //#region ChatSoundSections
 declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SectionEnums {
 	abstract class ChatSoundSections extends System.Enum {
@@ -2304,43 +2311,43 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Au
 	{
 		// Constructors:
 		constructor(
-			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams | null
+			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams
 		);
 
 		// Methods:
 		CategoriesCount(): number;
 
 		VariationsCount(
-			category: string | null
+			category: string
 		): number;
 
 		GetRandomVariation(
-			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer | null,
-			category: string | null
+			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer,
+			category: string
 		): HordeClassLibrary.HordeContent.ViewResources.Audio.SoundView;
 
 		GetSound(
-			category: string | null,
+			category: string,
 			variation: number
 		): HordeClassLibrary.HordeContent.ViewResources.Audio.SoundView;
 
 		GetSounds(
-			category: string | null
+			category: string
 		): System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.ViewResources.Audio.SoundView>;
 
 		GetRandom(
-			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer | null
+			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer
 		): HordeClassLibrary.HordeContent.ViewResources.Audio.SoundView;
 
 		GetFirst(): HordeClassLibrary.HordeContent.ViewResources.Audio.SoundView;
 
 		AddItem(
-			category: string | null,
-			sound: HordeClassLibrary.HordeContent.ViewResources.Audio.SoundView | null
+			category: string,
+			sound: HordeClassLibrary.HordeContent.ViewResources.Audio.SoundView
 		): void;
 
 		RemoveItem(
-			sound: HordeClassLibrary.HordeContent.ViewResources.Audio.SoundView | null
+			sound: HordeClassLibrary.HordeContent.ViewResources.Audio.SoundView
 		): void;
 	}
 }
@@ -2389,21 +2396,21 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 	{
 		// Constructors:
 		constructor(
-			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams | null
+			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams
 		);
 
 		// Methods:
 		GetAnimation(
-			resolution: string | null
+			resolution: string
 		): HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView;
 
 		AddItem(
-			resolution: string | null,
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			resolution: string,
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 
 		RemoveItem(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 	}
 }
@@ -2416,7 +2423,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 	{
 		// Constructors:
 		constructor(
-			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams | null
+			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams
 		);
 
 		// Methods:
@@ -2427,7 +2434,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 		): number;
 
 		GetRandomVariation(
-			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer | null,
+			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer,
 			direction: number
 		): HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView;
 
@@ -2438,11 +2445,11 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 
 		AddItem(
 			direction: number,
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 
 		RemoveItem(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 	}
 }
@@ -2466,7 +2473,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 	{
 		// Constructors:
 		constructor(
-			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams | null
+			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams
 		);
 
 		// Methods:
@@ -2476,11 +2483,11 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 
 		AddItem(
 			state: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.Specialization.ButtonAnimationState,
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 
 		RemoveItem(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 	}
 }
@@ -2493,7 +2500,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 	{
 		// Constructors:
 		constructor(
-			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams | null
+			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams
 		);
 
 		// Methods:
@@ -2510,7 +2517,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 		): boolean;
 
 		GetRandomVariation(
-			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer | null,
+			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer,
 			deathType: HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType,
 			direction: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection
 		): HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView;
@@ -2524,11 +2531,11 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 		AddItem(
 			deathType: HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType,
 			direction: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection,
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 
 		RemoveItem(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 	}
 }
@@ -2541,7 +2548,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 	{
 		// Constructors:
 		constructor(
-			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams | null
+			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams
 		);
 
 		// Methods:
@@ -2552,11 +2559,11 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 		): HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView;
 
 		AddItem(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 
 		RemoveItem(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 	}
 }
@@ -2569,14 +2576,14 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 	{
 		// Constructors:
 		constructor(
-			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams | null
+			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams
 		);
 
 		// Methods:
 		VariationsCount(): number;
 
 		GetRandomVariation(
-			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer | null
+			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer
 		): HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView;
 
 		GetAnimation(
@@ -2584,11 +2591,11 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 		): HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView;
 
 		AddItem(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 
 		RemoveItem(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 	}
 }
@@ -2622,12 +2629,12 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 	{
 		// Constructors:
 		constructor(
-			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams | null
+			creationParams: HordeClassLibrary.HordeContent.Configs.ConfigFactories.ConfigCreationParams
 		);
 
 		// Methods:
 		AddItemsToCatalog(
-			catalogItems: System.Collections.Generic.Dictionary<HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.Specialization.UnitAnimationCatalogKeyProvider, HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView> | null
+			catalogItems: System.Collections.Generic.Dictionary<HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.Specialization.UnitAnimationCatalogKeyProvider, HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView>
 		): void;
 
 		StagesCount(
@@ -2636,7 +2643,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 		): number;
 
 		StagesCount(
-			state: string | null,
+			state: string,
 			direction: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection
 		): number;
 
@@ -2647,7 +2654,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 		): number;
 
 		VariationsCount(
-			state: string | null,
+			state: string,
 			direction: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection,
 			stage: number
 		): number;
@@ -2659,21 +2666,21 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 		): boolean;
 
 		IsAnimationExist(
-			state: string | null,
+			state: string,
 			direction: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection,
 			stage: number
 		): boolean;
 
 		GetRandomVariation(
-			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer | null,
+			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer,
 			state: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimState,
 			direction: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection,
 			stage: number
 		): HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView;
 
 		GetRandomVariation(
-			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer | null,
-			state: string | null,
+			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer,
+			state: string,
 			direction: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection,
 			stage: number
 		): HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView;
@@ -2686,7 +2693,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 		): HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView;
 
 		GetAnimation(
-			state: string | null,
+			state: string,
 			direction: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection,
 			stage: number,
 			variation: number
@@ -2696,28 +2703,28 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Gr
 			state: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimState,
 			direction: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection,
 			stage: number,
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 
 		AddItem(
-			state: string | null,
+			state: string,
 			direction: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection,
 			stage: number,
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 
 		RemoveItem(
 			state: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimState,
 			direction: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection,
 			stage: number,
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 
 		RemoveItem(
-			state: string | null,
+			state: string,
 			direction: HordeClassLibrary.UnitComponents.Enumerations.UnitAnimDirection,
 			stage: number,
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 	}
 }
@@ -2780,8 +2787,8 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Audio
 	{
 		// Constructors:
 		constructor(
-			uid: string | null,
-			description: string | null
+			uid: string,
+			description: string
 		);
 
 		// Properties:
@@ -2818,8 +2825,8 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graph
 
 		// Constructors:
 		constructor(
-			items: System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlasItem> | null,
-			sourcePath: string | null
+			items: System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlasItem>,
+			sourcePath: string
 		);
 
 		// Properties:
@@ -2828,11 +2835,11 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graph
 
 		// Methods:
 		AddItem(
-			itemData: HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlasItem | null
+			itemData: HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlasItem
 		): void;
 
 		AddItemsRange(
-			itemsDataRange: System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlasItem> | null
+			itemsDataRange: System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlasItem>
 		): void;
 
 		Clear(): void;
@@ -2847,13 +2854,13 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graph
 	{
 		// Constructors:
 		constructor(
-			uid: string | null,
-			description: string | null,
+			uid: string,
+			description: string,
 			location: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			frameSize: HordeResurrection.Basic.Primitives.Geometry.Size2D,
 			framesCount: number,
-			maskColors: HordeResurrection.Basic.Primitives.HordeColor[] | null,
-			script: HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.AnimatorScript | null
+			maskColors: HordeResurrection.Basic.Primitives.HordeColor[],
+			script: HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.AnimatorScript
 		);
 
 		// Properties:
@@ -2868,7 +2875,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graph
 
 		// Methods:
 		SetupParent(
-			atlas: HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlas | null
+			atlas: HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlas
 		): void;
 	}
 }
@@ -2901,7 +2908,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.VisualEffects.SpecialPa
 	{
 		// Constructors:
 		constructor(
-			animationsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.Specialization.BulletAnimationsCatalog | null
+			animationsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.Specialization.BulletAnimationsCatalog
 		);
 
 		// Properties:
@@ -2917,7 +2924,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.VisualEffects.SpecialPa
 	{
 		// Constructors:
 		constructor(
-			animationsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.Specialization.SimpleAnimationsCatalog | null,
+			animationsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.Specialization.SimpleAnimationsCatalog,
 			maxDispersionDistance: number,
 			movingSpeed: HordeResurrection.Basic.Primitives.PreciseFraction
 		);
@@ -2936,7 +2943,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.VisualEffects.SpecialPa
 	{
 		// Constructors:
 		constructor(
-			animationsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.Specialization.SimpleAnimationsCatalog | null
+			animationsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.Specialization.SimpleAnimationsCatalog
 		);
 
 		// Properties:
@@ -2952,7 +2959,7 @@ declare namespace HordeClassLibrary.HordeContent.Configs.VisualEffects.SpecialPa
 	{
 		// Constructors:
 		constructor(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null,
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView,
 			timeToShow: number
 		);
 
@@ -2981,13 +2988,13 @@ declare namespace HordeClassLibrary.HordeContent.Configs.VisualEffects {
 
 		// Methods:
 		CreateInstance(
-			context: HordeClassLibrary.World.Context.BattleContext | null,
+			context: HordeClassLibrary.World.Context.BattleContext,
 			center: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): HordeClassLibrary.World.Objects.VisualEffects.AnimBasedVisualEffect;
 
 		CreateInstance(
-			context: HordeClassLibrary.World.Context.BattleContext | null,
-			creationParams: HordeClassLibrary.World.Objects.VisualEffects.CreationParameters.AnimBasedVisualEffectCreationParams | null
+			context: HordeClassLibrary.World.Context.BattleContext,
+			creationParams: HordeClassLibrary.World.Objects.VisualEffects.CreationParameters.AnimBasedVisualEffectCreationParams
 		): HordeClassLibrary.World.Objects.VisualEffects.AnimBasedVisualEffect;
 
 		static CreateVisualEffectConfig(): HordeClassLibrary.HordeContent.Configs.VisualEffects.VisualEffectConfig;
@@ -3006,11 +3013,11 @@ declare namespace HordeClassLibrary.HordeContent.ContentPacks {
 
 		// Methods:
 		IsMergedWith(
-			contentPackUid: string | null
+			contentPackUid: string
 		): boolean;
 
 		MergeWith(
-			contentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack | null
+			contentPack: HordeClassLibrary.HordeContent.ContentPacks.ContentPack
 		): void;
 
 		FinalSetup(): void;
@@ -3071,9 +3078,9 @@ declare namespace HordeClassLibrary.HordeContent.ContentPacks {
 		static MakeCoreContentPackInfo(): HordeClassLibrary.HordeContent.ContentPacks.ContentPackInfo;
 
 		static TryMakeContentPackInfo(
-			rootDir: string | null,
-			contentPackDir: string | null,
-			/*out*/ contentPackInfo: HordeClassLibrary.HordeContent.ContentPacks.ContentPackInfo | null
+			rootDir: string,
+			contentPackDir: string,
+			/*out*/ contentPackInfo: HordeClassLibrary.HordeContent.ContentPacks.ContentPackInfo
 		): boolean;
 	}
 }
@@ -3113,11 +3120,11 @@ declare namespace HordeClassLibrary.HordeContent.ContentPacks.Stamp {
 
 		// Methods:
 		UpdateHashByFile(
-			filePath: string | null
+			filePath: string
 		): void;
 
 		UpdateHashByString(
-			str: string | null
+			str: string
 		): void;
 
 		FinalizeHash(): void;
@@ -3131,9 +3138,9 @@ declare namespace HordeClassLibrary.HordeContent.ContentPacks.Stamp {
 
 		// Constructors:
 		constructor(
-			uid: string | null,
-			hash: string | null,
-			version: string | null
+			uid: string,
+			hash: string,
+			version: string
 		);
 
 		// Properties:
@@ -3150,8 +3157,8 @@ declare namespace HordeClassLibrary.HordeContent.ContentPacks.Stamp {
 
 		// Constructors:
 		constructor(
-			generalHash: string | null,
-			stamps: System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp> | null
+			generalHash: string,
+			stamps: System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp>
 		);
 
 		// Properties:
@@ -3160,16 +3167,16 @@ declare namespace HordeClassLibrary.HordeContent.ContentPacks.Stamp {
 
 		// Methods:
 		Contains(
-			uid: string | null
+			uid: string
 		): boolean;
 
 		TryGetByUid(
-			uid: string | null,
-			/*out*/ stamp: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp | null
+			uid: string,
+			/*out*/ stamp: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp
 		): boolean;
 
 		CompareTo(
-			otherStamps: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStampsCollection | null
+			otherStamps: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStampsCollection
 		): HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStampsCollectionDiff;
 	}
 }
@@ -3180,30 +3187,34 @@ declare namespace HordeClassLibrary.HordeContent.ContentPacks.Stamp {
 	class ContentStampsCollectionDiff extends System.Object {
 
 		// Fields:
-		static readonly NoDiff: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStampsCollectionDiff;
 		static readonly NullRef: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStampsCollectionDiff;
 
 		// Properties:
 		readonly MissingStamps: System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp>;
 		readonly DifferentStamps: System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp>;
 		readonly ExcessStamps: System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp>;
+		readonly CorrectStamps: System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp>;
 		readonly Differences: number;
 		readonly HasChanges: boolean;
 
 		// Methods:
 		AddMissingStamp(
-			stamp: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp | null
+			stamp: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp
 		): void;
 
 		AddDifferentStamp(
-			stamp: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp | null
+			stamp: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp
 		): void;
 
 		AddExcessStamp(
-			stamp: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp | null
+			stamp: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp
 		): void;
 
-		ComposeDiffString(): string;
+		AddCorrectStamp(
+			stamp: HordeClassLibrary.HordeContent.ContentPacks.Stamp.ContentStamp
+		): void;
+
+		EnsureNotReserved(): void;
 	}
 }
 //#endregion
@@ -3220,11 +3231,11 @@ declare namespace HordeClassLibrary.HordeContent {
 		static Initialize(): void;
 
 		static GetWorker(
-			workerName: string | null
+			workerName: string
 		): HordeClassLibrary.World.Objects.VisualEffects.Factories.AVisualEffectFactory;
 
 		static GetWorkerFunc(
-			workerName: string | null
+			workerName: string
 		): HordeClassLibrary.World.Objects.VisualEffects.Factories.AVisualEffectFactory.CreateInstanceDelegate;
 
 		static GetAllWorkers(): System.Collections.Generic.IEnumerable<HordeClassLibrary.World.Objects.VisualEffects.Factories.AVisualEffectFactory>;
@@ -3253,7 +3264,7 @@ declare namespace HordeClassLibrary.HordeContent {
 		static Initialize(): void;
 
 		static CreateWorker(
-			workerName: string | null
+			workerName: string
 		): HordeClassLibrary.UnitComponents.Workers.Interfaces.AUnitWorker;
 
 		// Dummy constructor for some magic:
@@ -3309,7 +3320,7 @@ declare namespace HordeClassLibrary.HordeContent.ViewResources.Audio {
 		// Constructors:
 		constructor(
 			Category: HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Audio.SoundCategory,
-			SubCategory: string | null
+			SubCategory: string
 		);
 
 		// Properties:
@@ -3340,13 +3351,13 @@ declare namespace HordeClassLibrary.HordeContent.ViewResources.Graphics {
 	{
 		// Constructors:
 		constructor(
-			animationAtlasItem: HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlasItem | null
+			animationAtlasItem: HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlasItem
 		);
 
 		// Properties:
 		readonly FramesCount: number;
 		readonly Script: HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.AnimatorScript;
-		readonly SourceAtlasItem: HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlasItem;
+		readonly SourceAtlasImagePath: string;
 	}
 }
 //#endregion
@@ -3372,7 +3383,7 @@ declare namespace HordeClassLibrary.HordeContent.ViewResources.Graphics.External
 
 		// Methods:
 		SetImagePixelMask(
-			imageMask: HordeClassLibrary.HordeContent.ViewResources.Graphics.ImageMaskPixel[] | null
+			imageMask: HordeClassLibrary.HordeContent.ViewResources.Graphics.ImageMaskPixel[]
 		): void;
 	}
 }
@@ -3408,12 +3419,12 @@ declare namespace HordeClassLibrary.HordeContent.ViewResources.Graphics.Internal
 
 		// Constructors:
 		constructor(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null,
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView,
 			looped: boolean
 		);
 
 		constructor(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		);
 
 		// Properties:
@@ -3425,12 +3436,12 @@ declare namespace HordeClassLibrary.HordeContent.ViewResources.Graphics.Internal
 		GetCurrentRenderData(): HordeClassLibrary.HordeContent.ViewResources.Graphics.RenderData;
 
 		Reinit(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 
 		static ReinitOrCreateNew(
-			current: HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.Animator | null,
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			current: HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.Animator,
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.Animator;
 
 		SetFrame(
@@ -3471,7 +3482,7 @@ declare namespace HordeClassLibrary.HordeContent.ViewResources.Graphics.Internal
 
 		// Constructors:
 		constructor(
-			defaultBlock: HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.AnimatorScriptBlock | null
+			defaultBlock: HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.AnimatorScriptBlock
 		);
 
 		// Properties:
@@ -3510,7 +3521,7 @@ declare namespace HordeClassLibrary.HordeContent.ViewResources.Graphics.Internal
 
 		AddTask(
 			task: HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.Tasks.AnimatorScriptTasks,
-			parameters: HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.Tasks.Parameters.AnimatorScriptTaskParametersBase | null
+			parameters: HordeClassLibrary.HordeContent.ViewResources.Graphics.InternalLogic.Tasks.Parameters.AnimatorScriptTaskParametersBase
 		): void;
 
 		RemoveTask(
@@ -3621,7 +3632,7 @@ declare namespace HordeClassLibrary.HordeContent.ViewResources.Graphics.Internal
 	{
 		// Constructors:
 		constructor(
-			flagLocations: System.Collections.Generic.List<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			flagLocations: System.Collections.Generic.List<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		);
 
 		// Properties:
@@ -3650,7 +3661,7 @@ declare namespace HordeClassLibrary.HordeContent.ViewResources.Graphics.Internal
 	{
 		// Constructors:
 		constructor(
-			smokeLocations: System.Collections.Generic.List<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			smokeLocations: System.Collections.Generic.List<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		);
 
 		// Properties:
@@ -3768,13 +3779,13 @@ declare namespace HordeClassLibrary.Miscellaneous {
 			y0: number,
 			x1: number,
 			y1: number,
-			plot: HordeClassLibrary.Miscellaneous.Bresenhams.PlotFunction | null
+			plot: HordeClassLibrary.Miscellaneous.Bresenhams.PlotFunction
 		): void;
 
 		static Line(
 			p1: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			p2: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			plot: HordeClassLibrary.Miscellaneous.Bresenhams.PlotFunction | null
+			plot: HordeClassLibrary.Miscellaneous.Bresenhams.PlotFunction
 		): void;
 
 		static old_Line(
@@ -3782,7 +3793,7 @@ declare namespace HordeClassLibrary.Miscellaneous {
 			y0: number,
 			x1: number,
 			y1: number,
-			plot: HordeClassLibrary.Miscellaneous.Bresenhams.PlotFunction | null
+			plot: HordeClassLibrary.Miscellaneous.Bresenhams.PlotFunction
 		): void;
 
 		// Dummy constructor for some magic:
@@ -3817,7 +3828,7 @@ declare namespace HordeClassLibrary.Miscellaneous {
 			sizeX: number,
 			sizeY: number,
 			continuous: boolean,
-			plot: HordeClassLibrary.Miscellaneous.BresenhamsAdvanced.PlotFunction | null
+			plot: HordeClassLibrary.Miscellaneous.BresenhamsAdvanced.PlotFunction
 		): void;
 
 		static Line(
@@ -3825,7 +3836,7 @@ declare namespace HordeClassLibrary.Miscellaneous {
 			p2: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			size: HordeResurrection.Basic.Primitives.Geometry.Size2D,
 			continuous: boolean,
-			plot: HordeClassLibrary.Miscellaneous.BresenhamsAdvanced.PlotFunction | null
+			plot: HordeClassLibrary.Miscellaneous.BresenhamsAdvanced.PlotFunction
 		): void;
 
 		static old_Line(
@@ -3833,7 +3844,7 @@ declare namespace HordeClassLibrary.Miscellaneous {
 			y0: number,
 			x1: number,
 			y1: number,
-			plot: HordeClassLibrary.Miscellaneous.BresenhamsAdvanced.PlotFunction | null
+			plot: HordeClassLibrary.Miscellaneous.BresenhamsAdvanced.PlotFunction
 		): void;
 
 		// Dummy constructor for some magic:
@@ -3922,15 +3933,15 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Graphics {
 
 		// Methods:
 		Read(
-			instr: System.IO.Stream | null
+			instr: System.IO.Stream
 		): void;
 
 		Write(
-			outstr: System.IO.Stream | null
+			outstr: System.IO.Stream
 		): void;
 
 		WriteInfo(
-			strBuilder: System.Text.StringBuilder | null
+			strBuilder: System.Text.StringBuilder
 		): void;
 	}
 }
@@ -3942,11 +3953,11 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Other {
 
 		// Constructors:
 		constructor(
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		);
 
 		constructor(
-			buff: number[] | null
+			buff: number[]
 		);
 
 		// Fields:
@@ -3960,7 +3971,7 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Other {
 
 		// Methods:
 		FromBuff(
-			buff: number[] | null
+			buff: number[]
 		): void;
 	}
 }
@@ -3973,7 +3984,7 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena {
 		// Constructors:
 		constructor(
 			readMode: HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.CitadelScenaReadMode,
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		);
 
 		constructor();
@@ -4002,7 +4013,7 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena {
 		// Methods:
 		ReadData(
 			readMode: HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.CitadelScenaReadMode,
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		): void;
 	}
 }
@@ -4016,7 +4027,7 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena {
 		constructor(
 			index: number,
 			skipUnits: boolean,
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		);
 
 		// Fields:
@@ -4055,7 +4066,7 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena {
 
 		// Methods:
 		ReadUnits(
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		): void;
 	}
 }
@@ -4084,7 +4095,7 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.Heade
 
 		// Constructors:
 		constructor(
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		);
 
 		// Fields:
@@ -4122,8 +4133,8 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.Heade
 	{
 		// Constructors:
 		constructor(
-			binaryReader: System.IO.BinaryReader | null,
-			itemInfo: HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.Headers.CitadelScenaSectionInfo | null
+			binaryReader: System.IO.BinaryReader,
+			itemInfo: HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.Headers.CitadelScenaSectionInfo
 		);
 
 		// Fields:
@@ -4146,8 +4157,8 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.Heade
 	{
 		// Constructors:
 		constructor(
-			binaryReader: System.IO.BinaryReader | null,
-			itemInfo: HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.Headers.CitadelScenaSectionInfo | null
+			binaryReader: System.IO.BinaryReader,
+			itemInfo: HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.Headers.CitadelScenaSectionInfo
 		);
 
 		// Fields:
@@ -4167,7 +4178,7 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.Heade
 
 		// Constructors:
 		constructor(
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		);
 
 		// Fields:
@@ -4187,8 +4198,8 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles {
 
 		// Constructors:
 		constructor(
-			sequenceContext: HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles.CitadelSegmentsDataSequenceContext | null,
-			binaryReader: System.IO.BinaryReader | null
+			sequenceContext: HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles.CitadelSegmentsDataSequenceContext,
+			binaryReader: System.IO.BinaryReader
 		);
 
 		// Fields:
@@ -4212,17 +4223,16 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles {
 		readonly IndexInSequence: number;
 		readonly IsLastInSequence: boolean;
 		readonly IsFrozen: boolean;
-		readonly ChoppedType: HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles.CitadelSegmentType;
 		MinimapHordeColor: HordeResurrection.Basic.Primitives.HordeColor;
 		ImagePixels: HordeResurrection.Basic.Primitives.HordeColor[];
 
 		// Methods:
 		ReadMinimapColor(
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		): void;
 
 		ReadImageData(
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		): void;
 
 		ComposeBasicInfoArray(): number[];
@@ -4328,7 +4338,7 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles {
 
 		// Methods:
 		ProcessCurrentSegmentData(
-			segmentData: HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles.CitadelSegmentData | null
+			segmentData: HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles.CitadelSegmentData
 		): void;
 
 		PostProcessChecks(): void;
@@ -4350,15 +4360,15 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles {
 		// Methods:
 		ReadSegmentsData(
 			segmentsDataCount: number,
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		): void;
 
 		ReadMinimapColors(
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		): void;
 
 		ReadImagesData(
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		): void;
 
 		GetSequences(): System.Collections.Generic.IEnumerable<System.Collections.Generic.List<HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles.CitadelSegmentData>>;
@@ -4374,7 +4384,7 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Units {
 
 		// Constructors:
 		constructor(
-			binaryReader: System.IO.BinaryReader | null,
+			binaryReader: System.IO.BinaryReader,
 			maxSize: number
 		);
 
@@ -4460,7 +4470,7 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.Extra
 
 		// Constructors:
 		constructor(
-			binaryReader: System.IO.BinaryReader | null,
+			binaryReader: System.IO.BinaryReader,
 			size: number,
 			armyId: HordeClassLibrary.Miscellaneous.Citadel.Enumerations.CitadelArmyType,
 			unitId: number
@@ -4474,8 +4484,8 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.Extra
 
 		// Methods:
 		GetValue(
-			structName: string | null,
-			fieldName: string | null
+			structName: string,
+			fieldName: string
 		): number;
 	}
 }
@@ -4487,14 +4497,14 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.Extra
 
 		// Constructors:
 		constructor(
-			name: string | null,
-			fields: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.ExtraData.CitadelUnitExtraDataFieldDescriptor[] | null
+			name: string,
+			fields: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.ExtraData.CitadelUnitExtraDataFieldDescriptor[]
 		);
 
 		constructor(
-			name: string | null,
-			parent: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.ExtraData.CitadelUnitExtraDataDescriptor | null,
-			newFields: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.ExtraData.CitadelUnitExtraDataFieldDescriptor[] | null
+			name: string,
+			parent: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.ExtraData.CitadelUnitExtraDataDescriptor,
+			newFields: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.ExtraData.CitadelUnitExtraDataFieldDescriptor[]
 		);
 
 		// Properties:
@@ -4506,20 +4516,20 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.Extra
 
 		// Methods:
 		Derive(
-			name: string | null,
-			newFields: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.ExtraData.CitadelUnitExtraDataFieldDescriptor[] | null
+			name: string,
+			newFields: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.ExtraData.CitadelUnitExtraDataFieldDescriptor[]
 		): HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.ExtraData.CitadelUnitExtraDataDescriptor;
 
 		DerivesFrom(
-			parentName: string | null
+			parentName: string
 		): boolean;
 
 		DerivesOrEqual(
-			structName: string | null
+			structName: string
 		): boolean;
 
 		ReadData(
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		): number[];
 	}
 }
@@ -4531,7 +4541,7 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.Extra
 
 		// Constructors:
 		constructor(
-			name: string | null,
+			name: string,
 			size: number
 		);
 
@@ -4541,7 +4551,7 @@ declare namespace HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.Extra
 
 		// Methods:
 		ReadData(
-			binaryReader: System.IO.BinaryReader | null
+			binaryReader: System.IO.BinaryReader
 		): number;
 	}
 }
@@ -4556,6 +4566,38 @@ declare namespace HordeClassLibrary.Miscellaneous {
 		/** ConfiguratorAction.CommandsSetter = 3 */ static readonly CommandsSetter: ConfiguratorAction;
 		/** ConfiguratorAction.UnitsList = 4 */ static readonly UnitsList: ConfiguratorAction;
 	}
+}
+//#endregion
+
+//#region FileDescriptor
+declare namespace HordeClassLibrary.Miscellaneous.FileTree {
+	class FileDescriptor extends System.Object
+		implements HordeClassLibrary.Miscellaneous.FileTree.IFileDescriptor
+	{
+		// Constructors:
+		constructor(
+			filePath: string
+		);
+
+		// Properties:
+		readonly Path: string;
+		readonly Name: string;
+		readonly Size: number;
+	}
+}
+//#endregion
+
+//#region IFileDescriptor
+declare namespace HordeClassLibrary.Miscellaneous.FileTree {
+	interface IFileDescriptor {
+
+		// Properties:
+		readonly Path: string;
+		readonly Name: string;
+		readonly Size: number;
+	}
+	/** TypeScript type stub for .Net interface */
+	abstract class IFileDescriptor {}
 }
 //#endregion
 
@@ -4586,11 +4628,11 @@ declare namespace HordeClassLibrary.PathFinders.AStarMini.AStarMiniPathFinder {
 
 		// Methods:
 		Get(
-			context: HordeClassLibrary.PathFinders.PathFinderContext | null,
+			context: HordeClassLibrary.PathFinders.PathFinderContext,
 			searchRadius: number,
 			start: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null,
-			options: HordeClassLibrary.PathFinders.AStar.AStarOptions | null
+			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>,
+			options: HordeClassLibrary.PathFinders.AStar.AStarOptions
 		): HordeResurrection.Basic.Pool.PoolSlot<HordeClassLibrary.PathFinders.AStarMini.AStarMiniPathFinder>;
 
 		Get(): HordeResurrection.Basic.Pool.PoolSlot<HordeClassLibrary.PathFinders.AStarMini.AStarMiniPathFinder>;
@@ -4639,11 +4681,11 @@ declare namespace HordeClassLibrary.PathFinders.AStar.AStarPathFinder {
 
 		// Methods:
 		Get(
-			context: HordeClassLibrary.PathFinders.PathFinderContext | null,
+			context: HordeClassLibrary.PathFinders.PathFinderContext,
 			mapSize: HordeResurrection.Basic.Primitives.Geometry.Size2D,
 			start: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null,
-			brWorld: number[] | null
+			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>,
+			brWorld: number[]
 		): HordeResurrection.Basic.Pool.PoolSlot<HordeClassLibrary.PathFinders.AStar.AStarPathFinder>;
 
 		Get(): HordeResurrection.Basic.Pool.PoolSlot<HordeClassLibrary.PathFinders.AStar.AStarPathFinder>;
@@ -4669,7 +4711,7 @@ declare namespace HordeClassLibrary.PathFinders {
 
 		Reinitialize(
 			start: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		): void;
 
 		ReturnToPool(): void;
@@ -4703,10 +4745,10 @@ declare namespace HordeClassLibrary.PathFinders.ContourPathFinder {
 	{
 		// Constructors:
 		constructor(
-			context: HordeClassLibrary.PathFinders.PathFinderContext | null,
+			context: HordeClassLibrary.PathFinders.PathFinderContext,
 			start: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null,
-			options?: HordeClassLibrary.PathFinders.ContourPathFinder.CpfOptions | null /* = null */
+			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>,
+			options?: HordeClassLibrary.PathFinders.ContourPathFinder.CpfOptions /* = null */
 		);
 
 		// Properties:
@@ -4774,14 +4816,14 @@ declare namespace HordeClassLibrary.PathFinders {
 
 		// Methods:
 		static BasicFill(
-			array: boolean[][] | null,
+			array: boolean[][],
 			x: number,
 			y: number
 		): void;
 
 		static ScanlineFill(
-			isBorder: HordeClassLibrary.PathFinders.IsBorderDelegateOld | null,
-			markCell: HordeClassLibrary.PathFinders.MarkCellDelegate | null,
+			isBorder: HordeClassLibrary.PathFinders.IsBorderDelegateOld,
+			markCell: HordeClassLibrary.PathFinders.MarkCellDelegate,
 			width: number,
 			height: number,
 			x: number,
@@ -4790,8 +4832,8 @@ declare namespace HordeClassLibrary.PathFinders {
 		): void;
 
 		static ScanlineFTFill(
-			isBorder: HordeClassLibrary.PathFinders.IsBorderDelegateOld | null,
-			markCell: HordeClassLibrary.PathFinders.MarkCellDelegate | null,
+			isBorder: HordeClassLibrary.PathFinders.IsBorderDelegateOld,
+			markCell: HordeClassLibrary.PathFinders.MarkCellDelegate,
 			width: number,
 			height: number,
 			x: number,
@@ -4799,8 +4841,8 @@ declare namespace HordeClassLibrary.PathFinders {
 		): void;
 
 		static MilazzoFill(
-			isBorder: HordeClassLibrary.PathFinders.IsBorderDelegateOld | null,
-			markCell: HordeClassLibrary.PathFinders.MarkCellDelegate | null,
+			isBorder: HordeClassLibrary.PathFinders.IsBorderDelegateOld,
+			markCell: HordeClassLibrary.PathFinders.MarkCellDelegate,
 			width: number,
 			height: number,
 			x: number,
@@ -4821,11 +4863,11 @@ declare namespace HordeClassLibrary.PathFinders {
 		constructor();
 
 		constructor(
-			path: System.Collections.Generic.LinkedList<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			path: System.Collections.Generic.LinkedList<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		);
 
 		constructor(
-			other: HordeClassLibrary.PathFinders.Path2D | null
+			other: HordeClassLibrary.PathFinders.Path2D
 		);
 
 		// Properties:
@@ -4862,15 +4904,15 @@ declare namespace HordeClassLibrary.PathFinders {
 		RemoveLast(): void;
 
 		Append(
-			other: HordeClassLibrary.PathFinders.Path2D | null
+			other: HordeClassLibrary.PathFinders.Path2D
 		): void;
 
 		AppendStart(
-			other: HordeClassLibrary.PathFinders.Path2D | null
+			other: HordeClassLibrary.PathFinders.Path2D
 		): void;
 
 		CheckPathPassability(
-			isBorder: HordeClassLibrary.PathFinders.IsBorderDelegate | null
+			isBorder: HordeClassLibrary.PathFinders.IsBorderDelegate
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 
 		RemoveExcessPoints(): void;
@@ -4884,14 +4926,14 @@ declare namespace HordeClassLibrary.PathFinders {
 
 		// Constructors:
 		constructor(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			lastWaitingPoints?: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null /* = null */
+			unit: HordeClassLibrary.World.Objects.Units.Unit,
+			lastWaitingPoints?: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> /* = null */
 		);
 
 		constructor(
-			speedAtCellByKnownMap: HordeClassLibrary.PathFinders.SpeedAtCellByKnownMapDelegate | null,
-			speedAtCellByRealMap: HordeClassLibrary.PathFinders.SpeedAtCellByRealMapDelegate | null,
-			lastWaitingPoints?: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null /* = null */
+			speedAtCellByKnownMap: HordeClassLibrary.PathFinders.SpeedAtCellByKnownMapDelegate,
+			speedAtCellByRealMap: HordeClassLibrary.PathFinders.SpeedAtCellByRealMapDelegate,
+			lastWaitingPoints?: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> /* = null */
 		);
 
 		// Properties:
@@ -4913,7 +4955,7 @@ declare namespace HordeClassLibrary.PathFinders {
 
 		// Constructors:
 		constructor(
-			name: string | null
+			name: string
 		);
 
 		// Properties:
@@ -4954,7 +4996,7 @@ declare namespace HordeClassLibrary.PathFinders {
 	interface /* delegate */ SpeedAtCellByKnownMapDelegate {
 		(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit
 		): number;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -4967,7 +5009,7 @@ declare namespace HordeClassLibrary.PathFinders {
 	interface /* delegate */ SpeedAtCellByRealMapDelegate {
 		(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): number;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -5007,7 +5049,7 @@ declare namespace HordeClassLibrary.PathFinders {
 	{
 		// Constructors:
 		constructor(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			unit: HordeClassLibrary.World.Objects.Units.Unit,
 			first: boolean
 		);
 
@@ -5038,8 +5080,8 @@ declare namespace HordeClassLibrary.Scripting.Misc {
 
 		// Methods:
 		Register(
-			workerName: string | null,
-			workerFunc: Microsoft.ClearScript.ScriptObject | null
+			workerName: string,
+			workerFunc: Microsoft.ClearScript.ScriptObject
 		): void;
 
 		Clear(): void;
@@ -5056,123 +5098,123 @@ declare namespace HordeClassLibrary.Scripting.ScriptApi {
 
 		// Methods:
 		static GetForce(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.Army.Force;
 
 		static GetUnitConfig(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
 
 		static GetUnitCommand(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.UnitCommandConfig;
 
 		static GetBulletConfig(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.Bullets.BulletConfig;
 
 		static GetVisualEffectConfig(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.VisualEffects.VisualEffectConfig;
 
 		static GetSoundEffectConfig(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.SoundEffects.SoundEffectConfig;
 
 		static GetFont(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.Fonts.FontConfig;
 
 		static GetString(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.StringConfig;
 
 		static GetAnimationCatalog(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.BaseAnimationsCatalog;
 
 		static GetAnimationAtlas(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.ViewResourceInfos.Graphics.AnimationAtlasItem;
 
 		static GetSoundsCatalog(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SoundsCatalog;
 
 		static GetGuiParams(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.Interface.GuiParams;
 
 		static GetRuleConfig(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.Rules.RuleConfig;
 
 		static GetMindCharacter(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.HordeContent.Configs.MasterMind.MindCharacterConfig;
 
 		static GetConfig(
-			cfgUid: string | null,
-			configTypeName: string | null
+			cfgUid: string,
+			configTypeName: string
 		): HordeClassLibrary.HordeContent.Configs.AConfig;
 
 		static HasUnitConfig(
-			uid: string | null
+			uid: string
 		): boolean;
 
 		static HasUnitCommand(
-			uid: string | null
+			uid: string
 		): boolean;
 
 		static HasBulletConfig(
-			uid: string | null
+			uid: string
 		): boolean;
 
 		static HasVisualEffectConfig(
-			uid: string | null
+			uid: string
 		): boolean;
 
 		static HasSoundEffectConfig(
-			uid: string | null
+			uid: string
 		): boolean;
 
 		static HasAnimation(
-			uid: string | null
+			uid: string
 		): boolean;
 
 		static HasSoundsCatalog(
-			uid: string | null
+			uid: string
 		): boolean;
 
 		static HasRuleConfig(
-			uid: string | null
+			uid: string
 		): boolean;
 
 		static HasMindCharacter(
-			uid: string | null
+			uid: string
 		): boolean;
 
 		static HasConfig(
-			cfgUid: string | null,
-			configTypeName: string | null
+			cfgUid: string,
+			configTypeName: string
 		): boolean;
 
 		static CloneConfig(
-			cfg: HordeClassLibrary.HordeContent.Configs.AConfig | null,
-			cloneUid?: string | null /* = null */
+			cfg: HordeClassLibrary.HordeContent.Configs.AConfig,
+			cloneUid?: string /* = null */
 		): HordeClassLibrary.HordeContent.Configs.AConfig;
 
 		static AddConfig(
-			cfg: HordeClassLibrary.HordeContent.Configs.AConfig | null
+			cfg: HordeClassLibrary.HordeContent.Configs.AConfig
 		): void;
 
 		static RemoveConfig(
-			cfg: HordeClassLibrary.HordeContent.Configs.AConfig | null
+			cfg: HordeClassLibrary.HordeContent.Configs.AConfig
 		): void;
 
 		static RemoveConfig(
-			uid: string | null,
-			configTypeName: string | null
+			uid: string,
+			configTypeName: string
 		): void;
 
 		// Dummy constructor for some magic:
@@ -5191,8 +5233,8 @@ declare namespace HordeClassLibrary.Scripting.ScriptApi {
 		): void;
 
 		EnablePlugin(
-			pluginName: string | null,
-			pluginPath: string | null,
+			pluginName: string,
+			pluginPath: string,
 			executeOnFirstRunMethod?: boolean /* = false */
 		): void;
 
@@ -5207,37 +5249,37 @@ declare namespace HordeClassLibrary.Scripting.ScriptApi {
 
 		// Methods:
 		static SetValue(
-			memberOwner: any | null,
-			memberName: string | null,
-			value: any | null
+			memberOwner: any,
+			memberName: string,
+			value: any
 		): void;
 
 		static GetValue(
-			memberOwner: any | null,
-			memberName: string | null
+			memberOwner: any,
+			memberName: string
 		): any;
 
 		static GameVersionEquals(
-			version: string | null
+			version: string
 		): boolean;
 
 		static GameVersionEqualsOrGreater(
-			version: string | null
+			version: string
 		): boolean;
 
 		static GameVersionLesserThan(
-			version: string | null
+			version: string
 		): boolean;
 
 		static ForEach<T>(
 			$T: any,
-			source: System.Collections.Generic.IEnumerable<T> | null,
-			action: any | null
+			source: System.Collections.Generic.IEnumerable<T>,
+			action: any
 		): void;
 
 		static RemoveAll<T>(
 			$T: any,
-			list: System.Collections.Generic.List<T> | null,
+			list: System.Collections.Generic.List<T>,
 			item: T | null
 		): number;
 
@@ -5261,8 +5303,8 @@ declare namespace HordeClassLibrary.UnitComponents.BattleSystem {
 
 		// Constructors:
 		constructor(
-			citadelCfg: HordeClassLibrary.HordeContent.Configs.Citadel.CitadelUnitConfig | null,
-			bulletConfig: HordeClassLibrary.HordeContent.Configs.Bullets.BulletConfig | null
+			citadelCfg: HordeClassLibrary.HordeContent.Configs.Citadel.CitadelUnitConfig,
+			bulletConfig: HordeClassLibrary.HordeContent.Configs.Bullets.BulletConfig
 		);
 
 		// Properties:
@@ -5282,28 +5324,35 @@ declare namespace HordeClassLibrary.UnitComponents.BattleSystem {
 
 		// Methods:
 		CanAttackTargetExt(
-			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): HordeClassLibrary.UnitComponents.Enumerations.CanNotAttackCause;
 
 		GetLaunchPosition(
-			uSource: HordeClassLibrary.World.Objects.Units.Unit | null,
+			uSource: HordeClassLibrary.World.Objects.Units.Unit,
 			targetPosition: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D;
 
 		GetLaunchPosition(
-			uSource: HordeClassLibrary.World.Objects.Units.Unit | null,
+			uSource: HordeClassLibrary.World.Objects.Units.Unit,
 			gunDir: HordeClassLibrary.UnitComponents.Enumerations.UnitDirection
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D;
 
 		Shot(
-			uSource: HordeClassLibrary.World.Objects.Units.Unit | null,
-			uTarget: HordeClassLibrary.World.Objects.Units.Unit | null,
+			uSource: HordeClassLibrary.World.Objects.Units.Unit,
+			uTarget: HordeClassLibrary.World.Objects.Units.Unit,
+			targetPosition: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector,
+			targetLayer: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer
+		): void;
+
+		Shot(
+			uSource: HordeClassLibrary.World.Objects.Units.Unit,
+			uTarget: HordeClassLibrary.World.Objects.Units.Unit,
 			targetPosition: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			targetLayer: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer
 		): void;
 
 		static CreateArmament(
-			bulletConfig: HordeClassLibrary.HordeContent.Configs.Bullets.BulletConfig | null
+			bulletConfig: HordeClassLibrary.HordeContent.Configs.Bullets.BulletConfig
 		): HordeClassLibrary.UnitComponents.BattleSystem.UnitArmament;
 	}
 }
@@ -5796,8 +5845,8 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			victimUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			victimUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			dmg: number,
 			eDmg: number,
 			hurtType: HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType
@@ -5816,8 +5865,8 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			attacker: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			attacker: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.EventArgs.ComradeIsAttackedEventArgs;
 	}
 }
@@ -5834,8 +5883,8 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			requestedCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): HordeClassLibrary.UnitComponents.EventArgs.MoveAwayRequestEventArgs;
 	}
@@ -5853,9 +5902,9 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit,
+			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		): HordeClassLibrary.UnitComponents.EventArgs.MoveOutRequestEventArgs;
 	}
 }
@@ -5873,8 +5922,8 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			requestedCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			suggestedCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): HordeClassLibrary.UnitComponents.EventArgs.StepAwayRequestEventArgs;
@@ -5894,7 +5943,7 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			damageSourceCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			dmg: number,
 			hurtType: HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType
@@ -5915,8 +5964,8 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			attackerUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			attackerUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			dmg: number,
 			hurtType: HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType
 		): HordeClassLibrary.UnitComponents.EventArgs.TakeDamageEventArgs;
@@ -5931,7 +5980,7 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 	{
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.EventArgs.UnitBuildingCompleteEventArgs;
 	}
 }
@@ -5944,7 +5993,7 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 	{
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.EventArgs.UnitDeathEventArgs;
 	}
 }
@@ -5957,7 +6006,7 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 	{
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.EventArgs.UnitDeletionEventArgs;
 	}
 }
@@ -5970,7 +6019,7 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 	{
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.EventArgs.UnitDummyStateChangedEventArgs;
 	}
 }
@@ -5987,7 +6036,7 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			oldHealth: number,
 			newHealth: number
 		): HordeClassLibrary.UnitComponents.EventArgs.UnitHealthChangedEventArgs;
@@ -6006,7 +6055,7 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			oldState: HordeClassLibrary.UnitComponents.Enumerations.UnitLifeState,
 			newState: HordeClassLibrary.UnitComponents.Enumerations.UnitLifeState
 		): HordeClassLibrary.UnitComponents.EventArgs.UnitLifeStateChangedEventArgs;
@@ -6025,7 +6074,7 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			oldCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			newCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): HordeClassLibrary.UnitComponents.EventArgs.UnitMovedToCellEventArgs;
@@ -6040,7 +6089,7 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 	{
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.EventArgs.UnitNearDeathEventArgs;
 	}
 }
@@ -6053,7 +6102,7 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 	{
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.EventArgs.UnitOrderChangedEventArgs;
 	}
 }
@@ -6070,9 +6119,9 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			oldOwner: HordeClassLibrary.World.Settlements.Settlement | null,
-			newOwner: HordeClassLibrary.World.Settlements.Settlement | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			oldOwner: HordeClassLibrary.World.Settlements.Settlement,
+			newOwner: HordeClassLibrary.World.Settlements.Settlement
 		): HordeClassLibrary.UnitComponents.EventArgs.UnitOwnerChangedEventArgs;
 	}
 }
@@ -6088,8 +6137,8 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 
 		// Methods:
 		static Get(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			newUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			newUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.EventArgs.UnitReplacedEventArgs;
 	}
 }
@@ -6099,8 +6148,8 @@ declare namespace HordeClassLibrary.UnitComponents.EventArgs {
 declare namespace HordeClassLibrary.UnitComponents.Events {
 	interface /* delegate */ UnitEventHandler {
 		(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			args: HordeClassLibrary.UnitComponents.EventArgs.BaseUnitEventArgs | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			args: HordeClassLibrary.UnitComponents.EventArgs.BaseUnitEventArgs
 		): void;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -6125,7 +6174,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -6133,19 +6182,19 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 
 		// Methods:
 		CauseDamage(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null,
+			target: HordeClassLibrary.World.Objects.Units.Unit,
 			dmg: number,
 			hurtType: HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType
 		): number;
 
 		CauseEffectiveDamage(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null,
+			target: HordeClassLibrary.World.Objects.Units.Unit,
 			eDmg1: number,
 			hurtType: HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType
 		): number;
 
 		CalculateCausedEffectiveDamage(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null,
+			target: HordeClassLibrary.World.Objects.Units.Unit,
 			aDmg: number
 		): number;
 
@@ -6164,13 +6213,13 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): void;
 
 		InstantKill(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null,
+			target: HordeClassLibrary.World.Objects.Units.Unit,
 			hurtType: HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType,
 			immediateDeathProcessing?: boolean /* = false */
 		): number;
 
 		InstantDeath(
-			attacker: HordeClassLibrary.World.Objects.Units.Unit | null,
+			attacker: HordeClassLibrary.World.Objects.Units.Unit,
 			hurtType: HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType,
 			immediateDeathProcessing?: boolean /* = false */
 		): number;
@@ -6180,23 +6229,23 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		CanBeCapturedNowAndHarmless(): boolean;
 
 		CanCaptureNow(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null
+			target: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		CanCaptureNow(
-			target: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+			target: HordeClassLibrary.World.Objects.Units.KnownUnit
 		): boolean;
 
 		CanCaptureNow(
-			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): boolean;
 
 		CanCapture(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null
+			target: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		CanAutoCaptureNow(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null
+			target: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		GetCapturer(): HordeClassLibrary.World.Objects.Units.Unit;
@@ -6210,32 +6259,32 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		IsHarmless(): boolean;
 
 		IsTurnedToTarget(
-			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): boolean;
 
 		CanAttackTargetExt(
-			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): HordeClassLibrary.UnitComponents.Enumerations.CanNotAttackCause;
 
 		CanAttackTarget(
-			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): boolean;
 
 		IsTargetInAttackRange(
-			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): boolean;
 
 		GetPointsForAttack(
-			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): HordeResurrection.Basic.Pool.PoolSlot<System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>> | null;
 
 		CanRunOverUnit(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null,
+			target: HordeClassLibrary.World.Objects.Units.Unit,
 			runOverCell?: HordeResurrection.Basic.Primitives.Geometry.Point2D | null /* = null */
 		): boolean;
 
 		CanComeAroundToTarget(
-			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null,
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit,
 			pushAwayAllowed: boolean
 		): boolean | null;
 	}
@@ -6249,7 +6298,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Fields:
@@ -6259,7 +6308,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		// Methods:
 		TryGetCommandConfig(
 			cmd: HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand,
-			/*out*/ cmdCfg: HordeClassLibrary.HordeContent.Configs.UnitCommandConfig | null
+			/*out*/ cmdCfg: HordeClassLibrary.HordeContent.Configs.UnitCommandConfig
 		): boolean;
 
 		IsCommandAllowed(
@@ -6272,7 +6321,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 
 		AddCommand(
 			cmd: HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand,
-			cmdCfg: HordeClassLibrary.HordeContent.Configs.UnitCommandConfig | null
+			cmdCfg: HordeClassLibrary.HordeContent.Configs.UnitCommandConfig
 		): void;
 
 		RemoveAddedCommand(
@@ -6280,7 +6329,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): void;
 
 		DisallowCommands(
-			commands: System.Collections.Generic.IEnumerable<HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand> | null
+			commands: System.Collections.Generic.IEnumerable<HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand>
 		): void;
 
 		DisallowCommand(
@@ -6289,7 +6338,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): boolean;
 
 		AllowDisallowedCommands(
-			commands: System.Collections.Generic.IEnumerable<HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand> | null
+			commands: System.Collections.Generic.IEnumerable<HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand>
 		): void;
 
 		AllowDisallowedCommand(
@@ -6338,11 +6387,11 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		EnumerateAutomatedCommands(): System.Collections.Generic.IEnumerable<HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand>;
 
 		CopyAutoCommandsFrom(
-			otherUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			otherUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		static GetAllCommandsExcept(
-			exclude: HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand[] | null
+			exclude: HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand[]
 		): HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand[];
 
 		// Events:
@@ -6380,7 +6429,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Methods:
@@ -6395,15 +6444,15 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): HordeClassLibrary.World.Objects.Units.Unit;
 
 		CallForHelp(
-			attacker: HordeClassLibrary.World.Objects.Units.Unit | null
+			attacker: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		GetNearestRepairTarget(): HordeClassLibrary.World.Objects.Units.Unit;
 
 		FilterNearestUnitsAndDo(
 			radius: number,
-			filterCallback: HordeClassLibrary.UnitComponents.Minds.CommunicationMind.FilterCallbackDelegate | null,
-			filterPassCallback: HordeClassLibrary.UnitComponents.Minds.CommunicationMind.FilterPassCallbackDelegate | null,
+			filterCallback: HordeClassLibrary.UnitComponents.Minds.CommunicationMind.FilterCallbackDelegate,
+			filterPassCallback: HordeClassLibrary.UnitComponents.Minds.CommunicationMind.FilterPassCallbackDelegate,
 			center?: HordeResurrection.Basic.Primitives.Geometry.Point2D | null /* = null */,
 			centerSize?: HordeResurrection.Basic.Primitives.Geometry.Size2D | null /* = null */
 		): void;
@@ -6415,7 +6464,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 declare namespace HordeClassLibrary.UnitComponents.Minds.CommunicationMind {
 	interface /* delegate */ FilterCallbackDelegate {
 		(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			uX: number,
 			uY: number,
 			uL: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer
@@ -6430,7 +6479,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds.CommunicationMind {
 declare namespace HordeClassLibrary.UnitComponents.Minds.CommunicationMind {
 	interface /* delegate */ FilterPassCallbackDelegate {
 		(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			uX: number,
 			uY: number,
 			uL: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer
@@ -6448,7 +6497,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -6511,7 +6560,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds.EffectsMind {
 	{
 		// Constructors:
 		constructor(
-			TriggeredUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			TriggeredUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			OldEffects: HordeClassLibrary.UnitComponents.Enumerations.UnitEffectFlag,
 			NewEffects: HordeClassLibrary.UnitComponents.Enumerations.UnitEffectFlag
 		);
@@ -6551,7 +6600,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -6559,7 +6608,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 
 		// Methods:
 		AddEvent(
-			eventArgs: HordeClassLibrary.UnitComponents.EventArgs.BaseUnitEventArgs | null
+			eventArgs: HordeClassLibrary.UnitComponents.EventArgs.BaseUnitEventArgs
 		): void;
 
 		ClearFrameEvents(): void;
@@ -6605,7 +6654,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -6631,12 +6680,12 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			positionModel: HordeClassLibrary.World.Objects.Units.UnitPositionModel | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			positionData: HordeClassLibrary.World.Objects.Units.UnitPositionData
 		);
 
 		// Properties:
-		/* writeonly */ Position: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		/* writeonly */ Position: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector;
 		/* writeonly */ Direction: HordeClassLibrary.UnitComponents.Enumerations.UnitDirection;
 		readonly CurrentContainer: HordeClassLibrary.World.Objects.Units.Unit;
 
@@ -6652,7 +6701,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		ForceUpdateComebackCell(): void;
 
 		GetFreeCellByRealMapFor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 
 		CompleteChangingCellCoordinates(): void;
@@ -6678,12 +6727,12 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 
 		SpeedAtCellByRealMap(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): number;
 
 		SpeedAtCellByKnownMap(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit
 		): number;
 
 		GetEmptyCellInRegion(
@@ -6692,11 +6741,11 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 
 		EnterIn(
-			containerProfession: HordeClassLibrary.UnitComponents.ProfessionData.Interfaces.IUnitContainerProfession | null
+			containerProfession: HordeClassLibrary.UnitComponents.ProfessionData.Interfaces.IUnitContainerProfession
 		): boolean;
 
 		LeaveFrom(
-			containerProfession: HordeClassLibrary.UnitComponents.ProfessionData.Interfaces.IUnitContainerProfession | null,
+			containerProfession: HordeClassLibrary.UnitComponents.ProfessionData.Interfaces.IUnitContainerProfession,
 			exitCell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		): boolean;
 
@@ -6705,7 +6754,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): HordeClassLibrary.UnitComponents.Enumerations.UnitDirection;
 
 		GetDirectionToUnit(
-			targetUnit: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			targetUnit: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): HordeClassLibrary.UnitComponents.Enumerations.UnitDirection;
 
 		VisualNearestPointToRect(
@@ -6715,7 +6764,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): number;
 
 		VisualNearestPointToUnit(
-			targetUnit: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null,
+			targetUnit: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit,
 			/*out*/ nearestSourcePoint: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			/*out*/ nearestTargetPoint: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): number;
@@ -6726,7 +6775,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): number;
 
 		DistanceToUnit(
-			targetUnit: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			targetUnit: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): number;
 
 		DistanceToCell(
@@ -6740,16 +6789,16 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		GetCellTile(): HordeClassLibrary.World.Objects.Tiles.Tile;
 
 		SelectNearestUnit(
-			units: System.Collections.Generic.IEnumerable<HordeClassLibrary.World.Objects.Units.Unit> | null,
-			blackList?: System.Collections.Generic.HashSet<HordeClassLibrary.World.Objects.Units.Unit> | null /* = null */
+			units: System.Collections.Generic.IEnumerable<HordeClassLibrary.World.Objects.Units.Unit>,
+			blackList?: System.Collections.Generic.HashSet<HordeClassLibrary.World.Objects.Units.Unit> /* = null */
 		): HordeClassLibrary.World.Objects.Units.Unit;
 
 		SortByNearestEntrance(
-			unitsToSort: System.Collections.Generic.IEnumerable<HordeClassLibrary.World.Objects.Units.Unit> | null
+			unitsToSort: System.Collections.Generic.IEnumerable<HordeClassLibrary.World.Objects.Units.Unit>
 		): HordeResurrection.Basic.Pool.PoolSlot<System.Collections.Generic.List<HordeClassLibrary.World.Objects.Units.Unit>>;
 
 		GetEntranceCellsFor(
-			forUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			forUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeResurrection.Basic.Pool.PoolSlot<System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>>;
 
 		GetEntranceCellOrThrow(): HordeResurrection.Basic.Primitives.Geometry.Point2D;
@@ -6757,15 +6806,15 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		GetEntranceCellOrNull(): HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 
 		GetAnyFreeEdgeCell(
-			checkForUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			checkForUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 
 		GetDistanceToEntrance(
-			building: HordeClassLibrary.World.Objects.Units.Unit | null
+			building: HordeClassLibrary.World.Objects.Units.Unit
 		): number;
 
 		InEntranceCell(
-			targetBuilding: HordeClassLibrary.World.Objects.Units.Unit | null
+			targetBuilding: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		InScenaCell(
@@ -6773,7 +6822,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): boolean;
 
 		CheckPathToEntrance(
-			targetBuilding: HordeClassLibrary.World.Objects.Units.Unit | null,
+			targetBuilding: HordeClassLibrary.World.Objects.Units.Unit,
 			allowPushAway: boolean
 		): HordeClassLibrary.UnitComponents.Minds.MapMind.PathCheckResult;
 
@@ -6783,9 +6832,9 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): HordeClassLibrary.UnitComponents.Minds.MapMind.PathCheckResult;
 
 		CheckPathTo(
-			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null,
+			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>,
 			allowPushAway: boolean,
-			lastWaitingCells?: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null /* = null */
+			lastWaitingCells?: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> /* = null */
 		): HordeClassLibrary.UnitComponents.Minds.MapMind.PathCheckResult;
 	}
 }
@@ -6815,7 +6864,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -6858,31 +6907,31 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): void;
 
 		AssignOrder(
-			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null,
-			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs | null,
+			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase,
+			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs,
 			overrideAssignOrderMode?: HordeClassLibrary.UnitComponents.OrdersSystem.AssignOrderMode | null /* = null */
 		): void;
 
 		SetInstinctOrder(
-			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null,
+			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase,
 			deactivateNotificationsTime?: number /* = 64 */
 		): void;
 
 		SetPanikOrder(
-			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderPanik | null
+			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderPanik
 		): void;
 
 		CopyBehaviorFrom(
-			otherUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			otherUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		CopyAllOrdersFrom(
-			otherUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			otherUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			copyInstinct: boolean
 		): void;
 
 		CopyFollowingOrdersFrom(
-			otherUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			otherUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		ReviewQueuedInstinctOrder(): void;
@@ -6925,7 +6974,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -6933,23 +6982,23 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 
 		// Methods:
 		UtterSound(
-			sectionName: System.Enum | null,
+			sectionName: System.Enum,
 			position: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			sectionSoundLimit?: number | null /* = null */,
 			isLooping?: boolean /* = false */
 		): HordeClassLibrary.World.Objects.SoundEffects.SimpleSoundEffect;
 
 		UtterSound(
-			soundsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SoundsCatalog | null,
-			sectionName: System.Enum | null,
+			soundsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SoundsCatalog,
+			sectionName: System.Enum,
 			position: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			sectionSoundLimit?: number | null /* = null */,
 			isLooping?: boolean /* = false */
 		): HordeClassLibrary.World.Objects.SoundEffects.SimpleSoundEffect;
 
 		UtterSound(
-			soundsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SoundsCatalog | null,
-			sectionName: string | null,
+			soundsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SoundsCatalog,
+			sectionName: string,
 			position: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			sectionSoundLimit?: number | null /* = null */,
 			isLooping?: boolean /* = false */
@@ -6967,7 +7016,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -6995,7 +7044,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): boolean;
 
 		HasAnimState(
-			state: string | null
+			state: string
 		): boolean;
 
 		SetAnimState(
@@ -7006,7 +7055,7 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): boolean;
 
 		SetAnimState(
-			state: string | null,
+			state: string,
 			stage?: number /* = 0 */,
 			looped?: boolean /* = true */,
 			forced?: boolean /* = false */
@@ -7021,8 +7070,8 @@ declare namespace HordeClassLibrary.UnitComponents.Minds {
 		): boolean;
 
 		SafeSetAnimState(
-			state: string | null,
-			fallbackState: string | null,
+			state: string,
+			fallbackState: string,
 			stage?: number /* = 0 */,
 			looped?: boolean /* = true */,
 			forced?: boolean /* = false */
@@ -7071,7 +7120,7 @@ declare namespace HordeClassLibrary.UnitComponents.Misc {
 
 		// Methods:
 		GetOrCreateFlagEffect(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			number: number,
 			placed: boolean
 		): HordeClassLibrary.UnitComponents.Misc.BuildingFlagsHelper.FlagSlot;
@@ -7081,15 +7130,15 @@ declare namespace HordeClassLibrary.UnitComponents.Misc {
 		RemoveFlags(): void;
 
 		SaveLastHandledData(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null,
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView,
 			wasUnderAttack: boolean
 		): void;
 
 		CountPlacedFlags(): number;
 
 		ChangeColorMap(
-			colorMap: any | null,
-			maskColor: HordeResurrection.Basic.Primitives.HordeColor | null
+			colorMap: any,
+			maskColor: HordeResurrection.Basic.Primitives.HordeColor
 		): void;
 	}
 
@@ -7109,7 +7158,7 @@ declare namespace HordeClassLibrary.UnitComponents.Misc.BuildingFlagsHelper {
 
 		// Constructors:
 		constructor(
-			effect: HordeClassLibrary.World.Objects.VisualEffects.Implementations.BuildingFlagEffect | null,
+			effect: HordeClassLibrary.World.Objects.VisualEffects.Implementations.BuildingFlagEffect,
 			isPlaced: boolean
 		);
 
@@ -7128,8 +7177,8 @@ declare namespace HordeClassLibrary.UnitComponents.Misc.BuildingFlagsHelper {
 		Remove(): void;
 
 		ChangeColorMap(
-			colorMap: any | null,
-			maskColor: HordeResurrection.Basic.Primitives.HordeColor | null
+			colorMap: any,
+			maskColor: HordeResurrection.Basic.Primitives.HordeColor
 		): void;
 	}
 }
@@ -7141,8 +7190,8 @@ declare namespace HordeClassLibrary.UnitComponents.Misc {
 
 		// Constructors:
 		constructor(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		);
 
 		// Properties:
@@ -7157,13 +7206,13 @@ declare namespace HordeClassLibrary.UnitComponents.Misc {
 		): void;
 
 		DetermineAvailableBuildCells(
-			territoryPlanner: HordeClassLibrary.World.Settlements.Territory.TerritoryPlanner | null,
+			territoryPlanner: HordeClassLibrary.World.Settlements.Territory.TerritoryPlanner,
 			cellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			cellEnd: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): void;
 
 		CountAvailableBuildCells(
-			territoryPlanner: HordeClassLibrary.World.Settlements.Territory.TerritoryPlanner | null,
+			territoryPlanner: HordeClassLibrary.World.Settlements.Territory.TerritoryPlanner,
 			cellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			cellEnd: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			/*out*/ actualCellEnd: HordeResurrection.Basic.Primitives.Geometry.Point2D,
@@ -7198,7 +7247,7 @@ declare namespace HordeClassLibrary.UnitComponents.Misc {
 	{
 		// Constructors:
 		constructor(
-			cellsSetSlot: HordeResurrection.Basic.Pool.IPoolSlot<System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>> | null
+			cellsSetSlot: HordeResurrection.Basic.Pool.IPoolSlot<System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>>
 		);
 
 		// Properties:
@@ -7219,7 +7268,7 @@ declare namespace HordeClassLibrary.UnitComponents.Misc {
 
 		// Constructors:
 		constructor(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			unit: HordeClassLibrary.World.Objects.Units.Unit,
 			startCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			maxSpiralRadius?: number | null /* = null */
 		);
@@ -7253,7 +7302,7 @@ declare namespace HordeClassLibrary.UnitComponents.Misc {
 
 		// Constructors:
 		constructor(
-			product: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			product: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		);
 
 		// Properties:
@@ -7276,7 +7325,7 @@ declare namespace HordeClassLibrary.UnitComponents.Misc {
 
 		// Constructors:
 		constructor(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			unit: HordeClassLibrary.World.Objects.Units.Unit,
 			startCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			maxSpiralRadius?: number | null /* = null */
 		);
@@ -7305,7 +7354,7 @@ declare namespace HordeClassLibrary.UnitComponents.Misc {
 
 		// Constructors:
 		constructor(
-			building: HordeClassLibrary.World.Objects.Units.Unit | null
+			building: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -7317,11 +7366,11 @@ declare namespace HordeClassLibrary.UnitComponents.Misc {
 
 		// Methods:
 		SetBuilding(
-			building: HordeClassLibrary.World.Objects.Units.Unit | null
+			building: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		IsReachable(
-			fromUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			fromUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		ClearIfNotAlive(): void;
@@ -7368,9 +7417,9 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Alarms {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null,
-			attackedComrade: HordeClassLibrary.World.Objects.Units.Unit | null,
-			attacker: HordeClassLibrary.World.Objects.Units.Unit | null,
+			owner: HordeClassLibrary.World.Objects.Units.Unit,
+			attackedComrade: HordeClassLibrary.World.Objects.Units.Unit,
+			attacker: HordeClassLibrary.World.Objects.Units.Unit,
 			estimatedAlarmLevel: number
 		);
 
@@ -7387,8 +7436,8 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Alarms {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null,
-			nearestEnemy: HordeClassLibrary.World.Objects.Units.Unit | null,
+			owner: HordeClassLibrary.World.Objects.Units.Unit,
+			nearestEnemy: HordeClassLibrary.World.Objects.Units.Unit,
 			estimatedAlarmLevel: number
 		);
 
@@ -7408,8 +7457,8 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Alarms {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null,
-			attacker: HordeClassLibrary.World.Objects.Units.Unit | null,
+			owner: HordeClassLibrary.World.Objects.Units.Unit,
+			attacker: HordeClassLibrary.World.Objects.Units.Unit,
 			estimatedAlarmLevel: number,
 			shouldBeAfraidOfTheAttacker: boolean
 		);
@@ -7443,7 +7492,7 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications {
 		MarkAsExpired(): void;
 
 		ReplaceOwner(
-			newOwner: HordeClassLibrary.World.Objects.Units.Unit | null
+			newOwner: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		// Dummy constructor for some magic:
@@ -7459,8 +7508,8 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Other {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null,
-			repairTarget: HordeClassLibrary.World.Objects.Units.Unit | null
+			owner: HordeClassLibrary.World.Objects.Units.Unit,
+			repairTarget: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -7476,7 +7525,7 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Other {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null
+			owner: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -7492,8 +7541,8 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Other {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null,
-			requestEvent: HordeClassLibrary.UnitComponents.EventArgs.MoveAwayRequestEventArgs | null
+			owner: HordeClassLibrary.World.Objects.Units.Unit,
+			requestEvent: HordeClassLibrary.UnitComponents.EventArgs.MoveAwayRequestEventArgs
 		);
 
 		// Properties:
@@ -7510,8 +7559,8 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Other {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null,
-			requestEvent: HordeClassLibrary.UnitComponents.EventArgs.MoveOutRequestEventArgs | null
+			owner: HordeClassLibrary.World.Objects.Units.Unit,
+			requestEvent: HordeClassLibrary.UnitComponents.EventArgs.MoveOutRequestEventArgs
 		);
 
 		// Properties:
@@ -7528,7 +7577,7 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Other {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null
+			owner: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -7541,8 +7590,8 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Other {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null,
-			requestEvent: HordeClassLibrary.UnitComponents.EventArgs.StepAwayRequestEventArgs | null
+			owner: HordeClassLibrary.World.Objects.Units.Unit,
+			requestEvent: HordeClassLibrary.UnitComponents.EventArgs.StepAwayRequestEventArgs
 		);
 
 		// Properties:
@@ -7574,8 +7623,8 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Tactic {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null,
-			targetUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			owner: HordeClassLibrary.World.Objects.Units.Unit,
+			targetUnit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -7591,7 +7640,7 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Tactic {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null
+			owner: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -7604,7 +7653,7 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Tactic {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null,
+			owner: HordeClassLibrary.World.Objects.Units.Unit,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -7638,8 +7687,8 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Threats {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null,
-			initiatorUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			owner: HordeClassLibrary.World.Objects.Units.Unit,
+			initiatorUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			estimatedThreatLevel: number
 		);
 
@@ -7656,8 +7705,8 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Threats {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null,
-			initiatorUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			owner: HordeClassLibrary.World.Objects.Units.Unit,
+			initiatorUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			estimatedThreatLevel: number
 		);
 
@@ -7674,7 +7723,7 @@ declare namespace HordeClassLibrary.UnitComponents.Notifications.Threats {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null,
+			owner: HordeClassLibrary.World.Objects.Units.Unit,
 			position: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			estimatedThreatLevel: number
 		);
@@ -7698,7 +7747,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 		Dispose(): void;
 
 		IsFighting(
-			/*out*/ target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			/*out*/ target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): boolean;
 
 		CanBeCanceledNow(): boolean;
@@ -7716,8 +7765,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		);
 
 		// Properties:
@@ -7733,8 +7782,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			target: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		);
 
 		// Properties:
@@ -7751,7 +7800,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -7768,7 +7817,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -7781,7 +7830,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -7794,7 +7843,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -7807,7 +7856,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -7820,8 +7869,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			target: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			target: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -7837,14 +7886,14 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			baseWaitTicks?: number /* = 32 */
 		);
 
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			finishSetSlot: HordeResurrection.Basic.Pool.IPoolSlot<System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>> | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			finishSetSlot: HordeResurrection.Basic.Pool.IPoolSlot<System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>>,
 			checkOutOfScenaPoints: boolean,
 			baseWaitTicks?: number /* = 32 */
 		);
@@ -7866,7 +7915,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 
 		// Methods:
 		ChangeFinish(
-			newFinishSetSlot: HordeResurrection.Basic.Pool.IPoolSlot<System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>> | null
+			newFinishSetSlot: HordeResurrection.Basic.Pool.IPoolSlot<System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>>
 		): void;
 	}
 }
@@ -7894,7 +7943,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			fromCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			threatCell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		);
@@ -7912,7 +7961,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			fromCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			suggestedCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			fallbackCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
@@ -7939,8 +7988,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			target: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			target: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -7956,7 +8005,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			side: HordeClassLibrary.UnitComponents.Enumerations.UnitDirection
 		);
 
@@ -7973,7 +8022,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			iterationsToWait: number
 		);
 
@@ -7990,8 +8039,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts.Producing {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			productUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			isAutomaticMode: boolean
 		);
 
@@ -8009,7 +8058,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts.Producing {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			autoBuild: boolean
 		);
 	}
@@ -8023,8 +8072,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts.Producing {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -8045,8 +8094,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts.Producing {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			count: number
 		);
 
@@ -8064,8 +8113,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts.Producing {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			cellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			cellEnd: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		);
@@ -8086,8 +8135,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts.Producing {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			targetUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			targetUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -8105,7 +8154,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Acts.Producing {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			repairMode: HordeClassLibrary.UnitComponents.OrdersSystem.Misc.OrderRepairMode
 		);
 
@@ -8213,7 +8262,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs {
 
 		// Methods:
 		GetTargetKnownUnit(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		): HordeClassLibrary.World.Objects.Units.KnownUnit;
 	}
 }
@@ -8227,7 +8276,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs {
 		// Constructors:
 		constructor(
 			assignOrderMode: HordeClassLibrary.UnitComponents.OrdersSystem.AssignOrderMode,
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			cellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			cellEnd?: HordeResurrection.Basic.Primitives.Geometry.Point2D | null /* = null */,
 			compoundStopOnNumber?: number | null /* = null */
@@ -8251,7 +8300,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs {
 		// Constructors:
 		constructor(
 			assignOrderMode: HordeClassLibrary.UnitComponents.OrdersSystem.AssignOrderMode,
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			count: number
 		);
 
@@ -8327,8 +8376,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			targetUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			targetUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			entryPoint: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -8357,8 +8406,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			targetUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			targetUnit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -8383,7 +8432,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -8400,7 +8449,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -8413,7 +8462,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -8429,7 +8478,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -8442,7 +8491,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -8455,8 +8504,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			target: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			target: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -8472,13 +8521,13 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			uTarget: HordeClassLibrary.World.Objects.Units.Unit | null,
-			targetPosition: HordeResurrection.Basic.Primitives.Geometry.Point2D
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			uTarget: HordeClassLibrary.World.Objects.Units.Unit,
+			targetPosition: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector
 		);
 
 		// Properties:
-		readonly TargetPosition: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly TargetPosition: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector;
 		readonly TargetMapLayer: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer;
 		readonly Target: HordeClassLibrary.World.Objects.Units.Unit;
 	}
@@ -8492,20 +8541,22 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			x: number,
 			y: number
 		);
 
 		// Fields:
-		Distance: HordeResurrection.Basic.Primitives.PreciseFraction;
+		LeftDistance: HordeResurrection.Basic.Primitives.PreciseFraction;
 
 		// Properties:
 		readonly DxDy: HordeResurrection.Basic.Primitives.Geometry.Point2D;
-		Speed: HordeResurrection.Basic.Primitives.PreciseFraction;
-		SpeedSteps: HordeResurrection.Basic.Primitives.PreciseFraction;
-		SpeedHandler: HordeResurrection.Basic.Primitives.HordeSpeedHandler;
-		FinishPosition: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		FinishPosition: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector;
+		LeftTicks: number;
+		TotalTicks: number;
+		readonly TransitionCompleted: boolean;
+		StepSize: HordeResurrection.Basic.Primitives.PreciseFraction;
+		readonly AvgSpeed: HordeResurrection.Basic.Primitives.PreciseFraction;
 		StuckFrames: number;
 	}
 }
@@ -8518,7 +8569,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -8531,7 +8582,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -8544,8 +8595,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			target: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			target: HordeClassLibrary.World.Objects.Units.Unit,
 			resourceType: HordeClassLibrary.UnitComponents.Enumerations.ResourceItemType
 		);
 
@@ -8564,7 +8615,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			turnDir: number
 		);
 
@@ -8582,7 +8633,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			iterationsToWait: number
 		);
 
@@ -8605,7 +8656,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			iterationsToWait: number
 		);
@@ -8629,8 +8680,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producin
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			productUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			isAutomaticMode: boolean
 		);
 
@@ -8649,7 +8700,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producin
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			autoBuild: boolean
 		);
 
@@ -8669,7 +8720,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producin
 
 		// Methods:
 		AddBuilder(
-			builder: HordeClassLibrary.World.Objects.Units.Unit | null,
+			builder: HordeClassLibrary.World.Objects.Units.Unit,
 			allowPowerbuilding?: boolean /* = true */
 		): boolean;
 
@@ -8685,8 +8736,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producin
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -8707,8 +8758,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producin
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		);
 
 		// Properties:
@@ -8731,8 +8782,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producin
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			cellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			cellEnd: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		);
@@ -8754,8 +8805,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producin
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			targetUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			targetUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -8774,7 +8825,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producin
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			repairMode: HordeClassLibrary.UnitComponents.OrdersSystem.Misc.OrderRepairMode
 		);
 
@@ -8821,8 +8872,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem {
 
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			ownOrderDoNothing: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderDoNothing | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			ownOrderDoNothing: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderDoNothing
 		);
 
 		// Properties:
@@ -8833,15 +8884,15 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem {
 		Deinitialize(): void;
 
 		EnqueueOrDisposeOrder(
-			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null
+			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase
 		): boolean;
 
 		PushOrderToStartOrDispose(
-			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null
+			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase
 		): boolean;
 
 		SetInstinctOrderOrDispose(
-			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null
+			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase
 		): boolean;
 
 		SoftCancelAllOrders(): void;
@@ -8851,11 +8902,11 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem {
 		ForceRemoveAllOrders(): void;
 
 		ForceReplaceAllOrders(
-			newOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null
+			newOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase
 		): void;
 
 		FilterQueue(
-			filterCallback: System.Func_1<HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase, boolean> | System.Func | null
+			filterCallback: System.Func_1<HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase, boolean> | System.Func
 		): boolean;
 
 		ForceDequeueOrder(
@@ -8897,7 +8948,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 
 		// Methods:
 		ToInstinct(
-			notification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null
+			notification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification
 		): void;
 
 		SetupDisableNotificationsTimer(
@@ -8905,13 +8956,13 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 		): void;
 
 		SetupDisableNotificationsTimerBy(
-			otherOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null
+			otherOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase
 		): void;
 
 		CompletelyDisableNotifications(): void;
 
 		MakeCopy(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase;
 
 		IsDone(): boolean;
@@ -8921,7 +8972,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 		Dispose(): void;
 
 		IsMoveAwayAllowed(
-			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		IsPushAwayAllowed(): boolean;
@@ -8931,15 +8982,15 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 		IsUpdateComebackCellAllowedIfInstinct(): boolean;
 
 		SetupNextOrder(
-			nextOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null
+			nextOrder: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase
 		): void;
 
 		HandleOwnerChanging(
-			e: HordeClassLibrary.UnitComponents.EventArgs.UnitOwnerChangedEventArgs | null
+			e: HordeClassLibrary.UnitComponents.EventArgs.UnitOwnerChangedEventArgs
 		): void;
 
 		DisallowCommandsByOrder(
-			commands: System.Collections.Generic.IEnumerable<HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand> | null
+			commands: System.Collections.Generic.IEnumerable<HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand>
 		): void;
 
 		AllowDisallowedCommands(): void;
@@ -8985,11 +9036,11 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 
 		// Constructors:
 		constructor(
-			targetKnownUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+			targetKnownUnit: HordeClassLibrary.World.Objects.Units.KnownUnit
 		);
 
 		constructor(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null
+			target: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -9026,9 +9077,9 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
-			unitTarget: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
+			unitTarget: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit,
 			parameters: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderAttackParameters
 		);
 
@@ -9055,9 +9106,9 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
-			unitTarget: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
+			unitTarget: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit,
 			parameters: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderAttackParameters
 		);
 	}
@@ -9071,9 +9122,9 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
-			unitTarget: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
+			unitTarget: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit,
 			parameters: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.OrderAttackParameters
 		);
 
@@ -9102,9 +9153,9 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
-			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
+			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs
 		);
 
 		// Properties:
@@ -9120,7 +9171,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -9133,8 +9184,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification
 		);
 	}
 }
@@ -9147,8 +9198,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification
 		);
 	}
 }
@@ -9161,8 +9212,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
 			target: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -9180,8 +9231,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification
 		);
 
 		// Properties:
@@ -9198,8 +9249,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
 			target: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -9217,8 +9268,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
 			claimCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -9240,9 +9291,9 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
-			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
+			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		);
 
 		// Properties:
@@ -9261,8 +9312,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
 			finish: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			movementMode?: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.MovementMode /* = MovementMode.Common */
 		);
@@ -9296,15 +9347,15 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
 			resourceCell?: HordeResurrection.Basic.Primitives.Geometry.Point2D | null /* = null */
 		);
 
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
-			targetStock: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
+			targetStock: HordeClassLibrary.World.Objects.Units.Unit,
 			resourceCell?: HordeResurrection.Basic.Primitives.Geometry.Point2D | null /* = null */
 		);
 
@@ -9334,8 +9385,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification
 		);
 
 		// Properties:
@@ -9351,8 +9402,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification
 		);
 	}
 }
@@ -9380,8 +9431,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
 			fromCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			threatCell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null
 		);
@@ -9399,8 +9450,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
 			fromCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			suggestedCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			fallbackCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
@@ -9420,8 +9471,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
 			side: HordeClassLibrary.UnitComponents.Enumerations.UnitDirection
 		);
 
@@ -9445,55 +9496,55 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing
 		): HordeResurrection.Basic.Pool.PoolSlot<System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>>;
 
 		static IsAroundConstructionSite(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			targetRectangle: HordeResurrection.Basic.Primitives.Geometry.Rect2D
 		): boolean;
 
 		static IsTurnedToConstructionSite(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			targetRectangle: HordeResurrection.Basic.Primitives.Geometry.Rect2D
 		): boolean;
 
 		static GetPartTargetsList(
-			produceAtArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ProduceAtCommandArgs | null
+			produceAtArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ProduceAtCommandArgs
 		): System.Collections.Concurrent.ConcurrentQueue<HordeResurrection.Basic.Primitives.Geometry.Point2D>;
 
 		static CountParts(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			cellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			cellEnd: HordeResurrection.Basic.Primitives.Geometry.Point2D | null,
 			compoundStopOnNumber: number | null
 		): number;
 
 		static CanProduce(
-			producer: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			producer: HordeClassLibrary.World.Objects.Units.Unit,
+			productConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		static CanBuildByRealMapAt(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			owner: HordeClassLibrary.World.Settlements.Settlement,
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			checkDistances: boolean
 		): boolean;
 
 		static CanBuildByKnownMapAt(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			owner: HordeClassLibrary.World.Settlements.Settlement,
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			checkDistances: boolean
 		): boolean;
 
 		static CheckPathAndCanBuildByKnownMap(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			unit: HordeClassLibrary.World.Objects.Units.Unit,
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			cellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			checkDistances: boolean
 		): boolean;
 
 		static CheckPathAndCanBuildAnyPartByKnownMap(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			unit: HordeClassLibrary.World.Objects.Units.Unit,
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			cellStart: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			cellEnd: HordeResurrection.Basic.Primitives.Geometry.Point2D | null,
 			compoundStopOnNumber: number | null,
@@ -9501,32 +9552,32 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing
 		): boolean;
 
 		static CheckPathToBuildRect(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			unit: HordeClassLibrary.World.Objects.Units.Unit,
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): boolean;
 
 		static IsLifeDistanceCheckRequired(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		static IsLifeDistanceCheckRequired(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		static SendDisbandRequest(
-			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
-			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			finishSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		): boolean;
 
 		static CanDisbandAllUnits(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
 			rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D
 		): boolean;
 
 		static CanDisbandFromBuildingPlaceHypothetical(
-			blockingUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			blockingUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		// Dummy constructor for some magic:
@@ -9543,8 +9594,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
 			parameters: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing.OrderBuildParameters
 		);
 
@@ -9565,8 +9616,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing
 
 		// Constructors:
 		constructor(
-			target: HordeClassLibrary.World.Objects.Units.Unit | null,
-			nextTargets: System.Collections.Concurrent.ConcurrentQueue<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			target: HordeClassLibrary.World.Objects.Units.Unit,
+			nextTargets: System.Collections.Concurrent.ConcurrentQueue<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		);
 
 		// Properties:
@@ -9590,8 +9641,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
 			autoBuild: boolean
 		);
 
@@ -9609,8 +9660,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
 			parameters: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing.OrderPreBuildParameters
 		);
 
@@ -9632,9 +9683,9 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing
 
 		// Constructors:
 		constructor(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			nextTargets: System.Collections.Concurrent.ConcurrentQueue<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			nextTargets: System.Collections.Concurrent.ConcurrentQueue<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		);
 
 		// Properties:
@@ -9661,9 +9712,9 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
-			produceArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ProduceCommandArgs | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
+			produceArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ProduceCommandArgs
 		);
 
 		// Properties:
@@ -9680,9 +9731,9 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
-			produceAtArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ProduceAtCommandArgs | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
+			produceAtArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ProduceAtCommandArgs
 		);
 
 		// Properties:
@@ -9699,8 +9750,8 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification,
 			parameters: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing.OrderRepairParameters
 		);
 
@@ -9723,7 +9774,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing
 
 		// Constructors:
 		constructor(
-			targetUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			targetUnit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -9743,9 +9794,9 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Orders.Producing
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			repairMode: HordeClassLibrary.UnitComponents.OrdersSystem.Misc.OrderRepairMode,
-			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification | null
+			motiveNotification: HordeClassLibrary.UnitComponents.Notifications.BaseUnitNotification
 		);
 
 		// Properties:
@@ -9770,7 +9821,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Special {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -9783,7 +9834,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Special {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -9796,7 +9847,7 @@ declare namespace HordeClassLibrary.UnitComponents.OrdersSystem.Special {
 	{
 		// Constructors:
 		constructor(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		);
 	}
 }
@@ -9879,7 +9930,7 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 
 		// Methods:
 		Initialize(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null
+			owner: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		Deinitialize(): void;
@@ -9904,7 +9955,7 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 
 		// Methods:
 		Initialize(
-			owner: HordeClassLibrary.World.Objects.Units.Unit | null
+			owner: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		Deinitialize(): void;
@@ -9930,7 +9981,7 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 	{
 		// Constructors:
 		constructor(
-			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.CapturableProfessionParams | null
+			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.CapturableProfessionParams
 		);
 
 		// Properties:
@@ -9942,11 +9993,11 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 
 		// Methods:
 		PlaceUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		KickUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		GetContainerCell(): HordeResurrection.Basic.Primitives.Geometry.Point2D;
@@ -9960,7 +10011,7 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 		CanBeCapturedNow(): boolean;
 
 		CanBeCapturedNow(
-			knownUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+			knownUnit: HordeClassLibrary.World.Objects.Units.KnownUnit
 		): boolean;
 
 		DisallowDestroyOrderFor(
@@ -9979,12 +10030,12 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 	{
 		// Constructors:
 		constructor(
-			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.CompoundProfessionParams | null
+			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.CompoundProfessionParams
 		);
 
 		// Methods:
 		InitializeCompoundParts(
-			producedUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			producedUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 	}
 }
@@ -9997,7 +10048,7 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 	{
 		// Constructors:
 		constructor(
-			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.HarvesterProfessionParams | null
+			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.HarvesterProfessionParams
 		);
 
 		// Properties:
@@ -10068,11 +10119,11 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData.Interfaces {
 
 		// Methods:
 		PlaceUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		KickUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		GetContainerCell(): HordeResurrection.Basic.Primitives.Geometry.Point2D;
@@ -10089,7 +10140,7 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 	{
 		// Constructors:
 		constructor(
-			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.MetalStockProfessionParams | null
+			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.MetalStockProfessionParams
 		);
 
 		// Properties:
@@ -10105,7 +10156,7 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 	{
 		// Constructors:
 		constructor(
-			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.MineProfessionParams | null
+			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.MineProfessionParams
 		);
 
 		// Properties:
@@ -10133,16 +10184,8 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 	{
 		// Constructors:
 		constructor(
-			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.MovableProfessionParams | null
+			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.MovableProfessionParams
 		);
-
-		// Properties:
-		readonly Steps: HordeResurrection.Basic.Primitives.PreciseFraction;
-
-		// Methods:
-		AddSteps(
-			stepsSpeed: HordeResurrection.Basic.Primitives.PreciseFraction
-		): boolean;
 	}
 }
 //#endregion
@@ -10154,7 +10197,7 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 	{
 		// Constructors:
 		constructor(
-			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.ReparableProfessionParams | null
+			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.ReparableProfessionParams
 		);
 
 		// Properties:
@@ -10166,11 +10209,11 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 
 		// Methods:
 		CanAddRepairer(
-			repairer: HordeClassLibrary.World.Objects.Units.Unit | null
+			repairer: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		AddRepairer(
-			repairer: HordeClassLibrary.World.Objects.Units.Unit | null
+			repairer: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 	}
 }
@@ -10183,7 +10226,7 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 	{
 		// Constructors:
 		constructor(
-			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.SawmillProfessionParams | null
+			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.SawmillProfessionParams
 		);
 
 		// Properties:
@@ -10225,7 +10268,7 @@ declare namespace HordeClassLibrary.UnitComponents.ProfessionData {
 	{
 		// Constructors:
 		constructor(
-			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.UnitProducerProfessionParams | null
+			professionParams: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.UnitProducerProfessionParams
 		);
 
 		// Fields:
@@ -10244,19 +10287,19 @@ declare namespace HordeClassLibrary.UnitComponents.Utils {
 
 		// Methods:
 		static GetNearDeathStage(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.Utils.BuildingStageUtils.StageInfo;
 
 		static GetDestructionStage(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.Utils.BuildingStageUtils.StageInfo;
 
 		static GetRepairStage(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.Utils.BuildingStageUtils.StageInfo;
 
 		static GetBuildingStage(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			healthValue: number
 		): HordeClassLibrary.UnitComponents.Utils.BuildingStageUtils.StageInfo;
 
@@ -10292,19 +10335,19 @@ declare namespace HordeClassLibrary.UnitComponents.Utils {
 
 		// Methods:
 		static SelectCompoundPart(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null,
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			scena: HordeClassLibrary.World.ScenaComponents.Scena,
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			initialPart?: HordeClassLibrary.UnitComponents.Enumerations.CompoundPart /* = CompoundPart.Point */
 		): HordeClassLibrary.UnitComponents.Enumerations.CompoundPart;
 
 		static SetActualCompoundPart(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			initialPart?: HordeClassLibrary.UnitComponents.Enumerations.CompoundPart /* = CompoundPart.Point */
 		): void;
 
 		static SetActualNeighborsCompoundPart(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		// Dummy constructor for some magic:
@@ -10319,30 +10362,30 @@ declare namespace HordeClassLibrary.UnitComponents.Utils {
 
 		// Methods:
 		static CheckStock(
-			harvester: HordeClassLibrary.World.Objects.Units.Unit | null,
-			target: HordeClassLibrary.World.Objects.Units.Unit | null,
+			harvester: HordeClassLibrary.World.Objects.Units.Unit,
+			target: HordeClassLibrary.World.Objects.Units.Unit,
 			item: HordeClassLibrary.UnitComponents.Enumerations.ResourceItemType | null
 		): boolean;
 
 		static CountStockQueue(
-			stockUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			stockUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			checkRadius: number
 		): number;
 
 		static GetStockQueueLength(
-			stockUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			stockUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			stockProfession: HordeClassLibrary.UnitComponents.Enumerations.UnitProfession
 		): number;
 
 		static SearchNearestTree(
-			workerUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			lumberStockUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			workerUnit: HordeClassLibrary.World.Objects.Units.Unit,
+			lumberStockUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			maxSpiralRadius: number
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 
 		static SearchNearestMine(
-			workerUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			metalStockUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			workerUnit: HordeClassLibrary.World.Objects.Units.Unit,
+			metalStockUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			maxSpiralRadius: number,
 			/*out*/ reachable: boolean
 		): HordeClassLibrary.World.Objects.Units.Unit;
@@ -10422,15 +10465,15 @@ declare namespace HordeClassLibrary.UnitComponents.Utils {
 
 		// Methods:
 		static GetPointsAtDistanceSafe(
-			unit: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null,
+			unit: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit,
 			dist: number,
-			targetPointsSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			targetPointsSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		): void;
 
 		static GetPointsAtDistanceUnsafe(
-			unit: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null,
+			unit: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit,
 			dist: number,
-			targetPointsSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			targetPointsSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		): void;
 
 		// Dummy constructor for some magic:
@@ -10487,7 +10530,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.BaseBuilding {
 
 		// Methods:
 		static CreateRuins(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			deathType: HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType
 		): void;
 	}
@@ -10657,12 +10700,12 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.BaseUnit {
 
 		// Methods:
 		static CreateEffects(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			deathType: HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType
 		): void;
 
 		static CreateDecayEffect(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			deathType: HordeClassLibrary.UnitComponents.Enumerations.UnitHurtType
 		): HordeClassLibrary.World.Objects.VisualEffects.AnimBasedVisualEffect;
 	}
@@ -10679,8 +10722,8 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.BaseUnit {
 
 		// Methods:
 		RandomTurn(
-			motion: HordeClassLibrary.UnitComponents.OrdersSystem.Motions.AMotionBase | null,
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			motion: HordeClassLibrary.UnitComponents.OrdersSystem.Motions.AMotionBase,
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 	}
 }
@@ -10787,26 +10830,26 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.BaseUnit.Special.Anal
 
 		// Methods:
 		IsNewTargetMoreActual(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			oldTarget: HordeClassLibrary.World.Objects.Units.Unit | null,
-			newTarget: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			oldTarget: HordeClassLibrary.World.Objects.Units.Unit,
+			newTarget: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean | null;
 
 		NearestUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			target1: HordeClassLibrary.World.Objects.Units.Unit | null,
-			target2: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			target1: HordeClassLibrary.World.Objects.Units.Unit,
+			target2: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.World.Objects.Units.Unit;
 
 		NearestPathUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			target1: HordeClassLibrary.World.Objects.Units.Unit | null,
-			target2: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			target1: HordeClassLibrary.World.Objects.Units.Unit,
+			target2: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.World.Objects.Units.Unit;
 
 		CanPassToAttackDistance(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			target: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			target: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 	}
 }
@@ -10822,12 +10865,12 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.BaseUnit.Special {
 
 		// Methods:
 		SuggestAlarm(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			newAlarm: HordeClassLibrary.UnitComponents.Notifications.Alarms.BaseUnitAlarm | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			newAlarm: HordeClassLibrary.UnitComponents.Notifications.Alarms.BaseUnitAlarm
 		): boolean;
 
 		ProcessComradeIsAttackedEvents(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 	}
 }
@@ -10898,7 +10941,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Buildings.Bridge {
 
 		// Methods:
 		static KillAllUnitsOnBridge(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 	}
 }
@@ -10943,49 +10986,49 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Buildings.Mine {
 
 		// Methods:
 		static CountResources(
-			mine: HordeClassLibrary.World.Objects.Units.Unit | null,
+			mine: HordeClassLibrary.World.Objects.Units.Unit,
 			/*out*/ goldAmount: number,
 			/*out*/ metalAmount: number
 		): void;
 
 		static CountResources(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null,
+			scena: HordeClassLibrary.World.ScenaComponents.Scena,
 			mineRect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
 			/*out*/ goldAmount: number,
 			/*out*/ metalAmount: number
 		): void;
 
 		static HasResources(
-			mine: HordeClassLibrary.World.Objects.Units.Unit | null,
+			mine: HordeClassLibrary.World.Objects.Units.Unit,
 			resMask?: HordeClassLibrary.World.Objects.Tiles.ResourceTileType | null /* = null */
 		): boolean;
 
 		static HasResources(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null,
+			scena: HordeClassLibrary.World.ScenaComponents.Scena,
 			mineRect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
 			resMask?: HordeClassLibrary.World.Objects.Tiles.ResourceTileType | null /* = null */
 		): boolean;
 
 		static CountKnownResources(
-			mine: HordeClassLibrary.World.Objects.Units.Unit | null,
+			mine: HordeClassLibrary.World.Objects.Units.Unit,
 			/*out*/ goldAmount: number,
 			/*out*/ metalAmount: number
 		): void;
 
 		static CountKnownResources(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
 			mineRect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
 			/*out*/ goldAmount: number,
 			/*out*/ metalAmount: number
 		): void;
 
 		static HasKnownResources(
-			mine: HordeClassLibrary.World.Objects.Units.Unit | null,
+			mine: HordeClassLibrary.World.Objects.Units.Unit,
 			resMask?: HordeClassLibrary.World.Objects.Tiles.ResourceTileType | null /* = null */
 		): boolean;
 
 		static HasKnownResources(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
 			mineRect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
 			resMask?: HordeClassLibrary.World.Objects.Tiles.ResourceTileType | null /* = null */
 		): boolean;
@@ -11126,7 +11169,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces {
 	{
 		// Methods:
 		Work(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		// Dummy constructor for some magic:
@@ -11139,7 +11182,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces {
 declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.AUnitWorkerCommon {
 	interface /* delegate */ DelegateWork {
 		(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -11154,7 +11197,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 	{
 		// Methods:
 		AnalyzeSituation(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		// Dummy constructor for some magic:
@@ -11167,7 +11210,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerAnalyzeSituation {
 	interface /* delegate */ DelegateAnalyzeSituation {
 		(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -11182,21 +11225,21 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 	{
 		// Methods:
 		CanBePlacedByRealMap(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null,
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			scena: HordeClassLibrary.World.ScenaComponents.Scena,
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			x: number,
 			y: number,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			checkForTerritory?: boolean /* = false */,
 			considerUnit?: boolean /* = true */
 		): boolean;
 
 		CanBePlacedByKnownMap(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			x: number,
 			y: number,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null,
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit,
 			checkForTerritory?: boolean /* = false */,
 			considerUnit?: boolean /* = true */
 		): boolean;
@@ -11211,11 +11254,11 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerCanBePlaced {
 	interface /* delegate */ DelegateCanBePlacedByRealMap {
 		(
-			scn: HordeClassLibrary.World.ScenaComponents.Scena | null,
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			scn: HordeClassLibrary.World.ScenaComponents.Scena,
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			x: number,
 			y: number,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			checkForTerritory?: boolean /* = false */,
 			considerUnit?: boolean /* = true */
 		): boolean;
@@ -11229,11 +11272,11 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AU
 declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerCanBePlaced {
 	interface /* delegate */ DelegateCanBePlacedByKnownMap {
 		(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			x: number,
 			y: number,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null,
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit,
 			checkForTerritory?: boolean /* = false */,
 			considerUnit?: boolean /* = true */
 		): boolean;
@@ -11250,7 +11293,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 	{
 		// Methods:
 		Cancel(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		// Dummy constructor for some magic:
@@ -11263,7 +11306,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerCancel {
 	interface /* delegate */ DelegateCancel {
 		(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -11278,7 +11321,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 	{
 		// Methods:
 		ProcessTick(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		// Dummy constructor for some magic:
@@ -11291,7 +11334,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerEveryTick {
 	interface /* delegate */ DelegateProcessTick {
 		(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -11306,8 +11349,8 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 	{
 		// Methods:
 		GetCommandType(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs
 		): boolean;
 
 		// Dummy constructor for some magic:
@@ -11320,8 +11363,8 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerGetCommandType {
 	interface /* delegate */ DelegateGetCommandType {
 		(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs
 		): boolean;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -11336,8 +11379,8 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 	{
 		// Methods:
 		GetOrder(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs
 		): boolean;
 
 		// Dummy constructor for some magic:
@@ -11350,8 +11393,8 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerGetOrder {
 	interface /* delegate */ DelegateGetOrder {
 		(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs | null
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs
 		): boolean;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -11370,15 +11413,15 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 
 		// Methods:
 		GetSpeedAtCellByRealMap(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): number;
 
 		GetSpeedAtCellByKnownMap(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit
 		): number;
 
 		// Dummy constructor for some magic:
@@ -11391,9 +11434,9 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special {
 declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerGetSpeedAtCell {
 	interface /* delegate */ DelegateGetSpeedAtCellByRealMap {
 		(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): number;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -11405,9 +11448,9 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AU
 declare namespace HordeClassLibrary.UnitComponents.Workers.Interfaces.Special.AUnitWorkerGetSpeedAtCell {
 	interface /* delegate */ DelegateGetSpeedAtCellByKnownMap {
 		(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+			/*out*/ troubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit
 		): number;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -11452,7 +11495,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Script {
 		// Constructors:
 		constructor(
 			CanBePlaced: boolean,
-			TroubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+			TroubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit
 		);
 
 		// Properties:
@@ -11470,7 +11513,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Script {
 		// Constructors:
 		constructor(
 			CanBePlaced: boolean,
-			TroubleUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			TroubleUnit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -11559,7 +11602,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Script {
 		// Constructors:
 		constructor(
 			Speed: number,
-			TroubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+			TroubleUnit: HordeClassLibrary.World.Objects.Units.KnownUnit
 		);
 
 		// Properties:
@@ -11577,7 +11620,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Script {
 		// Constructors:
 		constructor(
 			Speed: number,
-			TroubleUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			TroubleUnit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -11704,7 +11747,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Units.Aura {
 
 		// Methods:
 		ProcessHealing(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 	}
 }
@@ -11732,7 +11775,7 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Units.Builder {
 
 		// Methods:
 		static GetProducedHealth(
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			totalWorkTime: number
 		): number;
 
@@ -11779,17 +11822,17 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Units.Builder {
 
 		// Methods:
 		static GetLeftRepairTime(
-			repairedUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			repairedUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): number;
 
 		static GetRepairedHealth(
-			repairedUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			repairedUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			repairTime: number,
 			/*out*/ newTimeRemainder: number
 		): number;
 
 		static GetBaseRepairTime(
-			repairedUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			repairedUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): number;
 
 		// Dummy constructor for some magic:
@@ -11804,14 +11847,14 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Units.Harvester {
 
 		// Methods:
 		static DropItems(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
-			harvesterData: HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData | null,
-			harvesterParams?: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.HarvesterProfessionParams | null /* = null */
+			u: HordeClassLibrary.World.Objects.Units.Unit,
+			harvesterData: HordeClassLibrary.UnitComponents.ProfessionData.HarvesterProfessionData,
+			harvesterParams?: HordeClassLibrary.HordeContent.Configs.Units.ProfessionParams.HarvesterProfessionParams /* = null */
 		): void;
 
 		static TryGiveHarvestOrder(
-			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null,
-			productUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase,
+			productUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase;
 
 		// Dummy constructor for some magic:
@@ -11881,15 +11924,15 @@ declare namespace HordeClassLibrary.UnitComponents.Workers.Utils {
 
 		// Methods:
 		static CanWaitDisbandedUnitsForBuildOrder(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		static RefundBuildingCost(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		static SafeCancelOrderProduce(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		// Dummy constructor for some magic:
@@ -11904,8 +11947,8 @@ declare namespace HordeClassLibrary.Utils {
 
 		// Methods:
 		static Expand(
-			obj: any | null,
-			text: string | null
+			obj: any,
+			text: string
 		): string;
 
 		// Dummy constructor for some magic:
@@ -11930,15 +11973,15 @@ declare namespace HordeClassLibrary.Utils {
 
 		// Methods:
 		static ParseInt(
-			str: string | null
+			str: string
 		): number;
 
 		static ParseIntArr(
-			str: string | null
+			str: string
 		): number[];
 
 		static ParsePoint2D(
-			str: string | null
+			str: string
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D;
 
 		// Dummy constructor for some magic:
@@ -12086,18 +12129,18 @@ declare namespace HordeClassLibrary.Utils {
 		): boolean | null;
 
 		static AveragePoint(
-			points: System.Collections.Generic.IEnumerable<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null,
+			points: System.Collections.Generic.IEnumerable<HordeResurrection.Basic.Primitives.Geometry.Point2D>,
 			/*out*/ posX: number,
 			/*out*/ posY: number
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D;
 
 		static AveragePoint(
-			points: System.Collections.Generic.IEnumerable<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			points: System.Collections.Generic.IEnumerable<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D;
 
 		static GetVisualNearestPoint(
 			point: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			points: System.Collections.Generic.ICollection<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			points: System.Collections.Generic.ICollection<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D;
 
 		static GetRectangleVisualNearestPointsByMinkowski(
@@ -12149,6 +12192,10 @@ declare namespace HordeClassLibrary.World.Const {
 
 		// Fields:
 		static readonly /* const */ DumpTilesetCanvasesOnInitializationComplete: boolean; // = false
+		static readonly /* const */ AlwaysDownloadScena: boolean; // = false
+		static readonly /* const */ DownloadScenaDelay: number; // = 0
+		static readonly /* const */ FakeContentPacksComparing: boolean; // = false
+		static readonly /* const */ ShouldLogWindowStateChanges: boolean; // = true
 
 		// Dummy constructor for some magic:
 		protected constructor(...dummy: any[]);
@@ -12183,6 +12230,10 @@ declare namespace HordeClassLibrary.World.Const {
 		static readonly /* const */ ConfigsFileExtension: string; // = ".json"
 		static readonly /* const */ ScenasDir: string; // = "Content/Scenas/"
 		static readonly /* const */ ScenaFileExtension: string; // = ".scn"
+		static readonly /* const */ ScenasCacheDir: string; // = "Content/UserData/Cache/Scenas/"
+		static readonly /* const */ ScenaDescriptorsCacheFile: string; // = "Content/UserData/Cache/Scenas/DescriptorsCache.json"
+		static readonly /* const */ DownloadedScenasDirectory: string; // = "Content/Scenas/Downloads/"
+		static readonly /* const */ InstalledScenasDirectory: string; // = "Content/Scenas/Installed/"
 		static readonly /* const */ ForcesConfigPath: string; // = "Content/Configs/ForceConfigs.json"
 		static readonly /* const */ UnitConfigsDir: string; // = "Content/Configs/UnitConfigs/"
 		static readonly /* const */ BulletConfigsFilePath: string; // = "Content/Configs/BulletConfigs.json"
@@ -12232,6 +12283,7 @@ declare namespace HordeClassLibrary.World.Const {
 		static readonly /* const */ ReplaysFileExtension: string; // = ".json"
 		static readonly /* const */ ReplaysPathMask: string; // = "Content/UserData/Replays/{0:yyyy-MM-dd_HH-mm-ss}.json"
 		static readonly /* const */ ReplaysPathMaskExt: string; // = "Content/UserData/Replays/{0:yyyy-MM-dd_HH-mm-ss}_{1}.json"
+		static readonly /* const */ InstalledReplaysDirectory: string; // = "Content/UserData/Replays/Installed/"
 		static readonly /* const */ LogsDir: string; // = "Content/UserData/Logs/"
 		static readonly /* const */ LogPathMask: string; // = "Content/UserData/Logs/{0}.log"
 		static readonly /* const */ ReportsDir: string; // = "Content/UserData/Reports/"
@@ -12249,9 +12301,8 @@ declare namespace HordeClassLibrary.World.Const {
 		static readonly /* const */ PickupGraphicCatalogsMutexName: string; // = "HordeResurrection_PickupGraphicCatalogs"
 		static readonly /* const */ PickupSoundCatalogsMutexName: string; // = "HordeResurrection_PickupSoundCatalogs"
 		static readonly /* const */ PathSeparator: string; // = "/"
-		static readonly /* const */ NetworkScenaPartSize: number; // = 1048576
-		static readonly /* const */ NetworkDownloadedScenaNamePrefix: string; // = "download "
-		static readonly /* const */ NetworkScenaPathMask: string; // = "Content/Scenas/download {0}.scn"
+		static readonly /* const */ NetworkScenaPartSize: number; // = 20480
+		static readonly /* const */ NetworkScenaPathMask: string; // = "Content/Scenas/Downloads/{0}.scn"
 
 		// Properties:
 		static readonly ScriptFileExtensions: System.Collections.Generic.IReadOnlySet<string>;
@@ -12400,7 +12451,7 @@ declare namespace HordeClassLibrary.World.Context {
 
 		// Properties:
 		FogOfWar: HordeClassLibrary.World.Settlements.FogOfWar.FogOfWarSettings;
-		StartResources: HordeClassLibrary.World.Simple.ResourcesAmount;
+		StartResources: HordeClassLibrary.World.Simple.ResourcesAmount | null;
 		FpsLimit: number;
 		InputExecutionPeriod: number;
 	}
@@ -12516,11 +12567,10 @@ declare namespace HordeClassLibrary.World {
 
 		// Constructors:
 		constructor(
-			scenasDir: string | null
+			scenasDir: string
 		);
 
 		// Properties:
-		readonly Scenas: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptorsCollection;
 		readonly Nations: System.Collections.Generic.List<HordeClassLibrary.World.Nation>;
 
 		// Methods:
@@ -12648,11 +12698,11 @@ declare namespace HordeClassLibrary.World.Objects.Bullets {
 		): boolean;
 
 		CheckDetailedCollideWithUnit(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null
+			unit: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		static CheckDetailedCollideWithUnit(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			unit: HordeClassLibrary.World.Objects.Units.Unit,
 			position: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): boolean;
 
@@ -12667,7 +12717,7 @@ declare namespace HordeClassLibrary.World.Objects.Bullets {
 		ForceFinish(): void;
 
 		UtterSound(
-			sectionName: string | null,
+			sectionName: string,
 			position: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): void;
 
@@ -12750,7 +12800,7 @@ declare namespace HordeClassLibrary.World.Objects.Bullets {
 
 		// Methods:
 		SelectAnimationByDirection(
-			animationsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.Specialization.BulletAnimationsCatalog | null,
+			animationsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Graphics.Specialization.BulletAnimationsCatalog,
 			direction: number
 		): void;
 	}
@@ -12847,10 +12897,10 @@ declare namespace HordeClassLibrary.World.Objects.Bullets.Implementations.Fire {
 
 		// Methods:
 		static MakeFire(
-			sourceUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			sourceUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			firePosition: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			layer: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer,
-			fireConfig?: HordeClassLibrary.HordeContent.Configs.Bullets.BulletConfig | null /* = null */
+			fireConfig?: HordeClassLibrary.HordeContent.Configs.Bullets.BulletConfig /* = null */
 		): void;
 
 		// Dummy constructor for some magic:
@@ -13018,8 +13068,8 @@ declare namespace HordeClassLibrary.World.Objects.Bullets.Implementations.Other 
 
 		// Methods:
 		static LaunchFragments(
-			bulletConfig: HordeClassLibrary.HordeContent.Configs.Bullets.BulletConfig | null,
-			sourceUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			bulletConfig: HordeClassLibrary.HordeContent.Configs.Bullets.BulletConfig,
+			sourceUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			layer: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer,
 			count: number
 		): void;
@@ -13137,7 +13187,7 @@ declare namespace HordeClassLibrary.World.Objects.Bullets {
 		static CreateInstance(): HordeClassLibrary.World.Objects.Bullets.ShotParams;
 
 		static CreateFromCitadelConfig(
-			citadelCfg: HordeClassLibrary.HordeContent.Configs.Citadel.CitadelUnitConfig | null
+			citadelCfg: HordeClassLibrary.HordeContent.Configs.Citadel.CitadelUnitConfig
 		): HordeClassLibrary.World.Objects.Bullets.ShotParams;
 	}
 }
@@ -13155,7 +13205,7 @@ declare namespace HordeClassLibrary.World.Objects.Gears {
 
 		// Methods:
 		Initialize(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null
+			scena: HordeClassLibrary.World.ScenaComponents.Scena
 		): void;
 
 		UpdateOnGameTick(): void;
@@ -13210,8 +13260,8 @@ declare namespace HordeClassLibrary.World.Objects.Rules {
 	{
 		// Constructors:
 		constructor(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
-			ruleInstruction: HordeClassLibrary.HordeContent.Configs.Rules.Instructions.ARuleInstruction | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
+			ruleInstruction: HordeClassLibrary.HordeContent.Configs.Rules.Instructions.ARuleInstruction
 		);
 
 		// Properties:
@@ -13227,8 +13277,8 @@ declare namespace HordeClassLibrary.World.Objects.Rules {
 	{
 		// Constructors:
 		constructor(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
-			ruleInstruction: HordeClassLibrary.HordeContent.Configs.Rules.Instructions.ARuleInstruction | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
+			ruleInstruction: HordeClassLibrary.HordeContent.Configs.Rules.Instructions.ARuleInstruction
 		);
 
 		// Properties:
@@ -13244,17 +13294,17 @@ declare namespace HordeClassLibrary.World.Objects.Rules {
 	{
 		// Constructors:
 		constructor(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
-			ruleInstruction: HordeClassLibrary.HordeContent.Configs.Rules.Instructions.ARuleInstruction | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
+			ruleInstruction: HordeClassLibrary.HordeContent.Configs.Rules.Instructions.ARuleInstruction
 		);
 
 		// Methods:
 		IsAllowToProduceUnit(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		GetCurrentLimitForUnit(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): number | null;
 	}
 }
@@ -13267,17 +13317,17 @@ declare namespace HordeClassLibrary.World.Objects.Rules {
 	{
 		// Constructors:
 		constructor(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
-			ruleInstruction: HordeClassLibrary.HordeContent.Configs.Rules.Instructions.ARuleInstruction | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
+			ruleInstruction: HordeClassLibrary.HordeContent.Configs.Rules.Instructions.ARuleInstruction
 		);
 
 		// Methods:
 		IsAllowToProduceUnit(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		GetCurrentLimitForUnit(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): number | null;
 	}
 }
@@ -13299,7 +13349,7 @@ declare namespace HordeClassLibrary.World.Objects.SoundEffects {
 		Initialize(): void;
 
 		Process(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null
+			scena: HordeClassLibrary.World.ScenaComponents.Scena
 		): void;
 
 		MarkAsPaused(): void;
@@ -13337,7 +13387,7 @@ declare namespace HordeClassLibrary.World.Objects.SoundEffects {
 	{
 		// Constructors:
 		constructor(
-			sound: HordeClassLibrary.HordeContent.ViewResources.Audio.SoundView | null,
+			sound: HordeClassLibrary.HordeContent.ViewResources.Audio.SoundView,
 			center: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -13393,7 +13443,7 @@ declare namespace HordeClassLibrary.World.Objects.SoundEffects {
 declare namespace HordeClassLibrary.World.Objects.Squads {
 	interface /* delegate */ CanControlDelegate {
 		(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -13410,7 +13460,7 @@ declare namespace HordeClassLibrary.World.Objects.Squads {
 	{
 		// Constructors:
 		constructor(
-			units?: HordeClassLibrary.World.Objects.Units.UnitsCollection | null /* = null */
+			units?: HordeClassLibrary.World.Objects.Units.UnitsCollection /* = null */
 		);
 
 		// Fields:
@@ -13424,7 +13474,7 @@ declare namespace HordeClassLibrary.World.Objects.Squads {
 
 		// Methods:
 		GetAllowedCommands(
-			transferDict: System.Collections.Generic.Dictionary<HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand, HordeClassLibrary.HordeContent.Configs.UnitCommandConfig> | null
+			transferDict: System.Collections.Generic.Dictionary<HordeClassLibrary.UnitComponents.OrdersSystem.UnitCommand, HordeClassLibrary.HordeContent.Configs.UnitCommandConfig>
 		): void;
 
 		Destroy(): void;
@@ -13434,21 +13484,21 @@ declare namespace HordeClassLibrary.World.Objects.Squads {
 		ResetAverageValues(): void;
 
 		GiveOrder(
-			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs | null,
-			canControlCallback: HordeClassLibrary.World.Objects.Squads.CanControlDelegate | null
+			commandArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.ACommandArgs,
+			canControlCallback: HordeClassLibrary.World.Objects.Squads.CanControlDelegate
 		): void;
 
 		ChangeCommandAutomaticMode(
 			/*in*/ autoCommandSwitchArgs: HordeClassLibrary.UnitComponents.OrdersSystem.CommandArgs.AutoCommandSwitchArgs,
-			canControlCallback: HordeClassLibrary.World.Objects.Squads.CanControlDelegate | null
+			canControlCallback: HordeClassLibrary.World.Objects.Squads.CanControlDelegate
 		): void;
 
 		UnionWith(
-			other: HordeClassLibrary.World.Objects.Squads.Squad | null
+			other: HordeClassLibrary.World.Objects.Squads.Squad
 		): HordeClassLibrary.World.Objects.Squads.Squad;
 
 		ExceptSquad(
-			other: HordeClassLibrary.World.Objects.Squads.Squad | null
+			other: HordeClassLibrary.World.Objects.Squads.Squad
 		): HordeClassLibrary.World.Objects.Squads.Squad;
 
 		Copy(): HordeClassLibrary.World.Objects.Squads.Squad;
@@ -13460,7 +13510,7 @@ declare namespace HordeClassLibrary.World.Objects.Squads {
 		GetLastUnit(): HordeClassLibrary.World.Objects.Units.Unit;
 
 		ContainsConfig(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		IsCommandAutomated(
@@ -13500,7 +13550,7 @@ declare namespace HordeClassLibrary.World.Objects.Squads {
 		): HordeClassLibrary.World.Objects.Squads.Squad;
 
 		SetSquad(
-			squad: HordeClassLibrary.World.Objects.Squads.Squad | null,
+			squad: HordeClassLibrary.World.Objects.Squads.Squad,
 			squadNumber: number
 		): void;
 
@@ -13549,7 +13599,7 @@ declare namespace HordeClassLibrary.World.Objects.Tiles {
 
 		// Constructors:
 		constructor(
-			realTile: HordeClassLibrary.World.Objects.Tiles.ResourceTile | null,
+			realTile: HordeClassLibrary.World.Objects.Tiles.ResourceTile,
 			visibleNow: boolean
 		);
 
@@ -13562,7 +13612,7 @@ declare namespace HordeClassLibrary.World.Objects.Tiles {
 
 		// Methods:
 		UpdateTile(
-			tile: HordeClassLibrary.World.Objects.Tiles.ResourceTile | null,
+			tile: HordeClassLibrary.World.Objects.Tiles.ResourceTile,
 			visibleNow: boolean
 		): void;
 
@@ -13577,7 +13627,7 @@ declare namespace HordeClassLibrary.World.Objects.Tiles {
 
 		// Constructors:
 		constructor(
-			realTile: HordeClassLibrary.World.Objects.Tiles.Tile | null,
+			realTile: HordeClassLibrary.World.Objects.Tiles.Tile,
 			visibleNow: boolean
 		);
 
@@ -13588,16 +13638,16 @@ declare namespace HordeClassLibrary.World.Objects.Tiles {
 
 		// Methods:
 		UpdateTile(
-			tile: HordeClassLibrary.World.Objects.Tiles.Tile | null,
+			tile: HordeClassLibrary.World.Objects.Tiles.Tile,
 			visibleNow: boolean
 		): void;
 
 		CfgChanged(
-			actualCfg: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig | null
+			actualCfg: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig
 		): boolean;
 
 		SetKnownCfg(
-			cfg: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig | null
+			cfg: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig
 		): void;
 	}
 }
@@ -13609,7 +13659,7 @@ declare namespace HordeClassLibrary.World.Objects.Tiles {
 
 		// Constructors:
 		constructor(
-			model: HordeClassLibrary.World.Objects.Tiles.ResourceTileModel | null
+			data: HordeClassLibrary.World.Objects.Tiles.ResourceTileData
 		);
 
 		// Fields:
@@ -13635,9 +13685,9 @@ declare namespace HordeClassLibrary.World.Objects.Tiles {
 }
 //#endregion
 
-//#region ResourceTileModel
+//#region ResourceTileData
 declare namespace HordeClassLibrary.World.Objects.Tiles {
-	class ResourceTileModel extends System.Object {
+	class ResourceTileData extends System.Object {
 
 		// Constructors:
 		constructor();
@@ -13666,7 +13716,7 @@ declare namespace HordeClassLibrary.World.Objects.Tiles {
 
 		// Constructors:
 		constructor(
-			model: HordeClassLibrary.World.Objects.Tiles.TileModel | null
+			data: HordeClassLibrary.World.Objects.Tiles.TileData
 		);
 
 		// Properties:
@@ -13676,7 +13726,7 @@ declare namespace HordeClassLibrary.World.Objects.Tiles {
 
 		// Methods:
 		ChangeConfig(
-			newCfg: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig | null
+			newCfg: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig
 		): void;
 
 		HasFire(): boolean;
@@ -13694,9 +13744,9 @@ declare namespace HordeClassLibrary.World.Objects.Tiles {
 
 		// Constructors:
 		constructor(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null,
-			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer | null,
-			tileProvider: HordeClassLibrary.World.Objects.Tiles.ITileConfigProvider | null
+			scena: HordeClassLibrary.World.ScenaComponents.Scena,
+			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer,
+			tileProvider: HordeClassLibrary.World.Objects.Tiles.ITileConfigProvider
 		);
 
 		// Properties:
@@ -13741,9 +13791,9 @@ declare namespace HordeClassLibrary.World.Objects.Tiles.TileConfigPicker {
 }
 //#endregion
 
-//#region TileModel
+//#region TileData
 declare namespace HordeClassLibrary.World.Objects.Tiles {
-	class TileModel extends System.Object {
+	class TileData extends System.Object {
 
 		// Constructors:
 		constructor();
@@ -13763,7 +13813,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		constructor();
 
 		constructor(
-			unitToDelete: HordeClassLibrary.World.Objects.Units.Unit | null
+			unitToDelete: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -13782,7 +13832,8 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		readonly Owner: HordeClassLibrary.World.Settlements.Settlement;
 		readonly Rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D;
 		readonly Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
-		readonly Position: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly Position: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector;
+		readonly PositionInt: HordeResurrection.Basic.Primitives.Geometry.Point2D;
 		readonly MapLayer: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer;
 		readonly DrawLayer: HordeClassLibrary.World.Simple.DrawLayer;
 		readonly RealUnit: HordeClassLibrary.World.Objects.Units.Unit;
@@ -13810,7 +13861,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 	{
 		// Constructors:
 		constructor(
-			mapOwner: HordeClassLibrary.World.Settlements.Settlement | null
+			mapOwner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Properties:
@@ -13825,7 +13876,8 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		readonly Cfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
 		readonly Owner: HordeClassLibrary.World.Settlements.Settlement;
 		readonly RenderData: HordeClassLibrary.HordeContent.ViewResources.Graphics.RenderData;
-		readonly Position: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly Position: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector;
+		readonly PositionInt: HordeResurrection.Basic.Primitives.Geometry.Point2D;
 		readonly DrawLayer: HordeClassLibrary.World.Simple.DrawLayer;
 		readonly Effects: HordeClassLibrary.UnitComponents.Enumerations.UnitEffectFlag;
 		readonly Health: number;
@@ -13843,7 +13895,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		CanBeCapturedNow(): boolean;
 
 		Initialize(
-			realUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			realUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		Deinitialize(): void;
@@ -13890,7 +13942,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 
 		// Methods:
 		SetKnownUnit(
-			knownUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null
+			knownUnit: HordeClassLibrary.World.Objects.Units.KnownUnit
 		): void;
 	}
 }
@@ -14018,7 +14070,8 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		readonly ComebackCell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
 		readonly Rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D;
 		readonly MoveToRect: HordeResurrection.Basic.Primitives.Geometry.Rect2D | null;
-		readonly Position: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		readonly Position: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector;
+		readonly PositionInt: HordeResurrection.Basic.Primitives.Geometry.Point2D;
 		readonly Direction: HordeClassLibrary.UnitComponents.Enumerations.UnitDirection;
 		CompoundPart: HordeClassLibrary.UnitComponents.Enumerations.CompoundPart;
 		readonly DrawLayer: HordeClassLibrary.World.Simple.DrawLayer;
@@ -14097,7 +14150,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 
 		TryGetProfessionData<T extends HordeClassLibrary.UnitComponents.ProfessionData.IUnitProfessionData>(
 			$T: typeof HordeClassLibrary.UnitComponents.ProfessionData.IUnitProfessionData,
-			/*out*/ professionData: T | null
+			/*out*/ professionData: T
 		): boolean;
 
 		UpdateProfessionCommands(): void;
@@ -14107,18 +14160,18 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		): HordeClassLibrary.UnitComponents.Enumerations.PatternUnitFeature;
 
 		SuggestMoveAwayOrder(
-			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			requestedCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): void;
 
 		SuggestStepAwayWaitingOrder(
-			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit,
 			requestedCell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			suggestedCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): void;
 
 		CanMoveAwayNow(
-			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			requesterUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		RepairRequiredNow(): boolean;
@@ -14128,7 +14181,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		RepairCompleted(): boolean;
 
 		CanRepairLite(
-			repairTarget: HordeClassLibrary.World.Objects.Units.Unit | null
+			repairTarget: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		CanBeBuiltNow(): boolean;
@@ -14144,7 +14197,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		): void;
 
 		SetWaitTarget(
-			waitTarget: HordeClassLibrary.World.Objects.Units.Unit | null,
+			waitTarget: HordeClassLibrary.World.Objects.Units.Unit,
 			waitWeight?: number /* = 1 */
 		): void;
 
@@ -14153,7 +14206,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		GetId(): HordeClassLibrary.World.Objects.Units.UnitIdLabel;
 
 		ChangeOwner(
-			newOwner: HordeClassLibrary.World.Settlements.Settlement | null
+			newOwner: HordeClassLibrary.World.Settlements.Settlement
 		): void;
 
 		ChangeSight(
@@ -14182,6 +14235,70 @@ declare namespace HordeClassLibrary.World.Objects.Units.Unit {
 }
 //#endregion
 
+//#region UnitData
+declare namespace HordeClassLibrary.World.Objects.Units {
+	class UnitData extends System.Object {
+
+		// Constructors:
+		constructor(
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
+			positionData: HordeClassLibrary.World.Objects.Units.UnitPositionData
+		);
+
+		constructor();
+
+		// Properties:
+		Name: string;
+		Cfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
+		Experience: number;
+		Health: number;
+		HealthOld: number;
+		LifeState: HordeClassLibrary.UnitComponents.Enumerations.UnitLifeState;
+		PositionData: HordeClassLibrary.World.Objects.Units.UnitPositionData;
+		ProfessionsData: System.Collections.Generic.Dictionary<HordeClassLibrary.UnitComponents.Enumerations.UnitProfession, HordeClassLibrary.UnitComponents.ProfessionData.IUnitProfessionData>;
+		IsDummy: boolean;
+		CurrentSight: number;
+		CurrentForestVision: number;
+		IsCitadelUnit: boolean;
+		CitadelSpriteLocalIndex: number;
+		CitadelExtraData: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.ExtraData.CitadelUnitExtraData;
+
+		// Methods:
+		FromCitadelUnit(
+			citadelUnit: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.CitadelUnit
+		): void;
+	}
+}
+//#endregion
+
+//#region UnitDataFactory
+declare namespace HordeClassLibrary.World.Objects.Units {
+	abstract class UnitDataFactory {
+
+		// Methods:
+		static CreateProducedUnitData(
+			parameters: HordeClassLibrary.World.Objects.Units.ProducedUnitParameters
+		): HordeClassLibrary.World.Objects.Units.UnitData;
+
+		static CreateSpawnedUnitData(
+			parameters: HordeClassLibrary.World.Objects.Units.SpawnUnitParameters
+		): HordeClassLibrary.World.Objects.Units.UnitData;
+
+		static ProcessUnitReplacing(
+			newUnitData: HordeClassLibrary.World.Objects.Units.UnitData,
+			parameters: HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters
+		): void;
+
+		static CreateDummyUnitData(
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
+		): HordeClassLibrary.World.Objects.Units.UnitData;
+
+		// Dummy constructor for some magic:
+		protected constructor(...dummy: any[]);
+	}
+}
+//#endregion
+
 //#region UnitIdLabel
 declare namespace HordeClassLibrary.World.Objects.Units {
 	class /* struct */ UnitIdLabel extends System.ValueType
@@ -14190,7 +14307,7 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		// Constructors:
 		constructor(
 			Id: number,
-			SettlementUid: string | null
+			SettlementUid: string
 		);
 
 		// Properties:
@@ -14203,79 +14320,15 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 }
 //#endregion
 
-//#region UnitModel
+//#region UnitPositionData
 declare namespace HordeClassLibrary.World.Objects.Units {
-	class UnitModel extends System.Object {
-
-		// Constructors:
-		constructor(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
-			positionModel: HordeClassLibrary.World.Objects.Units.UnitPositionModel | null
-		);
-
-		constructor();
-
-		// Properties:
-		Name: string;
-		Cfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
-		Experience: number;
-		Health: number;
-		HealthOld: number;
-		LifeState: HordeClassLibrary.UnitComponents.Enumerations.UnitLifeState;
-		PositionModel: HordeClassLibrary.World.Objects.Units.UnitPositionModel;
-		ProfessionsData: System.Collections.Generic.Dictionary<HordeClassLibrary.UnitComponents.Enumerations.UnitProfession, HordeClassLibrary.UnitComponents.ProfessionData.IUnitProfessionData>;
-		IsDummy: boolean;
-		CurrentSight: number;
-		CurrentForestVision: number;
-		IsCitadelUnit: boolean;
-		CitadelSpriteLocalIndex: number;
-		CitadelExtraData: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.ExtraData.CitadelUnitExtraData;
-
-		// Methods:
-		FromCitadelUnit(
-			citadelUnit: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.CitadelUnit | null
-		): void;
-	}
-}
-//#endregion
-
-//#region UnitModelsFactory
-declare namespace HordeClassLibrary.World.Objects.Units {
-	abstract class UnitModelsFactory {
-
-		// Methods:
-		static CreateProducedUnitModel(
-			parameters: HordeClassLibrary.World.Objects.Units.ProducedUnitParameters | null
-		): HordeClassLibrary.World.Objects.Units.UnitModel;
-
-		static CreateSpawnedUnitModel(
-			parameters: HordeClassLibrary.World.Objects.Units.SpawnUnitParameters | null
-		): HordeClassLibrary.World.Objects.Units.UnitModel;
-
-		static ProcessUnitReplacing(
-			newUnitModel: HordeClassLibrary.World.Objects.Units.UnitModel | null,
-			parameters: HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters | null
-		): void;
-
-		static CreateDummyUnitModel(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
-		): HordeClassLibrary.World.Objects.Units.UnitModel;
-
-		// Dummy constructor for some magic:
-		protected constructor(...dummy: any[]);
-	}
-}
-//#endregion
-
-//#region UnitPositionModel
-declare namespace HordeClassLibrary.World.Objects.Units {
-	class UnitPositionModel extends System.Object {
+	class UnitPositionData extends System.Object {
 
 		// Constructors:
 		constructor();
 
 		// Properties:
-		Position: HordeResurrection.Basic.Primitives.Geometry.Point2D;
+		Position: HordeResurrection.Basic.Primitives.Geometry.PreciseFractionVector;
 		Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
 		MoveToCell: HordeResurrection.Basic.Primitives.Geometry.Point2D | null;
 		ComebackCell: HordeResurrection.Basic.Primitives.Geometry.Point2D;
@@ -14287,8 +14340,8 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 
 		// Methods:
 		FromCitadelUnit(
-			citadelUnit: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.CitadelUnit | null,
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			citadelUnit: HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.CitadelUnit,
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): void;
 	}
 }
@@ -14303,26 +14356,26 @@ declare namespace HordeClassLibrary.World.Objects.Units {
 		constructor();
 
 		constructor(
-			otherCollection: HordeClassLibrary.World.Objects.Units.UnitsCollection | null
+			otherCollection: HordeClassLibrary.World.Objects.Units.UnitsCollection
 		);
 
 		constructor(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null
+			unit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Methods:
 		Copy(): HordeClassLibrary.World.Objects.Units.UnitsCollection;
 
 		UnionWith(
-			other: HordeClassLibrary.World.Objects.Units.UnitsCollection | null
+			other: HordeClassLibrary.World.Objects.Units.UnitsCollection
 		): HordeClassLibrary.World.Objects.Units.UnitsCollection;
 
 		ExceptWith(
-			other: HordeClassLibrary.World.Objects.Units.UnitsCollection | null
+			other: HordeClassLibrary.World.Objects.Units.UnitsCollection
 		): HordeClassLibrary.World.Objects.Units.UnitsCollection;
 
 		IntersectWith(
-			other: HordeClassLibrary.World.Objects.Units.UnitsCollection | null
+			other: HordeClassLibrary.World.Objects.Units.UnitsCollection
 		): HordeClassLibrary.World.Objects.Units.UnitsCollection;
 	}
 }
@@ -14350,7 +14403,7 @@ declare namespace HordeClassLibrary.World.Objects.VisualEffects {
 
 		// Methods:
 		SetAnimation(
-			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null,
+			animation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView,
 			startFrameNumber: number | null
 		): void;
 
@@ -14378,11 +14431,11 @@ declare namespace HordeClassLibrary.World.Objects.VisualEffects {
 		Initialize(): void;
 
 		Process(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null
+			scena: HordeClassLibrary.World.ScenaComponents.Scena
 		): void;
 
 		CustomFogOfWarCheck(
-			fogOfWar: HordeClassLibrary.World.Settlements.Modules.Vision.FogOfWarVision | null
+			fogOfWar: HordeClassLibrary.World.Settlements.Modules.Vision.FogOfWarVision
 		): boolean;
 
 		// Dummy constructor for some magic:
@@ -14397,7 +14450,7 @@ declare namespace HordeClassLibrary.World.Objects.VisualEffects.CreationParamete
 
 		// Constructors:
 		constructor(
-			effectConfig: HordeClassLibrary.HordeContent.Configs.VisualEffects.VisualEffectConfig | null,
+			effectConfig: HordeClassLibrary.HordeContent.Configs.VisualEffects.VisualEffectConfig,
 			center: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -14415,7 +14468,7 @@ declare namespace HordeClassLibrary.World.Objects.VisualEffects.CreationParamete
 	{
 		// Constructors:
 		constructor(
-			effectConfig: HordeClassLibrary.HordeContent.Configs.VisualEffects.VisualEffectConfig | null,
+			effectConfig: HordeClassLibrary.HordeContent.Configs.VisualEffects.VisualEffectConfig,
 			center: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -14431,8 +14484,8 @@ declare namespace HordeClassLibrary.World.Objects.VisualEffects.Factories {
 
 		// Methods:
 		CreateInstance(
-			context: HordeClassLibrary.World.Context.BattleContext | null,
-			creationParams: HordeClassLibrary.World.Objects.VisualEffects.CreationParameters.AnimBasedVisualEffectCreationParams | null
+			context: HordeClassLibrary.World.Context.BattleContext,
+			creationParams: HordeClassLibrary.World.Objects.VisualEffects.CreationParameters.AnimBasedVisualEffectCreationParams
 		): HordeClassLibrary.World.Objects.VisualEffects.AnimBasedVisualEffect;
 
 		// Dummy constructor for some magic:
@@ -14445,8 +14498,8 @@ declare namespace HordeClassLibrary.World.Objects.VisualEffects.Factories {
 declare namespace HordeClassLibrary.World.Objects.VisualEffects.Factories.AVisualEffectFactory {
 	interface /* delegate */ CreateInstanceDelegate {
 		(
-			context: HordeClassLibrary.World.Context.BattleContext | null,
-			creationParams: HordeClassLibrary.World.Objects.VisualEffects.CreationParameters.AnimBasedVisualEffectCreationParams | null
+			context: HordeClassLibrary.World.Context.BattleContext,
+			creationParams: HordeClassLibrary.World.Objects.VisualEffects.CreationParameters.AnimBasedVisualEffectCreationParams
 		): HordeClassLibrary.World.Objects.VisualEffects.AnimBasedVisualEffect;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -14518,9 +14571,9 @@ declare namespace HordeClassLibrary.World.Objects.VisualEffects.Implementations 
 
 		// Methods:
 		SetDecayAnimation(
-			firstAnimation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null,
+			firstAnimation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView,
 			timeToShowFrame: number,
-			decayAnimation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView | null
+			decayAnimation: HordeClassLibrary.HordeContent.ViewResources.Graphics.AnimationView
 		): void;
 	}
 }
@@ -14612,7 +14665,7 @@ declare namespace HordeClassLibrary.World.Objects.VisualEffects.Implementations 
 
 		// Methods:
 		SetMonitoredUnit(
-			monitoredUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			monitoredUnit: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 	}
 }
@@ -14740,12 +14793,16 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 
 		// Constructors:
 		constructor(
-			fileInfo: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaFileInfo | null
+			fileDescriptor: HordeClassLibrary.Miscellaneous.FileTree.IFileDescriptor
+		);
+
+		constructor(
+			scenaPath: string
 		);
 
 		// Properties:
-		readonly FileInfo: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaFileInfo;
-		readonly HashInfo: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaHashInfo;
+		readonly FileInfo: HordeClassLibrary.Miscellaneous.FileTree.IFileDescriptor;
+		readonly Stamp: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaStamp;
 		readonly Format: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaFormat;
 		readonly GameVersion: HordeClassLibrary.Basic.GameVersion.HordeVersion;
 		readonly ScenaVersion: HordeClassLibrary.Basic.GameVersion.HordeVersion;
@@ -14753,144 +14810,9 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 		readonly Description: string;
 		readonly Size: HordeResurrection.Basic.Primitives.Geometry.Size2D;
 		readonly ContentPackRequirements: System.Collections.Generic.List<string>;
-		readonly Stamp: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaStamp;
 
 		// Methods:
 		CheckRequirements(): boolean;
-	}
-}
-//#endregion
-
-//#region ScenaDescriptorsCollection
-declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
-	class ScenaDescriptorsCollection extends System.Object
-		implements
-			System.Collections.Generic.IEnumerable<HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor>,
-			System.Collections.IEnumerable
-	{
-		// Constructors:
-		constructor();
-
-		// Methods:
-		FindScenaByHashOrFileName(
-			scenaStamp: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaStamp | null,
-			checkIntegrity: boolean
-		): HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor;
-
-		FindScenaByHash(
-			fileLength: number,
-			hash: number[] | null
-		): HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor;
-
-		FindScenaByHash(
-			scenaStamp: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaStamp | null
-		): HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor;
-
-		FindScenaByFileName(
-			fileName: string | null
-		): HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor;
-
-		FindScenaByFileName(
-			scenaStamp: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaStamp | null
-		): HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor;
-
-		ScanDirectory(
-			directory: string | null
-		): void;
-
-		AddScenaFile(
-			scenaPath: string | null
-		): HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor;
-
-		Clear(): void;
-
-		GetEnumerator(): System.Collections.Generic.IEnumerator<HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor>;
-
-		GetEnumerator(): System.Collections.IEnumerator;
-	}
-}
-//#endregion
-
-//#region ScenaFileInfo
-declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
-	class ScenaFileInfo extends System.Object {
-
-		// Constructors:
-		constructor(
-			filePath: string | null
-		);
-
-		// Properties:
-		readonly FilePath: string;
-		readonly FileName: string;
-		readonly FileLength: number;
-	}
-}
-//#endregion
-
-//#region ScenaHashInfo
-declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
-	class ScenaHashInfo extends System.Object {
-
-		// Constructors:
-		constructor(
-			scenaFileInfo: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaFileInfo | null
-		);
-
-		// Properties:
-		readonly ScenaFileInfo: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaFileInfo;
-		readonly HashBytes: number[];
-		readonly ShortHash: number;
-		readonly Hash: string;
-		readonly IsHashCalculated: boolean;
-
-		// Methods:
-		CompareHash(
-			shortHash: number,
-			fullHash: number[] | null
-		): boolean;
-
-		CompareFullHash(
-			fullHash: number[] | null
-		): boolean;
-	}
-}
-//#endregion
-
-//#region ScenaInLobby
-declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
-	class ScenaInLobby extends System.Object {
-
-		// Constructors:
-		constructor(
-			scenaDescriptor: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor | null
-		);
-
-		// Properties:
-		readonly Format: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaFormat;
-		readonly ScenaName: string;
-		readonly Size: HordeResurrection.Basic.Primitives.Geometry.Size2D;
-		readonly Rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D;
-		readonly Tileset: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaTileset;
-		readonly LandscapeMap: HordeClassLibrary.World.Objects.Tiles.TileModel[][];
-		readonly Settlements: System.Collections.Generic.Dictionary<string, HordeClassLibrary.World.Settlements.Models.SettlementModel>;
-		readonly FileStamp: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaStamp;
-		readonly IsLoaded: boolean;
-
-		// Methods:
-		GetStartResources(
-			/*out*/ resourcesAmount: HordeClassLibrary.World.Simple.ResourcesAmount | null
-		): boolean;
-
-		IsSettlementPlayable(
-			settlementUid: string | null
-		): boolean;
-
-		LoadBasicInfo(): void;
-
-		GetMinimapPixels(): number[];
-
-		GetMinimapData(): HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaMinimapData;
 	}
 }
 //#endregion
@@ -14902,18 +14824,28 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 		// Constructors:
 		constructor(
 			size: HordeResurrection.Basic.Primitives.Geometry.Size2D,
-			textureData: number[] | null
+			pixels: number[]
 		);
+
+		constructor(
+			size: HordeResurrection.Basic.Primitives.Geometry.Size2D,
+			compressedPixels: number[]
+		);
+
+		// Fields:
+		_pixels: number[];
+		_compressedPixels: number[];
 
 		// Properties:
 		readonly Size: HordeResurrection.Basic.Primitives.Geometry.Size2D;
-		readonly TextureData: number[];
+		readonly Pixels: number[];
+		readonly CompressedPixels: number[];
 
 		// Methods:
 		ToBytes(): number[];
 
 		static FromBytes(
-			bytes: number[] | null
+			bytes: number[]
 		): HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaMinimapData;
 	}
 }
@@ -14925,21 +14857,34 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Descriptors {
 
 		// Constructors:
 		constructor(
-			fileName: string | null,
-			fileLength: number,
-			hash: number[] | null,
-			version: string | null
+			fileName: string,
+			fileSize: number,
+			hash: number[],
+			version: string
 		);
 
-		constructor();
+		constructor(
+			fileDescriptor: HordeClassLibrary.Miscellaneous.FileTree.IFileDescriptor,
+			version: HordeClassLibrary.Basic.GameVersion.HordeVersion
+		);
 
 		// Properties:
 		readonly FileName: string;
-		readonly FileLength: number;
+		readonly FileSize: number;
 		readonly Hash: string;
-		readonly Version: string;
+		readonly Version: HordeClassLibrary.Basic.GameVersion.HordeVersion;
 		readonly HashBytes: number[];
 		readonly ShortHash: number;
+
+		// Methods:
+		CompareHash(
+			shortHash: number,
+			fullHash: number[]
+		): boolean;
+
+		CompareFullHash(
+			fullHash: number[]
+		): boolean;
 	}
 }
 //#endregion
@@ -14951,7 +14896,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		// Constructors:
 		constructor(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			curTile: HordeClassLibrary.World.Objects.Tiles.Tile | null
+			curTile: HordeClassLibrary.World.Objects.Tiles.Tile
 		);
 
 		// Properties:
@@ -14971,7 +14916,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		// Constructors:
 		constructor(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			curTile: HordeClassLibrary.World.Objects.Tiles.ResourceTile | null
+			curTile: HordeClassLibrary.World.Objects.Tiles.ResourceTile
 		);
 
 		// Properties:
@@ -15001,7 +14946,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.ScenaComponents.Scena | null
+			owner: HordeClassLibrary.World.ScenaComponents.Scena
 		);
 
 		// Properties:
@@ -15031,7 +14976,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		// Methods:
 		TryGet(
 			id: number,
-			/*out*/ obj: TScenaObject | null
+			/*out*/ obj: TScenaObject
 		): boolean;
 
 		GetEnumerator(): System.Collections.Generic.IEnumerator<TScenaObject>;
@@ -15115,7 +15060,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		// Constructors:
 		constructor(
 			$TScenaObject: typeof HordeClassLibrary.World.Objects.AScenaObject,
-			idProvider: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaObjectsIdProvider | null
+			idProvider: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaObjectsIdProvider
 		);
 
 		constructor(
@@ -15129,7 +15074,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		// Methods:
 		TryGet(
 			id: number,
-			/*out*/ obj: TScenaObject | null
+			/*out*/ obj: TScenaObject
 		): boolean;
 
 		GetEnumerator(): System.Collections.Generic.IEnumerator<TScenaObject>;
@@ -15193,7 +15138,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 	{
 		// Constructors:
 		constructor(
-			idProvider: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaObjectsIdProvider | null
+			idProvider: HordeClassLibrary.World.ScenaComponents.Intrinsics.ScenaObjectsIdProvider
 		);
 	}
 }
@@ -15263,7 +15208,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 	{
 		// Constructors:
 		constructor(
-			settlements: System.Collections.Generic.OrderedDictionary<string, HordeClassLibrary.World.Settlements.Settlement> | null
+			settlements: System.Collections.Generic.OrderedDictionary<string, HordeClassLibrary.World.Settlements.Settlement>
 		);
 
 		// Properties:
@@ -15274,11 +15219,11 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		// Methods:
 		GetByUid(
-			patternSettlementUid: string | null
+			patternSettlementUid: string
 		): HordeClassLibrary.World.Settlements.Settlement;
 
 		ApplyRules(
-			rules: System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.Configs.Rules.RuleConfig> | null
+			rules: System.Collections.Generic.IEnumerable<HordeClassLibrary.HordeContent.Configs.Rules.RuleConfig>
 		): void;
 
 		GetEnumerator(): System.Collections.Generic.IEnumerator<HordeClassLibrary.World.Settlements.Settlement>;
@@ -15290,7 +15235,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 	abstract class $Indexer_ScenaSettlements {
 		/** [ uid: string ] -> Settlement */
 		public get(
-			uid: string | null
+			uid: string
 		): HordeClassLibrary.World.Settlements.Settlement;
 	}
 }
@@ -15305,7 +15250,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		constructor();
 
 		constructor(
-			citadelTileset: HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles.CitadelTileset | null
+			citadelTileset: HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles.CitadelTileset
 		);
 
 		// Fields:
@@ -15316,17 +15261,17 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		// Methods:
 		GetGraphicsFromCitadelTileset(
-			citadelTileset: HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles.CitadelTileset | null
+			citadelTileset: HordeClassLibrary.Miscellaneous.Citadel.Structures.Tiles.CitadelTileset
 		): void;
 
 		GetTileByTypeAndMask(
-			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer | null,
+			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer,
 			type: HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType,
 			tMask: HordeClassLibrary.World.Simple.TileMask
 		): HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig;
 
 		GetTileByMask(
-			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer | null,
+			randomizer: HordeResurrection.Basic.Primitives.HordeRandomizer,
 			tMask: HordeClassLibrary.World.Simple.TileMask
 		): HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig;
 
@@ -15341,7 +15286,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		// Constructors:
 		constructor(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null
+			scena: HordeClassLibrary.World.ScenaComponents.Scena
 		);
 
 		// Properties:
@@ -15375,7 +15320,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		// Constructors:
 		constructor(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null
+			scena: HordeClassLibrary.World.ScenaComponents.Scena
 		);
 
 		// Properties:
@@ -15397,7 +15342,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		GetUnitsArrayInCell(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			unitInCellBuffer?: HordeClassLibrary.World.Objects.Units.Unit[] | null /* = null */
+			unitInCellBuffer?: HordeClassLibrary.World.Objects.Units.Unit[] /* = null */
 		): System.Collections.Generic.IList<HordeClassLibrary.World.Objects.Units.Unit>;
 
 		GetUpperUnit(
@@ -15415,30 +15360,30 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		GetSquadFromRect(
 			rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
-			filterCallback: System.Func_1<HordeClassLibrary.World.Objects.Units.Unit, boolean> | System.Func | null
+			filterCallback: System.Func_1<HordeClassLibrary.World.Objects.Units.Unit, boolean> | System.Func
 		): HordeClassLibrary.World.Objects.Squads.Squad;
 
 		GetSquadByIds(
-			ids: HordeClassLibrary.World.Objects.Units.UnitIdLabel[] | null,
-			filterCallback: System.Func_1<HordeClassLibrary.World.Objects.Units.Unit, boolean> | System.Func | null
+			ids: HordeClassLibrary.World.Objects.Units.UnitIdLabel[],
+			filterCallback: System.Func_1<HordeClassLibrary.World.Objects.Units.Unit, boolean> | System.Func
 		): HordeClassLibrary.World.Objects.Squads.Squad;
 
 		UnitsCount(): number;
 
 		CreateMapChangesObtainer(
-			name: string | null
+			name: string
 		): HordeClassLibrary.World.ScenaComponents.TickChanges.TickChangesObtainer<HordeClassLibrary.World.ScenaComponents.Intrinsics.UnitsMapModification>;
 
 		CreateOwnerChangesObtainer(
-			name: string | null
+			name: string
 		): HordeClassLibrary.World.ScenaComponents.TickChanges.TickChangesObtainer<HordeClassLibrary.World.ScenaComponents.Intrinsics.UnitsOwnerModification>;
 
 		CreateSightChangesObtainer(
-			name: string | null
+			name: string
 		): HordeClassLibrary.World.ScenaComponents.TickChanges.TickChangesObtainer<HordeClassLibrary.World.ScenaComponents.Intrinsics.UnitsSightModification>;
 
 		IsUnitInCell(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			x: number,
 			y: number
 		): boolean | null;
@@ -15513,21 +15458,21 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		// Methods:
 		AddUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		RemoveFromUnitMap(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		GetUnitsInCell(): System.Collections.Generic.IEnumerable<HordeClassLibrary.World.Objects.Units.Unit>;
 
 		GetUnitsArrayInCell(
-			unitsInCellBuffer?: HordeClassLibrary.World.Objects.Units.Unit[] | null /* = null */
+			unitsInCellBuffer?: HordeClassLibrary.World.Objects.Units.Unit[] /* = null */
 		): HordeClassLibrary.World.Objects.Units.Unit[];
 
 		IsUnitInCell(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		IsContainsUnit(
@@ -15560,7 +15505,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 		/** [ l: UnitMapLayer ] <- Unit */
 		public set(
 			l: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer,
-			value: HordeClassLibrary.World.Objects.Units.Unit | null
+			value: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 	}
 }
@@ -15581,7 +15526,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		// Constructors:
 		constructor(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			unit: HordeClassLibrary.World.Objects.Units.Unit,
 			rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
 			layer: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer,
 			modificationType: HordeClassLibrary.World.ScenaComponents.Intrinsics.UnitsMapModificationType
@@ -15605,7 +15550,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		// Constructors:
 		constructor(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null
+			scena: HordeClassLibrary.World.ScenaComponents.Scena
 		);
 
 		// Methods:
@@ -15624,9 +15569,9 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		// Constructors:
 		constructor(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			oldOwner: HordeClassLibrary.World.Settlements.Settlement | null,
-			newOwner: HordeClassLibrary.World.Settlements.Settlement | null
+			unit: HordeClassLibrary.World.Objects.Units.Unit,
+			oldOwner: HordeClassLibrary.World.Settlements.Settlement,
+			newOwner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Properties:
@@ -15664,7 +15609,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Intrinsics {
 
 		// Constructors:
 		constructor(
-			unit: HordeClassLibrary.World.Objects.Units.Unit | null
+			unit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -15687,8 +15632,8 @@ declare namespace HordeClassLibrary.World.ScenaComponents {
 	{
 		// Constructors:
 		constructor(
-			scenaDescriptor: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor | null,
-			context: HordeClassLibrary.World.Context.BattleContext | null
+			scenaDescriptor: HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor,
+			context: HordeClassLibrary.World.Context.BattleContext
 		);
 
 		// Properties:
@@ -15744,11 +15689,11 @@ declare namespace HordeClassLibrary.World.ScenaComponents {
 		): HordeResurrection.Basic.Primitives.Geometry.Point2D;
 
 		FixScenaPoints(
-			/*ref*/ pointsSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			/*ref*/ pointsSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		): void;
 
 		RemoveOutOfScenaPoints(
-			/*ref*/ pointsSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D> | null
+			/*ref*/ pointsSet: System.Collections.Generic.HashSet<HordeResurrection.Basic.Primitives.Geometry.Point2D>
 		): void;
 
 		RectIntersectWithScena(
@@ -15764,7 +15709,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents {
 
 		ForAllCellsInRect(
 			rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
-			action: System.Action_1<HordeResurrection.Basic.Primitives.Geometry.Point2D> | System.Action | null
+			action: System.Action_1<HordeResurrection.Basic.Primitives.Geometry.Point2D> | System.Action
 		): void;
 
 		LoadScena(): void;
@@ -15781,7 +15726,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Scena {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.ScenaComponents.Scena | null
+			owner: HordeClassLibrary.World.ScenaComponents.Scena
 		);
 
 		// Indexer:
@@ -15789,13 +15734,13 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Scena {
 
 		// Methods:
 		Initialize(
-			tilesMap: HordeClassLibrary.World.Objects.Tiles.Tile[][] | null
+			tilesMap: HordeClassLibrary.World.Objects.Tiles.Tile[][]
 		): void;
 
 		UpdateOnGameTick(): void;
 
 		CreateChangesObtainer(
-			name: string | null
+			name: string
 		): HordeClassLibrary.World.ScenaComponents.TickChanges.TickChangesObtainer<HordeClassLibrary.World.ScenaComponents.Intrinsics.LandscapeMapModification>;
 
 		ChangeCellPayload(
@@ -15807,15 +15752,19 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Scena {
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			type: HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TileType,
 			payload: HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.TilePayload
-		): void;
+		): boolean;
 
 		ChopTreeAt(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): void;
 
+		ScorchTreeAt(
+			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
+		): void;
+
 		ChangeTileConfig(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			newTileConfig: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig | null,
+			newTileConfig: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig,
 			changeOptions?: HordeClassLibrary.World.Objects.Tiles.ChangeTileOptions | null /* = null */
 		): void;
 
@@ -15849,7 +15798,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Scena {
 
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.ScenaComponents.Scena | null
+			owner: HordeClassLibrary.World.ScenaComponents.Scena
 		);
 
 		// Methods:
@@ -15858,28 +15807,28 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Scena {
 		Deinitialize(): void;
 
 		RegisterDecayEffect(
-			decay: HordeClassLibrary.World.Objects.VisualEffects.AnimBasedVisualEffect | null
+			decay: HordeClassLibrary.World.Objects.VisualEffects.AnimBasedVisualEffect
 		): void;
 
 		RegisterVisualEffect(
-			viewEffect: HordeClassLibrary.World.Objects.VisualEffects.AVisualEffect | null
+			viewEffect: HordeClassLibrary.World.Objects.VisualEffects.AVisualEffect
 		): void;
 
 		RegisterSoundEffect(
-			soundEffect: HordeClassLibrary.World.Objects.SoundEffects.SimpleSoundEffect | null
+			soundEffect: HordeClassLibrary.World.Objects.SoundEffects.SimpleSoundEffect
 		): void;
 
 		RegisterBullet(
-			bull: HordeClassLibrary.World.Objects.Bullets.BaseBullet | null
+			bull: HordeClassLibrary.World.Objects.Bullets.BaseBullet
 		): void;
 
 		RegisterGear(
-			gear: HordeClassLibrary.World.Objects.Gears.BaseGear | null
+			gear: HordeClassLibrary.World.Objects.Gears.BaseGear
 		): void;
 
 		UtterSound(
-			soundsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SoundsCatalog | null,
-			sectionName: string | null,
+			soundsCatalog: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SoundsCatalog,
+			sectionName: string,
 			position: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			isLooping?: boolean /* = false */
 		): void;
@@ -15893,7 +15842,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Scena {
 
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.ScenaComponents.Scena | null
+			owner: HordeClassLibrary.World.ScenaComponents.Scena
 		);
 
 		// Methods:
@@ -15902,7 +15851,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Scena {
 		GetFreePathfinderMap(): number[];
 
 		StorePathfinderMap(
-			map: number[] | null
+			map: number[]
 		): void;
 	}
 }
@@ -15914,7 +15863,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Scena {
 
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.ScenaComponents.Scena | null
+			owner: HordeClassLibrary.World.ScenaComponents.Scena
 		);
 
 		// Properties:
@@ -15926,13 +15875,13 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Scena {
 
 		// Methods:
 		Initialize(
-			resourcesMap: HordeClassLibrary.World.Objects.Tiles.ResourceTile[][] | null
+			resourcesMap: HordeClassLibrary.World.Objects.Tiles.ResourceTile[][]
 		): void;
 
 		UpdateOnGameTick(): void;
 
 		CreateChangesObtainer(
-			name: string | null
+			name: string
 		): HordeClassLibrary.World.ScenaComponents.TickChanges.TickChangesObtainer<HordeClassLibrary.World.ScenaComponents.Intrinsics.ResourcesMapModification>;
 
 		HasTreesInCell(
@@ -15968,11 +15917,11 @@ declare namespace HordeClassLibrary.World.ScenaComponents {
 
 		// Methods:
 		UpdateOnGameTick(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null
+			scena: HordeClassLibrary.World.ScenaComponents.Scena
 		): void;
 
 		CalculateGameHash(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null
+			scena: HordeClassLibrary.World.ScenaComponents.Scena
 		): number;
 	}
 }
@@ -15997,7 +15946,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.TickChanges {
 
 		// Constructors:
 		constructor(
-			name: string | null
+			name: string
 		);
 
 		// Properties:
@@ -16009,7 +15958,7 @@ declare namespace HordeClassLibrary.World.ScenaComponents.TickChanges {
 
 		// Methods:
 		AttachScena(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null
+			scena: HordeClassLibrary.World.ScenaComponents.Scena
 		): void;
 
 		DettachScena(): void;
@@ -16056,9 +16005,91 @@ declare namespace HordeClassLibrary.World.ScenaComponents.Watcher {
 
 		// Methods:
 		CheckRegistration(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null,
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			scena: HordeClassLibrary.World.ScenaComponents.Scena,
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
+	}
+}
+//#endregion
+
+//#region SettlementData
+declare namespace HordeClassLibrary.World.Settlements.Data {
+	class SettlementData extends System.Object {
+
+		// Constructors:
+		constructor(
+			uid: string
+		);
+
+		constructor();
+
+		// Properties:
+		IsDummy: boolean;
+		Uid: string;
+		Force: HordeClassLibrary.HordeContent.Configs.Army.Force;
+		ColorsTab: HordeResurrection.Basic.Primitives.HordeColor[];
+		ColorsTabDecays: HordeResurrection.Basic.Primitives.HordeColor[];
+		MaskColor: HordeResurrection.Basic.Primitives.HordeColor;
+		MinimapColor: HordeResurrection.Basic.Primitives.HordeColor;
+		LeaderName: string;
+		TownName: string;
+		Units: System.Collections.Generic.List<HordeClassLibrary.World.Objects.Units.UnitData>;
+		Diplomacy: HordeClassLibrary.World.Settlements.Data.SettlementDiplomacyData;
+		Resources: HordeClassLibrary.World.Simple.ResourcesAmount;
+		CensusData: HordeClassLibrary.World.Settlements.Data.SettlementPopulationCensusData;
+
+		// Methods:
+		FillFromCitadelScenaNation(
+			citadelNation: HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.CitadelScenaNation
+		): void;
+	}
+}
+//#endregion
+
+//#region SettlementDiplomacyData
+declare namespace HordeClassLibrary.World.Settlements.Data {
+	class SettlementDiplomacyData extends System.Object {
+
+		// Constructors:
+		constructor();
+
+		// Properties:
+		Statuses: System.Collections.Generic.Dictionary<HordeClassLibrary.World.Settlements.Data.SettlementData, HordeClassLibrary.World.Simple.DiplomacyStatus>;
+
+		// Methods:
+		FillFromCitadelStruct(
+			citadelNation: HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.CitadelScenaNation,
+			settlements: System.Collections.Generic.IReadOnlyList<HordeClassLibrary.World.Settlements.Data.SettlementData>
+		): void;
+	}
+}
+//#endregion
+
+//#region SettlementPopulationCensusData
+declare namespace HordeClassLibrary.World.Settlements.Data {
+	class SettlementPopulationCensusData extends System.Object {
+
+		// Constructors:
+		constructor();
+
+		// Properties:
+		BusyPeople: number;
+		ReservedPeople: number;
+		PeoplePotentialByHouses: number;
+		PeoplePotentialByTerritory: number;
+		MaxPeople: number;
+		TotalSalarySlots: number;
+		PopulationTerritoryArea: number;
+		PeopleIncomeTimer: number;
+		PeopleIncomeLevels: System.Collections.Generic.List<HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel>;
+		LastPeopleIncomeLevel: number;
+		OneSalarySize: HordeClassLibrary.World.Simple.ResourcesAmount;
+		TaxFactor: HordeClassLibrary.World.Simple.ResourcesAmount;
+		TitheFactor: HordeClassLibrary.World.Simple.ResourcesAmount;
+		TaxAndSalaryUpdatePeriod: number;
+
+		// Methods:
+		FillFromCitadelStruct(): void;
 	}
 }
 //#endregion
@@ -16120,7 +16151,7 @@ declare namespace HordeClassLibrary.World.Settlements.FogOfWar {
 
 		// Methods:
 		static Create(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
+			owner: HordeClassLibrary.World.Settlements.Settlement,
 			region: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
 			ticks: number
 		): HordeClassLibrary.World.Settlements.FogOfWar.AntiFogLantern;
@@ -16130,11 +16161,11 @@ declare namespace HordeClassLibrary.World.Settlements.FogOfWar {
 		Cancel(): void;
 
 		EmitFor(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		): boolean;
 
 		CancelFor(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		): boolean;
 	}
 }
@@ -16152,11 +16183,11 @@ declare namespace HordeClassLibrary.World.Settlements.FogOfWar {
 
 		// Methods:
 		Add(
-			antiFogLantern: HordeClassLibrary.World.Settlements.FogOfWar.AntiFogLantern | null
+			antiFogLantern: HordeClassLibrary.World.Settlements.FogOfWar.AntiFogLantern
 		): void;
 
 		Remove(
-			antiFogLantern: HordeClassLibrary.World.Settlements.FogOfWar.AntiFogLantern | null
+			antiFogLantern: HordeClassLibrary.World.Settlements.FogOfWar.AntiFogLantern
 		): void;
 
 		GetEnumerator(): System.Collections.Generic.IEnumerator<HordeClassLibrary.World.Settlements.FogOfWar.AntiFogLantern>;
@@ -16195,7 +16226,7 @@ declare namespace HordeClassLibrary.World.Settlements.FogOfWar {
 
 		// Constructors:
 		constructor(
-			hideAction: System.Action_2<HordeResurrection.Basic.Primitives.Geometry.Rect2D, boolean> | System.Action | null
+			hideAction: System.Action_2<HordeResurrection.Basic.Primitives.Geometry.Rect2D, boolean> | System.Action
 		);
 
 		// Properties:
@@ -16292,125 +16323,43 @@ declare namespace HordeClassLibrary.World.Settlements.Helpers {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null
+			owner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Methods:
 		IsEnoughResources(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		IsDiscovered(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		AreRequirementsSatisfied(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		IsSatisfiesRules(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		CanBeProduced(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		CanProduce(
-			producerCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			producerCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		GetEffectiveProduceList(
-			producerCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			producerCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			skipUndiscovered?: boolean /* = false */
 		): HordeResurrection.Basic.Pool.PoolSlot<System.Collections.Generic.List<HordeClassLibrary.UnitComponents.Misc.ProduceListItemInfo>>;
 
 		HasAnyInEffectiveProduceList(
-			producerCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			producerCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
-	}
-}
-//#endregion
-
-//#region SettlementDiplomacyModel
-declare namespace HordeClassLibrary.World.Settlements.Models {
-	class SettlementDiplomacyModel extends System.Object {
-
-		// Constructors:
-		constructor();
-
-		// Properties:
-		Statuses: System.Collections.Generic.Dictionary<HordeClassLibrary.World.Settlements.Models.SettlementModel, HordeClassLibrary.World.Simple.DiplomacyStatus>;
-
-		// Methods:
-		FillFromCitadelStruct(
-			citadelNation: HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.CitadelScenaNation | null,
-			settlements: System.Collections.Generic.IReadOnlyList<HordeClassLibrary.World.Settlements.Models.SettlementModel> | null
-		): void;
-	}
-}
-//#endregion
-
-//#region SettlementModel
-declare namespace HordeClassLibrary.World.Settlements.Models {
-	class SettlementModel extends System.Object {
-
-		// Constructors:
-		constructor(
-			uid: string | null
-		);
-
-		constructor();
-
-		// Properties:
-		IsDummy: boolean;
-		Uid: string;
-		Force: HordeClassLibrary.HordeContent.Configs.Army.Force;
-		ColorsTab: HordeResurrection.Basic.Primitives.HordeColor[];
-		ColorsTabDecays: HordeResurrection.Basic.Primitives.HordeColor[];
-		MaskColor: HordeResurrection.Basic.Primitives.HordeColor;
-		MinimapColor: HordeResurrection.Basic.Primitives.HordeColor;
-		LeaderName: string;
-		TownName: string;
-		Units: System.Collections.Generic.List<HordeClassLibrary.World.Objects.Units.UnitModel>;
-		Diplomacy: HordeClassLibrary.World.Settlements.Models.SettlementDiplomacyModel;
-		Resources: HordeClassLibrary.World.Simple.ResourcesAmount;
-		CensusModel: HordeClassLibrary.World.Settlements.Models.SettlementPopulationCensusModel;
-
-		// Methods:
-		FillFromCitadelScenaNation(
-			citadelNation: HordeClassLibrary.Miscellaneous.Citadel.Structures.Scena.CitadelScenaNation | null
-		): void;
-	}
-}
-//#endregion
-
-//#region SettlementPopulationCensusModel
-declare namespace HordeClassLibrary.World.Settlements.Models {
-	class SettlementPopulationCensusModel extends System.Object {
-
-		// Constructors:
-		constructor();
-
-		// Properties:
-		BusyPeople: number;
-		ReservedPeople: number;
-		PeoplePotentialByHouses: number;
-		PeoplePotentialByTerritory: number;
-		MaxPeople: number;
-		TotalSalarySlots: number;
-		PopulationTerritoryArea: number;
-		PeopleIncomeTimer: number;
-		PeopleIncomeLevels: System.Collections.Generic.List<HordeClassLibrary.World.Settlements.Modules.Misc.PeopleIncomeLevel>;
-		LastPeopleIncomeLevel: number;
-		OneSalarySize: HordeClassLibrary.World.Simple.ResourcesAmount;
-		TaxFactor: HordeClassLibrary.World.Simple.ResourcesAmount;
-		TitheFactor: HordeClassLibrary.World.Simple.ResourcesAmount;
-		TaxAndSalaryUpdatePeriod: number;
-
-		// Methods:
-		FillFromCitadelStruct(): void;
 	}
 }
 //#endregion
@@ -16438,22 +16387,22 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Misc {
 		Deinitialize(): void;
 
 		RegisterBuildingPlaces(
-			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null
+			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase
 		): void;
 
 		RegisterBuildingPlace(
-			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null,
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase,
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): void;
 
 		UnregisterBuildingPlaces(
-			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null
+			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase
 		): void;
 
 		UnregisterBuildingPlace(
-			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null,
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase,
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			targetCell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		): void;
 
@@ -16462,11 +16411,11 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Misc {
 		): boolean;
 
 		HasReservingFor(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		CountReservingFor(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): number;
 
 		GetBuildDataEnumeratorInCell(
@@ -16475,12 +16424,12 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Misc {
 
 		ForEachBuildDataIn(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			callback: System.Func_1<HordeClassLibrary.World.Settlements.Modules.Misc.BuildingSitesCollection.BuildData, boolean> | System.Func | null
+			callback: System.Func_1<HordeClassLibrary.World.Settlements.Modules.Misc.BuildingSitesCollection.BuildData, boolean> | System.Func
 		): void;
 
 		AnyBuildDataIn(
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
-			predicate: System.Func_1<HordeClassLibrary.World.Settlements.Modules.Misc.BuildingSitesCollection.BuildData, boolean> | System.Func | null
+			predicate: System.Func_1<HordeClassLibrary.World.Settlements.Modules.Misc.BuildingSitesCollection.BuildData, boolean> | System.Func
 		): boolean;
 
 		// Events:
@@ -16535,8 +16484,8 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Misc.BuildingSites
 	{
 		// Constructors:
 		constructor(
-			ProductCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
-			Order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase | null,
+			ProductCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
+			Order: HordeClassLibrary.UnitComponents.OrdersSystem.Orders.AOrderBase,
 			Cell: HordeResurrection.Basic.Primitives.Geometry.Point2D
 		);
 
@@ -16560,20 +16509,20 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Misc {
 
 		// Methods:
 		AddProducer(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		RemoveProducer(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		CanProduce(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		WhoCanProduce(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
-			producersToFillList: System.Collections.Generic.List<HordeClassLibrary.HordeContent.Configs.Units.UnitConfig> | null
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
+			producersToFillList: System.Collections.Generic.List<HordeClassLibrary.HordeContent.Configs.Units.UnitConfig>
 		): boolean;
 	}
 }
@@ -16618,7 +16567,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Misc {
 	interface /* delegate */ CountFogInRectDelegate {
 		(
 			rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
-			countersBuff: number[] | null
+			countersBuff: number[]
 		): void;
 	}
 	/** TypeScript type stub for .Net delegate */
@@ -16633,7 +16582,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Misc {
 	{
 		// Constructors:
 		constructor(
-			KnownUnit: HordeClassLibrary.World.Objects.Units.KnownUnit | null,
+			KnownUnit: HordeClassLibrary.World.Objects.Units.KnownUnit,
 			Rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D,
 			Layer: HordeClassLibrary.UnitComponents.Enumerations.UnitMapLayer
 		);
@@ -16704,7 +16653,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Misc {
 
 		// Constructors:
 		constructor(
-			ownerModel: HordeClassLibrary.World.Settlements.Models.SettlementPopulationCensusModel | null
+			ownerModel: HordeClassLibrary.World.Settlements.Data.SettlementPopulationCensusData
 		);
 
 		// Properties:
@@ -16713,19 +16662,19 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Misc {
 
 		// Methods:
 		Reserve(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): void;
 
 		Release(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): void;
 
 		ReleaseIfReserved(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		RememberReserver(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 	}
 }
@@ -16758,19 +16707,19 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Misc {
 
 		// Methods:
 		Add(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		Remove(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		Has(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		Contains(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		GetEnumerator(): System.Collections.Generic.IEnumerator<HordeClassLibrary.HordeContent.Configs.Units.UnitConfig>;
@@ -16789,20 +16738,20 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Misc {
 
 		// Methods:
 		AddProducer(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		RemoveProducer(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): void;
 
 		HasProducersFor(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		TryFillProducersSet(
-			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
-			producersSetToFill: System.Collections.Generic.HashSet<HordeClassLibrary.World.Objects.Units.Unit> | null
+			productCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
+			producersSetToFill: System.Collections.Generic.HashSet<HordeClassLibrary.World.Objects.Units.Unit>
 		): boolean;
 	}
 }
@@ -16814,23 +16763,23 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
-			settlementUnits: HordeClassLibrary.World.Settlements.Modules.SettlementUnits | null
+			owner: HordeClassLibrary.World.Settlements.Settlement,
+			settlementUnits: HordeClassLibrary.World.Settlements.Modules.SettlementUnits
 		);
 
 		// Methods:
 		HandleAddedUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			raiseEvents?: boolean /* = true */
 		): void;
 
 		HandleRemovedUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			raiseEvents?: boolean /* = true */
 		): void;
 
 		CountBuildInProgressOfType(
-			reqCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			reqCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): number;
 
 		// Events:
@@ -16847,7 +16796,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.SettlementBuilding
 	{
 		// Constructors:
 		constructor(
-			Unit: HordeClassLibrary.World.Objects.Units.Unit | null
+			Unit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -16866,7 +16815,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.SettlementBuilding
 	{
 		// Constructors:
 		constructor(
-			Unit: HordeClassLibrary.World.Objects.Units.Unit | null
+			Unit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -16885,56 +16834,56 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null
+			owner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Methods:
 		IsWarStatus(
-			other: HordeClassLibrary.World.Settlements.Settlement | null
+			other: HordeClassLibrary.World.Settlements.Settlement
 		): boolean;
 
 		IsNeutralStatus(
-			other: HordeClassLibrary.World.Settlements.Settlement | null
+			other: HordeClassLibrary.World.Settlements.Settlement
 		): boolean;
 
 		IsAllianceStatus(
-			other: HordeClassLibrary.World.Settlements.Settlement | null
+			other: HordeClassLibrary.World.Settlements.Settlement
 		): boolean;
 
 		GetDiplomacyStatus(
-			other: HordeClassLibrary.World.Settlements.Settlement | null
+			other: HordeClassLibrary.World.Settlements.Settlement
 		): HordeClassLibrary.World.Simple.DiplomacyStatus;
 
 		GetPartnerDiplomacyStatus(
-			other: HordeClassLibrary.World.Settlements.Settlement | null
+			other: HordeClassLibrary.World.Settlements.Settlement
 		): HordeClassLibrary.World.Simple.DiplomacyStatus;
 
 		Discover(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		): void;
 
 		DeclarePeace(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		): void;
 
 		DeclareAlliance(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		): void;
 
 		DeclareWar(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null
+			settlement: HordeClassLibrary.World.Settlements.Settlement
 		): void;
 
 		CanControlUnitsOf(
-			otherSettlement: HordeClassLibrary.World.Settlements.Settlement | null
+			otherSettlement: HordeClassLibrary.World.Settlements.Settlement
 		): boolean;
 
 		CanDisbandUnitsOf(
-			otherSettlement: HordeClassLibrary.World.Settlements.Settlement | null
+			otherSettlement: HordeClassLibrary.World.Settlements.Settlement
 		): boolean;
 
 		CanSeeUnitsOf(
-			otherSettlement: HordeClassLibrary.World.Settlements.Settlement | null
+			otherSettlement: HordeClassLibrary.World.Settlements.Settlement
 		): boolean;
 
 		static CanSeeUnitsOn(
@@ -16958,8 +16907,8 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.SettlementDiplomac
 	{
 		// Constructors:
 		constructor(
-			Source: HordeClassLibrary.World.Settlements.Settlement | null,
-			Target: HordeClassLibrary.World.Settlements.Settlement | null,
+			Source: HordeClassLibrary.World.Settlements.Settlement,
+			Target: HordeClassLibrary.World.Settlements.Settlement,
 			OldStatus: HordeClassLibrary.World.Simple.DiplomacyStatus,
 			NewStatus: HordeClassLibrary.World.Simple.DiplomacyStatus
 		);
@@ -16983,7 +16932,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null
+			owner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Properties:
@@ -16993,7 +16942,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 		// Methods:
 		AddTickEvent(
 			eventType: HordeClassLibrary.World.Settlements.Modules.SettlementEvents.TickEventType,
-			eventArgs?: System.EventArgs | null /* = null */
+			eventArgs?: System.EventArgs /* = null */
 		): void;
 
 		// Events:
@@ -17133,7 +17082,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null
+			owner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Methods:
@@ -17182,7 +17131,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 		): boolean | null;
 
 		CreateKnownMapChangesObtainer(
-			name: string | null
+			name: string
 		): HordeClassLibrary.World.ScenaComponents.TickChanges.TickChangesObtainer<HordeClassLibrary.World.Settlements.Modules.Misc.KnownMapModification>;
 
 		// Events:
@@ -17198,7 +17147,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null
+			owner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Fields:
@@ -17225,7 +17174,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null
+			owner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Properties:
@@ -17241,7 +17190,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.SettlementNameModu
 
 		// Constructors:
 		constructor(
-			defaultName: string | null
+			defaultName: string
 		);
 
 		// Properties:
@@ -17260,8 +17209,8 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
-			model: HordeClassLibrary.World.Settlements.Models.SettlementPopulationCensusModel | null
+			owner: HordeClassLibrary.World.Settlements.Settlement,
+			model: HordeClassLibrary.World.Settlements.Data.SettlementPopulationCensusData
 		);
 
 		// Fields:
@@ -17312,7 +17261,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null
+			owner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Properties:
@@ -17326,57 +17275,57 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 		UpdateOnGameTick(): void;
 
 		GetSpeedupFactor(
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): number;
 
 		GetOneProduceContributionTime(
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			producersCount?: number /* = 1 */
 		): number;
 
 		GetTotalProductionTime(
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			producersCount?: number /* = 1 */
 		): number;
 
 		GetOneProduceContributionCost(
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			producersCount?: number /* = 1 */
 		): HordeClassLibrary.World.Simple.ResourcesAmountF;
 
 		EstimateTotalBuildTime(
-			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			productUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): number;
 
 		GetOneRepairContributionTime(
-			repairedUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			repairedUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			repairersCount?: number /* = 1 */
 		): number;
 
 		GetTotalRepairTime(
-			repairedUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			repairedUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			repairersCount?: number /* = 1 */
 		): number;
 
 		GetOneRepairContributionCost(
-			repairedUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			repairedUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			repairersCount?: number /* = 1 */
 		): HordeClassLibrary.World.Simple.ResourcesAmountF;
 
 		CountTrainingInProgressOfType(
-			reqCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			reqCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): number;
 
 		RegisterUnitTrainingInProgress(
-			motionProduce: HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producing.MotionProduce | null
+			motionProduce: HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producing.MotionProduce
 		): void;
 
 		UnregisterTrainingInProgressUnit(
-			motionProduce: HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producing.MotionProduce | null
+			motionProduce: HordeClassLibrary.UnitComponents.OrdersSystem.Motions.Producing.MotionProduce
 		): void;
 
 		CountProducingNowUnits(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): number;
 	}
 }
@@ -17389,8 +17338,8 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
-			resources: HordeClassLibrary.World.Simple.ResourcesAmount | null
+			owner: HordeClassLibrary.World.Settlements.Settlement,
+			resources: HordeClassLibrary.World.Simple.ResourcesAmount
 		);
 
 		// Properties:
@@ -17402,26 +17351,26 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 
 		// Methods:
 		IsEnoughResources(
-			required: HordeClassLibrary.World.Simple.ResourcesAmount | null
+			required: HordeClassLibrary.World.Simple.ResourcesAmount
 		): boolean;
 
 		GetCopy(): HordeClassLibrary.World.Simple.ResourcesAmount;
 
 		AddResources(
-			amount: HordeClassLibrary.World.Simple.ResourcesAmount | null,
+			amount: HordeClassLibrary.World.Simple.ResourcesAmount,
 			safe?: boolean /* = false */
 		): void;
 
 		TakeResources(
-			amount: HordeClassLibrary.World.Simple.ResourcesAmount | null
+			amount: HordeClassLibrary.World.Simple.ResourcesAmount
 		): void;
 
 		TakeResourcesIfEnough(
-			amount: HordeClassLibrary.World.Simple.ResourcesAmount | null
+			amount: HordeClassLibrary.World.Simple.ResourcesAmount
 		): boolean;
 
 		SetResources(
-			amount: HordeClassLibrary.World.Simple.ResourcesAmount | null
+			amount: HordeClassLibrary.World.Simple.ResourcesAmount
 		): void;
 
 		// Events:
@@ -17451,7 +17400,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null
+			owner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Properties:
@@ -17461,15 +17410,15 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 
 		// Methods:
 		UnitDiscovered(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		HasUnmetRequirements(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		GetUnmetRequirements(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): System.Collections.Generic.HashSet<HordeClassLibrary.HordeContent.Configs.Units.UnitConfig>;
 	}
 }
@@ -17485,7 +17434,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null
+			owner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Properties:
@@ -17498,29 +17447,29 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 		UpdateAfterGameTick(): void;
 
 		CreateProductUnit(
-			parameters: HordeClassLibrary.World.Objects.Units.ProducedUnitParameters | null
+			parameters: HordeClassLibrary.World.Objects.Units.ProducedUnitParameters
 		): HordeClassLibrary.World.Objects.Units.Unit;
 
 		SpawnUnit(
-			parameters: HordeClassLibrary.World.Objects.Units.SpawnUnitParameters | null,
+			parameters: HordeClassLibrary.World.Objects.Units.SpawnUnitParameters,
 			silent?: boolean /* = false */
 		): HordeClassLibrary.World.Objects.Units.Unit;
 
 		ReplaceUnit(
-			parameters: HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters | null
+			parameters: HordeClassLibrary.World.Objects.Units.ReplaceUnitParameters
 		): HordeClassLibrary.World.Objects.Units.Unit;
 
 		DeleteUnit(
-			parameters: HordeClassLibrary.World.Objects.Units.DeleteUnitParameters | null
+			parameters: HordeClassLibrary.World.Objects.Units.DeleteUnitParameters
 		): boolean;
 
 		CreateDummyUnit(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): HordeClassLibrary.World.Objects.Units.Unit;
 
 		GetProductConfigByUid(
-			producerCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
-			productUid: string | null
+			producerCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
+			productUid: string
 		): HordeClassLibrary.HordeContent.Configs.Units.UnitConfig;
 
 		GetById(
@@ -17585,7 +17534,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.SettlementUnits {
 	{
 		// Constructors:
 		constructor(
-			Unit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			Unit: HordeClassLibrary.World.Objects.Units.Unit,
 			IsAdded: boolean
 		);
 
@@ -17607,8 +17556,8 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.SettlementUnits {
 	{
 		// Constructors:
 		constructor(
-			Unit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			ProducerUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			Unit: HordeClassLibrary.World.Objects.Units.Unit,
+			ProducerUnit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -17628,7 +17577,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.SettlementUnits {
 	{
 		// Constructors:
 		constructor(
-			Unit: HordeClassLibrary.World.Objects.Units.Unit | null
+			Unit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -17647,8 +17596,8 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.SettlementUnits {
 	{
 		// Constructors:
 		constructor(
-			OldUnit: HordeClassLibrary.World.Objects.Units.Unit | null,
-			NewUnit: HordeClassLibrary.World.Objects.Units.Unit | null
+			OldUnit: HordeClassLibrary.World.Objects.Units.Unit,
+			NewUnit: HordeClassLibrary.World.Objects.Units.Unit
 		);
 
 		// Properties:
@@ -17667,41 +17616,41 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
-			settlementUnits: HordeClassLibrary.World.Settlements.Modules.SettlementUnits | null
+			owner: HordeClassLibrary.World.Settlements.Settlement,
+			settlementUnits: HordeClassLibrary.World.Settlements.Modules.SettlementUnits
 		);
 
 		// Methods:
 		HandleAddedUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			silent?: boolean /* = false */
 		): void;
 
 		HandleRemovedUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			silent?: boolean /* = false */
 		): void;
 
 		TryRegisterReadyToCombatUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			silent?: boolean /* = false */
 		): void;
 
 		TryUnregisterReadyToCombatUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null,
+			u: HordeClassLibrary.World.Objects.Units.Unit,
 			silent?: boolean /* = false */
 		): void;
 
 		IsUnitReadyToCombat(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		TryRegisterNearDeathUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		TryUnregisterNearDeathUnit(
-			u: HordeClassLibrary.World.Objects.Units.Unit | null
+			u: HordeClassLibrary.World.Objects.Units.Unit
 		): boolean;
 
 		// Events:
@@ -17717,7 +17666,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.SettlementUnitsCom
 	{
 		// Constructors:
 		constructor(
-			Unit: HordeClassLibrary.World.Objects.Units.Unit | null,
+			Unit: HordeClassLibrary.World.Objects.Units.Unit,
 			IsAdded: boolean
 		);
 
@@ -17738,7 +17687,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 
 		// Constructors:
 		constructor(
-			settlementUnits: HordeClassLibrary.World.Settlements.Modules.SettlementUnits | null
+			settlementUnits: HordeClassLibrary.World.Settlements.Modules.SettlementUnits
 		);
 
 		// Properties:
@@ -17767,11 +17716,11 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 
 		TryGetBySpecification(
 			specification: HordeClassLibrary.UnitComponents.Enumerations.UnitSpecification,
-			/*out*/ professionEntry: HordeClassLibrary.World.Settlements.Modules.Misc.ProfessionEntry | null
+			/*out*/ professionEntry: HordeClassLibrary.World.Settlements.Modules.Misc.ProfessionEntry
 		): boolean;
 
 		CountUnitsOfType(
-			reqCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			reqCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): number;
 
 		CountUnitsWithSpecification(
@@ -17788,7 +17737,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null
+			owner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Properties:
@@ -17800,22 +17749,22 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 		UpdateOnGameTick(): void;
 
 		CanSeeUnit(
-			u: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null
+			u: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit
 		): boolean;
 
 		CanSeeUnit(
-			u: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null,
+			u: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit,
 			rect: HordeResurrection.Basic.Primitives.Geometry.Rect2D
 		): boolean;
 
 		CanSeeUnit(
-			u: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null,
+			u: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit,
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			ignoreFog?: boolean /* = false */
 		): boolean;
 
 		CanSeeUnitExt(
-			u: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit | null,
+			u: HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit,
 			cell: HordeResurrection.Basic.Primitives.Geometry.Point2D,
 			ignoreFog?: boolean /* = false */
 		): HordeClassLibrary.UnitComponents.Enumerations.UnitVisibility;
@@ -17852,7 +17801,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null
+			owner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Properties:
@@ -17875,12 +17824,12 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Vision {
 		UpdateOnGameTick(): void;
 
 		ExploreByUnitsOf(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
 			raiseGeneralEvent?: boolean /* = false */
 		): boolean;
 
 		HideByUnitsOf(
-			settlement: HordeClassLibrary.World.Settlements.Settlement | null,
+			settlement: HordeClassLibrary.World.Settlements.Settlement,
 			raiseGeneralEvent?: boolean /* = false */
 		): boolean;
 
@@ -17901,8 +17850,8 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Vision {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
-			vision: HordeClassLibrary.World.Settlements.Modules.SettlementVision | null
+			owner: HordeClassLibrary.World.Settlements.Settlement,
+			vision: HordeClassLibrary.World.Settlements.Modules.SettlementVision
 		);
 
 		// Properties:
@@ -17999,8 +17948,8 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Vision {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null,
-			vision: HordeClassLibrary.World.Settlements.Modules.SettlementVision | null
+			owner: HordeClassLibrary.World.Settlements.Settlement,
+			vision: HordeClassLibrary.World.Settlements.Modules.SettlementVision
 		);
 	}
 }
@@ -18012,7 +17961,7 @@ declare namespace HordeClassLibrary.World.Settlements.Rules {
 
 		// Methods:
 		ProcessNewContext(
-			context: HordeClassLibrary.World.Objects.Rules.ARuleContext | null
+			context: HordeClassLibrary.World.Objects.Rules.ARuleContext
 		): void;
 
 		RemoveAll(): void;
@@ -18031,14 +17980,14 @@ declare namespace HordeClassLibrary.World.Settlements.Rules {
 	{
 		// Constructors:
 		constructor(
-			owner: HordeClassLibrary.World.Settlements.Settlement | null
+			owner: HordeClassLibrary.World.Settlements.Settlement
 		);
 
 		// Methods:
 		UpdateAfterGameTick(): void;
 
 		AddRule(
-			ruleCfg: HordeClassLibrary.HordeContent.Configs.Rules.RuleConfig | null
+			ruleCfg: HordeClassLibrary.HordeContent.Configs.Rules.RuleConfig
 		): void;
 
 		RemoveAllRules(): void;
@@ -18048,11 +17997,11 @@ declare namespace HordeClassLibrary.World.Settlements.Rules {
 		GetFreePeopleLimit(): number;
 
 		CanProduceUnit(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): boolean;
 
 		GetCurrentLimitForUnit(
-			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null
+			uCfg: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig
 		): number | null;
 	}
 }
@@ -18064,7 +18013,7 @@ declare namespace HordeClassLibrary.World.Settlements.Rules {
 
 		// Constructors:
 		constructor(
-			ruleInstruction: HordeClassLibrary.HordeContent.Configs.Rules.Instructions.ExistenceRuleInstruction | null
+			ruleInstruction: HordeClassLibrary.HordeContent.Configs.Rules.Instructions.ExistenceRuleInstruction
 		);
 
 		// Properties:
@@ -18081,8 +18030,8 @@ declare namespace HordeClassLibrary.World.Settlements {
 
 		// Constructors:
 		constructor(
-			scena: HordeClassLibrary.World.ScenaComponents.Scena | null,
-			model: HordeClassLibrary.World.Settlements.Models.SettlementModel | null,
+			scena: HordeClassLibrary.World.ScenaComponents.Scena,
+			data: HordeClassLibrary.World.Settlements.Data.SettlementData,
 			number?: number /* = 0 */
 		);
 
@@ -18148,7 +18097,7 @@ declare namespace HordeClassLibrary.World.Settlements {
 		): HordeResurrection.Basic.Primitives.HordeColor;
 
 		static SetMinimapColors(
-			colors: number[] | null
+			colors: number[]
 		): void;
 	}
 }
@@ -18188,8 +18137,8 @@ declare namespace HordeClassLibrary.World.Settlements.Territory {
 		Replan(): void;
 
 		ChangeConfiguration(
-			workSettlement: HordeClassLibrary.World.Settlements.Settlement | null,
-			workUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig | null,
+			workSettlement: HordeClassLibrary.World.Settlements.Settlement,
+			workUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			checkDistances: boolean
 		): void;
 
@@ -18310,10 +18259,10 @@ declare namespace HordeClassLibrary.World.Simple {
 	{
 		// Constructors:
 		constructor(
-			Text: string | null,
-			Color?: HordeResurrection.Basic.Primitives.HordeColor | null /* = null */,
-			Sound?: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SoundsCatalog | null /* = null */,
-			SoundSection?: string | null /* = null */
+			Text: string,
+			Color?: HordeResurrection.Basic.Primitives.HordeColor /* = null */,
+			Sound?: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SoundsCatalog /* = null */,
+			SoundSection?: string /* = null */
 		);
 
 		// Fields:
@@ -18327,13 +18276,13 @@ declare namespace HordeClassLibrary.World.Simple {
 
 		// Methods:
 		static CreateWithNoSound(
-			text: string | null,
-			color?: HordeResurrection.Basic.Primitives.HordeColor | null /* = null */
+			text: string,
+			color?: HordeResurrection.Basic.Primitives.HordeColor /* = null */
 		): HordeClassLibrary.World.Simple.GameMessage;
 
 		static CreateWithDefaultSound(
-			text: string | null,
-			color?: HordeResurrection.Basic.Primitives.HordeColor | null /* = null */
+			text: string,
+			color?: HordeResurrection.Basic.Primitives.HordeColor /* = null */
 		): HordeClassLibrary.World.Simple.GameMessage;
 	}
 }
@@ -18348,11 +18297,11 @@ declare namespace HordeClassLibrary.World.Simple {
 
 		// Methods:
 		ForEach(
-			callback: System.Action_1<HordeClassLibrary.World.Simple.GameMessage> | System.Action | null
+			callback: System.Action_1<HordeClassLibrary.World.Simple.GameMessage> | System.Action
 		): void;
 
 		AddMessage(
-			message: HordeClassLibrary.World.Simple.GameMessage | null
+			message: HordeClassLibrary.World.Simple.GameMessage
 		): void;
 
 		ClearMessages(): void;
@@ -18375,11 +18324,11 @@ declare namespace HordeClassLibrary.World.Simple {
 		);
 
 		constructor(
-			other: HordeClassLibrary.World.Simple.ResourcesAmount | null
+			other: HordeClassLibrary.World.Simple.ResourcesAmount
 		);
 
 		constructor(
-			citadelResources: HordeClassLibrary.Miscellaneous.Citadel.Structures.Other.CitadelResourcesAmount | null
+			citadelResources: HordeClassLibrary.Miscellaneous.Citadel.Structures.Other.CitadelResourcesAmount
 		);
 
 		// Fields:
@@ -18405,16 +18354,16 @@ declare namespace HordeClassLibrary.World.Simple {
 		): HordeClassLibrary.World.Simple.ResourcesAmount;
 
 		Add(
-			amount: HordeClassLibrary.World.Simple.ResourcesAmount | null,
+			amount: HordeClassLibrary.World.Simple.ResourcesAmount,
 			safe?: boolean /* = false */
 		): void;
 
 		Subtract(
-			amount: HordeClassLibrary.World.Simple.ResourcesAmount | null
+			amount: HordeClassLibrary.World.Simple.ResourcesAmount
 		): void;
 
 		Update(
-			amount: HordeClassLibrary.World.Simple.ResourcesAmount | null
+			amount: HordeClassLibrary.World.Simple.ResourcesAmount
 		): void;
 
 		BoundTo(
@@ -18423,24 +18372,24 @@ declare namespace HordeClassLibrary.World.Simple {
 		): HordeClassLibrary.World.Simple.ResourcesAmount;
 
 		BoundTo(
-			minAmount?: HordeClassLibrary.World.Simple.ResourcesAmount | null /* = null */,
-			maxAmount?: HordeClassLibrary.World.Simple.ResourcesAmount | null /* = null */
+			minAmount?: HordeClassLibrary.World.Simple.ResourcesAmount /* = null */,
+			maxAmount?: HordeClassLibrary.World.Simple.ResourcesAmount /* = null */
 		): HordeClassLibrary.World.Simple.ResourcesAmount;
 
 		IsEnough(
-			required: HordeClassLibrary.World.Simple.ResourcesAmount | null
+			required: HordeClassLibrary.World.Simple.ResourcesAmount
 		): boolean;
 
 		FromCitadelResources(
-			citadelResources: HordeClassLibrary.Miscellaneous.Citadel.Structures.Other.CitadelResourcesAmount | null
+			citadelResources: HordeClassLibrary.Miscellaneous.Citadel.Structures.Other.CitadelResourcesAmount
 		): void;
 
 		Equals(
-			other: HordeClassLibrary.World.Simple.ResourcesAmount | null
+			other: HordeClassLibrary.World.Simple.ResourcesAmount
 		): boolean;
 
 		Equals(
-			citadelRes: HordeClassLibrary.Miscellaneous.Citadel.Structures.Other.CitadelResourcesAmount | null
+			citadelRes: HordeClassLibrary.Miscellaneous.Citadel.Structures.Other.CitadelResourcesAmount
 		): boolean;
 	}
 }
@@ -18461,11 +18410,11 @@ declare namespace HordeClassLibrary.World.Simple {
 		);
 
 		constructor(
-			resourcesAmount: HordeClassLibrary.World.Simple.ResourcesAmount | null
+			resourcesAmount: HordeClassLibrary.World.Simple.ResourcesAmount
 		);
 
 		constructor(
-			resourcesAmount: HordeClassLibrary.World.Simple.ResourcesAmountF | null
+			resourcesAmount: HordeClassLibrary.World.Simple.ResourcesAmountF
 		);
 
 		// Fields:
@@ -18479,8 +18428,8 @@ declare namespace HordeClassLibrary.World.Simple {
 
 		// Methods:
 		CeilingToResourcesAmount(
-			prevRemainder: HordeClassLibrary.World.Simple.ResourcesAmountF | null,
-			/*out*/ newRemainer: HordeClassLibrary.World.Simple.ResourcesAmountF | null
+			prevRemainder: HordeClassLibrary.World.Simple.ResourcesAmountF,
+			/*out*/ newRemainer: HordeClassLibrary.World.Simple.ResourcesAmountF
 		): HordeClassLibrary.World.Simple.ResourcesAmount;
 	}
 }
@@ -18497,7 +18446,7 @@ declare namespace HordeClassLibrary.World.Simple {
 		);
 
 		constructor(
-			tCfg: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig | null
+			tCfg: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig
 		);
 
 		// Properties:
@@ -18509,7 +18458,7 @@ declare namespace HordeClassLibrary.World.Simple {
 
 		// Methods:
 		IsMatch(
-			tCfg: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig | null
+			tCfg: HordeClassLibrary.HordeContent.Configs.Tiles.TileConfig
 		): boolean;
 
 		// Default parameterless constructor for value types
@@ -18727,6 +18676,8 @@ export const UnitSoundsCatalogFactory = HordeClassLibrary.HordeContent.Configs.V
 export type UnitSoundsCatalogFactory = HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.Factory.UnitSoundsCatalogFactory;
 export const BuildingSoundSections = HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SectionEnums.BuildingSoundSections;
 export type BuildingSoundSections = HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SectionEnums.BuildingSoundSections;
+export const ButtonSoundSections = HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SectionEnums.ButtonSoundSections;
+export type ButtonSoundSections = HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SectionEnums.ButtonSoundSections;
 export const ChatSoundSections = HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SectionEnums.ChatSoundSections;
 export type ChatSoundSections = HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SectionEnums.ChatSoundSections;
 export const UncategorizedSoundSections = HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SectionEnums.UncategorizedSoundSections;
@@ -18933,6 +18884,10 @@ export const CitadelUnitExtraDataFieldDescriptor = HordeClassLibrary.Miscellaneo
 export type CitadelUnitExtraDataFieldDescriptor = HordeClassLibrary.Miscellaneous.Citadel.Structures.Units.ExtraData.CitadelUnitExtraDataFieldDescriptor;
 export const ConfiguratorAction = HordeClassLibrary.Miscellaneous.ConfiguratorAction;
 export type ConfiguratorAction = HordeClassLibrary.Miscellaneous.ConfiguratorAction;
+export const FileDescriptor = HordeClassLibrary.Miscellaneous.FileTree.FileDescriptor;
+export type FileDescriptor = HordeClassLibrary.Miscellaneous.FileTree.FileDescriptor;
+export const IFileDescriptor = HordeClassLibrary.Miscellaneous.FileTree.IFileDescriptor;
+export type IFileDescriptor = HordeClassLibrary.Miscellaneous.FileTree.IFileDescriptor;
 export const AStarMiniPathFinder = HordeClassLibrary.PathFinders.AStarMini.AStarMiniPathFinder;
 export type AStarMiniPathFinder = HordeClassLibrary.PathFinders.AStarMini.AStarMiniPathFinder;
 export const PathFindersPool = HordeClassLibrary.PathFinders.AStarMini.AStarMiniPathFinder.PathFindersPool;
@@ -19775,8 +19730,8 @@ export const KnownTile = HordeClassLibrary.World.Objects.Tiles.KnownTile;
 export type KnownTile = HordeClassLibrary.World.Objects.Tiles.KnownTile;
 export const ResourceTile = HordeClassLibrary.World.Objects.Tiles.ResourceTile;
 export type ResourceTile = HordeClassLibrary.World.Objects.Tiles.ResourceTile;
-export const ResourceTileModel = HordeClassLibrary.World.Objects.Tiles.ResourceTileModel;
-export type ResourceTileModel = HordeClassLibrary.World.Objects.Tiles.ResourceTileModel;
+export const ResourceTileData = HordeClassLibrary.World.Objects.Tiles.ResourceTileData;
+export type ResourceTileData = HordeClassLibrary.World.Objects.Tiles.ResourceTileData;
 export const ResourceTileType = HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
 export type ResourceTileType = HordeClassLibrary.World.Objects.Tiles.ResourceTileType;
 export const Tile = HordeClassLibrary.World.Objects.Tiles.Tile;
@@ -19785,8 +19740,8 @@ export const TileConfigPicker = HordeClassLibrary.World.Objects.Tiles.TileConfig
 export type TileConfigPicker = HordeClassLibrary.World.Objects.Tiles.TileConfigPicker;
 export const ReplacementParameters = HordeClassLibrary.World.Objects.Tiles.TileConfigPicker.ReplacementParameters;
 export type ReplacementParameters = HordeClassLibrary.World.Objects.Tiles.TileConfigPicker.ReplacementParameters;
-export const TileModel = HordeClassLibrary.World.Objects.Tiles.TileModel;
-export type TileModel = HordeClassLibrary.World.Objects.Tiles.TileModel;
+export const TileData = HordeClassLibrary.World.Objects.Tiles.TileData;
+export type TileData = HordeClassLibrary.World.Objects.Tiles.TileData;
 export const DeleteUnitParameters = HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
 export type DeleteUnitParameters = HordeClassLibrary.World.Objects.Units.DeleteUnitParameters;
 export const IKnownOrRealUnit = HordeClassLibrary.World.Objects.Units.IKnownOrRealUnit;
@@ -19811,14 +19766,14 @@ export const Unit = HordeClassLibrary.World.Objects.Units.Unit;
 export type Unit = HordeClassLibrary.World.Objects.Units.Unit;
 export const TickEndEventArgs = HordeClassLibrary.World.Objects.Units.Unit.TickEndEventArgs;
 export type TickEndEventArgs = HordeClassLibrary.World.Objects.Units.Unit.TickEndEventArgs;
+export const UnitData = HordeClassLibrary.World.Objects.Units.UnitData;
+export type UnitData = HordeClassLibrary.World.Objects.Units.UnitData;
+export const UnitDataFactory = HordeClassLibrary.World.Objects.Units.UnitDataFactory;
+export type UnitDataFactory = HordeClassLibrary.World.Objects.Units.UnitDataFactory;
 export const UnitIdLabel = HordeClassLibrary.World.Objects.Units.UnitIdLabel;
 export type UnitIdLabel = HordeClassLibrary.World.Objects.Units.UnitIdLabel;
-export const UnitModel = HordeClassLibrary.World.Objects.Units.UnitModel;
-export type UnitModel = HordeClassLibrary.World.Objects.Units.UnitModel;
-export const UnitModelsFactory = HordeClassLibrary.World.Objects.Units.UnitModelsFactory;
-export type UnitModelsFactory = HordeClassLibrary.World.Objects.Units.UnitModelsFactory;
-export const UnitPositionModel = HordeClassLibrary.World.Objects.Units.UnitPositionModel;
-export type UnitPositionModel = HordeClassLibrary.World.Objects.Units.UnitPositionModel;
+export const UnitPositionData = HordeClassLibrary.World.Objects.Units.UnitPositionData;
+export type UnitPositionData = HordeClassLibrary.World.Objects.Units.UnitPositionData;
 export const UnitsCollection = HordeClassLibrary.World.Objects.Units.UnitsCollection;
 export type UnitsCollection = HordeClassLibrary.World.Objects.Units.UnitsCollection;
 export const AnimBasedVisualEffect = HordeClassLibrary.World.Objects.VisualEffects.AnimBasedVisualEffect;
@@ -19873,14 +19828,6 @@ export const VisualEffectState = HordeClassLibrary.World.Objects.VisualEffects.V
 export type VisualEffectState = HordeClassLibrary.World.Objects.VisualEffects.VisualEffectState;
 export const ScenaDescriptor = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor;
 export type ScenaDescriptor = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptor;
-export const ScenaDescriptorsCollection = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptorsCollection;
-export type ScenaDescriptorsCollection = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaDescriptorsCollection;
-export const ScenaFileInfo = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaFileInfo;
-export type ScenaFileInfo = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaFileInfo;
-export const ScenaHashInfo = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaHashInfo;
-export type ScenaHashInfo = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaHashInfo;
-export const ScenaInLobby = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaInLobby;
-export type ScenaInLobby = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaInLobby;
 export const ScenaMinimapData = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaMinimapData;
 export type ScenaMinimapData = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaMinimapData;
 export const ScenaStamp = HordeClassLibrary.World.ScenaComponents.Descriptors.ScenaStamp;
@@ -19967,6 +19914,12 @@ export const ScenaWatcher = HordeClassLibrary.World.ScenaComponents.Watcher.Scen
 export type ScenaWatcher = HordeClassLibrary.World.ScenaComponents.Watcher.ScenaWatcher;
 export const UnitsRegistrationWatcher = HordeClassLibrary.World.ScenaComponents.Watcher.UnitsRegistrationWatcher;
 export type UnitsRegistrationWatcher = HordeClassLibrary.World.ScenaComponents.Watcher.UnitsRegistrationWatcher;
+export const SettlementData = HordeClassLibrary.World.Settlements.Data.SettlementData;
+export type SettlementData = HordeClassLibrary.World.Settlements.Data.SettlementData;
+export const SettlementDiplomacyData = HordeClassLibrary.World.Settlements.Data.SettlementDiplomacyData;
+export type SettlementDiplomacyData = HordeClassLibrary.World.Settlements.Data.SettlementDiplomacyData;
+export const SettlementPopulationCensusData = HordeClassLibrary.World.Settlements.Data.SettlementPopulationCensusData;
+export type SettlementPopulationCensusData = HordeClassLibrary.World.Settlements.Data.SettlementPopulationCensusData;
 export const AlmostDefeatCondition = HordeClassLibrary.World.Settlements.Existence.AlmostDefeatCondition;
 export type AlmostDefeatCondition = HordeClassLibrary.World.Settlements.Existence.AlmostDefeatCondition;
 export const ExistenceStatus = HordeClassLibrary.World.Settlements.Existence.ExistenceStatus;
@@ -19995,12 +19948,6 @@ export const ASettlementHelper = HordeClassLibrary.World.Settlements.Helpers.ASe
 export type ASettlementHelper = HordeClassLibrary.World.Settlements.Helpers.ASettlementHelper;
 export const UnitProductHelper = HordeClassLibrary.World.Settlements.Helpers.UnitProductHelper;
 export type UnitProductHelper = HordeClassLibrary.World.Settlements.Helpers.UnitProductHelper;
-export const SettlementDiplomacyModel = HordeClassLibrary.World.Settlements.Models.SettlementDiplomacyModel;
-export type SettlementDiplomacyModel = HordeClassLibrary.World.Settlements.Models.SettlementDiplomacyModel;
-export const SettlementModel = HordeClassLibrary.World.Settlements.Models.SettlementModel;
-export type SettlementModel = HordeClassLibrary.World.Settlements.Models.SettlementModel;
-export const SettlementPopulationCensusModel = HordeClassLibrary.World.Settlements.Models.SettlementPopulationCensusModel;
-export type SettlementPopulationCensusModel = HordeClassLibrary.World.Settlements.Models.SettlementPopulationCensusModel;
 export const ASettlementModule = HordeClassLibrary.World.Settlements.Modules.ASettlementModule;
 export type ASettlementModule = HordeClassLibrary.World.Settlements.Modules.ASettlementModule;
 export const BuildingSitesCollection = HordeClassLibrary.World.Settlements.Modules.Misc.BuildingSitesCollection;
