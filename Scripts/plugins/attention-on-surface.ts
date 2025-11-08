@@ -78,7 +78,7 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
      * Создание декораций для Attention-событий.
      */
     private _createDecoration(attentionInfo: AttentionClickInfo) {
-        let position = primitives.createPoint(
+        let position = new primitives.Point2D(
             attentionInfo.cell.X * WorldConstants.CellSize + WorldConstants.HalfCellSize,
             attentionInfo.cell.Y * WorldConstants.CellSize + WorldConstants.HalfCellSize);
 

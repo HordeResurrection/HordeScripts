@@ -28,19 +28,19 @@ export class Example_SettlementTaxAndSalary extends HordeExampleBase {
         for (let settlementId of this.settlements) {
             let settlement = scenaSettlements.GetByUid(settlementId);
 
-            let censusModel = ScriptUtils.GetValue(settlement.Census, "Model");
+            let censusData = ScriptUtils.GetValue(settlement.Census, "Data");
 
             // Установить размер одной зарплаты
-            censusModel.OneSalarySize = createResourcesAmount(4, 0, 0, 0);
+            censusData.OneSalarySize = createResourcesAmount(4, 0, 0, 0);
 
             // Установить размер налогов с одного человека
-            censusModel.TaxFactor = createResourcesAmount(8, 4, 4, 0);
+            censusData.TaxFactor = createResourcesAmount(8, 4, 4, 0);
 
             // Установить размер церковной десятины с одного человека
-            censusModel.TitheFactor = createResourcesAmount(4, 2, 2, 0);
+            censusData.TitheFactor = createResourcesAmount(4, 2, 2, 0);
 
             // Установить период сбора налогов и выплаты жалования (чтобы отключить сбор, необходимо установить 0)
-            censusModel.TaxAndSalaryUpdatePeriod = 9000;
+            censusData.TaxAndSalaryUpdatePeriod = 9000;
         }
     }
 }

@@ -63,7 +63,7 @@ export class BeammanPlugin extends HordePluginBase {
 
             // Звуки боя на первый удар
             if (hitNum == 0) {
-                u.SoundsMind.UtterSound(this.hitSounds, "Hit", u.Position);
+                u.SoundsMind.UtterSound(this.hitSounds, "Hit", u.PositionInt);
             }
 
             // Устанавливаем время перезарядки
@@ -102,8 +102,10 @@ export class BeammanPlugin extends HordePluginBase {
         }
 
         // Координаты текущего удара
-        let targetPosition = new Point2D(hitBias.X + u.Position.X,
-            hitBias.Y + u.Position.Y);
+        let targetPosition = new Point2D(
+            hitBias.X + u.PositionInt.X,
+            hitBias.Y + u.PositionInt.Y
+        );
 
         // Дружественным воинам урон не наносим
         let unitInCell = u.Scena.UnitsMap.GetUpperUnit(Math.floor(targetPosition.X / WorldConstants.CellSize),

@@ -154,7 +154,7 @@ export class Example_CustomUnitOrder extends HordeExampleBase {
                 return;
             }
             spawnedUnit.Delete();
-            spawnDecoration(u.Scena, this.smokeDecorationCfg, spawnedUnit.Position);
+            spawnDecoration(u.Scena, this.smokeDecorationCfg, spawnedUnit.PositionInt);
             
             // Отмечаем, что состояние полностью обработано, пора получать следующий приказ
             motion.State = StateMotion.Done;

@@ -1,6 +1,6 @@
 import { spawnString } from "library/game-logic/decoration-spawn";
 import HordeExampleBase from "./base-example";
-import { createHordeColor, createPoint } from "library/common/primitives";
+import { createHordeColor, Point2D } from "library/common/primitives";
 import { DrawLayer, FontUtils } from "library/game-logic/horde-types";
 
 /**
@@ -15,7 +15,7 @@ export class Example_StringDecoration extends HordeExampleBase {
      */
     public constructor() {
         super("String decoration");
-        this.center = createPoint(600, 600);
+        this.center = new Point2D(600, 600);
     }
 
     /**
@@ -61,6 +61,6 @@ export class Example_StringDecoration extends HordeExampleBase {
 
         let ttl = this.decorationString.TicksToLive;
         this.decorationString.Text = `Привет ОРДА !!!\nЭто что? Буквы в Орде?!\n${Math.floor(ttl / 10) / 10}`;
-        this.decorationString.Position = createPoint(this.center.X + x, this.center.Y + y);
+        this.decorationString.Position = new Point2D(this.center.X + x, this.center.Y + y);
     }
 }

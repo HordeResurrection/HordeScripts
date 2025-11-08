@@ -1,6 +1,6 @@
 import { log } from "library/common/logging";
 import { generateRandomCellInRect } from "library/common/position-tools";
-import { createPoint, Point2D } from "library/common/primitives";
+import { Point2D } from "library/common/primitives";
 import { Settlement, Unit, UnitConfig, UnitDirection } from "./horde-types";
 import { unitCanBePlacedByRealMap } from "./unit-and-map";
 
@@ -47,7 +47,7 @@ export function spawnUnits(
     let outSpawnedUnits: Unit[] = [];
     for (let position = generator.next(); !position.done && outSpawnedUnits.length < uCount; position = generator.next()) {
         if (unitCanBePlacedByRealMap(uCfg, position.value.X, position.value.Y)) {
-            spawnParams.Cell = createPoint(position.value.X, position.value.Y);
+            spawnParams.Cell = new Point2D(position.value.X, position.value.Y);
             outSpawnedUnits.push(settlement.Units.SpawnUnit(spawnParams));
         }
     }

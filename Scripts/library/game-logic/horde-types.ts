@@ -34,8 +34,8 @@ export type DiplomacyStatus = HordeClassLibrary.World.Simple.DiplomacyStatus;
 // Ландшафт
 export const Tile = HordeClassLibrary.World.Objects.Tiles.Tile;
 export type Tile = HordeClassLibrary.World.Objects.Tiles.Tile;
-export const TileModel = HordeClassLibrary.World.Objects.Tiles.TileModel;
-export type TileModel = HordeClassLibrary.World.Objects.Tiles.TileModel;
+export const TileData = HordeClassLibrary.World.Objects.Tiles.TileData;
+export type TileData = HordeClassLibrary.World.Objects.Tiles.TileData;
 export const KnownTile = HordeClassLibrary.World.Objects.Tiles.KnownTile;
 export type KnownTile = HordeClassLibrary.World.Objects.Tiles.KnownTile;
 
@@ -50,8 +50,8 @@ export type TilePayload = HordeClassLibrary.HordeContent.Configs.Tiles.Stuff.Til
 // Ресурсы
 export const ResourceTile = HordeClassLibrary.World.Objects.Tiles.ResourceTile;
 export type ResourceTile = HordeClassLibrary.World.Objects.Tiles.ResourceTile;
-export const ResourceTileModel = HordeClassLibrary.World.Objects.Tiles.ResourceTileModel;
-export type ResourceTileModel = HordeClassLibrary.World.Objects.Tiles.ResourceTileModel;
+export const ResourceTileData = HordeClassLibrary.World.Objects.Tiles.ResourceTileData;
+export type ResourceTileData = HordeClassLibrary.World.Objects.Tiles.ResourceTileData;
 export const KnownResourceTile = HordeClassLibrary.World.Objects.Tiles.KnownResourceTile;
 export type KnownResourceTile = HordeClassLibrary.World.Objects.Tiles.KnownResourceTile;
 

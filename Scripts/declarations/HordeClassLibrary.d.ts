@@ -16653,7 +16653,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules.Misc {
 
 		// Constructors:
 		constructor(
-			ownerModel: HordeClassLibrary.World.Settlements.Data.SettlementPopulationCensusData
+			ownerData: HordeClassLibrary.World.Settlements.Data.SettlementPopulationCensusData
 		);
 
 		// Properties:
@@ -17210,7 +17210,7 @@ declare namespace HordeClassLibrary.World.Settlements.Modules {
 		// Constructors:
 		constructor(
 			owner: HordeClassLibrary.World.Settlements.Settlement,
-			model: HordeClassLibrary.World.Settlements.Data.SettlementPopulationCensusData
+			data: HordeClassLibrary.World.Settlements.Data.SettlementPopulationCensusData
 		);
 
 		// Fields:

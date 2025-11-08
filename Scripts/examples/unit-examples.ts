@@ -29,13 +29,13 @@ export class Example_UnitWorks extends HordeExampleBase {
         if (false) inspect(unit);
 
         // Здесь хранятся значения переменных юнита
-        let unitDTO = ScriptUtils.GetValue(unit, "Model");
+        let unitDTO = ScriptUtils.GetValue(unit, "Data");
         this.log.info('Здоровье юнита:', unitDTO.Health);
-        this.log.info('Направление юнита:', unitDTO.PositionModel.Direction);
+        this.log.info('Направление юнита:', unitDTO.PositionData.Direction);
 
         // Устанавливаем направление "Вверх"
-        unitDTO.PositionModel.Direction = UnitDirection.Up;
-        this.log.info('Направление юнита после изменения:', unitDTO.PositionModel.Direction);
+        unitDTO.PositionData.Direction = UnitDirection.Up;
+        this.log.info('Направление юнита после изменения:', unitDTO.PositionData.Direction);
 
         // Боевой отдел:
         let battleMind = unit.BattleMind;

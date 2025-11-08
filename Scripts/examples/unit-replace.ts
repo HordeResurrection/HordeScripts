@@ -44,7 +44,7 @@ export class Example_ReplaceUnit extends HordeExampleBase {
         }
 
         // Создание графического эффекта
-        spawnDecoration(ActiveScena.GetRealScena(), HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), newUnit.Position);
+        spawnDecoration(ActiveScena.GetRealScena(), HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), newUnit.PositionInt);
         this.log.info("Выбранный юнит заменен на:", newUnit);
     }
 

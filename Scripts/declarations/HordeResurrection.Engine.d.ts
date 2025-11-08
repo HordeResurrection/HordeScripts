@@ -2257,8 +2257,6 @@ declare namespace HordeResurrection.Engine.Logic.Main {
 
 		static RemoveAll(): void;
 
-		static GetPlayersEnumerator(): System.Collections.Generic.IEnumerator<HordeResurrection.Engine.Logic.Main.Players.Player>;
-
 		static GetPlayer(
 			playerGuid: string
 		): HordeResurrection.Engine.Logic.Main.Players.Player;
