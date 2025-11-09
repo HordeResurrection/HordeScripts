@@ -2177,7 +2177,6 @@ declare namespace HordeResurrection.Engine.Logic.Main {
 		static readonly DefaultSettings: HordeResurrection.Engine.Settings.HordeSettings;
 		static readonly GuiParams: HordeClassLibrary.HordeContent.Configs.Interface.GuiParams;
 		static readonly CameraConfiguration: HordeResurrection.Engine.Logic.Battle.Camera.CameraConfiguration;
-		static readonly UiState: HordeResurrection.Engine.StateMachines.UI.UiState;
 		static readonly CommandLineArgs: HordeResurrection.Engine.Logic.Main.Stuff.CommandLineArgs;
 		static readonly State: HordeResurrection.Engine.Logic.Main.Stuff.GameState;
 		static readonly SystemMessagesColor: HordeResurrection.Basic.Primitives.HordeColor;
@@ -2186,8 +2185,6 @@ declare namespace HordeResurrection.Engine.Logic.Main {
 		static SetCameraConfiguration(
 			cameraConfiguration: HordeResurrection.Engine.Logic.Battle.Camera.CameraConfiguration
 		): void;
-
-		static InitUiStateMachine(): void;
 
 		static InitSettings(): void;
 
@@ -2212,8 +2209,6 @@ declare namespace HordeResurrection.Engine.Logic.Main {
 		): void;
 
 		static GoToExit(): void;
-
-		static UiGoBack(): void;
 
 		static GetUserHordeSettingsFilePath(): string;
 
@@ -3285,89 +3280,6 @@ declare namespace HordeResurrection.Engine.Settings {
 }
 //#endregion
 
-//#region NetworkState
-declare namespace HordeResurrection.Engine.StateMachines.Network.Main {
-	abstract class NetworkState extends System.Enum {
-		/** NetworkState.Inactive = 0 */ static readonly Inactive: NetworkState;
-		/** NetworkState.Activated = 1 */ static readonly Activated: NetworkState;
-		/** NetworkState.PreLobby = 2 */ static readonly PreLobby: NetworkState;
-		/** NetworkState.CreatingLobby = 3 */ static readonly CreatingLobby: NetworkState;
-		/** NetworkState.ConnectingToHost = 4 */ static readonly ConnectingToHost: NetworkState;
-		/** NetworkState.ConnectedToHost = 5 */ static readonly ConnectedToHost: NetworkState;
-		/** NetworkState.HostMode = 6 */ static readonly HostMode: NetworkState;
-		/** NetworkState.GameStarting = 7 */ static readonly GameStarting: NetworkState;
-		/** NetworkState.GameStarted = 8 */ static readonly GameStarted: NetworkState;
-		/** NetworkState.Error = 9 */ static readonly Error: NetworkState;
-	}
-}
-//#endregion
-
-//#region NetworkStateCommand
-declare namespace HordeResurrection.Engine.StateMachines.Network.Main {
-	abstract class NetworkStateCommand extends System.Enum {
-		/** NetworkStateCommand.ActivateNetwork = 0 */ static readonly ActivateNetwork: NetworkStateCommand;
-		/** NetworkStateCommand.StartPreLobby = 1 */ static readonly StartPreLobby: NetworkStateCommand;
-		/** NetworkStateCommand.CreateLobby = 2 */ static readonly CreateLobby: NetworkStateCommand;
-		/** NetworkStateCommand.CancelCreateLobby = 3 */ static readonly CancelCreateLobby: NetworkStateCommand;
-		/** NetworkStateCommand.HostLobby = 4 */ static readonly HostLobby: NetworkStateCommand;
-		/** NetworkStateCommand.TryConnectToLobby = 5 */ static readonly TryConnectToLobby: NetworkStateCommand;
-		/** NetworkStateCommand.CantConnectToLobby = 6 */ static readonly CantConnectToLobby: NetworkStateCommand;
-		/** NetworkStateCommand.CompleteConnectToLobby = 7 */ static readonly CompleteConnectToLobby: NetworkStateCommand;
-		/** NetworkStateCommand.ExitLobby = 8 */ static readonly ExitLobby: NetworkStateCommand;
-		/** NetworkStateCommand.PrepareGameStart = 9 */ static readonly PrepareGameStart: NetworkStateCommand;
-		/** NetworkStateCommand.GameStart = 10 */ static readonly GameStart: NetworkStateCommand;
-		/** NetworkStateCommand.EndGame = 11 */ static readonly EndGame: NetworkStateCommand;
-		/** NetworkStateCommand.DeactivateNetwork = 12 */ static readonly DeactivateNetwork: NetworkStateCommand;
-	}
-}
-//#endregion
-
-//#region UiState
-declare namespace HordeResurrection.Engine.StateMachines.UI {
-	abstract class UiState extends System.Enum {
-		/** UiState.Undefined = 0 */ static readonly Undefined: UiState;
-		/** UiState.Intro = 1 */ static readonly Intro: UiState;
-		/** UiState.StartMenu = 2 */ static readonly StartMenu: UiState;
-		/** UiState.TestMenu = 3 */ static readonly TestMenu: UiState;
-		/** UiState.Loading = 4 */ static readonly Loading: UiState;
-		/** UiState.LocalLobby = 5 */ static readonly LocalLobby: UiState;
-		/** UiState.LanPreLobby = 6 */ static readonly LanPreLobby: UiState;
-		/** UiState.LanCreateLobby = 7 */ static readonly LanCreateLobby: UiState;
-		/** UiState.LanLobby = 8 */ static readonly LanLobby: UiState;
-		/** UiState.InternetPreLobby = 9 */ static readonly InternetPreLobby: UiState;
-		/** UiState.InternetCreateLobby = 10 */ static readonly InternetCreateLobby: UiState;
-		/** UiState.InternetLobby = 11 */ static readonly InternetLobby: UiState;
-		/** UiState.ReplaysLobby = 12 */ static readonly ReplaysLobby: UiState;
-		/** UiState.Settings = 13 */ static readonly Settings: UiState;
-		/** UiState.Authors = 14 */ static readonly Authors: UiState;
-		/** UiState.Battle = 15 */ static readonly Battle: UiState;
-	}
-}
-//#endregion
-
-//#region UiStateCommand
-declare namespace HordeResurrection.Engine.StateMachines.UI {
-	abstract class UiStateCommand extends System.Enum {
-		/** UiStateCommand.Back = 0 */ static readonly Back: UiStateCommand;
-		/** UiStateCommand.StartIntro = 1 */ static readonly StartIntro: UiStateCommand;
-		/** UiStateCommand.GoToStartMenu = 2 */ static readonly GoToStartMenu: UiStateCommand;
-		/** UiStateCommand.OpenTestMenu = 3 */ static readonly OpenTestMenu: UiStateCommand;
-		/** UiStateCommand.GoToLoading = 4 */ static readonly GoToLoading: UiStateCommand;
-		/** UiStateCommand.StartBattle = 5 */ static readonly StartBattle: UiStateCommand;
-		/** UiStateCommand.OpenSettings = 6 */ static readonly OpenSettings: UiStateCommand;
-		/** UiStateCommand.OpenAuthors = 7 */ static readonly OpenAuthors: UiStateCommand;
-		/** UiStateCommand.OpenLocalLobby = 8 */ static readonly OpenLocalLobby: UiStateCommand;
-		/** UiStateCommand.OpenLanPreLobby = 9 */ static readonly OpenLanPreLobby: UiStateCommand;
-		/** UiStateCommand.OpenLanCreateLobby = 10 */ static readonly OpenLanCreateLobby: UiStateCommand;
-		/** UiStateCommand.OpenLanLobby = 11 */ static readonly OpenLanLobby: UiStateCommand;
-		/** UiStateCommand.OpenInternetPreLobby = 12 */ static readonly OpenInternetPreLobby: UiStateCommand;
-		/** UiStateCommand.OpenInternetCreateLobby = 13 */ static readonly OpenInternetCreateLobby: UiStateCommand;
-		/** UiStateCommand.OpenInternetLobby = 14 */ static readonly OpenInternetLobby: UiStateCommand;
-		/** UiStateCommand.OpenReplaysLobby = 15 */ static readonly OpenReplaysLobby: UiStateCommand;
-	}
-}
-//#endregion
-
 //#region Types shorthand
 // ----------------------------------------------------- //
 // ---------========= Types shorthand =========--------- //
@@ -3689,13 +3601,5 @@ export const TerritoryVisualizatorSettings = HordeResurrection.Engine.Settings.T
 export type TerritoryVisualizatorSettings = HordeResurrection.Engine.Settings.TerritoryVisualizatorSettings;
 export const FillMode = HordeResurrection.Engine.Settings.FillMode;
 export type FillMode = HordeResurrection.Engine.Settings.FillMode;
-export const NetworkState = HordeResurrection.Engine.StateMachines.Network.Main.NetworkState;
-export type NetworkState = HordeResurrection.Engine.StateMachines.Network.Main.NetworkState;
-export const NetworkStateCommand = HordeResurrection.Engine.StateMachines.Network.Main.NetworkStateCommand;
-export type NetworkStateCommand = HordeResurrection.Engine.StateMachines.Network.Main.NetworkStateCommand;
-export const UiState = HordeResurrection.Engine.StateMachines.UI.UiState;
-export type UiState = HordeResurrection.Engine.StateMachines.UI.UiState;
-export const UiStateCommand = HordeResurrection.Engine.StateMachines.UI.UiStateCommand;
-export type UiStateCommand = HordeResurrection.Engine.StateMachines.UI.UiStateCommand;
 */
 //#endregion
