@@ -9,7 +9,7 @@ export class Example_PlayerSelectedSquad extends HordeExampleBase {
 
     public constructor() {
         super("Player selected squad");
-        this.workPlayer = Players[0].GetRealPlayer();
+        this.workPlayer = ActivePlayer;
     }
 
     public onFirstRun() {
