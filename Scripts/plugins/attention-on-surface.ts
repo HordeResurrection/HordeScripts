@@ -3,7 +3,7 @@ import { Scena, VisualEffectConfig, VisualEffectFogOfWarMode, WorldConstants } f
 import * as primitives from "library/common/primitives";
 import * as decorations from "library/game-logic/decoration-spawn";
 
-type AttentionEventArgs = HordeResurrection.Engine.Services.Battle.AttentionEventArgs;
+type AttentionEventArgs = HordeResurrection.Engine.Services.AttentionEventArgs;
 
 
 /**
@@ -63,8 +63,7 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
                 cell: args.Cell
             };
             
-            let activePlayer = HordeResurrection.Engine.Logic.Main.PlayersController.ActivePlayer;
-            if (!args.RecepientSettlements.Contains(activePlayer.GetWorkUISettlement())) {
+            if (!args.RecepientSettlements.Contains(ActivePlayer.GetWorkUISettlement())) {
                 return;
             }
 

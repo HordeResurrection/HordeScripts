@@ -44,15 +44,15 @@ export class Example_ReplaceUnit extends HordeExampleBase {
         }
 
         // Создание графического эффекта
-        spawnDecoration(ActiveScena.GetRealScena(), HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), newUnit.PositionInt);
+        spawnDecoration(ActiveScena, HordeContentApi.GetVisualEffectConfig("#VisualEffectConfig_LittleDust"), newUnit.PositionInt);
         this.log.info("Выбранный юнит заменен на:", newUnit);
     }
 
     private getUnitToReplace() {
         // - Варианты:
         return getOrCreateTestUnit(this);
-        //return ActiveScena.GetRealScena().Settlements.GetByUid("0").Units.GetCastleOrAnyUnit();
-        //return Players[0].GetRealPlayer().SelectedSquadVirtual.GetFirstUnit();
+        //return ActiveScena.Settlements.GetByUid("0").Units.GetCastleOrAnyUnit();
+        //return ActivePlayer.SelectedSquadVirtual.GetFirstUnit();
     }
 
     private getTargetConfig() {

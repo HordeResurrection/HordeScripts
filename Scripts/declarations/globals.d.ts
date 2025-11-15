@@ -11,6 +11,11 @@
 declare const ActiveScena: HordeClassLibrary.World.ScenaComponents.Scena;
 
 /**
+ * Игрок на этом хосте.
+ */
+declare const ActivePlayer: HordeResurrection.Engine.Battle.Players.Player;
+
+/**
  * Массив игроков-участников текущего сражения.
  */
 declare const Players: HordeResurrection.Engine.Battle.Players.Player[];

@@ -1,12 +1,13 @@
 import { Point2D } from "library/common/primitives";
 import { ARequest, MasterMind, ProduceRequest, ProduceRequestParameters, ProductionDepartment } from "library/mastermind/mastermind-types";
 import HordeExampleBase from "./base-example";
+import { Player } from "library/game-logic/horde-types";
 
 /**
  * Пример работы с MasterMind
  */
 export class Example_MasterMindRequest extends HordeExampleBase {
-    workPlayerNum: number;
+    workPlayer: Player;
     printRequestsPeriod: number;
     masterMind: MasterMind | null;
     productionDepartament: ProductionDepartment | null;
@@ -14,7 +15,10 @@ export class Example_MasterMindRequest extends HordeExampleBase {
     public constructor() {
         super("Request for MasterMind");
 
-        this.workPlayerNum = Math.min(1, Players.length - 1);  // Если есть бот, то задачи будут отправлены на него
+        this.workPlayer = ActivePlayer;
+        if (Players.length > 1)
+            this.workPlayer = Players[1];  // Если есть бот, то задачи будут отправлены на него
+
         this.printRequestsPeriod = 1000;
         this.masterMind = null;
         this.productionDepartament = null;
@@ -23,8 +27,7 @@ export class Example_MasterMindRequest extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
-        let workPlayer = Players[this.workPlayerNum].GetRealPlayer();
-        this.masterMind = workPlayer.MasterMind;
+        this.masterMind = this.workPlayer.MasterMind;
         if (!this.masterMind) {
             this.log.info('Выбранный игрок не управляется MasterMind.');
             return;
@@ -32,7 +35,7 @@ export class Example_MasterMindRequest extends HordeExampleBase {
 
         // Активация MasterMind, если отключен
         if (!this.masterMind.IsWorkMode) {
-            this.log.info('Включение режима работы MasterMind для', workPlayer.Nickname);
+            this.log.info('Включение режима работы MasterMind для', this.workPlayer.Nickname);
             this.masterMind.IsWorkMode = true;
         }
 
@@ -108,8 +111,7 @@ export class Example_MasterMindRequest extends HordeExampleBase {
         produceRequestParameters.ProductEntranceCheckRadius = 2;        // Радиус проверяемого региона вокруг клетки входа (для зданий-казарм и складов)
         produceRequestParameters.ReservationIgnoreLevel = 0;            // Уровень баллов резервирования, которые будут проигнорированы при выбре места строительства
 
-        let workPlayer = Players[this.workPlayerNum].GetRealPlayer();
-        let producer = workPlayer.GetRealSettlement().Units.GetById(205);
+        let producer = this.workPlayer.GetRealSettlement().Units.GetById(205);
         produceRequestParameters.Producer = producer;                   // Так можно задать юнита-исполнителя (если null, то будет выбран свободный подходящий производитель)
 
         // Добавление запроса

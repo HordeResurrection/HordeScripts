@@ -1966,8 +1966,6 @@ declare namespace HordeResurrection.Engine.Battle.Players {
 
 		FullDeinitialize(): void;
 
-		RemoveSettlement(): void;
-
 		GetRealSettlement(): HordeClassLibrary.World.Settlements.Settlement;
 
 		GetWorkUISettlement(): HordeClassLibrary.World.Settlements.Settlement;
@@ -2012,11 +2010,6 @@ declare namespace HordeResurrection.Engine.Battle.Players {
 			workUnitConfig: HordeClassLibrary.HordeContent.Configs.Units.UnitConfig,
 			checkDistances: boolean
 		): HordeClassLibrary.World.Settlements.Territory.TerritoryPlanner;
-
-		InitMasterMind(
-			character?: HordeClassLibrary.HordeContent.Configs.MasterMind.MindCharacterConfig | null /* = null */,
-			name?: string /* = null */
-		): void;
 
 		ActivateMasterMind(): void;
 

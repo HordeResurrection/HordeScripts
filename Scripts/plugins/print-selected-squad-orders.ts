@@ -14,15 +14,13 @@ export class PrintSelectedSquadOrdersPlugin extends HordePluginBase {
 
 
     public onFirstRun() {
-        let workPlayer = HordeResurrection.Engine.Logic.Main.PlayersController.ActivePlayer;
-
         if (this.globalStorage.squadChangedHandler) {
             this.globalStorage.squadChangedHandler.disconnect();
         }
 
         // Обработчик события изменения UI-отряда игрока
         // Подробнее см. в "Example_PlayerSelectedSquad"
-        let squadUISelector = ScriptUtils.GetValue(workPlayer, "SquadUISelector") as HordeResurrection.Engine.Logic.Main.Players.Input.PlayerSquadSelector;
+        let squadUISelector = ScriptUtils.GetValue(ActivePlayer, "SquadUISelector") as HordeResurrection.Engine.Battle.Players.Input.PlayerSquadSelector;
         this.globalStorage.squadChangedHandler = squadUISelector.SquadChanged.connect((sender, args) => {
             try {
                 if (!args) {
