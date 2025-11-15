@@ -27,7 +27,7 @@ export class Example_PlayerSelectedSquad extends HordeExampleBase {
 
         // Пример работы с UI отрядом игрока
         // Здесь при каждом выделении отряда будет отображаться информация в лог.
-        let squadUISelector = ScriptUtils.GetValue(this.workPlayer, "SquadUISelector") as HordeResurrection.Engine.Logic.Main.Players.Input.PlayerSquadSelector;
+        let squadUISelector = ScriptUtils.GetValue(this.workPlayer, "SquadUISelector") as HordeResurrection.Engine.Battle.Players.Input.PlayerSquadSelector;
         this.globalStorage.squadChangedHandler = squadUISelector.SquadChanged.connect((sender, args) => {
             if (!args) {
                 return;

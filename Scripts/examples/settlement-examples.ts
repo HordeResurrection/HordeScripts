@@ -15,29 +15,28 @@ export class Example_SettlementWorks extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
-        let realPlayer = Players[0].GetRealPlayer();
-        let realSettlement = realPlayer.GetRealSettlement();
+        let settlement = ActiveScena.Settlements.GetByUid("0");
 
         // Дипломатия
-        let diplomacy = realSettlement.Diplomacy;
-        let otherSettlement = Players[1].GetRealPlayer().GetRealSettlement();
+        let diplomacy = settlement.Diplomacy;
+        let otherSettlement = ActiveScena.Settlements.GetByUid("1");
         if (diplomacy.IsWarStatus(otherSettlement)) {
-            this.log.info(`${realSettlement.LeaderName} ВОЮЕТ с ${otherSettlement.LeaderName}!`);
+            this.log.info(`${settlement.LeaderName} ВОЮЕТ с ${otherSettlement.LeaderName}!`);
         } else {
-            this.log.info(`${realSettlement.LeaderName} НЕ воюет с ${otherSettlement.LeaderName}!`);
+            this.log.info(`${settlement.LeaderName} НЕ воюет с ${otherSettlement.LeaderName}!`);
         }
 
         // Модуль вИдения
         // Примеры см. в "Example_ScenaWorks"
-        // let vision = realSettlement.Vision;
+        // let vision = settlement.Vision;
 
         // Юниты поселения
-        let units = realSettlement.Units;
+        let units = settlement.Units;
         this.log.info(`Количество юнитов:`, units.Count);
         // Здесь можно получать юнитов только по идентификатору, а по координатам см. через сцену.
         let unit = units.GetById(0);
         if (unit) {
-            this.log.info(`У ${realPlayer.Nickname} обнаружен юнит с id=0: ${unit}`);
+            this.log.info(`У '${settlement.TownName}' обнаружен юнит с id=0: ${unit}`);
         }
 
         // Перечисление юнитов этого поселения
@@ -49,7 +48,7 @@ export class Example_SettlementWorks extends HordeExampleBase {
         enumerator.Dispose();
 
         // Модуль победы/поражения
-        let existence = realSettlement.Existence;
+        let existence = settlement.Existence;
 
         // Объявить поражение
         if (false) { existence.ForceTotalDefeat(); }  // Убрать false и тогда этому поселению будет засчитано поражение
@@ -127,12 +126,11 @@ export class Example_SettlementUnitsInfo extends HordeExampleBase {
     public onFirstRun() {
         this.logMessageOnRun();
 
-        let realPlayer = Players[0].GetRealPlayer();
-        let realSettlement = realPlayer.GetRealSettlement();
+        let settlement = ActiveScena.Settlements.GetByUid("0");
         let that = this;
 
         // Юниты разных типов
-        let professionCenter = realSettlement.Units.Professions;
+        let professionCenter = settlement.Units.Professions;
         this.log.info('Выбор юнита по типу:');
         let logUnit = function (str: string, u: Unit) { that.log.info(str + ':', u ? u : '<None>') };
         logUnit('- Первый в MainBuildings', professionCenter.MainBuildings.First());
@@ -152,7 +150,7 @@ export class Example_SettlementUnitsInfo extends HordeExampleBase {
         logUnit('- Первый в Unarmed', professionCenter.Unarmed.First());
 
         // Информация о производстве
-        let settlementProduction = realSettlement.Production;
+        let settlementProduction = settlement.Production;
         let catapultCfg = HordeContentApi.GetUnitConfig("#UnitConfig_Slavyane_Catapult");
         this.log.info('В данный момент катапульт имеется:', professionCenter.CountUnitsOfType(catapultCfg));
         this.log.info('В данный момент катапульт производится:', settlementProduction.CountProducingNowUnits(catapultCfg));

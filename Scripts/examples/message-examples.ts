@@ -1,7 +1,6 @@
 import { broadcastMessage } from "library/common/messages";
 import { createHordeColor, Point2D } from "library/common/primitives";
 import HordeExampleBase from "./base-example";
-import { BattleController } from "library/game-logic/horde-types";
 
 
 // ===================================================
@@ -58,15 +57,15 @@ export class Example_SendBotMessage extends HordeExampleBase {
             if (((gameTickNum + player.Slot * 100) % 1000) == 0) {
 
                 // Отправка чат-сообщения всем игрокам
-                BattleController.SendBotChatMessage(player, `Hello to all (P-${player.Slot})`, HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets.All);
+                BattleChat.SendBotChatMessage(player, `Hello to all (P-${player.Slot})`, HordeResurrection.Engine.Battle.Players.ChatTargets.All);
 
                 // Отправка чат-сообщения союзникам
-                BattleController.SendBotChatMessage(player, `Hello allies (P-${player.Slot})`, HordeResurrection.Engine.Logic.Battle.Stuff.ChatTargets.Allies);
+                BattleChat.SendBotChatMessage(player, `Hello allies (P-${player.Slot})`, HordeResurrection.Engine.Battle.Players.ChatTargets.Allies);
 
                 // Отправка метки на карте
                 let rnd = ActiveScena.Context.Randomizer;
                 let attentionCell = new Point2D(player.Slot + 10, rnd.RandomNumber(0, player.Slot) + 10);
-                BattleController.SendBotAttention(player, attentionCell);
+                BattleChat.SendBotAttention(player, attentionCell);
             }
         }
     }
@@ -95,7 +94,7 @@ export class Example_HookSentChatMessages extends HordeExampleBase {
 
         // Устанавливаем обработчик сообщений
         let that = this;
-        this.globalStorage.currentHandler = BattleController.ChatMessageSent.connect(function (sender, args) {
+        this.globalStorage.currentHandler = BattleChat.ChatMessageSent.connect(function (sender, args) {
             try {
                 if (!args) {
                     return;
@@ -135,7 +134,7 @@ export class Example_HookReceivedChatMessages extends HordeExampleBase {
 
         // Устанавливаем обработчик сообщений
         let that = this;
-        this.globalStorage.currentHandler = BattleController.ChatMessageReceived.connect(function (sender, args) {
+        this.globalStorage.currentHandler = BattleChat.ChatMessageReceived.connect(function (sender, args) {
             try {
                 if (!args) {
                     return;

@@ -2,8 +2,6 @@
 // ===================================================
 // --- Глобальные переменные
 
-export const BattleController = HordeResurrection.Engine.Logic.Battle.BattleController;
-export type BattleController = HordeResurrection.Engine.Logic.Battle.BattleController;
 export const AllContent = HordeClassLibrary.HordeContent.AllContent;
 export type AllContent = HordeClassLibrary.HordeContent.AllContent;
 export const WorldConstants = HordeClassLibrary.World.Const.WorldConstants;
@@ -375,8 +373,8 @@ export type GeometryCanvas = HordeResurrection.Game.Render.GeometryCanvas.Geomet
 // ===================================================
 // --- Player
 
-export const Player = HordeResurrection.Engine.Logic.Main.Players.Player;
-export type Player = HordeResurrection.Engine.Logic.Main.Players.Player;
+export const Player = HordeResurrection.Engine.Battle.Players.Player;
+export type Player = HordeResurrection.Engine.Battle.Players.Player;
 
 
 // ===================================================

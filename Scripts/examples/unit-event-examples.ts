@@ -1,4 +1,4 @@
-import { BaseUnitEventArgs, BattleController, TakeDamageEventArgs, Unit } from "library/game-logic/horde-types";
+import { BaseUnitEventArgs, TakeDamageEventArgs, Unit } from "library/game-logic/horde-types";
 import HordeExampleBase from "./base-example";
 import { getOrCreateTestUnit } from "./unit-example-utils";
 
@@ -90,7 +90,7 @@ export class Example_UnitEnumerateEvents extends HordeExampleBase {
 
             // Перечисление событий за такт
             ForEach(lastFrameEvents, (e: BaseUnitEventArgs) => {
-                this.log.info('Tick:' + BattleController.GameTimer.GameFramesCounter, '-', e);
+                this.log.info('Tick:' + Battle.GameTimer.GameFramesCounter, '-', e);
 
                 // Проверка убийства юнита
                 if (unit.Health <= 0) {

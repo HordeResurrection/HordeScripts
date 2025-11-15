@@ -2,29 +2,29 @@ import { Point2D } from "library/common/primitives";
 import { ListT } from "library/dotnet/dotnet-types";
 import { Player, UnitCommand } from "library/game-logic/horde-types";
 
-export const VirtualSelectUnitsMode = HordeResurrection.Engine.Logic.Battle.InputSystem.Enums.VirtualSelectUnitsMode;
-export type VirtualSelectUnitsMode = HordeResurrection.Engine.Logic.Battle.InputSystem.Enums.VirtualSelectUnitsMode;
+export const VirtualSelectUnitsMode = HordeResurrection.Engine.Battle.InputSystem.Enums.VirtualSelectUnitsMode;
+export type VirtualSelectUnitsMode = HordeResurrection.Engine.Battle.InputSystem.Enums.VirtualSelectUnitsMode;
 export const AssignOrderMode = HordeClassLibrary.UnitComponents.OrdersSystem.AssignOrderMode;
 export type AssignOrderMode = HordeClassLibrary.UnitComponents.OrdersSystem.AssignOrderMode;
 const UnitIdLabel = HordeClassLibrary.World.Objects.Units.UnitIdLabel;
 type UnitIdLabel = HordeClassLibrary.World.Objects.Units.UnitIdLabel;
 
-const AVirtualInputItem = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.AVirtualInputItem;
-type AVirtualInputItem = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.AVirtualInputItem;
-const VirtualSelectUnits = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSelectUnits;
-type VirtualSelectUnits = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSelectUnits;
-const VirtualSelectUnitsById = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSelectUnitsById;
-type VirtualSelectUnitsById = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSelectUnitsById;
-const VirtualSmartMouseClick = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSmartMouseClick;
-type VirtualSmartMouseClick = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualSmartMouseClick;
-const VirtualPointBasedCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualPointBasedCommand;
-type VirtualPointBasedCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualPointBasedCommand;
-const VirtualOneClickCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualOneClickCommand;
-type VirtualOneClickCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualOneClickCommand;
-const VirtualProduceBuildingCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualProduceBuildingCommand;
-type VirtualProduceBuildingCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualProduceBuildingCommand;
-const VirtualProduceUnitCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualProduceUnitCommand;
-type VirtualProduceUnitCommand = HordeResurrection.Engine.Logic.Battle.InputSystem.InputItems.VirtualProduceUnitCommand;
+const AVirtualInputItem = HordeResurrection.Engine.Battle.InputSystem.InputItems.AVirtualInputItem;
+type AVirtualInputItem = HordeResurrection.Engine.Battle.InputSystem.InputItems.AVirtualInputItem;
+const VirtualSelectUnits = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualSelectUnits;
+type VirtualSelectUnits = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualSelectUnits;
+const VirtualSelectUnitsById = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualSelectUnitsById;
+type VirtualSelectUnitsById = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualSelectUnitsById;
+const VirtualSmartMouseClick = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualSmartMouseClick;
+type VirtualSmartMouseClick = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualSmartMouseClick;
+const VirtualPointBasedCommand = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualPointBasedCommand;
+type VirtualPointBasedCommand = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualPointBasedCommand;
+const VirtualOneClickCommand = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualOneClickCommand;
+type VirtualOneClickCommand = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualOneClickCommand;
+const VirtualProduceBuildingCommand = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualProduceBuildingCommand;
+type VirtualProduceBuildingCommand = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualProduceBuildingCommand;
+const VirtualProduceUnitCommand = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualProduceUnitCommand;
+type VirtualProduceUnitCommand = HordeResurrection.Engine.Battle.InputSystem.InputItems.VirtualProduceUnitCommand;
 
 
 export class PlayerVirtualInput {

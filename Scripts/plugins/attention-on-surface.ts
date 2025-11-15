@@ -1,9 +1,9 @@
 import HordePluginBase from "./base-plugin";
-import { BattleController, Scena, VisualEffectConfig, VisualEffectFogOfWarMode, WorldConstants } from "library/game-logic/horde-types";
+import { Scena, VisualEffectConfig, VisualEffectFogOfWarMode, WorldConstants } from "library/game-logic/horde-types";
 import * as primitives from "library/common/primitives";
 import * as decorations from "library/game-logic/decoration-spawn";
 
-type AttentionEventArgs = HordeResurrection.Engine.Logic.Battle.BattleController.AttentionEventArgs;
+type AttentionEventArgs = HordeResurrection.Engine.Services.Battle.AttentionEventArgs;
 
 
 /**
@@ -35,7 +35,7 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
         }
 
         let that = this;
-        let handler = BattleController.AttentionSent.connect((sender, args) => that._attentionHandler(sender, args!));
+        let handler = BattleChat.AttentionSent.connect((sender, args) => that._attentionHandler(sender, args!));
         this.globalStorage.attentionClickHandler = handler;
     }
 
@@ -48,7 +48,7 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
         }
 
         let that = this;
-        let handler = BattleController.AttentionReceived.connect((sender, args) => that._attentionHandler(sender, args!));
+        let handler = BattleChat.AttentionReceived.connect((sender, args) => that._attentionHandler(sender, args!));
         this.globalStorage.attentionReceivedHandler = handler;
     }
 
@@ -58,7 +58,7 @@ export class AttentionOnSurfacePlugin extends HordePluginBase {
     private _attentionHandler(sender: any, args: AttentionEventArgs) {
         try {
             let info: AttentionClickInfo = {
-                tick: BattleController.GameTimer.GameFramesCounter,
+                tick: Battle.GameTimer.GameFramesCounter,
                 player: args.InitiatorPlayer,
                 cell: args.Cell
             };

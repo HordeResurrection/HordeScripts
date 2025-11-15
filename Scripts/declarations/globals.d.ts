@@ -13,7 +13,17 @@ declare const ActiveScena: HordeClassLibrary.World.ScenaComponents.Scena;
 /**
  * Массив игроков-участников текущего сражения.
  */
-declare const Players: HordeResurrection.Engine.Logic.Main.Players.Player[];
+declare const Players: HordeResurrection.Engine.Battle.Players.Player[];
+
+/**
+ * Различные объекты и функции связанные с обработкой сражения.
+ */
+declare const Battle: HordeResurrection.Engine.Battle.Script.ScriptBattleObjects;
+
+/**
+ * Предоставляет доступ к чату.
+ */
+declare const BattleChat: HordeResurrection.Engine.Battle.Script.ScriptBattleChat;
 
 /**
  * Здесь хранятся обработчики юнитов.

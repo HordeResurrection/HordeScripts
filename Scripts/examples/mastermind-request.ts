@@ -14,7 +14,7 @@ export class Example_MasterMindRequest extends HordeExampleBase {
     public constructor() {
         super("Request for MasterMind");
 
-        this.workPlayerNum = 1;
+        this.workPlayerNum = Math.min(1, Players.length - 1);  // Если есть бот, то задачи будут отправлены на него
         this.printRequestsPeriod = 1000;
         this.masterMind = null;
         this.productionDepartament = null;

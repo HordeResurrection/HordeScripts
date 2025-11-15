@@ -18273,6 +18273,7 @@ declare namespace HordeClassLibrary.World.Simple {
 		Color: HordeResurrection.Basic.Primitives.HordeColor;
 		Sound: HordeClassLibrary.HordeContent.Configs.ViewResourceCatalogs.Audio.SoundsCatalog;
 		SoundSection: string;
+		NoLog: boolean;
 
 		// Methods:
 		static CreateWithNoSound(
